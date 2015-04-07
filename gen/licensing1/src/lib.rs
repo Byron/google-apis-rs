@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *0.1.3+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *licensing* crate version *0.1.4+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -306,7 +306,7 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
         Licensing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -316,7 +316,7 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -348,20 +348,20 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignment {
     /// Name of the sku of the product.
-    #[serde(alias="skuId")]
+    #[serde(rename="skuId")]
     pub sku_id: Option<String>,
     /// Identifies the resource as a LicenseAssignment.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etags: Option<String>,
     /// Email id of the user.
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: Option<String>,
     /// Link to this page.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the product.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
 
@@ -382,7 +382,7 @@ impl ResponseResult for LicenseAssignment {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct LicenseAssignmentInsert {
     /// Email id of the user
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: Option<String>,
 }
 
@@ -402,7 +402,7 @@ impl RequestValue for LicenseAssignmentInsert {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LicenseAssignmentList {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The LicenseAssignments in this page of results.
     pub items: Vec<LicenseAssignment>,

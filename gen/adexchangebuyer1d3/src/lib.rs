@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.3+20150323*, where *20150323* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.4+20150323*, where *20150323* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -323,7 +323,7 @@ impl<'a, C, NC, A> AdExchangeBuyer<C, NC, A>
         AdExchangeBuyer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -351,7 +351,7 @@ impl<'a, C, NC, A> AdExchangeBuyer<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -374,7 +374,7 @@ pub struct PretargetingConfigExcludedPlacements {
     /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
     pub token: String,
     /// The type of the placement.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -415,24 +415,24 @@ pub struct Account {
     /// Resource type.
     pub kind: Option<String>,
     /// The sum of all bidderLocation.maximumQps values cannot exceed this. Please contact your technical account manager if you need to change this.
-    #[serde(alias="maximumTotalQps")]
+    #[serde(rename="maximumTotalQps")]
     pub maximum_total_qps: Option<i32>,
     /// The maximum number of active creatives that an account can have, where a creative is active if it was inserted or bid with in the last 30 days. Please contact your technical account manager if you need to change this.
-    #[serde(alias="maximumActiveCreatives")]
+    #[serde(rename="maximumActiveCreatives")]
     pub maximum_active_creatives: Option<i32>,
     /// Your bidder locations that have distinct URLs.
-    #[serde(alias="bidderLocation")]
+    #[serde(rename="bidderLocation")]
     pub bidder_location: Option<Vec<AccountBidderLocation>>,
     /// The nid parameter value used in cookie match requests. Please contact your technical account manager if you need to change this.
-    #[serde(alias="cookieMatchingNid")]
+    #[serde(rename="cookieMatchingNid")]
     pub cookie_matching_nid: Option<String>,
     /// The number of creatives that this account inserted or bid with in the last 30 days.
-    #[serde(alias="numberActiveCreatives")]
+    #[serde(rename="numberActiveCreatives")]
     pub number_active_creatives: Option<i32>,
     /// Account id.
     pub id: Option<i32>,
     /// The base URL used in cookie match requests.
-    #[serde(alias="cookieMatchingUrl")]
+    #[serde(rename="cookieMatchingUrl")]
     pub cookie_matching_url: Option<String>,
 }
 
@@ -491,13 +491,13 @@ pub struct BillingInfo {
     /// Resource type.
     pub kind: String,
     /// A list of adgroup IDs associated with this particular account. These IDs may show up as part of a realtime bidding BidRequest, which indicates a bid request for this account.
-    #[serde(alias="billingId")]
+    #[serde(rename="billingId")]
     pub billing_id: Vec<String>,
     /// Account id.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: i32,
     /// Account name.
-    #[serde(alias="accountName")]
+    #[serde(rename="accountName")]
     pub account_name: String,
 }
 
@@ -518,7 +518,7 @@ pub struct DirectDealsList {
     /// Resource type.
     pub kind: String,
     /// A list of direct deals relevant for your account.
-    #[serde(alias="directDeals")]
+    #[serde(rename="directDeals")]
     pub direct_deals: Vec<DirectDeal>,
 }
 
@@ -557,7 +557,7 @@ impl ResponseResult for AccountsList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativesList {
     /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of creatives.
     pub items: Vec<Creative>,
@@ -582,20 +582,20 @@ impl ResponseResult for CreativesList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Budget {
     /// The billing id to determine which adgroup to provide budget information for. This is required for get and update requests.
-    #[serde(alias="billingId")]
+    #[serde(rename="billingId")]
     pub billing_id: Option<String>,
     /// The kind of the resource, i.e. "adexchangebuyer#budget".
     pub kind: Option<String>,
     /// The budget amount to apply for the billingId provided. This is required for update requests.
-    #[serde(alias="budgetAmount")]
+    #[serde(rename="budgetAmount")]
     pub budget_amount: Option<String>,
     /// The currency code for the buyer. This cannot be altered here.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
     /// The unique id that describes this item.
     pub id: Option<String>,
     /// The id of the account. This is required for get and update requests.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -617,58 +617,58 @@ impl ResponseResult for Budget {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Creative {
     /// Detected product categories, if any. Read-only. This field should not be set in requests.
-    #[serde(alias="productCategories")]
+    #[serde(rename="productCategories")]
     pub product_categories: Option<Vec<i32>>,
     /// Creative serving status. Read-only. This field should not be set in requests.
     pub status: Option<String>,
     /// The agency id for this creative.
-    #[serde(alias="agencyId")]
+    #[serde(rename="agencyId")]
     pub agency_id: Option<String>,
     /// All attributes for the ads that may be shown from this snippet.
     pub attribute: Option<Vec<i32>>,
     /// Ad height.
     pub height: Option<i32>,
     /// The name of the company being advertised in the creative.
-    #[serde(alias="advertiserName")]
+    #[serde(rename="advertiserName")]
     pub advertiser_name: Option<String>,
     /// The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.
-    #[serde(alias="HTMLSnippet")]
+    #[serde(rename="HTMLSnippet")]
     pub html_snippet: Option<String>,
     /// A buyer-specific id identifying the creative in this ad.
-    #[serde(alias="buyerCreativeId")]
+    #[serde(rename="buyerCreativeId")]
     pub buyer_creative_id: Option<String>,
     /// Account id.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<i32>,
     /// Detected advertiser id, if any. Read-only. This field should not be set in requests.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<Vec<String>>,
     /// Resource type.
     pub kind: Option<String>,
     /// The url to fetch a video ad. If set, HTMLSnippet should not be set.
-    #[serde(alias="videoURL")]
+    #[serde(rename="videoURL")]
     pub video_url: Option<String>,
     /// The set of destination urls for the snippet.
-    #[serde(alias="clickThroughUrl")]
+    #[serde(rename="clickThroughUrl")]
     pub click_through_url: Option<Vec<String>>,
     /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
     pub corrections: Option<Vec<CreativeCorrections>>,
     /// Ad width.
     pub width: Option<i32>,
     /// All restricted categories for the ads that may be shown from this snippet.
-    #[serde(alias="restrictedCategories")]
+    #[serde(rename="restrictedCategories")]
     pub restricted_categories: Option<Vec<i32>>,
     /// All vendor types for the ads that may be shown from this snippet.
-    #[serde(alias="vendorType")]
+    #[serde(rename="vendorType")]
     pub vendor_type: Option<Vec<i32>>,
     /// The filtering reasons for the creative. If this feature is not enabled, please ask your technical account manager. Read-only. This field should not be set in requests.
-    #[serde(alias="filteringReasons")]
+    #[serde(rename="filteringReasons")]
     pub filtering_reasons: Option<CreativeFilteringReasons>,
     /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
-    #[serde(alias="disapprovalReasons")]
+    #[serde(rename="disapprovalReasons")]
     pub disapproval_reasons: Option<Vec<CreativeDisapprovalReasons>>,
     /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.
-    #[serde(alias="sensitiveCategories")]
+    #[serde(rename="sensitiveCategories")]
     pub sensitive_categories: Option<Vec<i32>>,
 }
 
@@ -691,7 +691,7 @@ pub struct PerformanceReportList {
     /// Resource type.
     pub kind: String,
     /// A list of performance reports relevant for the account.
-    #[serde(alias="performanceReport")]
+    #[serde(rename="performanceReport")]
     pub performance_report: Vec<PerformanceReport>,
 }
 
@@ -705,10 +705,10 @@ impl ResponseResult for PerformanceReportList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFilteringReasonsReasons {
     /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
-    #[serde(alias="filteringCount")]
+    #[serde(rename="filteringCount")]
     pub filtering_count: i64,
     /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
-    #[serde(alias="filteringStatus")]
+    #[serde(rename="filteringStatus")]
     pub filtering_status: i32,
 }
 
@@ -725,7 +725,7 @@ pub struct PretargetingConfigPlacements {
     /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
     pub token: String,
     /// The type of the placement.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -756,49 +756,49 @@ impl Part for PretargetingConfigDimensions {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PerformanceReport {
     /// Average QPS for cookie matcher operations.
-    #[serde(alias="cookieMatcherStatusRate")]
+    #[serde(rename="cookieMatcherStatusRate")]
     pub cookie_matcher_status_rate: Vec<String>,
     /// Rate of various prefiltering statuses per match. Please refer to the callout-status-codes.txt file for different statuses.
-    #[serde(alias="calloutStatusRate")]
+    #[serde(rename="calloutStatusRate")]
     pub callout_status_rate: Vec<String>,
     /// Average QPS for hosted match operations.
-    #[serde(alias="hostedMatchStatusRate")]
+    #[serde(rename="hostedMatchStatusRate")]
     pub hosted_match_status_rate: Vec<String>,
     /// The unix timestamp of the starting time of this performance data.
     pub timestamp: String,
     /// The 50th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
-    #[serde(alias="latency50thPercentile")]
+    #[serde(rename="latency50thPercentile")]
     pub latency50th_percentile: f64,
     /// The 85th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
-    #[serde(alias="latency85thPercentile")]
+    #[serde(rename="latency85thPercentile")]
     pub latency85th_percentile: f64,
     /// Average QPS for pixel match responses from clients.
-    #[serde(alias="pixelMatchResponses")]
+    #[serde(rename="pixelMatchResponses")]
     pub pixel_match_responses: f64,
     /// Rate of ads with a given status. Please refer to the creative-status-codes.txt file for different statuses.
-    #[serde(alias="creativeStatusRate")]
+    #[serde(rename="creativeStatusRate")]
     pub creative_status_rate: Vec<String>,
     /// The 95th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
-    #[serde(alias="latency95thPercentile")]
+    #[serde(rename="latency95thPercentile")]
     pub latency95th_percentile: f64,
     /// Rate of various quota account statuses per quota check.
-    #[serde(alias="noQuotaInRegion")]
+    #[serde(rename="noQuotaInRegion")]
     pub no_quota_in_region: f64,
     /// Resource type.
     pub kind: String,
     /// The trading location of this data.
     pub region: String,
     /// The configured quota limits for this account.
-    #[serde(alias="quotaConfiguredLimit")]
+    #[serde(rename="quotaConfiguredLimit")]
     pub quota_configured_limit: f64,
     /// Rate of various quota account statuses per quota check.
-    #[serde(alias="outOfQuota")]
+    #[serde(rename="outOfQuota")]
     pub out_of_quota: f64,
     /// The throttled quota limits for this account.
-    #[serde(alias="quotaThrottledLimit")]
+    #[serde(rename="quotaThrottledLimit")]
     pub quota_throttled_limit: f64,
     /// Average QPS for pixel match requests from clients.
-    #[serde(alias="pixelMatchRequests")]
+    #[serde(rename="pixelMatchRequests")]
     pub pixel_match_requests: f64,
 }
 
@@ -860,30 +860,30 @@ pub struct DirectDeal {
     /// Deal name.
     pub name: String,
     /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// The account id of the buyer this deal is for.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: i32,
     /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
-    #[serde(alias="fixedCpm")]
+    #[serde(rename="fixedCpm")]
     pub fixed_cpm: String,
     /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.
-    #[serde(alias="publisherBlocksOverriden")]
+    #[serde(rename="publisherBlocksOverriden")]
     pub publisher_blocks_overriden: bool,
     /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// The name of the publisher offering this direct deal.
-    #[serde(alias="sellerNetwork")]
+    #[serde(rename="sellerNetwork")]
     pub seller_network: String,
     /// Deal id.
     pub id: String,
     /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).
-    #[serde(alias="privateExchangeMinCpm")]
+    #[serde(rename="privateExchangeMinCpm")]
     pub private_exchange_min_cpm: String,
 }
 
@@ -912,59 +912,59 @@ pub struct PretargetingConfig {
     /// Requests matching any of these platforms will match. Possible values are PRETARGETING_PLATFORM_MOBILE, PRETARGETING_PLATFORM_DESKTOP, and PRETARGETING_PLATFORM_TABLET.
     pub platforms: Option<Vec<String>>,
     /// List must contain exactly one of PRETARGETING_CREATIVE_TYPE_HTML or PRETARGETING_CREATIVE_TYPE_VIDEO.
-    #[serde(alias="creativeType")]
+    #[serde(rename="creativeType")]
     pub creative_type: Option<Vec<String>>,
     /// Requests containing any of these geo criteria ids will match.
-    #[serde(alias="geoCriteriaIds")]
+    #[serde(rename="geoCriteriaIds")]
     pub geo_criteria_ids: Option<Vec<String>>,
     /// Requests containing any of these mobile operating system version ids will match. Values are from mobile-os.csv in the downloadable files section.
-    #[serde(alias="mobileOperatingSystemVersions")]
+    #[serde(rename="mobileOperatingSystemVersions")]
     pub mobile_operating_system_versions: Option<Vec<String>>,
     /// The config id; generated automatically. Leave this field blank for insert requests.
-    #[serde(alias="configId")]
+    #[serde(rename="configId")]
     pub config_id: Option<String>,
     /// Requests containing any of these users list ids will not match.
-    #[serde(alias="excludedUserLists")]
+    #[serde(rename="excludedUserLists")]
     pub excluded_user_lists: Option<Vec<String>>,
     /// Whether this config is active. Required for all requests.
-    #[serde(alias="isActive")]
+    #[serde(rename="isActive")]
     pub is_active: Option<bool>,
     /// The name of the config. Must be unique. Required for all requests.
-    #[serde(alias="configName")]
+    #[serde(rename="configName")]
     pub config_name: Option<String>,
     /// Requests containing any of these vertical ids will not match. Values are from the publisher-verticals.txt file in the downloadable files section.
-    #[serde(alias="excludedVerticals")]
+    #[serde(rename="excludedVerticals")]
     pub excluded_verticals: Option<Vec<String>>,
     /// Requests which allow one of these (width, height) pairs will match. All pairs must be supported ad dimensions.
     pub dimensions: Option<Vec<PretargetingConfigDimensions>>,
     /// Requests containing any of these geo criteria ids will not match.
-    #[serde(alias="excludedGeoCriteriaIds")]
+    #[serde(rename="excludedGeoCriteriaIds")]
     pub excluded_geo_criteria_ids: Option<Vec<String>>,
     /// Creative attributes should be declared here if all creatives corresponding to this pretargeting configuration have that creative attribute. Values are from pretargetable-creative-attributes.txt in the downloadable files section.
-    #[serde(alias="supportedCreativeAttributes")]
+    #[serde(rename="supportedCreativeAttributes")]
     pub supported_creative_attributes: Option<Vec<String>>,
     /// Requests with any of these content labels will not match. Values are from content-labels.txt in the downloadable files section.
-    #[serde(alias="excludedContentLabels")]
+    #[serde(rename="excludedContentLabels")]
     pub excluded_content_labels: Option<Vec<String>>,
     /// Requests that allow any of these vendor ids will match. Values are from vendors.txt in the downloadable files section.
-    #[serde(alias="vendorTypes")]
+    #[serde(rename="vendorTypes")]
     pub vendor_types: Option<Vec<String>>,
     /// Request containing any of these language codes will match.
     pub languages: Option<Vec<String>>,
     /// Requests containing any of these user list ids will match.
-    #[serde(alias="userLists")]
+    #[serde(rename="userLists")]
     pub user_lists: Option<Vec<String>>,
     /// Requests containing any of these mobile device ids will match. Values are from mobile-devices.csv in the downloadable files section.
-    #[serde(alias="mobileDevices")]
+    #[serde(rename="mobileDevices")]
     pub mobile_devices: Option<Vec<String>>,
     /// The id for billing purposes, provided for reference. Leave this field blank for insert requests; the id will be generated automatically.
-    #[serde(alias="billingId")]
+    #[serde(rename="billingId")]
     pub billing_id: Option<String>,
     /// Requests containing any of these mobile carrier ids will match. Values are from mobile-carriers.csv in the downloadable files section.
-    #[serde(alias="mobileCarriers")]
+    #[serde(rename="mobileCarriers")]
     pub mobile_carriers: Option<Vec<String>>,
     /// Requests containing any of these placements will not match.
-    #[serde(alias="excludedPlacements")]
+    #[serde(rename="excludedPlacements")]
     pub excluded_placements: Option<Vec<PretargetingConfigExcludedPlacements>>,
     /// Requests containing any of these placements will match.
     pub placements: Option<Vec<PretargetingConfigPlacements>>,
@@ -989,7 +989,7 @@ pub struct AccountBidderLocation {
     /// - US_WEST
     pub region: String,
     /// The maximum queries per second the Ad Exchange will send.
-    #[serde(alias="maximumQps")]
+    #[serde(rename="maximumQps")]
     pub maximum_qps: i32,
 }
 

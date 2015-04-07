@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *0.1.3+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *QPX Express* crate version *0.1.4+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
@@ -286,7 +286,7 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
         QPXExpress {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -296,7 +296,7 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -317,21 +317,21 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PassengerCounts {
     /// The number of passengers that are infants travelling in the lap of an adult.
-    #[serde(alias="infantInLapCount")]
+    #[serde(rename="infantInLapCount")]
     pub infant_in_lap_count: i32,
     /// Identifies this as a passenger count object, representing the number of passengers. Value: the fixed string qpxexpress#passengerCounts.
     pub kind: String,
     /// The number of passengers that are infants each assigned a seat.
-    #[serde(alias="infantInSeatCount")]
+    #[serde(rename="infantInSeatCount")]
     pub infant_in_seat_count: i32,
     /// The number of passengers that are adults.
-    #[serde(alias="adultCount")]
+    #[serde(rename="adultCount")]
     pub adult_count: i32,
     /// The number of passengers that are senior citizens.
-    #[serde(alias="seniorCount")]
+    #[serde(rename="seniorCount")]
     pub senior_count: i32,
     /// The number of passengers that are children.
-    #[serde(alias="childCount")]
+    #[serde(rename="childCount")]
     pub child_count: i32,
 }
 
@@ -347,13 +347,13 @@ pub struct SegmentPricing {
     /// Identifies this as a segment pricing object, representing the price of this segment. Value: the fixed string qpxexpress#segmentPricing.
     pub kind: String,
     /// A segment identifier unique within a single solution. It is used to refer to different parts of the same solution.
-    #[serde(alias="fareId")]
+    #[serde(rename="fareId")]
     pub fare_id: String,
     /// Details of the free baggage allowance on this segment.
-    #[serde(alias="freeBaggageOption")]
+    #[serde(rename="freeBaggageOption")]
     pub free_baggage_option: Vec<FreeBaggageAllowance>,
     /// Unique identifier in the response of this segment.
-    #[serde(alias="segmentId")]
+    #[serde(rename="segmentId")]
     pub segment_id: String,
 }
 
@@ -369,25 +369,25 @@ pub struct LegInfo {
     /// The leg origin as a city and airport.
     pub origin: String,
     /// The terminal the flight is scheduled to depart from.
-    #[serde(alias="originTerminal")]
+    #[serde(rename="originTerminal")]
     pub origin_terminal: String,
     /// The number of miles in this leg.
     pub mileage: i32,
     /// Whether passenger information must be furnished to the United States Transportation Security Administration (TSA) prior to departure.
     pub secure: bool,
     /// Duration of a connection following this leg, in minutes.
-    #[serde(alias="connectionDuration")]
+    #[serde(rename="connectionDuration")]
     pub connection_duration: i32,
     /// The scheduled departure time of the leg, local to the point of departure.
-    #[serde(alias="departureTime")]
+    #[serde(rename="departureTime")]
     pub departure_time: String,
     /// The aircraft (or bus, ferry, railcar, etc) travelling between the two points of this leg.
     pub aircraft: String,
     /// In percent, the published on time performance on this leg.
-    #[serde(alias="onTimePerformance")]
+    #[serde(rename="onTimePerformance")]
     pub on_time_performance: i32,
     /// The scheduled time of arrival at the destination of the leg, local to the point of arrival.
-    #[serde(alias="arrivalTime")]
+    #[serde(rename="arrivalTime")]
     pub arrival_time: String,
     /// The scheduled travelling time from the origin to the destination.
     pub duration: i32,
@@ -398,13 +398,13 @@ pub struct LegInfo {
     /// Identifies this as a leg object. A leg is the smallest unit of travel, in the case of a flight a takeoff immediately followed by a landing at two set points on a particular carrier with a particular flight number. Value: the fixed string qpxexpress#legInfo.
     pub kind: String,
     /// The terminal the flight is scheduled to arrive at.
-    #[serde(alias="destinationTerminal")]
+    #[serde(rename="destinationTerminal")]
     pub destination_terminal: String,
     /// Whether you have to change planes following this leg. Only applies to the next leg.
-    #[serde(alias="changePlane")]
+    #[serde(rename="changePlane")]
     pub change_plane: bool,
     /// Department of Transportation disclosure information on the actual operator of a flight in a code share. (A code share refers to a marketing agreement between two carriers, where one carrier will list in its schedules (and take bookings for) flights that are actually operated by another carrier.)
-    #[serde(alias="operatingDisclosure")]
+    #[serde(rename="operatingDisclosure")]
     pub operating_disclosure: String,
     /// A simple, general description of the meal(s) served on the flight, for example: "Hot meal".
     pub meal: String,
@@ -420,7 +420,7 @@ impl Part for LegInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FareInfo {
     /// no description provided
-    #[serde(alias="basisCode")]
+    #[serde(rename="basisCode")]
     pub basis_code: String,
     /// The city code of the city the trip begins at.
     pub origin: String,
@@ -448,20 +448,20 @@ pub struct SegmentInfo {
     /// Identifies this as a segment object. A segment is one or more consecutive legs on the same flight. For example a hypothetical flight ZZ001, from DFW to OGG, could have one segment with two legs: DFW to HNL (leg 1), HNL to OGG (leg 2). Value: the fixed string qpxexpress#segmentInfo.
     pub kind: String,
     /// The number of seats available in this booking code on this segment.
-    #[serde(alias="bookingCodeCount")]
+    #[serde(rename="bookingCodeCount")]
     pub booking_code_count: i32,
     /// The flight this is a segment of.
     pub flight: FlightInfo,
     /// The legs composing this segment.
     pub leg: Vec<LegInfo>,
     /// Whether the operation of this segment remains subject to government approval.
-    #[serde(alias="subjectToGovernmentApproval")]
+    #[serde(rename="subjectToGovernmentApproval")]
     pub subject_to_government_approval: bool,
     /// In minutes, the duration of the connection following this segment.
-    #[serde(alias="connectionDuration")]
+    #[serde(rename="connectionDuration")]
     pub connection_duration: i32,
     /// The booking code or class for this segment.
-    #[serde(alias="bookingCode")]
+    #[serde(rename="bookingCode")]
     pub booking_code: String,
     /// The duration of the flight segment in minutes.
     pub duration: i32,
@@ -470,7 +470,7 @@ pub struct SegmentInfo {
     /// The cabin booked for this segment.
     pub cabin: String,
     /// The solution-based index of a segment in a married segment group. Married segments can only be booked together. For example, an airline might report a certain booking code as sold out from Boston to Pittsburgh, but as available as part of two married segments Boston to Chicago connecting through Pittsburgh. For example content of this field, consider the round-trip flight ZZ1 PHX-PHL ZZ2 PHL-CLT ZZ3 CLT-PHX. This has three segments, with the two outbound ones (ZZ1 ZZ2) married. In this case, the two outbound segments belong to married segment group 0, and the return segment belongs to married segment group 1.
-    #[serde(alias="marriedSegmentGroup")]
+    #[serde(rename="marriedSegmentGroup")]
     pub married_segment_group: String,
 }
 
@@ -492,10 +492,10 @@ pub struct TripOptionsRequest {
     /// Return only solutions with refundable fares.
     pub refundable: bool,
     /// IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket.
-    #[serde(alias="saleCountry")]
+    #[serde(rename="saleCountry")]
     pub sale_country: i64,
     /// Do not return solutions that cost more than this price. The alphabetical part of the price is in ISO 4217. The format, in regex, is [A-Z]{3}\d+(\.\d+)? Example: $102.07
-    #[serde(alias="maxPrice")]
+    #[serde(rename="maxPrice")]
     pub max_price: String,
 }
 
@@ -528,15 +528,15 @@ pub struct PricingInfo {
     /// The fare used to price one or more segments.
     pub fare: Vec<FareInfo>,
     /// The horizontal fare calculation. This is a field on a ticket that displays all of the relevant items that go into the calculation of the fare.
-    #[serde(alias="fareCalculation")]
+    #[serde(rename="fareCalculation")]
     pub fare_calculation: String,
     /// Identifies this as a pricing object, representing the price of one or more travel segments. Value: the fixed string qpxexpress#pricingInfo.
     pub kind: String,
     /// The per-segment price and baggage information.
-    #[serde(alias="segmentPricing")]
+    #[serde(rename="segmentPricing")]
     pub segment_pricing: Vec<SegmentPricing>,
     /// Total per-passenger price (fare and tax) in the sale or equivalent currency.
-    #[serde(alias="saleTotal")]
+    #[serde(rename="saleTotal")]
     pub sale_total: String,
     /// The passenger type code for this pricing. An alphanumeric code used by a carrier to restrict fares to certain categories of passenger. For instance, a fare might be valid only for senior citizens.
     pub ptc: String,
@@ -545,18 +545,18 @@ pub struct PricingInfo {
     /// The taxes used to calculate the tax total per ticket.
     pub tax: Vec<TaxInfo>,
     /// The total fare in the sale or equivalent currency.
-    #[serde(alias="saleFareTotal")]
+    #[serde(rename="saleFareTotal")]
     pub sale_fare_total: String,
     /// The total fare in the base fare currency (the currency of the country of origin). This element is only present when the sales currency and the currency of the country of commencement are different.
-    #[serde(alias="baseFareTotal")]
+    #[serde(rename="baseFareTotal")]
     pub base_fare_total: String,
     /// Whether the fares on this pricing are refundable.
     pub refundable: bool,
     /// The taxes in the sale or equivalent currency.
-    #[serde(alias="saleTaxTotal")]
+    #[serde(rename="saleTaxTotal")]
     pub sale_tax_total: String,
     /// The latest ticketing time for this pricing assuming the reservation occurs at ticketing time and there is no change in fares/rules. The time is local to the point of sale (POS).
-    #[serde(alias="latestTicketingTime")]
+    #[serde(rename="latestTicketingTime")]
     pub latest_ticketing_time: String,
 }
 
@@ -570,12 +570,12 @@ impl Part for PricingInfo {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TimeOfDayRange {
     /// The earliest time of day in HH:MM format.
-    #[serde(alias="earliestTime")]
+    #[serde(rename="earliestTime")]
     pub earliest_time: String,
     /// Identifies this as a time of day range object, representing two times in a single day defining a time range. Value: the fixed string qpxexpress#timeOfDayRange.
     pub kind: String,
     /// The latest time of day in HH:MM format.
-    #[serde(alias="latestTime")]
+    #[serde(rename="latestTime")]
     pub latest_time: String,
 }
 
@@ -646,10 +646,10 @@ pub struct TaxInfo {
     /// The code to enter in the ticket's tax box.
     pub code: String,
     /// The price of the tax in the sales or equivalent currency.
-    #[serde(alias="salePrice")]
+    #[serde(rename="salePrice")]
     pub sale_price: String,
     /// Whether this is a government charge or a carrier surcharge.
-    #[serde(alias="chargeType")]
+    #[serde(rename="chargeType")]
     pub charge_type: String,
     /// For government charges, the country levying the charge.
     pub country: String,
@@ -667,14 +667,14 @@ impl Part for TaxInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TripOptionsResponse {
     /// A list of priced itinerary solutions to the QPX Express query.
-    #[serde(alias="tripOption")]
+    #[serde(rename="tripOption")]
     pub trip_option: Vec<TripOption>,
     /// Identifies this as a QPX Express trip response object, which consists of zero or more solutions. Value: the fixed string qpxexpress#tripOptions.
     pub kind: String,
     /// Informational data global to list of solutions.
     pub data: Data,
     /// An identifier uniquely identifying this response.
-    #[serde(alias="requestId")]
+    #[serde(rename="requestId")]
     pub request_id: String,
 }
 
@@ -731,22 +731,22 @@ pub struct SliceInput {
     /// Airport or city IATA designator of the destination.
     pub destination: String,
     /// The maximum number of stops you are willing to accept in this slice.
-    #[serde(alias="maxStops")]
+    #[serde(rename="maxStops")]
     pub max_stops: i32,
     /// Slices must depart in this time of day range, local to the point of departure.
-    #[serde(alias="permittedDepartureTime")]
+    #[serde(rename="permittedDepartureTime")]
     pub permitted_departure_time: TimeOfDayRange,
     /// A list of 2-letter IATA airline designators. Slices with only these carriers should be returned.
-    #[serde(alias="permittedCarrier")]
+    #[serde(rename="permittedCarrier")]
     pub permitted_carrier: Vec<String>,
     /// The longest connection between two legs, in minutes, you are willing to accept.
-    #[serde(alias="maxConnectionDuration")]
+    #[serde(rename="maxConnectionDuration")]
     pub max_connection_duration: i32,
     /// Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.
-    #[serde(alias="preferredCabin")]
+    #[serde(rename="preferredCabin")]
     pub preferred_cabin: String,
     /// A list of 2-letter IATA airline designators. Exclude slices that use these carriers.
-    #[serde(alias="prohibitedCarrier")]
+    #[serde(rename="prohibitedCarrier")]
     pub prohibited_carrier: Vec<String>,
 }
 
@@ -788,7 +788,7 @@ pub struct BagDescriptor {
     /// Identifies this as a baggage object. Value: the fixed string qpxexpress#bagDescriptor.
     pub kind: String,
     /// Provides the commercial name for an optional service.
-    #[serde(alias="commercialName")]
+    #[serde(rename="commercialName")]
     pub commercial_name: String,
 }
 
@@ -840,7 +840,7 @@ impl Part for SliceInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TripOption {
     /// The total price for all passengers on the trip, in the form of a currency followed by an amount, e.g. USD253.35.
-    #[serde(alias="saleTotal")]
+    #[serde(rename="saleTotal")]
     pub sale_total: String,
     /// Identifies this as a trip information object. Value: the fixed string qpxexpress#tripOption.
     pub kind: String,
@@ -885,10 +885,10 @@ impl Part for Data {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBaggageAllowance {
     /// The maximum number of kilos any one piece of baggage may weigh.
-    #[serde(alias="kilosPerPiece")]
+    #[serde(rename="kilosPerPiece")]
     pub kilos_per_piece: i32,
     /// A representation of a type of bag, such as an ATPCo subcode, Commercial Name, or other description.
-    #[serde(alias="bagDescriptor")]
+    #[serde(rename="bagDescriptor")]
     pub bag_descriptor: Vec<BagDescriptor>,
     /// The number of pounds of free baggage allowed.
     pub pounds: i32,

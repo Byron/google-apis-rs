@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.3+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.4+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
@@ -348,7 +348,7 @@ impl<'a, C, NC, A> SQLAdmin<C, NC, A>
         SQLAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -379,7 +379,7 @@ impl<'a, C, NC, A> SQLAdmin<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -410,25 +410,25 @@ pub struct BackupRun {
     /// This is always sql#backupRun.
     pub kind: String,
     /// The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="windowStartTime")]
+    #[serde(rename="windowStartTime")]
     pub window_start_time: String,
     /// A unique identifier for this backup run. Note that this is unique only within the scope of a particular Cloud SQL instance.
     pub id: String,
     /// Name of the database instance.
     pub instance: String,
     /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// Information about why the backup operation failed. This is only present if the run has the FAILED status.
     pub error: OperationError,
     /// The time the backup operation completed in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// The time the run was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="enqueuedTime")]
+    #[serde(rename="enqueuedTime")]
     pub enqueued_time: String,
     /// The URI of this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -443,10 +443,10 @@ impl ResponseResult for BackupRun {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SslCertDetail {
     /// The public information about the cert.
-    #[serde(alias="certInfo")]
+    #[serde(rename="certInfo")]
     pub cert_info: SslCert,
     /// The private key for the client cert, in pem format. Keep private in order to protect your security.
-    #[serde(alias="certPrivateKey")]
+    #[serde(rename="certPrivateKey")]
     pub cert_private_key: String,
 }
 
@@ -468,28 +468,28 @@ impl Part for SslCertDetail {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCert {
     /// Serial number, as extracted from the certificate.
-    #[serde(alias="certSerialNumber")]
+    #[serde(rename="certSerialNumber")]
     pub cert_serial_number: String,
     /// This is always sql#sslCert.
     pub kind: String,
     /// Sha1 Fingerprint.
-    #[serde(alias="sha1Fingerprint")]
+    #[serde(rename="sha1Fingerprint")]
     pub sha1_fingerprint: String,
     /// User supplied name. Constrained to [a-zA-Z.-_ ]+.
-    #[serde(alias="commonName")]
+    #[serde(rename="commonName")]
     pub common_name: String,
     /// Name of the database instance.
     pub instance: String,
     /// PEM representation.
     pub cert: String,
     /// The time when the certificate expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="expirationTime")]
+    #[serde(rename="expirationTime")]
     pub expiration_time: String,
     /// The time when the certificate was created in RFC 3339 format, for example 2012-11-15T16:19:00.094Z
-    #[serde(alias="createTime")]
+    #[serde(rename="createTime")]
     pub create_time: String,
     /// no description provided
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -506,7 +506,7 @@ pub struct RestoreBackupContext {
     /// This is always sql#restoreBackupContext.
     pub kind: String,
     /// The ID of the backup run to restore from.
-    #[serde(alias="backupRunId")]
+    #[serde(rename="backupRunId")]
     pub backup_run_id: String,
 }
 
@@ -520,7 +520,7 @@ impl Part for RestoreBackupContext {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextCsvExportOptions {
     /// The select query used to extract the data.
-    #[serde(alias="selectQuery")]
+    #[serde(rename="selectQuery")]
     pub select_query: String,
 }
 
@@ -539,10 +539,10 @@ pub struct BackupConfiguration {
     /// Whether this configuration is enabled.
     pub enabled: bool,
     /// Whether binary log is enabled. If backup configuration is disabled, binary log must be disabled as well.
-    #[serde(alias="binaryLogEnabled")]
+    #[serde(rename="binaryLogEnabled")]
     pub binary_log_enabled: bool,
     /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
 }
 
@@ -561,7 +561,7 @@ impl Part for BackupConfiguration {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesCloneRequest {
     /// Contains details about the clone operation.
-    #[serde(alias="cloneContext")]
+    #[serde(rename="cloneContext")]
     pub clone_context: Option<CloneContext>,
 }
 
@@ -577,7 +577,7 @@ pub struct ReplicaConfiguration {
     /// This is always sql#replicaConfiguration.
     pub kind: String,
     /// MySQL specific configuration when replicating from a MySQL on-premises master.
-    #[serde(alias="mysqlReplicaConfiguration")]
+    #[serde(rename="mysqlReplicaConfiguration")]
     pub mysql_replica_configuration: MySqlReplicaConfiguration,
 }
 
@@ -598,10 +598,10 @@ pub struct SslCertsInsertResponse {
     /// This is always sql#sslCertsInsert.
     pub kind: String,
     /// The new client certificate and private key. The new certificate will not work until the instance is restarted.
-    #[serde(alias="clientCert")]
+    #[serde(rename="clientCert")]
     pub client_cert: SslCertDetail,
     /// The server Certificate Authority's certificate. If this is missing you can force a new one to be generated by calling resetSslConfig method on instances resource.
-    #[serde(alias="serverCaCert")]
+    #[serde(rename="serverCaCert")]
     pub server_ca_cert: SslCert,
 }
 
@@ -620,7 +620,7 @@ impl ResponseResult for SslCertsInsertResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of operation resources.
     pub items: Vec<Operation>,
@@ -660,10 +660,10 @@ pub struct ImportContext {
     /// The file type for the specified uri.
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
-    #[serde(alias="fileType")]
+    #[serde(rename="fileType")]
     pub file_type: String,
     /// Options for importing data as CSV.
-    #[serde(alias="csvImportOptions")]
+    #[serde(rename="csvImportOptions")]
     pub csv_import_options: ImportContextCsvImportOptions,
     /// A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL.
     pub uri: String,
@@ -683,10 +683,10 @@ impl Part for ImportContext {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpMapping {
     /// The due time for this IP to be retired in RFC 3339 format, for example 2012-11-15T16:19:00.094Z. This field is only available when the IP is scheduled to be retired.
-    #[serde(alias="timeToRetire")]
+    #[serde(rename="timeToRetire")]
     pub time_to_retire: String,
     /// The IP address assigned.
-    #[serde(alias="ipAddress")]
+    #[serde(rename="ipAddress")]
     pub ip_address: String,
 }
 
@@ -700,7 +700,7 @@ impl Part for IpMapping {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContext {
     /// Options for exporting data as CSV.
-    #[serde(alias="csvExportOptions")]
+    #[serde(rename="csvExportOptions")]
     pub csv_export_options: ExportContextCsvExportOptions,
     /// This is always sql#exportContext.
     pub kind: String,
@@ -709,10 +709,10 @@ pub struct ExportContext {
     /// The file type for the specified uri.
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
-    #[serde(alias="fileType")]
+    #[serde(rename="fileType")]
     pub file_type: String,
     /// Options for exporting data as SQL statements.
-    #[serde(alias="sqlExportOptions")]
+    #[serde(rename="sqlExportOptions")]
     pub sql_export_options: ExportContextSqlExportOptions,
     /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form gs://bucketName/fileName. If the file already exists, the operation fails. If fileType is SQL and the filename ends with .gz, the contents are compressed.
     pub uri: String,
@@ -733,7 +733,7 @@ impl Part for ExportContext {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BackupRunsListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of backup runs in reverse chronological order of the enqueued time.
     pub items: Vec<BackupRun>,
@@ -775,7 +775,7 @@ pub struct Database {
     /// The MySQL collation value.
     pub collation: Option<String>,
     /// The URI of this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -807,13 +807,13 @@ impl Part for ImportContextCsvImportOptions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpConfiguration {
     /// Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP.
-    #[serde(alias="requireSsl")]
+    #[serde(rename="requireSsl")]
     pub require_ssl: bool,
     /// Whether the instance should be assigned an IP address or not.
-    #[serde(alias="ipv4Enabled")]
+    #[serde(rename="ipv4Enabled")]
     pub ipv4_enabled: bool,
     /// The list of external networks that are allowed to connect to the instance using the IP. In CIDR notation, also known as 'slash' notation (e.g. 192.168.100.0/24).
-    #[serde(alias="authorizedNetworks")]
+    #[serde(rename="authorizedNetworks")]
     pub authorized_networks: Vec<AclEntry>,
 }
 
@@ -853,19 +853,19 @@ pub struct Flag {
     /// This is the name of the flag. Flag names always use underscores, not hyphens, e.g. max_allowed_packet
     pub name: Option<String>,
     /// For STRING flags, a list of strings that the value can be set to.
-    #[serde(alias="allowedStringValues")]
+    #[serde(rename="allowedStringValues")]
     pub allowed_string_values: Option<Vec<String>>,
     /// The database version this flag applies to. Currently this can only be [MYSQL_5_5].
-    #[serde(alias="appliesTo")]
+    #[serde(rename="appliesTo")]
     pub applies_to: Option<Vec<String>>,
     /// The type of the flag. Flags are typed to being BOOLEAN, STRING, INTEGER or NONE. NONE is used for flags which do not take a value, such as skip_grant_tables.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// For INTEGER flags, the maximum allowed value.
-    #[serde(alias="maxValue")]
+    #[serde(rename="maxValue")]
     pub max_value: Option<String>,
     /// For INTEGER flags, the minimum allowed value.
-    #[serde(alias="minValue")]
+    #[serde(rename="minValue")]
     pub min_value: Option<String>,
 }
 
@@ -918,14 +918,14 @@ impl Resource for User {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tier {
     /// The maximum disk size of this tier in bytes.
-    #[serde(alias="DiskQuota")]
+    #[serde(rename="DiskQuota")]
     pub disk_quota: Option<String>,
     /// An identifier for the service tier, for example D1, D2 etc. For related information, see Pricing.
     pub tier: Option<String>,
     /// This is always sql#tier.
     pub kind: Option<String>,
     /// The maximum RAM usage of this tier in bytes.
-    #[serde(alias="RAM")]
+    #[serde(rename="RAM")]
     pub ram: Option<String>,
     /// The applicable regions for this tier. Can be us-east1, europe-west1 or asia-east1.
     pub region: Option<Vec<String>>,
@@ -941,12 +941,12 @@ impl Resource for Tier {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CloneContext {
     /// Binary log coordinates, if specified, indentify the the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordintes.
-    #[serde(alias="binLogCoordinates")]
+    #[serde(rename="binLogCoordinates")]
     pub bin_log_coordinates: BinLogCoordinates,
     /// This is always sql#cloneContext.
     pub kind: String,
     /// Name of the Cloud SQL instance to be created as a clone.
-    #[serde(alias="destinationInstanceName")]
+    #[serde(rename="destinationInstanceName")]
     pub destination_instance_name: String,
 }
 
@@ -965,7 +965,7 @@ impl Part for CloneContext {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesRestoreBackupRequest {
     /// Parameters required to perform the restore backup operation.
-    #[serde(alias="restoreBackupContext")]
+    #[serde(rename="restoreBackupContext")]
     pub restore_backup_context: Option<RestoreBackupContext>,
 }
 
@@ -1020,28 +1020,28 @@ pub struct MySqlReplicaConfiguration {
     /// The password for the replication connection.
     pub password: String,
     /// A list of permissible ciphers to use for SSL encryption.
-    #[serde(alias="sslCipher")]
+    #[serde(rename="sslCipher")]
     pub ssl_cipher: String,
     /// PEM representation of the trusted CA's x509 certificate.
-    #[serde(alias="caCertificate")]
+    #[serde(rename="caCertificate")]
     pub ca_certificate: String,
     /// PEM representation of the slave's x509 certificate.
-    #[serde(alias="clientCertificate")]
+    #[serde(rename="clientCertificate")]
     pub client_certificate: String,
     /// Interval in milliseconds between replication heartbeats.
-    #[serde(alias="masterHeartbeatPeriod")]
+    #[serde(rename="masterHeartbeatPeriod")]
     pub master_heartbeat_period: String,
     /// Whether or not to check the master's Common Name value in the certificate that it sends during the SSL handshake.
-    #[serde(alias="verifyServerCertificate")]
+    #[serde(rename="verifyServerCertificate")]
     pub verify_server_certificate: bool,
     /// Path to a SQL dump file in Google Cloud Storage from which the slave instance is to be created. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are also supported. Dumps should have the binlog co-ordinates from which replication should begin. This can be accomplished by setting --master-data to 1 when using mysqldump.
-    #[serde(alias="dumpFilePath")]
+    #[serde(rename="dumpFilePath")]
     pub dump_file_path: String,
     /// Seconds to wait between connect retries. MySQL's default is 60 seconds.
-    #[serde(alias="connectRetryInterval")]
+    #[serde(rename="connectRetryInterval")]
     pub connect_retry_interval: i32,
     /// PEM representation of the slave's private key. The corresponsing public key is encoded in the client's certificate.
-    #[serde(alias="clientKey")]
+    #[serde(rename="clientKey")]
     pub client_key: String,
 }
 
@@ -1055,44 +1055,44 @@ impl Part for MySqlReplicaConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
     /// The database flags passed to the instance at startup.
-    #[serde(alias="databaseFlags")]
+    #[serde(rename="databaseFlags")]
     pub database_flags: Vec<DatabaseFlags>,
     /// This is always sql#settings.
     pub kind: String,
     /// The App Engine app IDs that can access this instance.
-    #[serde(alias="authorizedGaeApplications")]
+    #[serde(rename="authorizedGaeApplications")]
     pub authorized_gae_applications: Vec<String>,
     /// The activation policy for this instance. This specifies when the instance should be activated and is applicable only when the instance state is RUNNABLE. This can be one of the following.
     /// ALWAYS: The instance should always be active.
     /// NEVER: The instance should never be activated.
     /// ON_DEMAND: The instance is activated upon receiving requests.
-    #[serde(alias="activationPolicy")]
+    #[serde(rename="activationPolicy")]
     pub activation_policy: String,
     /// The daily backup configuration for the instance.
-    #[serde(alias="backupConfiguration")]
+    #[serde(rename="backupConfiguration")]
     pub backup_configuration: BackupConfiguration,
     /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance.
-    #[serde(alias="ipConfiguration")]
+    #[serde(rename="ipConfiguration")]
     pub ip_configuration: IpConfiguration,
     /// no description provided
-    #[serde(alias="crashSafeReplicationEnabled")]
+    #[serde(rename="crashSafeReplicationEnabled")]
     pub crash_safe_replication_enabled: bool,
     /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
-    #[serde(alias="databaseReplicationEnabled")]
+    #[serde(rename="databaseReplicationEnabled")]
     pub database_replication_enabled: bool,
     /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.
-    #[serde(alias="replicationType")]
+    #[serde(rename="replicationType")]
     pub replication_type: String,
     /// The tier of service for this instance, for example D1, D2. For more information, see pricing.
     pub tier: String,
     /// The pricing plan for this instance. This can be either PER_USE or PACKAGE.
-    #[serde(alias="pricingPlan")]
+    #[serde(rename="pricingPlan")]
     pub pricing_plan: String,
     /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
-    #[serde(alias="settingsVersion")]
+    #[serde(rename="settingsVersion")]
     pub settings_version: String,
     /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.
-    #[serde(alias="locationPreference")]
+    #[serde(rename="locationPreference")]
     pub location_preference: LocationPreference,
 }
 
@@ -1111,7 +1111,7 @@ impl Part for Settings {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SslCertsInsertRequest {
     /// User supplied name. Must be a distinct name from the other certificates for this instance. New certificates will not be usable until the instance is restarted.
-    #[serde(alias="commonName")]
+    #[serde(rename="commonName")]
     pub common_name: Option<String>,
 }
 
@@ -1145,7 +1145,7 @@ impl ResponseResult for SslCertsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclEntry {
     /// The time when this access control entry expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="expirationTime")]
+    #[serde(rename="expirationTime")]
     pub expiration_time: String,
     /// This is always sql#aclEntry.
     pub kind: String,
@@ -1170,7 +1170,7 @@ impl Part for AclEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstancesListResponse {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of database instance resources.
     pub items: Vec<DatabaseInstance>,
@@ -1207,7 +1207,7 @@ impl Part for OperationErrorNested {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesExportRequest {
     /// Contains details about the export operation.
-    #[serde(alias="exportContext")]
+    #[serde(rename="exportContext")]
     pub export_context: Option<ExportContext>,
 }
 
@@ -1226,7 +1226,7 @@ impl RequestValue for InstancesExportRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsersListResponse {
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of user resources in the instance.
     pub items: Vec<User>,
@@ -1252,48 +1252,48 @@ impl ResponseResult for UsersListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstance {
     /// The maximum disk size of the instance in bytes.
-    #[serde(alias="maxDiskSize")]
+    #[serde(rename="maxDiskSize")]
     pub max_disk_size: Option<String>,
     /// The replicas of the instance.
-    #[serde(alias="replicaNames")]
+    #[serde(rename="replicaNames")]
     pub replica_names: Option<Vec<String>>,
     /// The current disk usage of the instance in bytes.
-    #[serde(alias="currentDiskSize")]
+    #[serde(rename="currentDiskSize")]
     pub current_disk_size: Option<String>,
     /// The service account email address assigned to the instance.
-    #[serde(alias="serviceAccountEmailAddress")]
+    #[serde(rename="serviceAccountEmailAddress")]
     pub service_account_email_address: Option<String>,
     /// The assigned IP addresses for the instance.
-    #[serde(alias="ipAddresses")]
+    #[serde(rename="ipAddresses")]
     pub ip_addresses: Option<Vec<IpMapping>>,
     /// The database engine type and version. Can be MYSQL_5_5 or MYSQL_5_6. Defaults to MYSQL_5_5. The databaseVersion can not be changed after instance creation.
-    #[serde(alias="databaseVersion")]
+    #[serde(rename="databaseVersion")]
     pub database_version: Option<String>,
     /// The instance type. This can be one of the following.
     /// CLOUD_SQL_INSTANCE: A Cloud SQL instance that is not replicating from a master.
     /// ON_PREMISES_INSTANCE: An instance running on the customer's premises.
     /// READ_REPLICA_INSTANCE: A Cloud SQL instance configured as a read-replica.
-    #[serde(alias="instanceType")]
+    #[serde(rename="instanceType")]
     pub instance_type: Option<String>,
     /// Configuration specific to on-premises instances.
-    #[serde(alias="onPremisesConfiguration")]
+    #[serde(rename="onPremisesConfiguration")]
     pub on_premises_configuration: Option<OnPremisesConfiguration>,
     /// This is always sql#instance.
     pub kind: Option<String>,
     /// Name of the Cloud SQL instance. This does not include the project ID.
     pub name: Option<String>,
     /// The IPv6 address assigned to the instance.
-    #[serde(alias="ipv6Address")]
+    #[serde(rename="ipv6Address")]
     pub ipv6_address: Option<String>,
     /// SSL configuration.
-    #[serde(alias="serverCaCert")]
+    #[serde(rename="serverCaCert")]
     pub server_ca_cert: Option<SslCert>,
     /// The geographical region. Can be us-central, asia-east1 or europe-west1. Defaults to us-central. The region can not be changed after instance creation.
     pub region: Option<String>,
     /// The user settings.
     pub settings: Option<Settings>,
     /// The name of the instance which will act as master in the replication setup.
-    #[serde(alias="masterInstanceName")]
+    #[serde(rename="masterInstanceName")]
     pub master_instance_name: Option<String>,
     /// The project ID of the project containing the Cloud SQL instance. The Google apps domain is prefixed if applicable.
     pub project: Option<String>,
@@ -1307,10 +1307,10 @@ pub struct DatabaseInstance {
     /// HTTP 1.1 Entity tag for the resource.
     pub etag: Option<String>,
     /// Configuration specific to read-replicas replicating from on-premises masters.
-    #[serde(alias="replicaConfiguration")]
+    #[serde(rename="replicaConfiguration")]
     pub replica_configuration: Option<ReplicaConfiguration>,
     /// The URI of this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1330,7 +1330,7 @@ impl ResponseResult for DatabaseInstance {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesImportRequest {
     /// Contains details about the import operation.
-    #[serde(alias="importContext")]
+    #[serde(rename="importContext")]
     pub import_context: Option<ImportContext>,
 }
 
@@ -1364,12 +1364,12 @@ impl ResponseResult for DatabasesListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct BinLogCoordinates {
     /// Position (offset) within the binary log file.
-    #[serde(alias="binLogPosition")]
+    #[serde(rename="binLogPosition")]
     pub bin_log_position: String,
     /// This is always sql#binLogCoordinates.
     pub kind: String,
     /// Name of the binary log file for a Cloud SQL instance.
-    #[serde(alias="binLogFileName")]
+    #[serde(rename="binLogFileName")]
     pub bin_log_file_name: String,
 }
 
@@ -1412,40 +1412,40 @@ pub struct Operation {
     /// The status of an operation. Valid values are PENDING, RUNNING, DONE, UNKNOWN.
     pub status: String,
     /// The context for import operation, if applicable.
-    #[serde(alias="importContext")]
+    #[serde(rename="importContext")]
     pub import_context: ImportContext,
     /// This is always sql#operation.
     pub kind: String,
     /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     pub name: String,
     /// The context for export operation, if applicable.
-    #[serde(alias="exportContext")]
+    #[serde(rename="exportContext")]
     pub export_context: ExportContext,
     /// The project ID of the target instance related to this operation.
-    #[serde(alias="targetProject")]
+    #[serde(rename="targetProject")]
     pub target_project: String,
     /// Name of the database instance related to this operation.
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// The type of the operation. Valid values are CREATE, DELETE, UPDATE, RESTART, IMPORT, EXPORT, BACKUP_VOLUME, RESTORE_VOLUME, CREATE_USER, DELETE_USER, CREATE_DATABASE, DELETE_DATABASE .
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// The URI of the instance related to the operation.
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationErrorNested,
     /// The time this operation finished in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// The URI of this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// The email address of the user who initiated this operation.
     pub user: String,
@@ -1464,7 +1464,7 @@ pub struct LocationPreference {
     /// This is always sql#locationPreference.
     pub kind: String,
     /// The AppEngine application to follow, it must be in the same region as the Cloud SQL instance.
-    #[serde(alias="followGaeApplication")]
+    #[serde(rename="followGaeApplication")]
     pub follow_gae_application: String,
     /// The preferred Compute Engine zone (e.g. us-centra1-a, us-central1-b, etc.).
     pub zone: String,
@@ -1496,7 +1496,7 @@ pub struct OnPremisesConfiguration {
     /// This is always sql#onPremisesConfiguration.
     pub kind: String,
     /// The host and port of the on-premises instance in host:port format
-    #[serde(alias="hostPort")]
+    #[serde(rename="hostPort")]
     pub host_port: String,
 }
 

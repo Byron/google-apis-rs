@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webmasters* crate version *0.1.3+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *webmasters* crate version *0.1.4+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *webmasters* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
@@ -306,7 +306,7 @@ impl<'a, C, NC, A> Webmasters<C, NC, A>
         Webmasters {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +325,7 @@ impl<'a, C, NC, A> Webmasters<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,7 +366,7 @@ pub struct WmxSitemapContent {
     /// The number of URLs from the sitemap that were indexed (of the content type).
     pub indexed: String,
     /// The specific type of content in this sitemap (for example "web", "images").
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The number of URLs in the sitemap (of the content type).
     pub submitted: String,
@@ -404,10 +404,10 @@ impl Part for UrlCrawlErrorCountsPerType {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WmxSite {
     /// The user's permission level for the site.
-    #[serde(alias="permissionLevel")]
+    #[serde(rename="permissionLevel")]
     pub permission_level: String,
     /// The URL of the site.
-    #[serde(alias="siteUrl")]
+    #[serde(rename="siteUrl")]
     pub site_url: String,
 }
 
@@ -426,7 +426,7 @@ impl ResponseResult for WmxSite {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsCountsQueryResponse {
     /// The time series of the number of URL crawl errors for per error category and platform.
-    #[serde(alias="countPerTypes")]
+    #[serde(rename="countPerTypes")]
     pub count_per_types: Vec<UrlCrawlErrorCountsPerType>,
 }
 
@@ -464,21 +464,21 @@ pub struct WmxSitemap {
     /// Number of warnings for the sitemap - issues with URLs in the sitemaps.
     pub warnings: String,
     /// If true, the sitemap has not been processed.
-    #[serde(alias="isPending")]
+    #[serde(rename="isPending")]
     pub is_pending: bool,
     /// Date & time in which this sitemap was submitted. Date format is in RFC 3339 format (yyyy-mm-dd).
-    #[serde(alias="lastSubmitted")]
+    #[serde(rename="lastSubmitted")]
     pub last_submitted: String,
     /// If true, the sitemap is a collection of sitemaps.
-    #[serde(alias="isSitemapsIndex")]
+    #[serde(rename="isSitemapsIndex")]
     pub is_sitemaps_index: bool,
     /// Date & time in which this sitemap was last downloaded. Date format is in RFC 3339 format (yyyy-mm-dd).
-    #[serde(alias="lastDownloaded")]
+    #[serde(rename="lastDownloaded")]
     pub last_downloaded: String,
     /// The url of the sitemap.
     pub path: String,
     /// The type of the sitemap (for example "sitemap").
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The various content types in the sitemap.
     pub contents: Vec<WmxSitemapContent>,
@@ -499,7 +499,7 @@ impl ResponseResult for WmxSitemap {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SitesListResponse {
     /// Access level information for a Webmaster Tools site.
-    #[serde(alias="siteEntry")]
+    #[serde(rename="siteEntry")]
     pub site_entry: Vec<WmxSite>,
 }
 
@@ -518,15 +518,15 @@ impl ResponseResult for SitesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsSample {
     /// Additional details about the URL, set only when calling get().
-    #[serde(alias="urlDetails")]
+    #[serde(rename="urlDetails")]
     pub url_details: UrlSampleDetails,
     /// The URL of an error, relative to the site.
-    #[serde(alias="pageUrl")]
+    #[serde(rename="pageUrl")]
     pub page_url: String,
     /// The time when the URL was last crawled, in RFC 3339 format.
     pub last_crawled: String,
     /// The HTTP response code, if any.
-    #[serde(alias="responseCode")]
+    #[serde(rename="responseCode")]
     pub response_code: i32,
     /// The time the error was first detected, in RFC 3339 format.
     pub first_detected: String,
@@ -543,10 +543,10 @@ impl ResponseResult for UrlCrawlErrorsSample {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlSampleDetails {
     /// List of sitemaps pointing at this URL.
-    #[serde(alias="containingSitemaps")]
+    #[serde(rename="containingSitemaps")]
     pub containing_sitemaps: Vec<String>,
     /// A sample set of URLs linking to this URL.
-    #[serde(alias="linkedFromUrls")]
+    #[serde(rename="linkedFromUrls")]
     pub linked_from_urls: Vec<String>,
 }
 
@@ -565,7 +565,7 @@ impl Part for UrlSampleDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsSamplesListResponse {
     /// Information about the sample URL and its crawl error.
-    #[serde(alias="urlCrawlErrorSample")]
+    #[serde(rename="urlCrawlErrorSample")]
     pub url_crawl_error_sample: Vec<UrlCrawlErrorsSample>,
 }
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.3+20150325*, where *20150325* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Games* crate version *0.1.4+20150325*, where *20150325* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -343,7 +343,7 @@ impl<'a, C, NC, A> Games<C, NC, A>
         Games {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -395,7 +395,7 @@ impl<'a, C, NC, A> Games<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -418,7 +418,7 @@ pub struct Category {
     /// The category name.
     pub category: String,
     /// Experience points earned in this category.
-    #[serde(alias="experiencePoints")]
+    #[serde(rename="experiencePoints")]
     pub experience_points: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#category.
     pub kind: String,
@@ -439,7 +439,7 @@ impl Part for Category {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The players.
     pub items: Vec<Player>,
@@ -461,17 +461,17 @@ pub struct PlayerScore {
     /// The numerical value for this player score.
     pub score: String,
     /// The formatted score for this player score.
-    #[serde(alias="formattedScore")]
+    #[serde(rename="formattedScore")]
     pub formatted_score: String,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    #[serde(alias="scoreTag")]
+    #[serde(rename="scoreTag")]
     pub score_tag: String,
     /// The time span for this player score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
-    #[serde(alias="timeSpan")]
+    #[serde(rename="timeSpan")]
     pub time_span: String,
 }
 
@@ -487,31 +487,31 @@ pub struct Instance {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instance.
     pub kind: String,
     /// URI which shows where a user can acquire this instance.
-    #[serde(alias="acquisitionUri")]
+    #[serde(rename="acquisitionUri")]
     pub acquisition_uri: String,
     /// Localized display name.
     pub name: String,
     /// Flag to show if this game instance supports turn based play.
-    #[serde(alias="turnBasedPlay")]
+    #[serde(rename="turnBasedPlay")]
     pub turn_based_play: bool,
     /// Platform dependent details for Web.
-    #[serde(alias="webInstance")]
+    #[serde(rename="webInstance")]
     pub web_instance: InstanceWebDetails,
     /// Platform dependent details for Android.
-    #[serde(alias="androidInstance")]
+    #[serde(rename="androidInstance")]
     pub android_instance: InstanceAndroidDetails,
     /// Platform dependent details for iOS.
-    #[serde(alias="iosInstance")]
+    #[serde(rename="iosInstance")]
     pub ios_instance: InstanceIosDetails,
     /// The platform type.
     /// Possible values are:  
     /// - "ANDROID" - Instance is for Android. 
     /// - "IOS" - Instance is for iOS 
     /// - "WEB_APP" - Instance is for Web App.
-    #[serde(alias="platformType")]
+    #[serde(rename="platformType")]
     pub platform_type: String,
     /// Flag to show if this game instance supports realtime play.
-    #[serde(alias="realtimePlay")]
+    #[serde(rename="realtimePlay")]
     pub realtime_play: bool,
 }
 
@@ -530,18 +530,18 @@ impl Part for Instance {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementDefinition {
     /// The total steps for an incremental achievement.
-    #[serde(alias="totalSteps")]
+    #[serde(rename="totalSteps")]
     pub total_steps: Option<i32>,
     /// The type of the achievement.
     /// Possible values are:  
     /// - "STANDARD" - Achievement is either locked or unlocked. 
     /// - "INCREMENTAL" - Achievement is incremental.
-    #[serde(alias="achievementType")]
+    #[serde(rename="achievementType")]
     pub achievement_type: Option<String>,
     /// The description of the achievement.
     pub description: Option<String>,
     /// The total steps for an incremental achievement as a string.
-    #[serde(alias="formattedTotalSteps")]
+    #[serde(rename="formattedTotalSteps")]
     pub formatted_total_steps: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinition.
     pub kind: Option<String>,
@@ -550,24 +550,24 @@ pub struct AchievementDefinition {
     /// - "HIDDEN" - Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="initialState")]
+    #[serde(rename="initialState")]
     pub initial_state: Option<String>,
     /// Experience points which will be earned when unlocking this achievement.
-    #[serde(alias="experiencePoints")]
+    #[serde(rename="experiencePoints")]
     pub experience_points: Option<String>,
     /// The ID of the achievement.
     pub id: Option<String>,
     /// Indicates whether the revealed icon image being returned is a default image, or is provided by the game.
-    #[serde(alias="isRevealedIconUrlDefault")]
+    #[serde(rename="isRevealedIconUrlDefault")]
     pub is_revealed_icon_url_default: Option<bool>,
     /// The image URL for the unlocked achievement icon.
-    #[serde(alias="unlockedIconUrl")]
+    #[serde(rename="unlockedIconUrl")]
     pub unlocked_icon_url: Option<String>,
     /// The image URL for the revealed achievement icon.
-    #[serde(alias="revealedIconUrl")]
+    #[serde(rename="revealedIconUrl")]
     pub revealed_icon_url: Option<String>,
     /// Indicates whether the unlocked icon image being returned is a default image, or is game-provided.
-    #[serde(alias="isUnlockedIconUrlDefault")]
+    #[serde(rename="isUnlockedIconUrlDefault")]
     pub is_unlocked_icon_url_default: Option<bool>,
     /// The name of the achievement.
     pub name: Option<String>,
@@ -588,7 +588,7 @@ impl Resource for AchievementDefinition {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementUnlockResponse {
     /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
-    #[serde(alias="newlyUnlocked")]
+    #[serde(rename="newlyUnlocked")]
     pub newly_unlocked: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUnlockResponse.
     pub kind: String,
@@ -606,13 +606,13 @@ pub struct RoomAutoMatchingCriteria {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchingCriteria.
     pub kind: String,
     /// The minimum number of players that should be added to the room by auto-matching.
-    #[serde(alias="minAutoMatchingPlayers")]
+    #[serde(rename="minAutoMatchingPlayers")]
     pub min_auto_matching_players: i32,
     /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
-    #[serde(alias="exclusiveBitmask")]
+    #[serde(rename="exclusiveBitmask")]
     pub exclusive_bitmask: String,
     /// The maximum number of players that should be added to the room by auto-matching.
-    #[serde(alias="maxAutoMatchingPlayers")]
+    #[serde(rename="maxAutoMatchingPlayers")]
     pub max_auto_matching_players: i32,
 }
 
@@ -626,12 +626,12 @@ impl Part for RoomAutoMatchingCriteria {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventUpdateRequest {
     /// The ID of the event being modified in this update.
-    #[serde(alias="definitionId")]
+    #[serde(rename="definitionId")]
     pub definition_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateRequest.
     pub kind: String,
     /// The number of times this event occurred in this time period.
-    #[serde(alias="updateCount")]
+    #[serde(rename="updateCount")]
     pub update_count: i64,
 }
 
@@ -650,7 +650,7 @@ impl Part for EventUpdateRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchList {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matches.
     pub items: Vec<TurnBasedMatch>,
@@ -675,7 +675,7 @@ pub struct AchievementUpdateMultipleResponse {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateListResponse.
     pub kind: String,
     /// The updated state of the achievements.
-    #[serde(alias="updatedAchievements")]
+    #[serde(rename="updatedAchievements")]
     pub updated_achievements: Vec<AchievementUpdateResponse>,
 }
 
@@ -691,7 +691,7 @@ pub struct EventChild {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventChild.
     pub kind: String,
     /// The ID of the child event.
-    #[serde(alias="childId")]
+    #[serde(rename="childId")]
     pub child_id: String,
 }
 
@@ -705,7 +705,7 @@ impl Part for EventChild {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventRecordFailure {
     /// The ID of the event that was not updated.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordFailure.
     pub kind: String,
@@ -713,7 +713,7 @@ pub struct EventRecordFailure {
     /// Possible values are:  
     /// - "NOT_FOUND" - An attempt was made to set an event that was not defined. 
     /// - "INVALID_UPDATE_VALUE" - An attempt was made to increment an event by a non-positive value.
-    #[serde(alias="failureCause")]
+    #[serde(rename="failureCause")]
     pub failure_cause: String,
 }
 
@@ -727,25 +727,25 @@ impl Part for EventRecordFailure {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementUpdateResponse {
     /// The current steps recorded for this achievement if it is incremental.
-    #[serde(alias="currentSteps")]
+    #[serde(rename="currentSteps")]
     pub current_steps: i32,
     /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
-    #[serde(alias="newlyUnlocked")]
+    #[serde(rename="newlyUnlocked")]
     pub newly_unlocked: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateResponse.
     pub kind: String,
     /// The achievement this update is was applied to.
-    #[serde(alias="achievementId")]
+    #[serde(rename="achievementId")]
     pub achievement_id: String,
     /// Whether the requested updates actually affected the achievement.
-    #[serde(alias="updateOccurred")]
+    #[serde(rename="updateOccurred")]
     pub update_occurred: bool,
     /// The current state of the achievement.
     /// Possible values are:  
     /// - "HIDDEN" - Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="currentState")]
+    #[serde(rename="currentState")]
     pub current_state: String,
 }
 
@@ -761,10 +761,10 @@ pub struct RoomModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomModification.
     pub kind: String,
     /// The timestamp at which they modified the room, in milliseconds since the epoch in UTC.
-    #[serde(alias="modifiedTimestampMillis")]
+    #[serde(rename="modifiedTimestampMillis")]
     pub modified_timestamp_millis: String,
     /// The ID of the participant that modified the room.
-    #[serde(alias="participantId")]
+    #[serde(rename="participantId")]
     pub participant_id: String,
 }
 
@@ -783,7 +783,7 @@ impl Part for RoomModification {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventDefinitionListResponse {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The event definitions.
     pub items: Vec<EventDefinition>,
@@ -812,19 +812,19 @@ pub struct PlayerScoreResponse {
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
-    #[serde(alias="beatenScoreTimeSpans")]
+    #[serde(rename="beatenScoreTimeSpans")]
     pub beaten_score_time_spans: Vec<String>,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    #[serde(alias="scoreTag")]
+    #[serde(rename="scoreTag")]
     pub score_tag: String,
     /// The scores in time spans that have not been beaten. As an example, the submitted score may be better than the player's DAILY score, but not better than the player's scores for the WEEKLY or ALL_TIME time spans.
-    #[serde(alias="unbeatenScores")]
+    #[serde(rename="unbeatenScores")]
     pub unbeaten_scores: Vec<PlayerScore>,
     /// The leaderboard ID that this score was submitted to.
-    #[serde(alias="leaderboardId")]
+    #[serde(rename="leaderboardId")]
     pub leaderboard_id: String,
     /// The formatted value of the submitted score.
-    #[serde(alias="formattedScore")]
+    #[serde(rename="formattedScore")]
     pub formatted_score: String,
 }
 
@@ -884,10 +884,10 @@ impl RequestValue for RoomP2PStatuses {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementIncrementResponse {
     /// The current steps recorded for this incremental achievement.
-    #[serde(alias="currentSteps")]
+    #[serde(rename="currentSteps")]
     pub current_steps: i32,
     /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
-    #[serde(alias="newlyUnlocked")]
+    #[serde(rename="newlyUnlocked")]
     pub newly_unlocked: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementIncrementResponse.
     pub kind: String,
@@ -908,14 +908,14 @@ impl ResponseResult for AchievementIncrementResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchSync {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matches.
     pub items: Vec<TurnBasedMatch>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchSync.
     pub kind: String,
     /// True if there were more matches available to fetch at the time the response was generated (which were not returned due to page size limits.)
-    #[serde(alias="moreAvailable")]
+    #[serde(rename="moreAvailable")]
     pub more_available: bool,
 }
 
@@ -934,17 +934,17 @@ impl ResponseResult for TurnBasedMatchSync {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchCreateRequest {
     /// The player ids to invite to the match.
-    #[serde(alias="invitedPlayerIds")]
+    #[serde(rename="invitedPlayerIds")]
     pub invited_player_ids: Option<Vec<String>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchCreateRequest.
     pub kind: Option<String>,
     /// Criteria for auto-matching players into this match.
-    #[serde(alias="autoMatchingCriteria")]
+    #[serde(rename="autoMatchingCriteria")]
     pub auto_matching_criteria: Option<TurnBasedAutoMatchingCriteria>,
     /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.
     pub variant: Option<i32>,
     /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.
-    #[serde(alias="requestId")]
+    #[serde(rename="requestId")]
     pub request_id: Option<String>,
 }
 
@@ -966,22 +966,22 @@ pub struct Quest {
     /// The description of the quest.
     pub description: String,
     /// The banner image URL for the quest.
-    #[serde(alias="bannerUrl")]
+    #[serde(rename="bannerUrl")]
     pub banner_url: String,
     /// The timestamp at which the quest was last updated by the user in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
-    #[serde(alias="lastUpdatedTimestampMillis")]
+    #[serde(rename="lastUpdatedTimestampMillis")]
     pub last_updated_timestamp_millis: String,
     /// The timestamp at which the user accepted the quest in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
-    #[serde(alias="acceptedTimestampMillis")]
+    #[serde(rename="acceptedTimestampMillis")]
     pub accepted_timestamp_millis: String,
     /// The icon image URL for the quest.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// The timestamp at which the user should be notified that the quest will end soon in milliseconds since the epoch in UTC.
-    #[serde(alias="notifyTimestampMillis")]
+    #[serde(rename="notifyTimestampMillis")]
     pub notify_timestamp_millis: String,
     /// The ID of the application this quest is part of.
-    #[serde(alias="applicationId")]
+    #[serde(rename="applicationId")]
     pub application_id: String,
     /// The ID of the quest.
     pub id: String,
@@ -992,10 +992,10 @@ pub struct Quest {
     /// The name of the quest.
     pub name: String,
     /// The timestamp at which the quest becomes active in milliseconds since the epoch in UTC.
-    #[serde(alias="startTimestampMillis")]
+    #[serde(rename="startTimestampMillis")]
     pub start_timestamp_millis: String,
     /// The timestamp at which the quest ceases to be active in milliseconds since the epoch in UTC.
-    #[serde(alias="endTimestampMillis")]
+    #[serde(rename="endTimestampMillis")]
     pub end_timestamp_millis: String,
     /// The state of the quest.
     /// Possible values are:  
@@ -1008,10 +1008,10 @@ pub struct Quest {
     /// - "DELETED": The quest should be deleted from the local database.
     pub state: String,
     /// Indicates whether the banner image being returned is a default image, or is game-provided.
-    #[serde(alias="isDefaultBannerUrl")]
+    #[serde(rename="isDefaultBannerUrl")]
     pub is_default_banner_url: bool,
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
-    #[serde(alias="isDefaultIconUrl")]
+    #[serde(rename="isDefaultIconUrl")]
     pub is_default_icon_url: bool,
 }
 
@@ -1052,10 +1052,10 @@ impl Part for AggregateStats {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementSetStepsAtLeastResponse {
     /// The current steps recorded for this incremental achievement.
-    #[serde(alias="currentSteps")]
+    #[serde(rename="currentSteps")]
     pub current_steps: i32,
     /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
-    #[serde(alias="newlyUnlocked")]
+    #[serde(rename="newlyUnlocked")]
     pub newly_unlocked: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementSetStepsAtLeastResponse.
     pub kind: String,
@@ -1078,10 +1078,10 @@ pub struct MetagameConfig {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#metagameConfig.
     pub kind: String,
     /// Current version of the metagame configuration data. When this data is updated, the version number will be increased by one.
-    #[serde(alias="currentVersion")]
+    #[serde(rename="currentVersion")]
     pub current_version: i32,
     /// The list of player levels.
-    #[serde(alias="playerLevels")]
+    #[serde(rename="playerLevels")]
     pub player_levels: Vec<PlayerLevel>,
 }
 
@@ -1100,7 +1100,7 @@ impl ResponseResult for MetagameConfig {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementDefinitionsListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The achievement definitions.
     pub items: Vec<AchievementDefinition>,
@@ -1118,18 +1118,18 @@ impl ResponseResult for AchievementDefinitionsListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PeerSessionDiagnostics {
     /// Unreliable channel diagnostics.
-    #[serde(alias="unreliableChannel")]
+    #[serde(rename="unreliableChannel")]
     pub unreliable_channel: PeerChannelDiagnostics,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerSessionDiagnostics.
     pub kind: String,
     /// Reliable channel diagnostics.
-    #[serde(alias="reliableChannel")]
+    #[serde(rename="reliableChannel")]
     pub reliable_channel: PeerChannelDiagnostics,
     /// Connected time in milliseconds.
-    #[serde(alias="connectedTimestampMillis")]
+    #[serde(rename="connectedTimestampMillis")]
     pub connected_timestamp_millis: String,
     /// The participant ID of the peer.
-    #[serde(alias="participantId")]
+    #[serde(rename="participantId")]
     pub participant_id: String,
 }
 
@@ -1160,10 +1160,10 @@ pub struct EventPeriodRange {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodRange.
     pub kind: String,
     /// The time when this update period begins, in millis, since 1970 UTC (Unix Epoch).
-    #[serde(alias="periodStartMillis")]
+    #[serde(rename="periodStartMillis")]
     pub period_start_millis: String,
     /// The time when this update period ends, in millis, since 1970 UTC (Unix Epoch).
-    #[serde(alias="periodEndMillis")]
+    #[serde(rename="periodEndMillis")]
     pub period_end_millis: String,
 }
 
@@ -1181,7 +1181,7 @@ pub struct ParticipantResult {
     /// The placement or ranking of the participant in the match results; a number from one to the number of participants in the match. Multiple participants may have the same placing value in case of a type.
     pub placing: i32,
     /// The ID of the participant.
-    #[serde(alias="participantId")]
+    #[serde(rename="participantId")]
     pub participant_id: String,
     /// The result of the participant for this match.
     /// Possible values are:  
@@ -1206,22 +1206,22 @@ pub struct NetworkDiagnostics {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#networkDiagnostics.
     pub kind: String,
     /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
-    #[serde(alias="networkOperatorName")]
+    #[serde(rename="networkOperatorName")]
     pub network_operator_name: String,
     /// The amount of time in milliseconds it took for the client to establish a connection with the XMPP server.
-    #[serde(alias="registrationLatencyMillis")]
+    #[serde(rename="registrationLatencyMillis")]
     pub registration_latency_millis: i32,
     /// iOS network type as defined in Reachability.h.
-    #[serde(alias="iosNetworkType")]
+    #[serde(rename="iosNetworkType")]
     pub ios_network_type: i32,
     /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
-    #[serde(alias="networkOperatorCode")]
+    #[serde(rename="networkOperatorCode")]
     pub network_operator_code: String,
     /// The Android network subtype.
-    #[serde(alias="androidNetworkSubtype")]
+    #[serde(rename="androidNetworkSubtype")]
     pub android_network_subtype: i32,
     /// The Android network type.
-    #[serde(alias="androidNetworkType")]
+    #[serde(rename="androidNetworkType")]
     pub android_network_type: i32,
 }
 
@@ -1266,7 +1266,7 @@ pub struct EventBatchRecordFailure {
     /// - "TIME_PERIOD_LONG": A batch was sent with a time range that was too long. 
     /// - "ALREADY_UPDATED": An attempt was made to record a batch of data which was already seen. 
     /// - "RECORD_RATE_HIGH": An attempt was made to record data faster than the server will apply updates.
-    #[serde(alias="failureCause")]
+    #[serde(rename="failureCause")]
     pub failure_cause: String,
 }
 
@@ -1282,7 +1282,7 @@ pub struct RoomClientAddress {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomClientAddress.
     pub kind: String,
     /// The XMPP address of the client on the Google Games XMPP network.
-    #[serde(alias="xmppAddress")]
+    #[serde(rename="xmppAddress")]
     pub xmpp_address: String,
 }
 
@@ -1296,18 +1296,18 @@ impl Part for RoomClientAddress {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerExperienceInfo {
     /// The current number of experience points for the player.
-    #[serde(alias="currentExperiencePoints")]
+    #[serde(rename="currentExperiencePoints")]
     pub current_experience_points: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerExperienceInfo.
     pub kind: String,
     /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.
-    #[serde(alias="lastLevelUpTimestampMillis")]
+    #[serde(rename="lastLevelUpTimestampMillis")]
     pub last_level_up_timestamp_millis: String,
     /// The next level of the player. If the current level is the maximum level, this should be same as the current level.
-    #[serde(alias="nextLevel")]
+    #[serde(rename="nextLevel")]
     pub next_level: PlayerLevel,
     /// The current level of the player.
-    #[serde(alias="currentLevel")]
+    #[serde(rename="currentLevel")]
     pub current_level: PlayerLevel,
 }
 
@@ -1327,20 +1327,20 @@ impl Part for PlayerExperienceInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardScores {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScores.
     pub kind: String,
     /// The pagination token for the previous page of results.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// The total number of scores in the leaderboard.
-    #[serde(alias="numScores")]
+    #[serde(rename="numScores")]
     pub num_scores: String,
     /// The scores in the leaderboard.
     pub items: Vec<LeaderboardEntry>,
     /// The score of the requesting player on the leaderboard. The player's score may appear both here and in the list of scores above. If you are viewing a public leaderboard and the player is not sharing their gameplay information publicly, the scoreRank and formattedScoreRank values will not be present.
-    #[serde(alias="playerScore")]
+    #[serde(rename="playerScore")]
     pub player_score: LeaderboardEntry,
 }
 
@@ -1354,7 +1354,7 @@ impl ResponseResult for LeaderboardScores {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomParticipant {
     /// True if this participant was auto-matched with the requesting player.
-    #[serde(alias="autoMatched")]
+    #[serde(rename="autoMatched")]
     pub auto_matched: bool,
     /// The status of the participant with respect to the room.
     /// Possible values are:  
@@ -1366,10 +1366,10 @@ pub struct RoomParticipant {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomParticipant.
     pub kind: String,
     /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
-    #[serde(alias="autoMatchedPlayer")]
+    #[serde(rename="autoMatchedPlayer")]
     pub auto_matched_player: AnonymousPlayer,
     /// Client address for the participant.
-    #[serde(alias="clientAddress")]
+    #[serde(rename="clientAddress")]
     pub client_address: RoomClientAddress,
     /// The capabilities which can be used when communicating with this participant.
     pub capabilities: Vec<String>,
@@ -1384,7 +1384,7 @@ pub struct RoomParticipant {
     /// - "SERVER_ERROR" - The client received an error response when it tried to communicate with the server. 
     /// - "TIMEOUT" - The client timed out while waiting for players to join and connect. 
     /// - "PRESENCE_FAILURE" - The client's XMPP connection ended abruptly.
-    #[serde(alias="leaveReason")]
+    #[serde(rename="leaveReason")]
     pub leave_reason: String,
     /// True if this participant is in the fully connected set of peers in the room.
     pub connected: bool,
@@ -1414,29 +1414,29 @@ pub struct Snapshot {
     /// The title of this snapshot.
     pub title: String,
     /// The cover image of this snapshot. May be absent if there is no image.
-    #[serde(alias="coverImage")]
+    #[serde(rename="coverImage")]
     pub cover_image: SnapshotImage,
     /// The timestamp (in millis since Unix epoch) of the last modification to this snapshot.
-    #[serde(alias="lastModifiedMillis")]
+    #[serde(rename="lastModifiedMillis")]
     pub last_modified_millis: String,
     /// The ID of the snapshot.
     pub id: String,
     /// The ID of the file underlying this snapshot in the Drive API. Only present if the snapshot is a view on a Drive file and the file is owned by the caller.
-    #[serde(alias="driveId")]
+    #[serde(rename="driveId")]
     pub drive_id: String,
     /// The duration associated with this snapshot, in millis.
-    #[serde(alias="durationMillis")]
+    #[serde(rename="durationMillis")]
     pub duration_millis: String,
     /// The unique name provided when the snapshot was created.
-    #[serde(alias="uniqueName")]
+    #[serde(rename="uniqueName")]
     pub unique_name: String,
     /// The type of this snapshot.
     /// Possible values are:  
     /// - "SAVE_GAME" - A snapshot representing a save game.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The progress value (64-bit integer set by developer) associated with this snapshot.
-    #[serde(alias="progressValue")]
+    #[serde(rename="progressValue")]
     pub progress_value: String,
 }
 
@@ -1474,7 +1474,7 @@ pub struct RoomLeaveRequest {
     /// - "REALTIME_SAME_CLIENT_ROOM_OPERATION" - The same client is trying to enter a new room.
     pub reason: Option<String>,
     /// Diagnostics for a player leaving the room.
-    #[serde(alias="leaveDiagnostics")]
+    #[serde(rename="leaveDiagnostics")]
     pub leave_diagnostics: Option<RoomLeaveDiagnostics>,
 }
 
@@ -1493,7 +1493,7 @@ impl RequestValue for RoomLeaveRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreListResponse {
     /// The score submissions statuses.
-    #[serde(alias="submittedScores")]
+    #[serde(rename="submittedScores")]
     pub submitted_scores: Vec<PlayerScoreResponse>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreListResponse.
     pub kind: String,
@@ -1511,25 +1511,25 @@ pub struct RoomLeaveDiagnostics {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveDiagnostics.
     pub kind: String,
     /// Whether or not sockets were used.
-    #[serde(alias="socketsUsed")]
+    #[serde(rename="socketsUsed")]
     pub sockets_used: bool,
     /// iOS network type as defined in Reachability.h.
-    #[serde(alias="iosNetworkType")]
+    #[serde(rename="iosNetworkType")]
     pub ios_network_type: i32,
     /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
-    #[serde(alias="networkOperatorCode")]
+    #[serde(rename="networkOperatorCode")]
     pub network_operator_code: String,
     /// Diagnostics about all peer sessions.
-    #[serde(alias="peerSession")]
+    #[serde(rename="peerSession")]
     pub peer_session: Vec<PeerSessionDiagnostics>,
     /// Android network subtype. http://developer.android.com/reference/android/net/NetworkInfo.html#getSubtype()
-    #[serde(alias="androidNetworkSubtype")]
+    #[serde(rename="androidNetworkSubtype")]
     pub android_network_subtype: i32,
     /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
-    #[serde(alias="networkOperatorName")]
+    #[serde(rename="networkOperatorName")]
     pub network_operator_name: String,
     /// Android network type. http://developer.android.com/reference/android/net/NetworkInfo.html#getType()
-    #[serde(alias="androidNetworkType")]
+    #[serde(rename="androidNetworkType")]
     pub android_network_type: i32,
 }
 
@@ -1555,7 +1555,7 @@ pub struct QuestMilestone {
     /// - "NOT_STARTED" - The milestone is for a quest that has not yet been accepted.
     pub state: Option<String>,
     /// The completion reward data of the milestone, represented as a Base64-encoded string. This is a developer-specified binary blob with size between 0 and 2 KB before encoding.
-    #[serde(alias="completionRewardData")]
+    #[serde(rename="completionRewardData")]
     pub completion_reward_data: Option<String>,
     /// The milestone ID.
     pub id: Option<String>,
@@ -1584,7 +1584,7 @@ pub struct TurnBasedMatchRematch {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchRematch.
     pub kind: String,
     /// The old match that the rematch was created from; will be updated such that the rematchId field will point at the new match.
-    #[serde(alias="previousMatch")]
+    #[serde(rename="previousMatch")]
     pub previous_match: TurnBasedMatch,
 }
 
@@ -1603,7 +1603,7 @@ impl ResponseResult for TurnBasedMatchRematch {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLeaderboardScoreListResponse {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The leaderboard scores.
     pub items: Vec<PlayerLeaderboardScore>,
@@ -1631,14 +1631,14 @@ pub struct Application {
     /// The category of the application.
     pub category: ApplicationCategory,
     /// A hint to the client UI for what color to use as an app-themed color. The color is given as an RGB triplet (e.g. "E0E0E0").
-    #[serde(alias="themeColor")]
+    #[serde(rename="themeColor")]
     pub theme_color: String,
     /// The description of the application.
     pub description: String,
     /// The author of the application.
     pub author: String,
     /// The last updated timestamp of the application.
-    #[serde(alias="lastUpdatedTimestamp")]
+    #[serde(rename="lastUpdatedTimestamp")]
     pub last_updated_timestamp: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#application.
     pub kind: String,
@@ -1647,7 +1647,7 @@ pub struct Application {
     /// A list of features that have been enabled for the application.
     /// Possible values are:  
     /// - "SNAPSHOTS" - Snapshots has been enabled
-    #[serde(alias="enabledFeatures")]
+    #[serde(rename="enabledFeatures")]
     pub enabled_features: Vec<String>,
     /// The number of achievements visible to the currently authenticated player.
     pub achievement_count: i32,
@@ -1672,12 +1672,12 @@ impl ResponseResult for Application {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Played {
     /// True if the player was auto-matched with the currently authenticated user.
-    #[serde(alias="autoMatched")]
+    #[serde(rename="autoMatched")]
     pub auto_matched: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#played.
     pub kind: String,
     /// The last time the player played the game in milliseconds since the epoch in UTC.
-    #[serde(alias="timeMillis")]
+    #[serde(rename="timeMillis")]
     pub time_millis: String,
 }
 
@@ -1691,7 +1691,7 @@ impl Part for Played {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestContribution {
     /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.
-    #[serde(alias="formattedValue")]
+    #[serde(rename="formattedValue")]
     pub formatted_value: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#questContribution.
     pub kind: String,
@@ -1709,20 +1709,20 @@ impl Part for QuestContribution {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestCriterion {
     /// The ID of the event the criterion corresponds to.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The total number of times the associated event must be incremented for the player to complete this quest.
-    #[serde(alias="completionContribution")]
+    #[serde(rename="completionContribution")]
     pub completion_contribution: QuestContribution,
     /// The value of the event associated with this quest at the time that the quest was accepted. This value may change if event increments that took place before the start of quest are uploaded after the quest starts.
     /// There will be no initialPlayerProgress until the player has accepted the quest.
-    #[serde(alias="initialPlayerProgress")]
+    #[serde(rename="initialPlayerProgress")]
     pub initial_player_progress: QuestContribution,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#questCriterion.
     pub kind: String,
     /// The number of increments the player has made toward the completion count event increments required to complete the quest. This value will not exceed the completion contribution.
     /// There will be no currentContribution until the player has accepted the quest.
-    #[serde(alias="currentContribution")]
+    #[serde(rename="currentContribution")]
     pub current_contribution: QuestContribution,
 }
 
@@ -1741,7 +1741,7 @@ impl Part for QuestCriterion {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomList {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The rooms.
     pub items: Vec<Room>,
@@ -1759,12 +1759,12 @@ impl ResponseResult for RoomList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLevel {
     /// The maximum experience points for this level.
-    #[serde(alias="maxExperiencePoints")]
+    #[serde(rename="maxExperiencePoints")]
     pub max_experience_points: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLevel.
     pub kind: String,
     /// The minimum experience points for this level.
-    #[serde(alias="minExperiencePoints")]
+    #[serde(rename="minExperiencePoints")]
     pub min_experience_points: String,
     /// The level for the user.
     pub level: i32,
@@ -1782,7 +1782,7 @@ pub struct RoomAutoMatchStatus {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchStatus.
     pub kind: String,
     /// An estimate for the amount of time (in seconds) that auto-matching is expected to take to complete.
-    #[serde(alias="waitEstimateSeconds")]
+    #[serde(rename="waitEstimateSeconds")]
     pub wait_estimate_seconds: i32,
 }
 
@@ -1800,7 +1800,7 @@ pub struct TurnBasedMatchData {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchData.
     pub kind: String,
     /// True if this match has data available but it wasn't returned in a list response; fetching the match individually will retrieve this data.
-    #[serde(alias="dataAvailable")]
+    #[serde(rename="dataAvailable")]
     pub data_available: bool,
 }
 
@@ -1814,17 +1814,17 @@ impl Part for TurnBasedMatchData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventDefinition {
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
-    #[serde(alias="isDefaultImageUrl")]
+    #[serde(rename="isDefaultImageUrl")]
     pub is_default_image_url: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinition.
     pub kind: String,
     /// The name to display for the event.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// Description of what this event represents.
     pub description: String,
     /// The base URL for the image that represents the event.
-    #[serde(alias="imageUrl")]
+    #[serde(rename="imageUrl")]
     pub image_url: String,
     /// The visibility of event being tracked in this definition.
     /// Possible values are:  
@@ -1832,7 +1832,7 @@ pub struct EventDefinition {
     /// - "HIDDEN": This event should only be shown to users that have recorded this event at least once.
     pub visibility: String,
     /// A list of events that are a child of this event.
-    #[serde(alias="childEvents")]
+    #[serde(rename="childEvents")]
     pub child_events: Vec<EventChild>,
     /// The ID of the event.
     pub id: String,
@@ -1848,24 +1848,24 @@ impl Part for EventDefinition {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceIosDetails {
     /// Indicates that this instance is the default for new installations on iPhone devices.
-    #[serde(alias="preferredForIphone")]
+    #[serde(rename="preferredForIphone")]
     pub preferred_for_iphone: bool,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceIosDetails.
     pub kind: String,
     /// Flag to indicate if this instance supports iPhone.
-    #[serde(alias="supportIphone")]
+    #[serde(rename="supportIphone")]
     pub support_iphone: bool,
     /// Indicates that this instance is the default for new installations on iPad devices.
-    #[serde(alias="preferredForIpad")]
+    #[serde(rename="preferredForIpad")]
     pub preferred_for_ipad: bool,
     /// iTunes App ID.
-    #[serde(alias="itunesAppId")]
+    #[serde(rename="itunesAppId")]
     pub itunes_app_id: String,
     /// Bundle identifier.
-    #[serde(alias="bundleIdentifier")]
+    #[serde(rename="bundleIdentifier")]
     pub bundle_identifier: String,
     /// Flag to indicate if this instance supports iPad.
-    #[serde(alias="supportIpad")]
+    #[serde(rename="supportIpad")]
     pub support_ipad: bool,
 }
 
@@ -1881,10 +1881,10 @@ pub struct InstanceAndroidDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceAndroidDetails.
     pub kind: String,
     /// Flag indicating whether the anti-piracy check is enabled.
-    #[serde(alias="enablePiracyCheck")]
+    #[serde(rename="enablePiracyCheck")]
     pub enable_piracy_check: bool,
     /// Android package name which maps to Google Play URL.
-    #[serde(alias="packageName")]
+    #[serde(rename="packageName")]
     pub package_name: String,
     /// Indicates that this instance is the default for new installations.
     pub preferred: bool,
@@ -1910,7 +1910,7 @@ pub struct AchievementRevealResponse {
     /// Possible values are:  
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="currentState")]
+    #[serde(rename="currentState")]
     pub current_state: String,
 }
 
@@ -1946,34 +1946,34 @@ pub struct Room {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#room.
     pub kind: String,
     /// Criteria for auto-matching players into this room.
-    #[serde(alias="autoMatchingCriteria")]
+    #[serde(rename="autoMatchingCriteria")]
     pub auto_matching_criteria: RoomAutoMatchingCriteria,
     /// Details about the room creation.
-    #[serde(alias="creationDetails")]
+    #[serde(rename="creationDetails")]
     pub creation_details: RoomModification,
     /// This short description is generated by our servers and worded relative to the player requesting the room. It is intended to be displayed when the room is shown in a list (that is, an invitation to a room.)
     pub description: String,
     /// The version of the room status: an increasing counter, used by the client to ignore out-of-order updates to room status.
-    #[serde(alias="roomStatusVersion")]
+    #[serde(rename="roomStatusVersion")]
     pub room_status_version: i32,
     /// Auto-matching status for this room. Not set if the room is not currently in the auto-matching queue.
-    #[serde(alias="autoMatchingStatus")]
+    #[serde(rename="autoMatchingStatus")]
     pub auto_matching_status: RoomAutoMatchStatus,
     /// Details about the last update to the room.
-    #[serde(alias="lastUpdateDetails")]
+    #[serde(rename="lastUpdateDetails")]
     pub last_update_details: RoomModification,
     /// The variant / mode of the application being played; can be any integer value, or left blank.
     pub variant: i32,
     /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<RoomParticipant>,
     /// Globally unique ID for a room.
-    #[serde(alias="roomId")]
+    #[serde(rename="roomId")]
     pub room_id: String,
     /// The ID of the application being played.
-    #[serde(alias="applicationId")]
+    #[serde(rename="applicationId")]
     pub application_id: String,
     /// The ID of the participant that invited the user to the room. Not set if the user was not invited to the room.
-    #[serde(alias="inviterId")]
+    #[serde(rename="inviterId")]
     pub inviter_id: String,
 }
 
@@ -1990,31 +1990,31 @@ pub struct LeaderboardEntry {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardEntry.
     pub kind: String,
     /// The numerical value of this score.
-    #[serde(alias="scoreValue")]
+    #[serde(rename="scoreValue")]
     pub score_value: String,
     /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    #[serde(alias="scoreTag")]
+    #[serde(rename="scoreTag")]
     pub score_tag: String,
     /// The time span of this high score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time high score. 
     /// - "WEEKLY" - The score is a weekly high score. 
     /// - "DAILY" - The score is a daily high score.
-    #[serde(alias="timeSpan")]
+    #[serde(rename="timeSpan")]
     pub time_span: String,
     /// The localized string for the numerical value of this score.
-    #[serde(alias="formattedScore")]
+    #[serde(rename="formattedScore")]
     pub formatted_score: String,
     /// The player who holds this score.
     pub player: Player,
     /// The localized string for the rank of this score for this leaderboard.
-    #[serde(alias="formattedScoreRank")]
+    #[serde(rename="formattedScoreRank")]
     pub formatted_score_rank: String,
     /// The rank of this score for this leaderboard.
-    #[serde(alias="scoreRank")]
+    #[serde(rename="scoreRank")]
     pub score_rank: String,
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
-    #[serde(alias="writeTimestampMillis")]
+    #[serde(rename="writeTimestampMillis")]
     pub write_timestamp_millis: String,
 }
 
@@ -2030,13 +2030,13 @@ pub struct TurnBasedAutoMatchingCriteria {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.
     pub kind: String,
     /// The minimum number of players that should be added to the match by auto-matching.
-    #[serde(alias="minAutoMatchingPlayers")]
+    #[serde(rename="minAutoMatchingPlayers")]
     pub min_auto_matching_players: i32,
     /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
-    #[serde(alias="exclusiveBitmask")]
+    #[serde(rename="exclusiveBitmask")]
     pub exclusive_bitmask: String,
     /// The maximum number of players that should be added to the match by auto-matching.
-    #[serde(alias="maxAutoMatchingPlayers")]
+    #[serde(rename="maxAutoMatchingPlayers")]
     pub max_auto_matching_players: i32,
 }
 
@@ -2057,23 +2057,23 @@ pub struct RoomCreateRequest {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomCreateRequest.
     pub kind: Option<String>,
     /// Criteria for auto-matching players into this room.
-    #[serde(alias="autoMatchingCriteria")]
+    #[serde(rename="autoMatchingCriteria")]
     pub auto_matching_criteria: Option<RoomAutoMatchingCriteria>,
     /// The player IDs to invite to the room.
-    #[serde(alias="invitedPlayerIds")]
+    #[serde(rename="invitedPlayerIds")]
     pub invited_player_ids: Option<Vec<String>>,
     /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.
     pub variant: Option<i32>,
     /// The capabilities that this client supports for realtime communication.
     pub capabilities: Option<Vec<String>>,
     /// Network diagnostics for the client creating the room.
-    #[serde(alias="networkDiagnostics")]
+    #[serde(rename="networkDiagnostics")]
     pub network_diagnostics: Option<NetworkDiagnostics>,
     /// Client address for the player creating the room.
-    #[serde(alias="clientAddress")]
+    #[serde(rename="clientAddress")]
     pub client_address: Option<RoomClientAddress>,
     /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.
-    #[serde(alias="requestId")]
+    #[serde(rename="requestId")]
     pub request_id: Option<String>,
 }
 
@@ -2092,7 +2092,7 @@ impl RequestValue for RoomCreateRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The quests.
     pub items: Vec<Quest>,
@@ -2115,7 +2115,7 @@ impl ResponseResult for QuestListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerEventListResponse {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The player events.
     pub items: Vec<PlayerEvent>,
@@ -2137,7 +2137,7 @@ pub struct GamesAchievementIncrement {
     /// The number of steps to be incremented.
     pub steps: i32,
     /// The requestId associated with an increment to an achievement.
-    #[serde(alias="requestId")]
+    #[serde(rename="requestId")]
     pub request_id: String,
 }
 
@@ -2153,10 +2153,10 @@ pub struct TurnBasedMatchModification {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchModification.
     pub kind: String,
     /// The timestamp at which they modified the match, in milliseconds since the epoch in UTC.
-    #[serde(alias="modifiedTimestampMillis")]
+    #[serde(rename="modifiedTimestampMillis")]
     pub modified_timestamp_millis: String,
     /// The ID of the participant that modified the match.
-    #[serde(alias="participantId")]
+    #[serde(rename="participantId")]
     pub participant_id: String,
 }
 
@@ -2175,7 +2175,7 @@ impl Part for TurnBasedMatchModification {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerAchievementListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The achievements.
     pub items: Vec<PlayerAchievement>,
@@ -2201,7 +2201,7 @@ pub struct PushToken {
     pub kind: Option<String>,
     /// The revision of the client SDK used by your application, in the same format that's used by revisions.check. Used to send backward compatible messages. Format: [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:  
     /// - IOS - Push token is for iOS
-    #[serde(alias="clientRevision")]
+    #[serde(rename="clientRevision")]
     pub client_revision: Option<String>,
     /// Unique identifier for this push token.
     pub id: Option<PushTokenId>,
@@ -2220,33 +2220,33 @@ impl Resource for PushToken {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLeaderboardScore {
     /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
-    #[serde(alias="writeTimestamp")]
+    #[serde(rename="writeTimestamp")]
     pub write_timestamp: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScore.
     pub kind: String,
     /// The public rank of the score in this leaderboard. This object will not be present if the user is not sharing their scores publicly.
-    #[serde(alias="publicRank")]
+    #[serde(rename="publicRank")]
     pub public_rank: LeaderboardScoreRank,
     /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    #[serde(alias="scoreTag")]
+    #[serde(rename="scoreTag")]
     pub score_tag: String,
     /// The time span of this score.
     /// Possible values are:  
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
-    #[serde(alias="timeSpan")]
+    #[serde(rename="timeSpan")]
     pub time_span: String,
     /// The formatted value of this score.
-    #[serde(alias="scoreString")]
+    #[serde(rename="scoreString")]
     pub score_string: String,
     /// The ID of the leaderboard this score is in.
     pub leaderboard_id: String,
     /// The numerical value of this score.
-    #[serde(alias="scoreValue")]
+    #[serde(rename="scoreValue")]
     pub score_value: String,
     /// The social rank of the score in this leaderboard.
-    #[serde(alias="socialRank")]
+    #[serde(rename="socialRank")]
     pub social_rank: LeaderboardScoreRank,
 }
 
@@ -2303,10 +2303,10 @@ pub struct AnonymousPlayer {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#anonymousPlayer.
     pub kind: String,
     /// The base URL for the image to display for the anonymous player.
-    #[serde(alias="avatarImageUrl")]
+    #[serde(rename="avatarImageUrl")]
     pub avatar_image_url: String,
     /// The name to display for the anonymous player.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
 }
 
@@ -2320,27 +2320,27 @@ impl Part for AnonymousPlayer {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PeerChannelDiagnostics {
     /// Number of bytes received.
-    #[serde(alias="bytesReceived")]
+    #[serde(rename="bytesReceived")]
     pub bytes_received: AggregateStats,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerChannelDiagnostics.
     pub kind: String,
     /// Number of bytes sent.
-    #[serde(alias="bytesSent")]
+    #[serde(rename="bytesSent")]
     pub bytes_sent: AggregateStats,
     /// Number of send failures.
-    #[serde(alias="numSendFailures")]
+    #[serde(rename="numSendFailures")]
     pub num_send_failures: i32,
     /// Number of messages lost.
-    #[serde(alias="numMessagesLost")]
+    #[serde(rename="numMessagesLost")]
     pub num_messages_lost: i32,
     /// Number of messages received.
-    #[serde(alias="numMessagesReceived")]
+    #[serde(rename="numMessagesReceived")]
     pub num_messages_received: i32,
     /// Number of messages sent.
-    #[serde(alias="numMessagesSent")]
+    #[serde(rename="numMessagesSent")]
     pub num_messages_sent: i32,
     /// Roundtrip latency stats in milliseconds.
-    #[serde(alias="roundtripLatencyMillis")]
+    #[serde(rename="roundtripLatencyMillis")]
     pub roundtrip_latency_millis: AggregateStats,
 }
 
@@ -2359,10 +2359,10 @@ impl Part for PeerChannelDiagnostics {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomJoinRequest {
     /// Network diagnostics for the client joining the room.
-    #[serde(alias="networkDiagnostics")]
+    #[serde(rename="networkDiagnostics")]
     pub network_diagnostics: Option<NetworkDiagnostics>,
     /// Client address for the player joining the room.
-    #[serde(alias="clientAddress")]
+    #[serde(rename="clientAddress")]
     pub client_address: Option<RoomClientAddress>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomJoinRequest.
     pub kind: Option<String>,
@@ -2395,13 +2395,13 @@ pub struct RoomStatus {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomStatus.
     pub kind: String,
     /// The version of the status for the room: an increasing counter, used by the client to ignore out-of-order updates to room status.
-    #[serde(alias="statusVersion")]
+    #[serde(rename="statusVersion")]
     pub status_version: i32,
     /// Globally unique ID for a room.
-    #[serde(alias="roomId")]
+    #[serde(rename="roomId")]
     pub room_id: String,
     /// Auto-matching status for this room. Not set if the room is not currently in the automatching queue.
-    #[serde(alias="autoMatchingStatus")]
+    #[serde(rename="autoMatchingStatus")]
     pub auto_matching_status: RoomAutoMatchStatus,
     /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<RoomParticipant>,
@@ -2439,7 +2439,7 @@ impl Part for PushTokenIdIos {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Leaderboard {
     /// The icon for the leaderboard.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboard.
     pub kind: String,
@@ -2448,7 +2448,7 @@ pub struct Leaderboard {
     /// The leaderboard ID.
     pub id: String,
     /// Indicates whether the icon image being returned is a default image, or is game-provided.
-    #[serde(alias="isIconUrlDefault")]
+    #[serde(rename="isIconUrlDefault")]
     pub is_icon_url_default: bool,
     /// How scores are ordered.
     /// Possible values are:  
@@ -2468,7 +2468,7 @@ impl ResponseResult for Leaderboard {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchParticipant {
     /// True if this participant was auto-matched with the requesting player.
-    #[serde(alias="autoMatched")]
+    #[serde(rename="autoMatched")]
     pub auto_matched: bool,
     /// The status of the participant with respect to the match.
     /// Possible values are:  
@@ -2483,7 +2483,7 @@ pub struct TurnBasedMatchParticipant {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchParticipant.
     pub kind: String,
     /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
-    #[serde(alias="autoMatchedPlayer")]
+    #[serde(rename="autoMatchedPlayer")]
     pub auto_matched_player: AnonymousPlayer,
     /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     pub player: Player,
@@ -2501,17 +2501,17 @@ impl Part for TurnBasedMatchParticipant {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardScoreRank {
     /// The number of scores in the leaderboard.
-    #[serde(alias="numScores")]
+    #[serde(rename="numScores")]
     pub num_scores: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScoreRank.
     pub kind: String,
     /// The rank in the leaderboard as a string.
-    #[serde(alias="formattedRank")]
+    #[serde(rename="formattedRank")]
     pub formatted_rank: String,
     /// The rank in the leaderboard.
     pub rank: String,
     /// The number of scores in the leaderboard as a string.
-    #[serde(alias="formattedNumScores")]
+    #[serde(rename="formattedNumScores")]
     pub formatted_num_scores: String,
 }
 
@@ -2525,10 +2525,10 @@ impl Part for LeaderboardScoreRank {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerName {
     /// The given name of this player. In some places, this is known as the first name.
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
     /// The family name of this player. In some places, this is known as the last name.
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
 }
 
@@ -2547,21 +2547,21 @@ pub struct PlayerAchievement {
     /// - "HIDDEN" - Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="achievementState")]
+    #[serde(rename="achievementState")]
     pub achievement_state: String,
     /// The current steps for an incremental achievement.
-    #[serde(alias="currentSteps")]
+    #[serde(rename="currentSteps")]
     pub current_steps: i32,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievement.
     pub kind: String,
     /// Experience points earned for the achievement. This field is absent for achievements that have not yet been unlocked and 0 for achievements that have been unlocked by testers but that are unpublished.
-    #[serde(alias="experiencePoints")]
+    #[serde(rename="experiencePoints")]
     pub experience_points: String,
     /// The current steps for an incremental achievement as a string.
-    #[serde(alias="formattedCurrentStepsString")]
+    #[serde(rename="formattedCurrentStepsString")]
     pub formatted_current_steps_string: String,
     /// The timestamp of the last modification to this achievement's state.
-    #[serde(alias="lastUpdatedTimestamp")]
+    #[serde(rename="lastUpdatedTimestamp")]
     pub last_updated_timestamp: String,
     /// The ID of the achievement.
     pub id: String,
@@ -2584,7 +2584,7 @@ pub struct RoomP2PStatus {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatus.
     pub kind: String,
     /// The ID of the participant.
-    #[serde(alias="participantId")]
+    #[serde(rename="participantId")]
     pub participant_id: String,
     /// The error code in event of a failure.
     /// Possible values are:  
@@ -2595,10 +2595,10 @@ pub struct RoomP2PStatus {
     /// More detailed diagnostic message returned in event of a failure.
     pub error_reason: String,
     /// The amount of time in milliseconds it took to send packets back and forth on the unreliable channel with this peer.
-    #[serde(alias="unreliableRoundtripLatencyMillis")]
+    #[serde(rename="unreliableRoundtripLatencyMillis")]
     pub unreliable_roundtrip_latency_millis: i32,
     /// The amount of time in milliseconds it took to establish connections with this peer.
-    #[serde(alias="connectionSetupLatencyMillis")]
+    #[serde(rename="connectionSetupLatencyMillis")]
     pub connection_setup_latency_millis: i32,
 }
 
@@ -2614,7 +2614,7 @@ pub struct EventPeriodUpdate {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.
     pub kind: String,
     /// The time period being covered by this update.
-    #[serde(alias="timePeriod")]
+    #[serde(rename="timePeriod")]
     pub time_period: EventPeriodRange,
     /// The updates being made for this time period.
     pub updates: Vec<EventUpdateRequest>,
@@ -2655,7 +2655,7 @@ impl RequestValue for AchievementUpdateMultipleRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SnapshotListResponse {
     /// Token corresponding to the next page of results. If there are no more results, the token is omitted.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The snapshots.
     pub items: Vec<Snapshot>,
@@ -2692,12 +2692,12 @@ pub struct ScoreSubmission {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#scoreSubmission.
     pub kind: String,
     /// The leaderboard this score is being submitted to.
-    #[serde(alias="leaderboardId")]
+    #[serde(rename="leaderboardId")]
     pub leaderboard_id: String,
     /// The new score being submitted.
     pub score: String,
     /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    #[serde(alias="scoreTag")]
+    #[serde(rename="scoreTag")]
     pub score_tag: String,
     /// Signature Values will contain URI-safe characters as defined by section 2.3 of RFC 3986.
     pub signature: String,
@@ -2722,7 +2722,7 @@ pub struct TurnBasedMatchResults {
     /// The final match data.
     pub data: Option<TurnBasedMatchDataRequest>,
     /// The version of the match being updated.
-    #[serde(alias="matchVersion")]
+    #[serde(rename="matchVersion")]
     pub match_version: Option<i32>,
     /// The match results for the participants in the match.
     pub results: Option<Vec<ParticipantResult>>,
@@ -2745,12 +2745,12 @@ pub struct TurnBasedMatchTurn {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchTurn.
     pub kind: Option<String>,
     /// The ID of the participant who should take their turn next. May be set to the current player's participant ID to update match state without changing the turn. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.
-    #[serde(alias="pendingParticipantId")]
+    #[serde(rename="pendingParticipantId")]
     pub pending_participant_id: Option<String>,
     /// The shared game state data after the turn is over.
     pub data: Option<TurnBasedMatchDataRequest>,
     /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.
-    #[serde(alias="matchVersion")]
+    #[serde(rename="matchVersion")]
     pub match_version: Option<i32>,
     /// The match results for the participants in the match.
     pub results: Option<Vec<ParticipantResult>>,
@@ -2787,42 +2787,42 @@ pub struct TurnBasedMatch {
     /// - "MATCH_DELETED" - The match should no longer be shown on the client. Returned only for tombstones for matches when sync is called.
     pub status: String,
     /// Criteria for auto-matching players into this match.
-    #[serde(alias="autoMatchingCriteria")]
+    #[serde(rename="autoMatchingCriteria")]
     pub auto_matching_criteria: TurnBasedAutoMatchingCriteria,
     /// The ID of the participant that invited the user to the match. Not set if the user was not invited to the match.
-    #[serde(alias="inviterId")]
+    #[serde(rename="inviterId")]
     pub inviter_id: String,
     /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.
-    #[serde(alias="matchVersion")]
+    #[serde(rename="matchVersion")]
     pub match_version: i32,
     /// The variant / mode of the application being played; can be any integer value, or left blank.
     pub variant: i32,
     /// Globally unique ID for a turn-based match.
-    #[serde(alias="matchId")]
+    #[serde(rename="matchId")]
     pub match_id: String,
     /// The ID of a rematch of this match. Only set for completed matches that have been rematched.
-    #[serde(alias="rematchId")]
+    #[serde(rename="rematchId")]
     pub rematch_id: String,
     /// The results reported for this match.
     pub results: Vec<ParticipantResult>,
     /// The number of the match in a chain of rematches. Will be set to 1 for the first match and incremented by 1 for each rematch.
-    #[serde(alias="matchNumber")]
+    #[serde(rename="matchNumber")]
     pub match_number: i32,
     /// The data / game state for the previous match; set for the first turn of rematches only.
-    #[serde(alias="previousMatchData")]
+    #[serde(rename="previousMatchData")]
     pub previous_match_data: TurnBasedMatchData,
     /// The ID of the application being played.
-    #[serde(alias="applicationId")]
+    #[serde(rename="applicationId")]
     pub application_id: String,
     /// This short description is generated by our servers based on turn state and is localized and worded relative to the player requesting the match. It is intended to be displayed when the match is shown in a list.
     pub description: String,
     /// The ID of another participant in the match that can be used when describing the participants the user is playing with.
-    #[serde(alias="withParticipantId")]
+    #[serde(rename="withParticipantId")]
     pub with_participant_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatch.
     pub kind: String,
     /// Details about the match creation.
-    #[serde(alias="creationDetails")]
+    #[serde(rename="creationDetails")]
     pub creation_details: TurnBasedMatchModification,
     /// The status of the current user in the match. Derived from the match type, match status, the user's participant status, and the pending participant for the match.
     /// Possible values are:  
@@ -2830,17 +2830,17 @@ pub struct TurnBasedMatch {
     /// - "USER_AWAITING_TURN" - The user is waiting for their turn. 
     /// - "USER_TURN" - The user has an action to take in the match. 
     /// - "USER_MATCH_COMPLETED" - The match has ended (it is completed, canceled, or expired.)
-    #[serde(alias="userMatchStatus")]
+    #[serde(rename="userMatchStatus")]
     pub user_match_status: String,
     /// The data / game state for this match.
     pub data: TurnBasedMatchData,
     /// The participants involved in the match, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<TurnBasedMatchParticipant>,
     /// The ID of the participant that is taking a turn.
-    #[serde(alias="pendingParticipantId")]
+    #[serde(rename="pendingParticipantId")]
     pub pending_participant_id: String,
     /// Details about the last update to the match.
-    #[serde(alias="lastUpdateDetails")]
+    #[serde(rename="lastUpdateDetails")]
     pub last_update_details: TurnBasedMatchModification,
 }
 
@@ -2859,15 +2859,15 @@ impl ResponseResult for TurnBasedMatch {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventRecordRequest {
     /// A list of the time period updates being made in this request.
-    #[serde(alias="timePeriods")]
+    #[serde(rename="timePeriods")]
     pub time_periods: Option<Vec<EventPeriodUpdate>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordRequest.
     pub kind: Option<String>,
     /// The request ID used to identify this attempt to record events.
-    #[serde(alias="requestId")]
+    #[serde(rename="requestId")]
     pub request_id: Option<String>,
     /// The current time when this update was sent, in milliseconds, since 1970 UTC (Unix Epoch).
-    #[serde(alias="currentTimeMillis")]
+    #[serde(rename="currentTimeMillis")]
     pub current_time_millis: Option<String>,
 }
 
@@ -2883,7 +2883,7 @@ pub struct InstanceWebDetails {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceWebDetails.
     pub kind: String,
     /// Launch URL for the game.
-    #[serde(alias="launchUrl")]
+    #[serde(rename="launchUrl")]
     pub launch_url: String,
     /// Indicates that this instance is the default for new installations.
     pub preferred: bool,
@@ -2904,7 +2904,7 @@ impl Part for InstanceWebDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CategoryListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of categories with usage data.
     pub items: Vec<Category>,
@@ -2922,18 +2922,18 @@ impl ResponseResult for CategoryListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerEvent {
     /// The ID of the event definition.
-    #[serde(alias="definitionId")]
+    #[serde(rename="definitionId")]
     pub definition_id: String,
     /// The ID of the player.
-    #[serde(alias="playerId")]
+    #[serde(rename="playerId")]
     pub player_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEvent.
     pub kind: String,
     /// The current number of times this event has occurred.
-    #[serde(alias="numEvents")]
+    #[serde(rename="numEvents")]
     pub num_events: String,
     /// The current number of times this event has occurred, as a string. The formatting of this string depends on the configuration of your event in the Play Games Developer Console.
-    #[serde(alias="formattedNumEvents")]
+    #[serde(rename="formattedNumEvents")]
     pub formatted_num_events: String,
 }
 
@@ -2955,23 +2955,23 @@ pub struct Player {
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#player.
     pub kind: String,
     /// The name to display for the player.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
     pub name: PlayerName,
     /// The player's title rewarded for their game activities.
     pub title: String,
     /// The ID of the player.
-    #[serde(alias="playerId")]
+    #[serde(rename="playerId")]
     pub player_id: String,
     /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.
-    #[serde(alias="lastPlayedWith")]
+    #[serde(rename="lastPlayedWith")]
     pub last_played_with: Played,
     /// An object to represent Play Game experience information for the player.
-    #[serde(alias="experienceInfo")]
+    #[serde(rename="experienceInfo")]
     pub experience_info: PlayerExperienceInfo,
     /// The base URL for the image that represents the player.
-    #[serde(alias="avatarImageUrl")]
+    #[serde(rename="avatarImageUrl")]
     pub avatar_image_url: String,
 }
 
@@ -2991,15 +2991,15 @@ impl ResponseResult for Player {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventUpdateResponse {
     /// The current status of any updated events
-    #[serde(alias="playerEvents")]
+    #[serde(rename="playerEvents")]
     pub player_events: Vec<PlayerEvent>,
     /// Any batch-wide failures which occurred applying updates.
-    #[serde(alias="batchFailures")]
+    #[serde(rename="batchFailures")]
     pub batch_failures: Vec<EventBatchRecordFailure>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateResponse.
     pub kind: String,
     /// Any failures updating a particular event.
-    #[serde(alias="eventFailures")]
+    #[serde(rename="eventFailures")]
     pub event_failures: Vec<EventRecordFailure>,
 }
 
@@ -3024,10 +3024,10 @@ pub struct RevisionCheckResponse {
     /// - "OK" - The revision being used is current. 
     /// - "DEPRECATED" - There is currently a newer version available, but the revision being used still works. 
     /// - "INVALID" - The revision being used is not supported in any released version.
-    #[serde(alias="revisionStatus")]
+    #[serde(rename="revisionStatus")]
     pub revision_status: String,
     /// The version of the API this client revision should use when calling API methods.
-    #[serde(alias="apiVersion")]
+    #[serde(rename="apiVersion")]
     pub api_version: String,
 }
 
@@ -3041,7 +3041,7 @@ impl ResponseResult for RevisionCheckResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AchievementUpdateRequest {
     /// The achievement this update is being applied to.
-    #[serde(alias="achievementId")]
+    #[serde(rename="achievementId")]
     pub achievement_id: String,
     /// The type of update being applied.
     /// Possible values are:  
@@ -3049,15 +3049,15 @@ pub struct AchievementUpdateRequest {
     /// - "UNLOCK" - Achievement is unlocked. 
     /// - "INCREMENT" - Achievement is incremented. 
     /// - "SET_STEPS_AT_LEAST" - Achievement progress is set to at least the passed value.
-    #[serde(alias="updateType")]
+    #[serde(rename="updateType")]
     pub update_type: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateRequest.
     pub kind: String,
     /// The payload if an update of type SET_STEPS_AT_LEAST was requested for the achievement.
-    #[serde(alias="setStepsAtLeastPayload")]
+    #[serde(rename="setStepsAtLeastPayload")]
     pub set_steps_at_least_payload: GamesAchievementSetStepsAtLeast,
     /// The payload if an update of type INCREMENT was requested for the achievement.
-    #[serde(alias="incrementPayload")]
+    #[serde(rename="incrementPayload")]
     pub increment_payload: GamesAchievementIncrement,
 }
 
@@ -3076,7 +3076,7 @@ impl Part for AchievementUpdateRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardListResponse {
     /// Token corresponding to the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The leaderboards.
     pub items: Vec<Leaderboard>,

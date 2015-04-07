@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *blogger* crate version *0.1.3+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *blogger* crate version *0.1.4+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *blogger* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
@@ -343,7 +343,7 @@ impl<'a, C, NC, A> Blogger<C, NC, A>
         Blogger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -374,7 +374,7 @@ impl<'a, C, NC, A> Blogger<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -409,20 +409,20 @@ impl Part for PostBlog {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPerUserInfo {
     /// True if the user has Admin level access to the blog.
-    #[serde(alias="hasAdminAccess")]
+    #[serde(rename="hasAdminAccess")]
     pub has_admin_access: bool,
     /// The kind of this entity. Always blogger#blogPerUserInfo
     pub kind: String,
     /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or READER).
     pub role: String,
     /// The Photo Album Key for the user when adding photos to the blog
-    #[serde(alias="photosAlbumKey")]
+    #[serde(rename="photosAlbumKey")]
     pub photos_album_key: String,
     /// ID of the User
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: String,
     /// ID of the Blog resource
-    #[serde(alias="blogId")]
+    #[serde(rename="blogId")]
     pub blog_id: String,
 }
 
@@ -438,16 +438,16 @@ pub struct PostPerUserInfo {
     /// The kind of this entity. Always blogger#postPerUserInfo
     pub kind: String,
     /// ID of the Post resource.
-    #[serde(alias="postId")]
+    #[serde(rename="postId")]
     pub post_id: String,
     /// ID of the User.
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: String,
     /// ID of the Blog that the post resource belongs to.
-    #[serde(alias="blogId")]
+    #[serde(rename="blogId")]
     pub blog_id: String,
     /// True if the user has Author level access to the post.
-    #[serde(alias="hasEditAccess")]
+    #[serde(rename="hasEditAccess")]
     pub has_edit_access: bool,
 }
 
@@ -476,7 +476,7 @@ pub struct Blog {
     /// The locale this Blog is set to.
     pub locale: BlogLocale,
     /// The JSON custom meta-data for the Blog
-    #[serde(alias="customMetaData")]
+    #[serde(rename="customMetaData")]
     pub custom_meta_data: String,
     /// The container of posts in this blog.
     pub posts: BlogPosts,
@@ -491,7 +491,7 @@ pub struct Blog {
     /// The container of pages in this blog.
     pub pages: BlogPages,
     /// The API REST URL to fetch this resource from.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// The name of this blog. This is displayed as the title.
     pub name: String,
@@ -513,7 +513,7 @@ impl ResponseResult for Blog {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostUserInfosList {
     /// Pagination token to fetch the next page, if one exists.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of Posts with User information for the post, for this Blog.
     pub items: Vec<PostUserInfo>,
@@ -572,7 +572,7 @@ pub struct CommentAuthor {
     /// The comment creator's avatar.
     pub image: CommentAuthorImage,
     /// The display name.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The identifier of the Comment creator.
     pub id: String,
@@ -617,7 +617,7 @@ impl Part for CommentPost {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserBlogs {
     /// The URL of the Blogs for this user.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -632,12 +632,12 @@ impl Part for UserBlogs {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostReplies {
     /// The count of comments on this post.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: String,
     /// The List of Comments for this Post.
     pub items: Vec<Comment>,
     /// The URL of the comments on this post.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -654,7 +654,7 @@ pub struct PageviewsCounts {
     /// Count of page views for the given time range
     pub count: String,
     /// Time range the given count applies to
-    #[serde(alias="timeRange")]
+    #[serde(rename="timeRange")]
     pub time_range: String,
 }
 
@@ -678,7 +678,7 @@ pub struct BlogList {
     /// The kind of this entity. Always blogger#blogList
     pub kind: String,
     /// Admin level list of blog per-user information
-    #[serde(alias="blogUserInfos")]
+    #[serde(rename="blogUserInfos")]
     pub blog_user_infos: Vec<BlogUserInfo>,
 }
 
@@ -699,7 +699,7 @@ pub struct User {
     /// Profile summary information.
     pub about: String,
     /// The display name.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The timestamp of when this profile was created, in seconds since epoch.
     pub created: String,
@@ -714,7 +714,7 @@ pub struct User {
     /// The identifier for this User.
     pub id: String,
     /// The API REST URL to fetch this resource from.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -761,7 +761,7 @@ pub struct Post {
     /// RFC 3339 date-time when this Post was last updated.
     pub updated: Option<String>,
     /// Comment control and display setting for readers of this post.
-    #[serde(alias="readerComments")]
+    #[serde(rename="readerComments")]
     pub reader_comments: Option<String>,
     /// The list of labels this Post was tagged with.
     pub labels: Option<Vec<String>>,
@@ -776,7 +776,7 @@ pub struct Post {
     /// The kind of this entity. Always blogger#post
     pub kind: Option<String>,
     /// The title link URL, similar to atom's related link.
-    #[serde(alias="titleLink")]
+    #[serde(rename="titleLink")]
     pub title_link: Option<String>,
     /// The author of this Post.
     pub author: Option<PostAuthor>,
@@ -785,7 +785,7 @@ pub struct Post {
     /// The title of the Post.
     pub title: Option<String>,
     /// The JSON meta-data for the Post.
-    #[serde(alias="customMetaData")]
+    #[serde(rename="customMetaData")]
     pub custom_meta_data: Option<String>,
     /// The content of the Post. May contain HTML markup.
     pub content: Option<String>,
@@ -796,7 +796,7 @@ pub struct Post {
     /// RFC 3339 date-time when this Post was published.
     pub published: Option<String>,
     /// The API REST URL to fetch this resource from.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -836,7 +836,7 @@ pub struct PostAuthor {
     /// The Post author's avatar.
     pub image: PostAuthorImage,
     /// The display name.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The identifier of the Post creator.
     pub id: String,
@@ -859,14 +859,14 @@ impl Part for PostAuthor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentList {
     /// Pagination token to fetch the next page, if one exists.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The List of Comments for a Post.
     pub items: Vec<Comment>,
     /// The kind of this entry. Always blogger#commentList
     pub kind: String,
     /// Pagination token to fetch the previous page, if one exists.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
 }
 
@@ -900,7 +900,7 @@ impl Part for PostImages {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostList {
     /// Pagination token to fetch the next page, if one exists.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of Posts for this Blog.
     pub items: Vec<Post>,
@@ -932,10 +932,10 @@ impl Part for CommentAuthorImage {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPages {
     /// The count of pages in this blog.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// The URL of the container for pages in this blog.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -950,12 +950,12 @@ impl Part for BlogPages {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPosts {
     /// The count of posts in this blog.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// The List of Posts for this Blog.
     pub items: Vec<Post>,
     /// The URL of the container for posts in this blog.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1004,7 +1004,7 @@ pub struct Page {
     /// The identifier for this resource.
     pub id: Option<String>,
     /// The API REST URL to fetch this resource from.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1033,7 +1033,7 @@ pub struct Comment {
     /// The status of the comment (only populated for admin users)
     pub status: String,
     /// Data about the comment this is in reply to.
-    #[serde(alias="inReplyTo")]
+    #[serde(rename="inReplyTo")]
     pub in_reply_to: CommentInReplyTo,
     /// The kind of this entry. Always blogger#comment
     pub kind: String,
@@ -1052,7 +1052,7 @@ pub struct Comment {
     /// The identifier for this resource.
     pub id: String,
     /// The API REST URL to fetch this resource from.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1098,7 +1098,7 @@ pub struct Pageviews {
     /// The container of posts in this blog.
     pub counts: Vec<PageviewsCounts>,
     /// Blog Id
-    #[serde(alias="blogId")]
+    #[serde(rename="blogId")]
     pub blog_id: String,
     /// The kind of this entry. Always blogger#page_views
     pub kind: String,
@@ -1118,7 +1118,7 @@ pub struct PageAuthor {
     /// The page author's avatar.
     pub image: PageAuthorImage,
     /// The display name.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The identifier of the Page creator.
     pub id: String,
@@ -1140,7 +1140,7 @@ impl Part for PageAuthor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageList {
     /// Pagination token to fetch the next page, if one exists.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of Pages for a Blog.
     pub items: Vec<Page>,

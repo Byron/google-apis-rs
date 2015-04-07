@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudmonitoring2_beta2` library allows access to all features of the *Google Cloud Monitoring* service.
 
-This documentation was generated from *Cloud Monitoring* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+This documentation was generated from *Cloud Monitoring* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 
 Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 [official documentation site](https://cloud.google.com/monitoring/v2beta2/).

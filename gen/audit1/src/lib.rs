@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *audit* crate version *0.1.3+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *audit* crate version *0.1.4+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *audit* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/admin-audit/get_started).
@@ -292,7 +292,7 @@ impl<'a, C, NC, A> Audit<C, NC, A>
         Audit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -302,7 +302,7 @@ impl<'a, C, NC, A> Audit<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -345,14 +345,14 @@ impl ResponseResult for Activities {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityActor {
     /// ID of application which interacted on behalf of the user.
-    #[serde(alias="applicationId")]
+    #[serde(rename="applicationId")]
     pub application_id: String,
     /// Email address of the user.
     pub email: String,
     /// For OAuth 2LO API requests, consumer_key of the requestor.
     pub key: String,
     /// User or OAuth 2LO request.
-    #[serde(alias="callerType")]
+    #[serde(rename="callerType")]
     pub caller_type: String,
 }
 
@@ -367,13 +367,13 @@ impl Part for ActivityActor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityId {
     /// Unique qualifier if multiple events have the same time.
-    #[serde(alias="uniqQualifier")]
+    #[serde(rename="uniqQualifier")]
     pub uniq_qualifier: String,
     /// Application ID of the source application.
-    #[serde(alias="applicationId")]
+    #[serde(rename="applicationId")]
     pub application_id: String,
     /// Obfuscated customer ID of the source customer.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: String,
     /// Time of occurrence of the activity.
     pub time: String,
@@ -394,10 +394,10 @@ pub struct Activity {
     /// Activity events.
     pub events: Vec<ActivityEvents>,
     /// IP Address of the user doing the action.
-    #[serde(alias="ipAddress")]
+    #[serde(rename="ipAddress")]
     pub ip_address: String,
     /// Domain of source customer.
-    #[serde(alias="ownerDomain")]
+    #[serde(rename="ownerDomain")]
     pub owner_domain: String,
     /// User doing the action.
     pub actor: ActivityActor,
@@ -431,7 +431,7 @@ impl Part for ActivityEventsParameters {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityEvents {
     /// Type of event.
-    #[serde(alias="eventType")]
+    #[serde(rename="eventType")]
     pub event_type: String,
     /// Name of event.
     pub name: String,

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *0.1.3+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *YouTube Analytics* crate version *0.1.4+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -329,7 +329,7 @@ impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
         YouTubeAnalytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -351,7 +351,7 @@ impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -402,7 +402,7 @@ pub struct Group {
     /// no description provided
     pub snippet: Option<GroupSnippet>,
     /// no description provided
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<GroupContentDetails>,
     /// no description provided
     pub kind: Option<String>,
@@ -424,10 +424,10 @@ impl ResponseResult for Group {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupContentDetails {
     /// no description provided
-    #[serde(alias="itemCount")]
+    #[serde(rename="itemCount")]
     pub item_count: i64,
     /// no description provided
-    #[serde(alias="itemType")]
+    #[serde(rename="itemType")]
     pub item_type: String,
 }
 
@@ -464,10 +464,10 @@ impl ResponseResult for GroupListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultTableColumnHeaders {
     /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: String,
     /// The type of the column (DIMENSION or METRIC).
-    #[serde(alias="columnType")]
+    #[serde(rename="columnType")]
     pub column_type: String,
     /// The name of the dimension or metric.
     pub name: String,
@@ -506,10 +506,10 @@ impl ResponseResult for GroupItemListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportOutputs {
     /// Cloud storage URL to download this report. This URL is valid for 30 minutes.
-    #[serde(alias="downloadUrl")]
+    #[serde(rename="downloadUrl")]
     pub download_url: String,
     /// Type of the output.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Format of the output.
     pub format: String,
@@ -526,7 +526,7 @@ impl Part for BatchReportOutputs {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupSnippet {
     /// no description provided
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// no description provided
     pub title: String,
@@ -556,7 +556,7 @@ pub struct GroupItem {
     /// no description provided
     pub resource: Option<GroupItemResource>,
     /// no description provided
-    #[serde(alias="groupId")]
+    #[serde(rename="groupId")]
     pub group_id: Option<String>,
     /// no description provided
     pub id: Option<String>,
@@ -599,7 +599,7 @@ pub struct BatchReportDefinition {
     /// This value specifies the type of data of this item. For batch report definition the kind property value is youtubeAnalytics#batchReportDefinition.
     pub kind: Option<String>,
     /// Type of the report definition.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The ID that YouTube assigns and uses to uniquely identify the report definition.
     pub id: Option<String>,
@@ -626,7 +626,7 @@ pub struct ResultTable {
     /// The list contains all rows of the result table. Each item in the list is an array that contains comma-delimited data corresponding to a single row of data. The order of the comma-delimited data fields will match the order of the columns listed in the columnHeaders field. If no data is available for the given query, the rows element will be omitted from the response. The response for a query with the day dimension will not contain rows for the most recent days.
     pub rows: Vec<Vec<String>>,
     /// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.
-    #[serde(alias="columnHeaders")]
+    #[serde(rename="columnHeaders")]
     pub column_headers: Vec<ResultTableColumnHeaders>,
 }
 
@@ -647,15 +647,15 @@ pub struct BatchReport {
     /// This value specifies the type of data of this item. For batch report the kind property value is youtubeAnalytics#batchReport.
     pub kind: Option<String>,
     /// The ID of the the report definition.
-    #[serde(alias="reportId")]
+    #[serde(rename="reportId")]
     pub report_id: Option<String>,
     /// Period included in the report. For reports containing all entities endTime is not set. Both startTime and endTime are inclusive.
-    #[serde(alias="timeSpan")]
+    #[serde(rename="timeSpan")]
     pub time_span: Option<BatchReportTimeSpan>,
     /// Report outputs.
     pub outputs: Option<Vec<BatchReportOutputs>>,
     /// The time when the report was updated.
-    #[serde(alias="timeUpdated")]
+    #[serde(rename="timeUpdated")]
     pub time_updated: Option<String>,
     /// The ID that YouTube assigns and uses to uniquely identify the report.
     pub id: Option<String>,
@@ -671,10 +671,10 @@ impl Resource for BatchReport {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportTimeSpan {
     /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// Start of the period included in the report. Inclusive.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
 }
 

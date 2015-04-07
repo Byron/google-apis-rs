@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *0.1.3+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *customsearch* crate version *0.1.4+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
@@ -336,7 +336,7 @@ impl<'a, C, NC, A> Customsearch<C, NC, A>
         Customsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -346,7 +346,7 @@ impl<'a, C, NC, A> Customsearch<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -369,19 +369,19 @@ pub struct ResultImage {
     /// no description provided
     pub width: i32,
     /// no description provided
-    #[serde(alias="contextLink")]
+    #[serde(rename="contextLink")]
     pub context_link: String,
     /// no description provided
-    #[serde(alias="thumbnailWidth")]
+    #[serde(rename="thumbnailWidth")]
     pub thumbnail_width: i32,
     /// no description provided
-    #[serde(alias="thumbnailLink")]
+    #[serde(rename="thumbnailLink")]
     pub thumbnail_link: String,
     /// no description provided
-    #[serde(alias="byteSize")]
+    #[serde(rename="byteSize")]
     pub byte_size: i32,
     /// no description provided
-    #[serde(alias="thumbnailHeight")]
+    #[serde(rename="thumbnailHeight")]
     pub thumbnail_height: i32,
     /// no description provided
     pub height: i32,
@@ -417,7 +417,7 @@ pub struct Search {
     /// no description provided
     pub spelling: SearchSpelling,
     /// no description provided
-    #[serde(alias="searchInformation")]
+    #[serde(rename="searchInformation")]
     pub search_information: SearchSearchInformation,
 }
 
@@ -449,7 +449,7 @@ impl Part for PromotionImage {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchUrl {
     /// no description provided
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// no description provided
     pub template: String,
@@ -466,10 +466,10 @@ impl Part for SearchUrl {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchSpelling {
     /// no description provided
-    #[serde(alias="correctedQuery")]
+    #[serde(rename="correctedQuery")]
     pub corrected_query: String,
     /// no description provided
-    #[serde(alias="htmlCorrectedQuery")]
+    #[serde(rename="htmlCorrectedQuery")]
     pub html_corrected_query: String,
 }
 
@@ -486,7 +486,7 @@ pub struct PromotionBodyLines {
     /// no description provided
     pub url: String,
     /// no description provided
-    #[serde(alias="htmlTitle")]
+    #[serde(rename="htmlTitle")]
     pub html_title: String,
     /// no description provided
     pub link: String,
@@ -511,26 +511,26 @@ pub struct ResultType {
     /// no description provided
     pub title: String,
     /// no description provided
-    #[serde(alias="displayLink")]
+    #[serde(rename="displayLink")]
     pub display_link: String,
     /// no description provided
-    #[serde(alias="cacheId")]
+    #[serde(rename="cacheId")]
     pub cache_id: String,
     /// no description provided
-    #[serde(alias="formattedUrl")]
+    #[serde(rename="formattedUrl")]
     pub formatted_url: String,
     /// no description provided
-    #[serde(alias="htmlFormattedUrl")]
+    #[serde(rename="htmlFormattedUrl")]
     pub html_formatted_url: String,
     /// no description provided
     pub pagemap: HashMap<String, Vec<HashMap<String, String>>>,
     /// no description provided
-    #[serde(alias="fileFormat")]
+    #[serde(rename="fileFormat")]
     pub file_format: String,
     /// no description provided
     pub snippet: String,
     /// no description provided
-    #[serde(alias="htmlSnippet")]
+    #[serde(rename="htmlSnippet")]
     pub html_snippet: String,
     /// no description provided
     pub link: String,
@@ -539,7 +539,7 @@ pub struct ResultType {
     /// no description provided
     pub mime: String,
     /// no description provided
-    #[serde(alias="htmlTitle")]
+    #[serde(rename="htmlTitle")]
     pub html_title: String,
 }
 
@@ -586,51 +586,51 @@ impl Part for ContextFacets {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Query {
     /// no description provided
-    #[serde(alias="dateRestrict")]
+    #[serde(rename="dateRestrict")]
     pub date_restrict: String,
     /// no description provided
-    #[serde(alias="inputEncoding")]
+    #[serde(rename="inputEncoding")]
     pub input_encoding: String,
     /// no description provided
-    #[serde(alias="orTerms")]
+    #[serde(rename="orTerms")]
     pub or_terms: String,
     /// no description provided
-    #[serde(alias="highRange")]
+    #[serde(rename="highRange")]
     pub high_range: String,
     /// no description provided
     pub cx: String,
     /// no description provided
-    #[serde(alias="startPage")]
+    #[serde(rename="startPage")]
     pub start_page: i32,
     /// no description provided
-    #[serde(alias="disableCnTwTranslation")]
+    #[serde(rename="disableCnTwTranslation")]
     pub disable_cn_tw_translation: String,
     /// no description provided
     pub cr: String,
     /// no description provided
-    #[serde(alias="imgType")]
+    #[serde(rename="imgType")]
     pub img_type: String,
     /// no description provided
-    #[serde(alias="relatedSite")]
+    #[serde(rename="relatedSite")]
     pub related_site: String,
     /// no description provided
     pub gl: String,
     /// no description provided
-    #[serde(alias="searchType")]
+    #[serde(rename="searchType")]
     pub search_type: String,
     /// no description provided
     pub title: String,
     /// no description provided
-    #[serde(alias="googleHost")]
+    #[serde(rename="googleHost")]
     pub google_host: String,
     /// no description provided
-    #[serde(alias="fileType")]
+    #[serde(rename="fileType")]
     pub file_type: String,
     /// no description provided
-    #[serde(alias="imgDominantColor")]
+    #[serde(rename="imgDominantColor")]
     pub img_dominant_color: String,
     /// no description provided
-    #[serde(alias="siteSearch")]
+    #[serde(rename="siteSearch")]
     pub site_search: String,
     /// no description provided
     pub cref: String,
@@ -639,49 +639,49 @@ pub struct Query {
     /// no description provided
     pub hq: String,
     /// no description provided
-    #[serde(alias="outputEncoding")]
+    #[serde(rename="outputEncoding")]
     pub output_encoding: String,
     /// no description provided
     pub safe: String,
     /// no description provided
-    #[serde(alias="searchTerms")]
+    #[serde(rename="searchTerms")]
     pub search_terms: String,
     /// no description provided
-    #[serde(alias="exactTerms")]
+    #[serde(rename="exactTerms")]
     pub exact_terms: String,
     /// no description provided
-    #[serde(alias="imgColorType")]
+    #[serde(rename="imgColorType")]
     pub img_color_type: String,
     /// no description provided
     pub hl: String,
     /// no description provided
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: String,
     /// no description provided
-    #[serde(alias="lowRange")]
+    #[serde(rename="lowRange")]
     pub low_range: String,
     /// no description provided
     pub count: i32,
     /// no description provided
-    #[serde(alias="imgSize")]
+    #[serde(rename="imgSize")]
     pub img_size: String,
     /// no description provided
     pub language: String,
     /// no description provided
     pub rights: String,
     /// no description provided
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// no description provided
-    #[serde(alias="excludeTerms")]
+    #[serde(rename="excludeTerms")]
     pub exclude_terms: String,
     /// no description provided
     pub filter: String,
     /// no description provided
-    #[serde(alias="linkSite")]
+    #[serde(rename="linkSite")]
     pub link_site: String,
     /// no description provided
-    #[serde(alias="siteSearchFilter")]
+    #[serde(rename="siteSearchFilter")]
     pub site_search_filter: String,
 }
 
@@ -695,17 +695,17 @@ impl Part for Query {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Promotion {
     /// no description provided
-    #[serde(alias="bodyLines")]
+    #[serde(rename="bodyLines")]
     pub body_lines: Vec<PromotionBodyLines>,
     /// no description provided
     pub title: String,
     /// no description provided
     pub link: String,
     /// no description provided
-    #[serde(alias="displayLink")]
+    #[serde(rename="displayLink")]
     pub display_link: String,
     /// no description provided
-    #[serde(alias="htmlTitle")]
+    #[serde(rename="htmlTitle")]
     pub html_title: String,
     /// no description provided
     pub image: PromotionImage,
@@ -721,16 +721,16 @@ impl Part for Promotion {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchSearchInformation {
     /// no description provided
-    #[serde(alias="formattedSearchTime")]
+    #[serde(rename="formattedSearchTime")]
     pub formatted_search_time: String,
     /// no description provided
-    #[serde(alias="formattedTotalResults")]
+    #[serde(rename="formattedTotalResults")]
     pub formatted_total_results: String,
     /// no description provided
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: String,
     /// no description provided
-    #[serde(alias="searchTime")]
+    #[serde(rename="searchTime")]
     pub search_time: f64,
 }
 
@@ -745,7 +745,7 @@ impl Part for SearchSearchInformation {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultLabels {
     /// no description provided
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// no description provided
     pub label_with_op: String,

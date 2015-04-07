@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dataflow1_b4"
-version = "0.1.3+20150401"
+version = "0.1.4+20150401"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with dataflow (protocol v1b4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dataflow1_b4"
@@ -17,5 +17,5 @@ hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
-serde = "*"
+serde = ">= 0.3.0"
 serde_macros = "*"

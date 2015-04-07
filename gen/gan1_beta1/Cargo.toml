@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gan1_beta1"
-version = "0.1.3+20130205"
+version = "0.1.4+20130205"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with gan (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gan1_beta1"
@@ -18,5 +18,5 @@ hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
-serde = "*"
+serde = ">= 0.3.0"
 serde_macros = "*"

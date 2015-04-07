@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *0.1.3+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *datastore* crate version *0.1.4+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *datastore* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/datastore/).
@@ -316,7 +316,7 @@ impl<'a, C, NC, A> Datastore<C, NC, A>
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -326,7 +326,7 @@ impl<'a, C, NC, A> Datastore<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -351,7 +351,7 @@ pub struct PartitionId {
     /// The namespace.
     pub namespace: String,
     /// The dataset ID.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: String,
 }
 
@@ -392,7 +392,7 @@ pub struct LookupRequest {
     /// Keys of entities to look up from the datastore.
     pub keys: Option<Vec<Key>>,
     /// Options for this lookup request. Optional.
-    #[serde(alias="readOptions")]
+    #[serde(rename="readOptions")]
     pub read_options: Option<ReadOptions>,
 }
 
@@ -468,7 +468,7 @@ pub struct Mutation {
     /// Ignore a user specified read-only period. Optional.
     pub force: bool,
     /// Insert entities with a newly allocated ID. Each inserted entity's key must omit the final identifier in its path and must not be reserved/read-only.
-    #[serde(alias="insertAutoId")]
+    #[serde(rename="insertAutoId")]
     pub insert_auto_id: Vec<Entity>,
     /// Keys of entities to delete. Each key must have a complete key path and must not be reserved/read-only.
     pub delete: Vec<Key>,
@@ -495,7 +495,7 @@ pub struct CommitResponse {
     /// no description provided
     pub header: ResponseHeader,
     /// The result of performing the mutation (if any).
-    #[serde(alias="mutationResult")]
+    #[serde(rename="mutationResult")]
     pub mutation_result: MutationResult,
 }
 
@@ -509,19 +509,19 @@ impl ResponseResult for CommitResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QueryResultBatch {
     /// The state of the query after the current batch. One of notFinished, moreResultsAfterLimit, noMoreResults.
-    #[serde(alias="moreResults")]
+    #[serde(rename="moreResults")]
     pub more_results: String,
     /// The number of results skipped because of Query.offset.
-    #[serde(alias="skippedResults")]
+    #[serde(rename="skippedResults")]
     pub skipped_results: i32,
     /// A cursor that points to the position after the last result in the batch. May be absent. TODO(arfuller): Once all plans produce cursors update documentation here.
-    #[serde(alias="endCursor")]
+    #[serde(rename="endCursor")]
     pub end_cursor: String,
     /// The results for this batch.
-    #[serde(alias="entityResults")]
+    #[serde(rename="entityResults")]
     pub entity_results: Vec<EntityResult>,
     /// The result type for every entity in entityResults. full for full entities, projection for entities with only projected properties, keyOnly for entities with only a key.
-    #[serde(alias="entityResultType")]
+    #[serde(rename="entityResultType")]
     pub entity_result_type: String,
 }
 
@@ -579,16 +579,16 @@ impl ResponseResult for RollbackResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GqlQuery {
     /// When false, the query string must not contain a literal.
-    #[serde(alias="allowLiteral")]
+    #[serde(rename="allowLiteral")]
     pub allow_literal: bool,
     /// A named argument must set field GqlQueryArg.name. No two named arguments may have the same name. For each non-reserved named binding site in the query string, there must be a named argument with that name, but not necessarily the inverse.
-    #[serde(alias="nameArgs")]
+    #[serde(rename="nameArgs")]
     pub name_args: Vec<GqlQueryArg>,
     /// The query string.
-    #[serde(alias="queryString")]
+    #[serde(rename="queryString")]
     pub query_string: String,
     /// Numbered binding site @1 references the first numbered argument, effectively using 1-based indexing, rather than the usual 0. A numbered argument must NOT set field GqlQueryArg.name. For each binding site numbered i in query_string, there must be an ith numbered argument. The inverse must also be true.
-    #[serde(alias="numberArgs")]
+    #[serde(rename="numberArgs")]
     pub number_args: Vec<GqlQueryArg>,
 }
 
@@ -604,7 +604,7 @@ pub struct Key {
     /// The entity path. An entity path consists of one or more elements composed of a kind and a string or numerical identifier, which identify entities. The first element identifies a root entity, the second element identifies a child of the root entity, the third element a child of the second entity, and so forth. The entities identified by all prefixes of the path are called the element's ancestors. An entity path is always fully complete: ALL of the entity's ancestors are required to be in the path along with the entity identifier itself. The only exception is that in some documented cases, the identifier in the last path element (for the entity) itself may be omitted. A path can never be empty. The path can have at most 100 elements.
     pub path: Vec<KeyPathElement>,
     /// Entities are partitioned into subsets, currently identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition.
-    #[serde(alias="partitionId")]
+    #[serde(rename="partitionId")]
     pub partition_id: PartitionId,
 }
 
@@ -618,7 +618,7 @@ impl Part for Key {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyExpression {
     /// The aggregation function to apply to the property. Optional. Can only be used when grouping by at least one property. Must then be set on all properties in the projection that are not being grouped by. Aggregation functions: first selects the first result as determined by the query's order.
-    #[serde(alias="aggregationFunction")]
+    #[serde(rename="aggregationFunction")]
     pub aggregation_function: String,
     /// The property to project.
     pub property: PropertyReference,
@@ -634,10 +634,10 @@ impl Part for PropertyExpression {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MutationResult {
     /// Keys for insertAutoId entities. One per entity from the request, in the same order.
-    #[serde(alias="insertAutoIdKeys")]
+    #[serde(rename="insertAutoIdKeys")]
     pub insert_auto_id_keys: Vec<Key>,
     /// Number of index writes.
-    #[serde(alias="indexUpdates")]
+    #[serde(rename="indexUpdates")]
     pub index_updates: i32,
 }
 
@@ -653,7 +653,7 @@ pub struct ReadOptions {
     /// The transaction to use. Optional.
     pub transaction: String,
     /// The read consistency to use. One of default, strong, or eventual. Cannot be set when transaction is set. Lookup and ancestor queries default to strong, global queries default to eventual and cannot be set to strong. Optional. Default is default.
-    #[serde(alias="readConsistency")]
+    #[serde(rename="readConsistency")]
     pub read_consistency: String,
 }
 
@@ -697,40 +697,40 @@ impl Part for ResponseHeader {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Value {
     /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
-    #[serde(alias="entityValue")]
+    #[serde(rename="entityValue")]
     pub entity_value: Entity,
     /// A double value.
-    #[serde(alias="doubleValue")]
+    #[serde(rename="doubleValue")]
     pub double_value: f64,
     /// A blob key value.
-    #[serde(alias="blobKeyValue")]
+    #[serde(rename="blobKeyValue")]
     pub blob_key_value: String,
     /// The meaning field is reserved and should not be used.
     pub meaning: i32,
     /// A timestamp value.
-    #[serde(alias="dateTimeValue")]
+    #[serde(rename="dateTimeValue")]
     pub date_time_value: String,
     /// A key value.
-    #[serde(alias="keyValue")]
+    #[serde(rename="keyValue")]
     pub key_value: Key,
     /// A blob value. May be a maximum of 1,000,000 bytes.
-    #[serde(alias="blobValue")]
+    #[serde(rename="blobValue")]
     pub blob_value: String,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
     pub indexed: bool,
     /// A UTF-8 encoded string value.
-    #[serde(alias="stringValue")]
+    #[serde(rename="stringValue")]
     pub string_value: String,
     /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
-    #[serde(alias="listValue")]
+    #[serde(rename="listValue")]
     pub list_value: Vec<Value>,
     /// A boolean value.
-    #[serde(alias="booleanValue")]
+    #[serde(rename="booleanValue")]
     pub boolean_value: bool,
     /// An integer value.
-    #[serde(alias="integerValue")]
+    #[serde(rename="integerValue")]
     pub integer_value: String,
 }
 
@@ -744,10 +744,10 @@ impl Part for Value {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Filter {
     /// A composite filter.
-    #[serde(alias="compositeFilter")]
+    #[serde(rename="compositeFilter")]
     pub composite_filter: CompositeFilter,
     /// A filter on a property.
-    #[serde(alias="propertyFilter")]
+    #[serde(rename="propertyFilter")]
     pub property_filter: PropertyFilter,
 }
 
@@ -780,40 +780,40 @@ impl Part for KeyPathElement {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Property {
     /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
-    #[serde(alias="entityValue")]
+    #[serde(rename="entityValue")]
     pub entity_value: Entity,
     /// A double value.
-    #[serde(alias="doubleValue")]
+    #[serde(rename="doubleValue")]
     pub double_value: f64,
     /// A blob key value.
-    #[serde(alias="blobKeyValue")]
+    #[serde(rename="blobKeyValue")]
     pub blob_key_value: String,
     /// The meaning field is reserved and should not be used.
     pub meaning: i32,
     /// A timestamp value.
-    #[serde(alias="dateTimeValue")]
+    #[serde(rename="dateTimeValue")]
     pub date_time_value: String,
     /// A key value.
-    #[serde(alias="keyValue")]
+    #[serde(rename="keyValue")]
     pub key_value: Key,
     /// A blob value. May be a maximum of 1,000,000 bytes.
-    #[serde(alias="blobValue")]
+    #[serde(rename="blobValue")]
     pub blob_value: String,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
     pub indexed: bool,
     /// A UTF-8 encoded string value.
-    #[serde(alias="stringValue")]
+    #[serde(rename="stringValue")]
     pub string_value: String,
     /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
-    #[serde(alias="listValue")]
+    #[serde(rename="listValue")]
     pub list_value: Vec<Value>,
     /// A boolean value.
-    #[serde(alias="booleanValue")]
+    #[serde(rename="booleanValue")]
     pub boolean_value: bool,
     /// An integer value.
-    #[serde(alias="integerValue")]
+    #[serde(rename="integerValue")]
     pub integer_value: String,
 }
 
@@ -871,7 +871,7 @@ impl Part for CompositeFilter {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CommitRequest {
     /// no description provided
-    #[serde(alias="ignoreReadOnly")]
+    #[serde(rename="ignoreReadOnly")]
     pub ignore_read_only: Option<bool>,
     /// The transaction identifier, returned by a call to beginTransaction. Must be set when mode is TRANSACTIONAL.
     pub transaction: Option<String>,
@@ -898,13 +898,13 @@ pub struct RunQueryRequest {
     /// The query to run. Either this field or field gql_query must be set, but not both.
     pub query: Option<Query>,
     /// Entities are partitioned into subsets, identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition. This partition ID is normalized with the standard default context partition ID, but all other partition IDs in RunQueryRequest are normalized with this partition ID as the context partition ID.
-    #[serde(alias="partitionId")]
+    #[serde(rename="partitionId")]
     pub partition_id: Option<PartitionId>,
     /// The GQL query to run. Either this field or field query must be set, but not both.
-    #[serde(alias="gqlQuery")]
+    #[serde(rename="gqlQuery")]
     pub gql_query: Option<GqlQuery>,
     /// The options for this query.
-    #[serde(alias="readOptions")]
+    #[serde(rename="readOptions")]
     pub read_options: Option<ReadOptions>,
 }
 
@@ -988,7 +988,7 @@ impl RequestValue for RollbackRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct BeginTransactionRequest {
     /// The transaction isolation level. Either snapshot or serializable. The default isolation level is snapshot isolation, which means that another transaction may not concurrently modify the data that is modified by this transaction. Optionally, a transaction can request to be made serializable which means that another transaction cannot concurrently modify the data that is read or modified by this transaction.
-    #[serde(alias="isolationLevel")]
+    #[serde(rename="isolationLevel")]
     pub isolation_level: Option<String>,
 }
 
@@ -1017,14 +1017,14 @@ impl Part for PropertyOrder {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Query {
     /// A starting point for the query results. Optional. Query cursors are returned in query result batches.
-    #[serde(alias="startCursor")]
+    #[serde(rename="startCursor")]
     pub start_cursor: String,
     /// The kinds to query (if empty, returns entities from all kinds).
     pub kinds: Vec<KindExpression>,
     /// The projection to return. If not set the entire entity is returned.
     pub projection: Vec<PropertyExpression>,
     /// The properties to group by (if empty, no grouping is applied to the result set).
-    #[serde(alias="groupBy")]
+    #[serde(rename="groupBy")]
     pub group_by: Vec<PropertyReference>,
     /// The filter to apply (optional).
     pub filter: Filter,
@@ -1033,7 +1033,7 @@ pub struct Query {
     /// The number of results to skip. Applies before limit, but after all other constraints (optional, defaults to 0).
     pub offset: i32,
     /// An ending point for the query results. Optional. Query cursors are returned in query result batches.
-    #[serde(alias="endCursor")]
+    #[serde(rename="endCursor")]
     pub end_cursor: String,
     /// The order to apply to the query results (if empty, order is unspecified).
     pub order: Vec<PropertyOrder>,

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *bigquery* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/bigquery/docs/overview).
@@ -345,7 +345,7 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -367,7 +367,7 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -388,7 +388,7 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TableDataInsertAllRequestRows {
     /// [Optional] A unique ID for each row. BigQuery uses this property to detect duplicate insertion requests on a best-effort basis.
-    #[serde(alias="insertId")]
+    #[serde(rename="insertId")]
     pub insert_id: String,
     /// [Required] A JSON object that contains a row of data. The object's properties and values must match the destination table's schema.
     pub json: JsonObject,
@@ -405,7 +405,7 @@ impl Part for TableDataInsertAllRequestRows {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics4 {
     /// [Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
-    #[serde(alias="destinationUriFileCounts")]
+    #[serde(rename="destinationUriFileCounts")]
     pub destination_uri_file_counts: Vec<i64>,
 }
 
@@ -424,26 +424,26 @@ impl Part for JobStatistics4 {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct QueryRequest {
     /// [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
-    #[serde(alias="timeoutMs")]
+    #[serde(rename="timeoutMs")]
     pub timeout_ms: Option<u32>,
     /// The resource type of the request.
     pub kind: Option<String>,
     /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run.
-    #[serde(alias="dryRun")]
+    #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
-    #[serde(alias="useQueryCache")]
+    #[serde(rename="useQueryCache")]
     pub use_query_cache: Option<bool>,
     /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
-    #[serde(alias="defaultDataset")]
+    #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
     /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
-    #[serde(alias="maxResults")]
+    #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
     /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".
     pub query: Option<String>,
     /// [Deprecated] This property is deprecated.
-    #[serde(alias="preserveNulls")]
+    #[serde(rename="preserveNulls")]
     pub preserve_nulls: Option<bool>,
 }
 
@@ -457,10 +457,10 @@ impl RequestValue for QueryRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
-    #[serde(alias="cacheHit")]
+    #[serde(rename="cacheHit")]
     pub cache_hit: bool,
     /// [Output-only] Total bytes processed for this job.
-    #[serde(alias="totalBytesProcessed")]
+    #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: String,
 }
 
@@ -474,16 +474,16 @@ impl Part for JobStatistics2 {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics3 {
     /// [Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.
-    #[serde(alias="outputRows")]
+    #[serde(rename="outputRows")]
     pub output_rows: String,
     /// [Output-only] Number of source files in a load job.
-    #[serde(alias="inputFiles")]
+    #[serde(rename="inputFiles")]
     pub input_files: String,
     /// [Output-only] Number of bytes of source data in a joad job.
-    #[serde(alias="inputFileBytes")]
+    #[serde(rename="inputFileBytes")]
     pub input_file_bytes: String,
     /// [Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.
-    #[serde(alias="outputBytes")]
+    #[serde(rename="outputBytes")]
     pub output_bytes: String,
 }
 
@@ -512,10 +512,10 @@ impl Part for JsonObject {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectList {
     /// A token to request the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The total number of projects in the list.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// The type of list.
     pub kind: String,
@@ -539,7 +539,7 @@ pub struct TableFieldSchema {
     /// [Optional] The field description. The maximum length is 16K characters.
     pub description: String,
     /// [Required] The field data type. Possible values include STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.
     pub mode: String,
@@ -571,28 +571,28 @@ pub struct Dataset {
     /// [Optional] A user-friendly description of the dataset.
     pub description: Option<String>,
     /// [Required] A reference that identifies the dataset.
-    #[serde(alias="datasetReference")]
+    #[serde(rename="datasetReference")]
     pub dataset_reference: Option<DatasetReference>,
     /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
     pub access: Option<Vec<DatasetAccess>>,
     /// [Experimental] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.
-    #[serde(alias="defaultTableExpirationMs")]
+    #[serde(rename="defaultTableExpirationMs")]
     pub default_table_expiration_ms: Option<String>,
     /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
     /// [Optional] A descriptive name for the dataset.
-    #[serde(alias="friendlyName")]
+    #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
     /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// [Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.
     pub id: Option<String>,
     /// [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -637,10 +637,10 @@ impl Part for TableCell {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobReference {
     /// [Required] The ID of the project containing this job.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -654,14 +654,14 @@ impl Part for JobReference {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatasetListDatasets {
     /// A descriptive name for the dataset, if one exists.
-    #[serde(alias="friendlyName")]
+    #[serde(rename="friendlyName")]
     pub friendly_name: String,
     /// The resource type. This property always returns the value "bigquery#dataset".
     pub kind: String,
     /// The fully-qualified, unique, opaque ID of the dataset.
     pub id: String,
     /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
-    #[serde(alias="datasetReference")]
+    #[serde(rename="datasetReference")]
     pub dataset_reference: DatasetReference,
 }
 
@@ -676,17 +676,17 @@ impl Part for DatasetListDatasets {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableListTables {
     /// The user-friendly name for this table.
-    #[serde(alias="friendlyName")]
+    #[serde(rename="friendlyName")]
     pub friendly_name: String,
     /// The resource type.
     pub kind: String,
     /// The type of table. Possible values are: TABLE, VIEW.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An opaque ID of the table
     pub id: String,
     /// A reference uniquely identifying the table.
-    #[serde(alias="tableReference")]
+    #[serde(rename="tableReference")]
     pub table_reference: TableReference,
 }
 
@@ -706,7 +706,7 @@ impl Part for TableListTables {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableList {
     /// A token to request the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Tables in the requested dataset.
     pub tables: Vec<TableListTables>,
@@ -715,7 +715,7 @@ pub struct TableList {
     /// A hash of this page of results.
     pub etag: String,
     /// The total number of tables in the dataset.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -729,7 +729,7 @@ impl ResponseResult for TableList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectReference {
     /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
 }
 
@@ -748,7 +748,7 @@ impl Part for ProjectReference {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableDataList {
     /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: String,
     /// The resource type of the response.
     pub kind: String,
@@ -757,7 +757,7 @@ pub struct TableDataList {
     /// Rows of results.
     pub rows: Vec<TableRow>,
     /// The total number of rows in the complete table.
-    #[serde(alias="totalRows")]
+    #[serde(rename="totalRows")]
     pub total_rows: String,
 }
 
@@ -786,12 +786,12 @@ pub struct Job {
     /// [Output-only] Information about the job, including starting time and ending time of the job.
     pub statistics: Option<JobStatistics>,
     /// [Optional] Reference describing the unique-per-user name of the job.
-    #[serde(alias="jobReference")]
+    #[serde(rename="jobReference")]
     pub job_reference: Option<JobReference>,
     /// [Output-only] A hash of this resource.
     pub etag: Option<String>,
     /// [Output-only] A URL that can be used to access this resource again.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Required] Describes the job configuration.
     pub configuration: Option<JobConfiguration>,
@@ -819,12 +819,12 @@ pub struct JobListJobs {
     /// [Output-only] Information about the job, including starting time and ending time of the job.
     pub statistics: JobStatistics,
     /// Job reference uniquely identifying the job.
-    #[serde(alias="jobReference")]
+    #[serde(rename="jobReference")]
     pub job_reference: JobReference,
     /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.
     pub state: String,
     /// A result object that will be present only if the job has failed.
-    #[serde(alias="errorResult")]
+    #[serde(rename="errorResult")]
     pub error_result: ErrorProto,
     /// [Full-projection-only] Specifies the job configuration.
     pub configuration: JobConfiguration,
@@ -849,46 +849,46 @@ pub struct JobConfigurationLoad {
     /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
     pub quote: String,
     /// [Required] The destination table to load the data into.
-    #[serde(alias="destinationTable")]
+    #[serde(rename="destinationTable")]
     pub destination_table: TableReference,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Vec<String>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
-    #[serde(alias="allowQuotedNewlines")]
+    #[serde(rename="allowQuotedNewlines")]
     pub allow_quoted_newlines: bool,
     /// [Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.
-    #[serde(alias="projectionFields")]
+    #[serde(rename="projectionFields")]
     pub projection_fields: Vec<String>,
     /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
-    #[serde(alias="allowJaggedRows")]
+    #[serde(rename="allowJaggedRows")]
     pub allow_jagged_rows: bool,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
-    #[serde(alias="fieldDelimiter")]
+    #[serde(rename="fieldDelimiter")]
     pub field_delimiter: String,
     /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". The default value is CSV.
-    #[serde(alias="sourceFormat")]
+    #[serde(rename="sourceFormat")]
     pub source_format: String,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
-    #[serde(alias="maxBadRecords")]
+    #[serde(rename="maxBadRecords")]
     pub max_bad_records: i32,
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
-    #[serde(alias="ignoreUnknownValues")]
+    #[serde(rename="ignoreUnknownValues")]
     pub ignore_unknown_values: bool,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="writeDisposition")]
+    #[serde(rename="writeDisposition")]
     pub write_disposition: String,
     /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
-    #[serde(alias="skipLeadingRows")]
+    #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: i32,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="createDisposition")]
+    #[serde(rename="createDisposition")]
     pub create_disposition: String,
     /// [Deprecated] The format of the schemaInline property.
-    #[serde(alias="schemaInlineFormat")]
+    #[serde(rename="schemaInlineFormat")]
     pub schema_inline_format: String,
     /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
-    #[serde(alias="schemaInline")]
+    #[serde(rename="schemaInline")]
     pub schema_inline: String,
     /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists or if the schema can be inferred from the loaded data.
     pub schema: TableSchema,
@@ -909,10 +909,10 @@ impl Part for JobConfigurationLoad {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobList {
     /// A token to request the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Total number of jobs in this collection.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// The resource type of the response.
     pub kind: String,
@@ -932,24 +932,24 @@ impl ResponseResult for JobList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationExtract {
     /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
-    #[serde(alias="destinationUri")]
+    #[serde(rename="destinationUri")]
     pub destination_uri: String,
     /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
-    #[serde(alias="destinationFormat")]
+    #[serde(rename="destinationFormat")]
     pub destination_format: String,
     /// [Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE.
     pub compression: String,
     /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
-    #[serde(alias="destinationUris")]
+    #[serde(rename="destinationUris")]
     pub destination_uris: Vec<String>,
     /// [Optional] Whether to print out a header row in the results. Default is true.
-    #[serde(alias="printHeader")]
+    #[serde(rename="printHeader")]
     pub print_header: bool,
     /// [Optional] Delimiter to use between fields in the exported data. Default is ','
-    #[serde(alias="fieldDelimiter")]
+    #[serde(rename="fieldDelimiter")]
     pub field_delimiter: String,
     /// [Required] A reference to the table being exported.
-    #[serde(alias="sourceTable")]
+    #[serde(rename="sourceTable")]
     pub source_table: TableReference,
 }
 
@@ -972,22 +972,22 @@ pub struct GetQueryResultsResponse {
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
     pub rows: Vec<TableRow>,
     /// Reference to the BigQuery Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
-    #[serde(alias="jobReference")]
+    #[serde(rename="jobReference")]
     pub job_reference: JobReference,
     /// Whether the query result was fetched from the query cache.
-    #[serde(alias="cacheHit")]
+    #[serde(rename="cacheHit")]
     pub cache_hit: bool,
     /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
-    #[serde(alias="jobComplete")]
+    #[serde(rename="jobComplete")]
     pub job_complete: bool,
     /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.
-    #[serde(alias="totalRows")]
+    #[serde(rename="totalRows")]
     pub total_rows: String,
     /// The total number of bytes processed for this query.
-    #[serde(alias="totalBytesProcessed")]
+    #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: String,
     /// A token used for paging results.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: String,
     /// A hash of this response.
     pub etag: String,
@@ -1005,20 +1005,20 @@ impl ResponseResult for GetQueryResultsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CsvOptions {
     /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
-    #[serde(alias="allowJaggedRows")]
+    #[serde(rename="allowJaggedRows")]
     pub allow_jagged_rows: bool,
     /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
-    #[serde(alias="skipLeadingRows")]
+    #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: i32,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
-    #[serde(alias="fieldDelimiter")]
+    #[serde(rename="fieldDelimiter")]
     pub field_delimiter: String,
     /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
     pub encoding: String,
     /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
     pub quote: String,
     /// [Optional] Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
-    #[serde(alias="allowQuotedNewlines")]
+    #[serde(rename="allowQuotedNewlines")]
     pub allow_quoted_newlines: bool,
 }
 
@@ -1032,21 +1032,21 @@ impl Part for CsvOptions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalDataConfiguration {
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns
-    #[serde(alias="ignoreUnknownValues")]
+    #[serde(rename="ignoreUnknownValues")]
     pub ignore_unknown_values: bool,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. CSV limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Vec<String>,
     /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE.
     pub compression: String,
     /// Additional properties to set if sourceFormat is set to CSV.
-    #[serde(alias="csvOptions")]
+    #[serde(rename="csvOptions")]
     pub csv_options: CsvOptions,
     /// [Optional] The data format. External data sources must be in CSV format. The default value is CSV.
-    #[serde(alias="sourceFormat")]
+    #[serde(rename="sourceFormat")]
     pub source_format: String,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
-    #[serde(alias="maxBadRecords")]
+    #[serde(rename="maxBadRecords")]
     pub max_bad_records: i32,
     /// [Required] The schema for the data.
     pub schema: TableSchema,
@@ -1062,7 +1062,7 @@ impl Part for ExternalDataConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorProto {
     /// Debugging information. This property is internal to Google and should not be used.
-    #[serde(alias="debugInfo")]
+    #[serde(rename="debugInfo")]
     pub debug_info: String,
     /// A human-readable description of the error.
     pub message: String,
@@ -1082,16 +1082,16 @@ impl Part for ErrorProto {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLink {
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="createDisposition")]
+    #[serde(rename="createDisposition")]
     pub create_disposition: String,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="writeDisposition")]
+    #[serde(rename="writeDisposition")]
     pub write_disposition: String,
     /// [Required] The destination table of the link job.
-    #[serde(alias="destinationTable")]
+    #[serde(rename="destinationTable")]
     pub destination_table: TableReference,
     /// [Required] URI of source table to link.
-    #[serde(alias="sourceUri")]
+    #[serde(rename="sourceUri")]
     pub source_uri: Vec<String>,
 }
 
@@ -1122,13 +1122,13 @@ pub struct DatasetAccess {
     /// [Required] Describes the rights granted to the user specified by the other member of the access object. The following string values are supported: READER, WRITER, OWNER.
     pub role: String,
     /// [Pick one] An email address of a user to grant access to. For example: fred@example.com.
-    #[serde(alias="userByEmail")]
+    #[serde(rename="userByEmail")]
     pub user_by_email: String,
     /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users.
-    #[serde(alias="specialGroup")]
+    #[serde(rename="specialGroup")]
     pub special_group: String,
     /// [Pick one] An email address of a Google Group to grant access to.
-    #[serde(alias="groupByEmail")]
+    #[serde(rename="groupByEmail")]
     pub group_by_email: String,
     /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.
     pub view: TableReference,
@@ -1149,7 +1149,7 @@ pub struct JobStatus {
     /// [Output-only] All errors encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.
     pub errors: Vec<ErrorProto>,
     /// [Output-only] Final error result of the job. If present, indicates that the job has completed and was unsuccessful.
-    #[serde(alias="errorResult")]
+    #[serde(rename="errorResult")]
     pub error_result: ErrorProto,
 }
 
@@ -1199,14 +1199,14 @@ impl Part for JsonValue {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TableDataInsertAllRequest {
     /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false, which treats unknown values as errors.
-    #[serde(alias="ignoreUnknownValues")]
+    #[serde(rename="ignoreUnknownValues")]
     pub ignore_unknown_values: Option<bool>,
     /// The resource type of the response.
     pub kind: Option<String>,
     /// The rows to insert.
     pub rows: Option<Vec<TableDataInsertAllRequestRows>>,
     /// [Optional] Insert all valid rows of a request, even if invalid rows exist. The default value is false, which causes the entire request to fail if any invalid rows exist.
-    #[serde(alias="skipInvalidRows")]
+    #[serde(rename="skipInvalidRows")]
     pub skip_invalid_rows: Option<bool>,
 }
 
@@ -1225,7 +1225,7 @@ impl RequestValue for TableDataInsertAllRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatasetList {
     /// A token that can be used to request the next results page. This property is omitted on the final results page.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list type. This property always returns the value "bigquery#datasetList".
     pub kind: String,
@@ -1249,18 +1249,18 @@ pub struct JobStatistics {
     /// [Output-only] Statistics for an extract job.
     pub extract: JobStatistics4,
     /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// [Output-only] Statistics for a query job.
     pub query: JobStatistics2,
     /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: String,
     /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
-    #[serde(alias="totalBytesProcessed")]
+    #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: String,
 }
 
@@ -1274,35 +1274,35 @@ impl Part for JobStatistics {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationQuery {
     /// [Experimental] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.
-    #[serde(alias="flattenResults")]
+    #[serde(rename="flattenResults")]
     pub flatten_results: bool,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified.
-    #[serde(alias="useQueryCache")]
+    #[serde(rename="useQueryCache")]
     pub use_query_cache: bool,
     /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
-    #[serde(alias="defaultDataset")]
+    #[serde(rename="defaultDataset")]
     pub default_dataset: DatasetReference,
     /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.
-    #[serde(alias="destinationTable")]
+    #[serde(rename="destinationTable")]
     pub destination_table: TableReference,
     /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
     pub priority: String,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="writeDisposition")]
+    #[serde(rename="writeDisposition")]
     pub write_disposition: String,
     /// If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set.
-    #[serde(alias="allowLargeResults")]
+    #[serde(rename="allowLargeResults")]
     pub allow_large_results: bool,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="createDisposition")]
+    #[serde(rename="createDisposition")]
     pub create_disposition: String,
     /// [Required] BigQuery SQL query to execute.
     pub query: String,
     /// [Deprecated] This property is deprecated.
-    #[serde(alias="preserveNulls")]
+    #[serde(rename="preserveNulls")]
     pub preserve_nulls: bool,
     /// [Experimental] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
-    #[serde(alias="tableDefinitions")]
+    #[serde(rename="tableDefinitions")]
     pub table_definitions: HashMap<String, ExternalDataConfiguration>,
 }
 
@@ -1316,10 +1316,10 @@ impl Part for JobConfigurationQuery {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetReference {
     /// [Optional] The ID of the project containing this dataset.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// [Required] A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: String,
 }
 
@@ -1348,7 +1348,7 @@ pub struct JobConfiguration {
     /// [Pick one] Configures a load job.
     pub load: JobConfigurationLoad,
     /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.
-    #[serde(alias="dryRun")]
+    #[serde(rename="dryRun")]
     pub dry_run: bool,
     /// [Pick one] Configures a query job.
     pub query: JobConfigurationQuery,
@@ -1370,17 +1370,17 @@ impl Part for JobConfiguration {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectListProjects {
     /// A descriptive name for this project.
-    #[serde(alias="friendlyName")]
+    #[serde(rename="friendlyName")]
     pub friendly_name: String,
     /// The resource type.
     pub kind: String,
     /// The numeric ID of this project.
-    #[serde(alias="numericId")]
+    #[serde(rename="numericId")]
     pub numeric_id: String,
     /// An opaque ID of this project.
     pub id: String,
     /// A unique reference to this project.
-    #[serde(alias="projectReference")]
+    #[serde(rename="projectReference")]
     pub project_reference: ProjectReference,
 }
 
@@ -1395,13 +1395,13 @@ impl Part for ProjectListProjects {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableReference {
     /// [Required] The ID of the project containing this table.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: String,
     /// [Required] The ID of the dataset containing this table.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: String,
 }
 
@@ -1427,39 +1427,39 @@ pub struct Table {
     /// [Output-only] The type of the resource.
     pub kind: Option<String>,
     /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
-    #[serde(alias="expirationTime")]
+    #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
     /// [Optional] A user-friendly description of this table.
     pub description: Option<String>,
     /// [Output-only] The time when this table was created, in milliseconds since the epoch.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// [Output-only] An opaque ID uniquely identifying the table.
     pub id: Option<String>,
     /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.
-    #[serde(alias="numRows")]
+    #[serde(rename="numRows")]
     pub num_rows: Option<String>,
     /// [Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.
-    #[serde(alias="numBytes")]
+    #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,
     /// [Output-only] A hash of this resource.
     pub etag: Option<String>,
     /// [Optional] A descriptive name for this table.
-    #[serde(alias="friendlyName")]
+    #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// [Optional] Describes the schema of this table.
     pub schema: Option<TableSchema>,
     /// [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. The default value is TABLE.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// [Required] Reference describing the ID of this table.
-    #[serde(alias="tableReference")]
+    #[serde(rename="tableReference")]
     pub table_reference: Option<TableReference>,
     /// [Output-only] A URL that can be used to access this resource again.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Optional] The view definition.
     pub view: Option<ViewDefinition>,
@@ -1484,7 +1484,7 @@ pub struct TableDataInsertAllResponse {
     /// The resource type of the response.
     pub kind: String,
     /// An array of errors for rows that were not inserted.
-    #[serde(alias="insertErrors")]
+    #[serde(rename="insertErrors")]
     pub insert_errors: Vec<TableDataInsertAllResponseInsertErrors>,
 }
 
@@ -1507,22 +1507,22 @@ pub struct QueryResponse {
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
     pub rows: Vec<TableRow>,
     /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
-    #[serde(alias="jobReference")]
+    #[serde(rename="jobReference")]
     pub job_reference: JobReference,
     /// Whether the query result was fetched from the query cache.
-    #[serde(alias="cacheHit")]
+    #[serde(rename="cacheHit")]
     pub cache_hit: bool,
     /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
-    #[serde(alias="jobComplete")]
+    #[serde(rename="jobComplete")]
     pub job_complete: bool,
     /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results.
-    #[serde(alias="totalRows")]
+    #[serde(rename="totalRows")]
     pub total_rows: String,
     /// The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.
-    #[serde(alias="totalBytesProcessed")]
+    #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: String,
     /// A token used for paging results.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: String,
     /// The schema of the results. Present only when the query completes successfully.
     pub schema: TableSchema,
@@ -1538,19 +1538,19 @@ impl ResponseResult for QueryResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationTableCopy {
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="createDisposition")]
+    #[serde(rename="createDisposition")]
     pub create_disposition: String,
     /// [Pick one] Source tables to copy.
-    #[serde(alias="sourceTables")]
+    #[serde(rename="sourceTables")]
     pub source_tables: Vec<TableReference>,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(alias="writeDisposition")]
+    #[serde(rename="writeDisposition")]
     pub write_disposition: String,
     /// [Required] The destination table
-    #[serde(alias="destinationTable")]
+    #[serde(rename="destinationTable")]
     pub destination_table: TableReference,
     /// [Pick one] Source table to copy.
-    #[serde(alias="sourceTable")]
+    #[serde(rename="sourceTable")]
     pub source_table: TableReference,
 }
 

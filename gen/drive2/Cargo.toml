@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive2"
-version = "0.1.3+20150326"
+version = "0.1.4+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2"
@@ -18,5 +18,5 @@ hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
-serde = "*"
+serde = ">= 0.3.0"
 serde_macros = "*"

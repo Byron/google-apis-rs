@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *0.1.3+20150309*, where *20150309* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *directory* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -450,7 +450,7 @@ impl<'a, C, NC, A> Directory<C, NC, A>
         Directory {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -493,7 +493,7 @@ impl<'a, C, NC, A> Directory<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -514,13 +514,13 @@ impl<'a, C, NC, A> Directory<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserName {
     /// Full Name
-    #[serde(alias="fullName")]
+    #[serde(rename="fullName")]
     pub full_name: String,
     /// First Name
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
     /// Last Name
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
 }
 
@@ -547,17 +547,17 @@ impl Part for UserName {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Group {
     /// List of non editable aliases (Read-only)
-    #[serde(alias="nonEditableAliases")]
+    #[serde(rename="nonEditableAliases")]
     pub non_editable_aliases: Option<Vec<String>>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// Description of the group
     pub description: Option<String>,
     /// Is the group created by admin (Read-only) *
-    #[serde(alias="adminCreated")]
+    #[serde(rename="adminCreated")]
     pub admin_created: Option<bool>,
     /// Group direct members count
-    #[serde(alias="directMembersCount")]
+    #[serde(rename="directMembersCount")]
     pub direct_members_count: Option<i64>,
     /// Email of Group
     pub email: Option<String>,
@@ -598,16 +598,16 @@ pub struct Notification {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Time at which notification was sent (Read-only)
-    #[serde(alias="sendTime")]
+    #[serde(rename="sendTime")]
     pub send_time: Option<String>,
     /// no description provided
-    #[serde(alias="notificationId")]
+    #[serde(rename="notificationId")]
     pub notification_id: Option<String>,
     /// Address from which the notification is received (Read-only)
-    #[serde(alias="fromAddress")]
+    #[serde(rename="fromAddress")]
     pub from_address: Option<String>,
     /// Boolean indicating whether the notification is unread or not.
-    #[serde(alias="isUnread")]
+    #[serde(rename="isUnread")]
     pub is_unread: Option<bool>,
     /// Subject of the notification (Read-only)
     pub subject: Option<String>,
@@ -629,24 +629,24 @@ pub struct SchemaFieldSpec {
     /// ETag of the resource.
     pub etag: String,
     /// Read ACLs on the field specifying who can view values of this field. Valid values are "ALL_DOMAIN_USERS" and "ADMINS_AND_SELF".
-    #[serde(alias="readAccessType")]
+    #[serde(rename="readAccessType")]
     pub read_access_type: String,
     /// Type of the field.
-    #[serde(alias="fieldType")]
+    #[serde(rename="fieldType")]
     pub field_type: String,
     /// Boolean specifying whether the field is indexed or not.
     pub indexed: bool,
     /// Name of the field.
-    #[serde(alias="fieldName")]
+    #[serde(rename="fieldName")]
     pub field_name: String,
     /// Indexing spec for a numeric field. By default, only exact match queries will be supported for numeric fields. Setting the numericIndexingSpec allows range queries to be supported.
-    #[serde(alias="numericIndexingSpec")]
+    #[serde(rename="numericIndexingSpec")]
     pub numeric_indexing_spec: SchemaFieldSpecNumericIndexingSpec,
     /// Unique identifier of Field (Read-only)
-    #[serde(alias="fieldId")]
+    #[serde(rename="fieldId")]
     pub field_id: String,
     /// Boolean specifying whether this is a multi-valued field or not.
-    #[serde(alias="multiValued")]
+    #[serde(rename="multiValued")]
     pub multi_valued: bool,
 }
 
@@ -676,7 +676,7 @@ pub struct Member {
     /// Role of member
     pub role: Option<String>,
     /// Type of member (Immutable)
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Email of member (Read-only)
     pub email: Option<String>,
@@ -705,7 +705,7 @@ pub struct OrgUnits {
     /// ETag of the resource.
     pub etag: String,
     /// List of user objects.
-    #[serde(alias="organizationUnits")]
+    #[serde(rename="organizationUnits")]
     pub organization_units: Vec<OrgUnit>,
 }
 
@@ -730,20 +730,20 @@ pub struct Token {
     /// The type of the API resource. This is always admin#directory#token.
     pub kind: String,
     /// The Client ID of the application the token is issued to.
-    #[serde(alias="clientId")]
+    #[serde(rename="clientId")]
     pub client_id: String,
     /// Whether the token is issued to an installed application. The value is true if the application is installed to a desktop or mobile device.
-    #[serde(alias="nativeApp")]
+    #[serde(rename="nativeApp")]
     pub native_app: bool,
     /// The displayable name of the application the token is issued to.
-    #[serde(alias="displayText")]
+    #[serde(rename="displayText")]
     pub display_text: String,
     /// ETag of the resource.
     pub etag: String,
     /// Whether the application is registered with Google. The value is true if the application has an anonymous Client ID.
     pub anonymous: bool,
     /// The unique ID of the user that issued the token.
-    #[serde(alias="userKey")]
+    #[serde(rename="userKey")]
     pub user_key: String,
 }
 
@@ -787,12 +787,12 @@ impl ResponseResult for Asps {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// A version-specific identifier for the watched resource.
-    #[serde(alias="resourceUri")]
+    #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
@@ -805,7 +805,7 @@ pub struct Channel {
     /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
     /// The type of delivery mechanism used for this channel.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
@@ -839,10 +839,10 @@ pub struct Schema {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Unique identifier of Schema (Read-only)
-    #[serde(alias="schemaId")]
+    #[serde(rename="schemaId")]
     pub schema_id: Option<String>,
     /// Schema name
-    #[serde(alias="schemaName")]
+    #[serde(rename="schemaName")]
     pub schema_name: Option<String>,
 }
 
@@ -871,16 +871,16 @@ pub struct Asp {
     /// The name of the application that the user, represented by their userId, entered when the ASP was created.
     pub name: String,
     /// The unique ID of the ASP.
-    #[serde(alias="codeId")]
+    #[serde(rename="codeId")]
     pub code_id: i32,
     /// The time when the ASP was last used. Expressed in Unix time format.
-    #[serde(alias="lastTimeUsed")]
+    #[serde(rename="lastTimeUsed")]
     pub last_time_used: String,
     /// The unique ID of the user who issued the ASP.
-    #[serde(alias="userKey")]
+    #[serde(rename="userKey")]
     pub user_key: String,
     /// The time when the ASP was created. Expressed in Unix time format.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: String,
 }
 
@@ -922,7 +922,7 @@ impl ResponseResult for Tokens {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Notifications {
     /// Token for fetching the next page of notifications.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of notifications in this page.
     pub items: Vec<Notification>,
@@ -931,7 +931,7 @@ pub struct Notifications {
     /// ETag of the resource.
     pub etag: String,
     /// Number of unread notification for the domain.
-    #[serde(alias="unreadNotificationsCount")]
+    #[serde(rename="unreadNotificationsCount")]
     pub unread_notifications_count: i32,
 }
 
@@ -952,70 +952,70 @@ impl ResponseResult for Notifications {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChromeOsDevice {
     /// List of recent device users, in descending order by last login time (Read-only)
-    #[serde(alias="recentUsers")]
+    #[serde(rename="recentUsers")]
     pub recent_users: Option<Vec<ChromeOsDeviceRecentUsers>>,
     /// Chromebook Mac Address on wifi network interface (Read-only)
-    #[serde(alias="macAddress")]
+    #[serde(rename="macAddress")]
     pub mac_address: Option<String>,
     /// Chromebook serial number (Read-only)
-    #[serde(alias="serialNumber")]
+    #[serde(rename="serialNumber")]
     pub serial_number: Option<String>,
     /// Date and time the device was last synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
-    #[serde(alias="lastSync")]
+    #[serde(rename="lastSync")]
     pub last_sync: Option<String>,
     /// Chromebook order number (Read-only)
-    #[serde(alias="orderNumber")]
+    #[serde(rename="orderNumber")]
     pub order_number: Option<String>,
     /// Mobile Equipment identifier for the 3G mobile card in the Chromebook (Read-only)
     pub meid: Option<String>,
     /// Address or location of the device as noted by the administrator
-    #[serde(alias="annotatedLocation")]
+    #[serde(rename="annotatedLocation")]
     pub annotated_location: Option<String>,
     /// User of the device
-    #[serde(alias="annotatedUser")]
+    #[serde(rename="annotatedUser")]
     pub annotated_user: Option<String>,
     /// Chromebook platform version (Read-only)
-    #[serde(alias="platformVersion")]
+    #[serde(rename="platformVersion")]
     pub platform_version: Option<String>,
     /// List of active time ranges (Read-only)
-    #[serde(alias="activeTimeRanges")]
+    #[serde(rename="activeTimeRanges")]
     pub active_time_ranges: Option<Vec<ChromeOsDeviceActiveTimeRanges>>,
     /// Unique identifier of Chrome OS Device (Read-only)
-    #[serde(alias="deviceId")]
+    #[serde(rename="deviceId")]
     pub device_id: Option<String>,
     /// Chromebook Mac Address on ethernet network interface (Read-only)
-    #[serde(alias="ethernetMacAddress")]
+    #[serde(rename="ethernetMacAddress")]
     pub ethernet_mac_address: Option<String>,
     /// Chromebook Os Version (Read-only)
-    #[serde(alias="osVersion")]
+    #[serde(rename="osVersion")]
     pub os_version: Option<String>,
     /// Chromebook firmware version (Read-only)
-    #[serde(alias="firmwareVersion")]
+    #[serde(rename="firmwareVersion")]
     pub firmware_version: Option<String>,
     /// Date and time the device was last enrolled (Read-only)
-    #[serde(alias="lastEnrollmentTime")]
+    #[serde(rename="lastEnrollmentTime")]
     pub last_enrollment_time: Option<String>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// Notes added by the administrator
     pub notes: Option<String>,
     /// Will Chromebook auto renew after support end date (Read-only)
-    #[serde(alias="willAutoRenew")]
+    #[serde(rename="willAutoRenew")]
     pub will_auto_renew: Option<bool>,
     /// Chromebook boot mode (Read-only)
-    #[serde(alias="bootMode")]
+    #[serde(rename="bootMode")]
     pub boot_mode: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// status of the device (Read-only)
     pub status: Option<String>,
     /// OrgUnit of the device
-    #[serde(alias="orgUnitPath")]
+    #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
     /// Chromebook Model (Read-only)
     pub model: Option<String>,
     /// Final date the device will be supported (Read-only)
-    #[serde(alias="supportEndDate")]
+    #[serde(rename="supportEndDate")]
     pub support_end_date: Option<String>,
 }
 
@@ -1056,7 +1056,7 @@ pub struct User {
     /// no description provided
     pub phones: Option<String>,
     /// Boolean indicating if the user is delegated admin (Read-only)
-    #[serde(alias="isDelegatedAdmin")]
+    #[serde(rename="isDelegatedAdmin")]
     pub is_delegated_admin: Option<bool>,
     /// Indicates if user is suspended
     pub suspended: Option<bool>,
@@ -1065,49 +1065,49 @@ pub struct User {
     /// List of aliases (Read-only)
     pub aliases: Option<Vec<String>>,
     /// List of non editable aliases (Read-only)
-    #[serde(alias="nonEditableAliases")]
+    #[serde(rename="nonEditableAliases")]
     pub non_editable_aliases: Option<Vec<String>>,
     /// Custom fields of the user.
-    #[serde(alias="customSchemas")]
+    #[serde(rename="customSchemas")]
     pub custom_schemas: Option<HashMap<String, UserCustomProperties>>,
     /// no description provided
-    #[serde(alias="deletionTime")]
+    #[serde(rename="deletionTime")]
     pub deletion_time: Option<String>,
     /// Suspension reason if user is suspended (Read-only)
-    #[serde(alias="suspensionReason")]
+    #[serde(rename="suspensionReason")]
     pub suspension_reason: Option<String>,
     /// Photo Url of the user (Read-only)
-    #[serde(alias="thumbnailPhotoUrl")]
+    #[serde(rename="thumbnailPhotoUrl")]
     pub thumbnail_photo_url: Option<String>,
     /// Boolean indicating if the user is admin (Read-only)
-    #[serde(alias="isAdmin")]
+    #[serde(rename="isAdmin")]
     pub is_admin: Option<bool>,
     /// no description provided
     pub relations: Option<String>,
     /// Boolean indicating if user is included in Global Address List
-    #[serde(alias="includeInGlobalAddressList")]
+    #[serde(rename="includeInGlobalAddressList")]
     pub include_in_global_address_list: Option<bool>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// User's last login time. (Read-only)
-    #[serde(alias="lastLoginTime")]
+    #[serde(rename="lastLoginTime")]
     pub last_login_time: Option<String>,
     /// OrgUnit of User
-    #[serde(alias="orgUnitPath")]
+    #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
     /// Indicates if user has agreed to terms (Read-only)
-    #[serde(alias="agreedToTerms")]
+    #[serde(rename="agreedToTerms")]
     pub agreed_to_terms: Option<bool>,
     /// no description provided
-    #[serde(alias="externalIds")]
+    #[serde(rename="externalIds")]
     pub external_ids: Option<String>,
     /// Boolean indicating if ip is whitelisted
-    #[serde(alias="ipWhitelisted")]
+    #[serde(rename="ipWhitelisted")]
     pub ip_whitelisted: Option<bool>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// Is mailbox setup (Read-only)
-    #[serde(alias="isMailboxSetup")]
+    #[serde(rename="isMailboxSetup")]
     pub is_mailbox_setup: Option<bool>,
     /// User's password
     pub password: Option<String>,
@@ -1116,27 +1116,27 @@ pub struct User {
     /// no description provided
     pub organizations: Option<String>,
     /// username of User
-    #[serde(alias="primaryEmail")]
+    #[serde(rename="primaryEmail")]
     pub primary_email: Option<String>,
     /// Hash function name for password. Supported are MD5, SHA-1 and crypt
-    #[serde(alias="hashFunction")]
+    #[serde(rename="hashFunction")]
     pub hash_function: Option<String>,
     /// User's name
     pub name: Option<UserName>,
     /// no description provided
     pub notes: Option<String>,
     /// User's Google account creation time. (Read-only)
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// no description provided
     pub websites: Option<String>,
     /// Boolean indicating if the user should change password in next login
-    #[serde(alias="changePasswordAtNextLogin")]
+    #[serde(rename="changePasswordAtNextLogin")]
     pub change_password_at_next_login: Option<bool>,
     /// no description provided
     pub ims: Option<String>,
     /// CustomerId of User (Read-only)
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: Option<String>,
 }
 
@@ -1157,7 +1157,7 @@ impl ResponseResult for User {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Groups {
     /// Token used to access next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Kind of resource this is.
     pub kind: String,
@@ -1177,7 +1177,7 @@ impl ResponseResult for Groups {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChromeOsDeviceRecentUsers {
     /// The type of the user
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Email address of the user. Present only if the user type is managed
     pub email: String,
@@ -1194,16 +1194,16 @@ impl Part for ChromeOsDeviceRecentUsers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MobileDeviceApplications {
     /// Version code of application
-    #[serde(alias="versionCode")]
+    #[serde(rename="versionCode")]
     pub version_code: i32,
     /// Package name of application
-    #[serde(alias="packageName")]
+    #[serde(rename="packageName")]
     pub package_name: String,
     /// Display name of application
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// Version name of application
-    #[serde(alias="versionName")]
+    #[serde(rename="versionName")]
     pub version_name: String,
     /// List of Permissions for application
     pub permission: Vec<String>,
@@ -1235,7 +1235,7 @@ impl Part for UserCustomProperties {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Members {
     /// Token used to access next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Kind of resource this is.
     pub kind: String,
@@ -1260,7 +1260,7 @@ impl ResponseResult for Members {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UserUndelete {
     /// OrgUnit of User
-    #[serde(alias="orgUnitPath")]
+    #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
 }
 
@@ -1308,7 +1308,7 @@ pub struct Alias {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Group's primary email (Read-only) User's primary email (Read-only)
-    #[serde(alias="primaryEmail")]
+    #[serde(rename="primaryEmail")]
     pub primary_email: Option<String>,
     /// Unique id of the group (Read-only) Unique id of the user (Read-only)
     pub id: Option<String>,
@@ -1330,7 +1330,7 @@ impl ResponseResult for Alias {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MobileDevices {
     /// Token used to access next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Kind of resource this is.
     pub kind: String,
@@ -1352,7 +1352,7 @@ pub struct ChromeOsDeviceActiveTimeRanges {
     /// Date of usage
     pub date: String,
     /// Duration in milliseconds
-    #[serde(alias="activeTime")]
+    #[serde(rename="activeTime")]
     pub active_time: i32,
 }
 
@@ -1374,12 +1374,12 @@ impl Part for ChromeOsDeviceActiveTimeRanges {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserPhoto {
     /// Mime Type of the photo
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// Base64 encoded photo data
-    #[serde(alias="photoData")]
+    #[serde(rename="photoData")]
     pub photo_data: Option<String>,
     /// Height in pixels of the photo
     pub height: Option<i32>,
@@ -1388,7 +1388,7 @@ pub struct UserPhoto {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Primary email of User (Read-only)
-    #[serde(alias="primaryEmail")]
+    #[serde(rename="primaryEmail")]
     pub primary_email: Option<String>,
     /// Unique identifier of User (Read-only)
     pub id: Option<String>,
@@ -1446,7 +1446,7 @@ impl RequestValue for UserMakeAdmin {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Users {
     /// Token used to access next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Kind of resource this is.
     pub kind: String,
@@ -1473,72 +1473,72 @@ impl ResponseResult for Users {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MobileDevice {
     /// Mobile Device Kernel version (Read-only)
-    #[serde(alias="kernelVersion")]
+    #[serde(rename="kernelVersion")]
     pub kernel_version: String,
     /// Date and time the device was last synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
-    #[serde(alias="lastSync")]
+    #[serde(rename="lastSync")]
     pub last_sync: String,
     /// Mobile Device compromised status (Read-only)
-    #[serde(alias="deviceCompromisedStatus")]
+    #[serde(rename="deviceCompromisedStatus")]
     pub device_compromised_status: String,
     /// Unique identifier of Mobile Device (Read-only)
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: String,
     /// Mobile Device MEID number (Read-only)
     pub meid: String,
     /// The default locale used on the Mobile Device (Read-only)
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
     /// Mobile Device Build number (Read-only)
-    #[serde(alias="buildNumber")]
+    #[serde(rename="buildNumber")]
     pub build_number: String,
     /// List of applications installed on Mobile Device
     pub applications: Vec<MobileDeviceApplications>,
     /// Mobile Device serial number (Read-only)
-    #[serde(alias="deviceId")]
+    #[serde(rename="deviceId")]
     pub device_id: String,
     /// Mobile Device IMEI number (Read-only)
     pub imei: String,
     /// Mobile Device user agent
-    #[serde(alias="userAgent")]
+    #[serde(rename="userAgent")]
     pub user_agent: String,
     /// Mobile Device Baseband version (Read-only)
-    #[serde(alias="basebandVersion")]
+    #[serde(rename="basebandVersion")]
     pub baseband_version: String,
     /// Kind of resource this is.
     pub kind: String,
     /// List of owner user's names (Read-only)
     pub name: Vec<String>,
     /// Date and time the device was first synchronized with the policy settings in the Google Apps administrator control panel (Read-only)
-    #[serde(alias="firstSync")]
+    #[serde(rename="firstSync")]
     pub first_sync: String,
     /// Name of the mobile operating system
     pub os: String,
     /// Mobile Device SSN or Serial Number (Read-only)
-    #[serde(alias="serialNumber")]
+    #[serde(rename="serialNumber")]
     pub serial_number: String,
     /// Mobile Device Hardware Id (Read-only)
-    #[serde(alias="hardwareId")]
+    #[serde(rename="hardwareId")]
     pub hardware_id: String,
     /// Mobile Device mobile or network operator (if available) (Read-only)
-    #[serde(alias="networkOperator")]
+    #[serde(rename="networkOperator")]
     pub network_operator: String,
     /// ETag of the resource.
     pub etag: String,
     /// Status of the device (Read-only)
     pub status: String,
     /// Boolean indicating if this account is on owner/primary profile or not (Read-only)
-    #[serde(alias="managedAccountIsOnOwnerProfile")]
+    #[serde(rename="managedAccountIsOnOwnerProfile")]
     pub managed_account_is_on_owner_profile: bool,
     /// Name of the model of the device
     pub model: String,
     /// The type of device (Read-only)
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// List of owner user's email addresses (Read-only)
     pub email: Vec<String>,
     /// Mobile Device WiFi MAC address (Read-only)
-    #[serde(alias="wifiMacAddress")]
+    #[serde(rename="wifiMacAddress")]
     pub wifi_mac_address: String,
 }
 
@@ -1558,7 +1558,7 @@ impl ResponseResult for MobileDevice {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChromeOsDevices {
     /// Token used to access next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of Chrome OS Device objects.
     pub chromeosdevices: Vec<ChromeOsDevice>,
@@ -1588,23 +1588,23 @@ pub struct OrgUnit {
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// Path of parent OrgUnit
-    #[serde(alias="parentOrgUnitPath")]
+    #[serde(rename="parentOrgUnitPath")]
     pub parent_org_unit_path: Option<String>,
     /// Name of OrgUnit
     pub name: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Id of OrgUnit
-    #[serde(alias="orgUnitId")]
+    #[serde(rename="orgUnitId")]
     pub org_unit_id: Option<String>,
     /// Id of parent OrgUnit
-    #[serde(alias="parentOrgUnitId")]
+    #[serde(rename="parentOrgUnitId")]
     pub parent_org_unit_id: Option<String>,
     /// Should block inheritance
-    #[serde(alias="blockInheritance")]
+    #[serde(rename="blockInheritance")]
     pub block_inheritance: Option<bool>,
     /// Path of OrgUnit
-    #[serde(alias="orgUnitPath")]
+    #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
     /// Description of OrgUnit
     pub description: Option<String>,
@@ -1633,10 +1633,10 @@ pub struct VerificationCode {
     /// ETag of the resource.
     pub etag: Option<String>,
     /// The obfuscated unique ID of the user.
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: Option<String>,
     /// A current verification code for the user. Invalidated or used verification codes are not returned as part of the result.
-    #[serde(alias="verificationCode")]
+    #[serde(rename="verificationCode")]
     pub verification_code: Option<String>,
 }
 
@@ -1650,10 +1650,10 @@ impl Resource for VerificationCode {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SchemaFieldSpecNumericIndexingSpec {
     /// Maximum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
-    #[serde(alias="maxValue")]
+    #[serde(rename="maxValue")]
     pub max_value: f64,
     /// Minimum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
-    #[serde(alias="minValue")]
+    #[serde(rename="minValue")]
     pub min_value: f64,
 }
 

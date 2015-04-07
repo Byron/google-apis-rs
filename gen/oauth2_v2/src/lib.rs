@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *oauth2* crate version *0.1.3+20150319*, where *20150319* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *oauth2* crate version *0.1.4+20150319*, where *20150319* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *oauth2* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/accounts/docs/OAuth2).
@@ -313,7 +313,7 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
         Oauth2 {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -326,7 +326,7 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -347,7 +347,7 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JwkKeys {
     /// no description provided
-    #[serde(alias="use")]
+    #[serde(rename="use")]
     pub use_: String,
     /// no description provided
     pub e: String,

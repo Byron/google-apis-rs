@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *0.1.3+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *fitness* crate version *0.1.4+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> Fitness<C, NC, A>
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -341,7 +341,7 @@ impl<'a, C, NC, A> Fitness<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -379,10 +379,10 @@ impl Part for DataType {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Value {
     /// Floating point value. When this is set, intVal must not be set.
-    #[serde(alias="fpVal")]
+    #[serde(rename="fpVal")]
     pub fp_val: f64,
     /// Integer value. When this is set, fpVal must not be set.
-    #[serde(alias="intVal")]
+    #[serde(rename="intVal")]
     pub int_val: i32,
 }
 
@@ -402,16 +402,16 @@ impl Part for Value {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
     /// The smallest start time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.
-    #[serde(alias="minStartTimeNs")]
+    #[serde(rename="minStartTimeNs")]
     pub min_start_time_ns: Option<String>,
     /// This token will be set when a dataset is received in response to a GET request and the dataset is too large to be included in a single response. Provide this value in a subsequent GET request to return the next page of data points within this dataset.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The largest end time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.
-    #[serde(alias="maxEndTimeNs")]
+    #[serde(rename="maxEndTimeNs")]
     pub max_end_time_ns: Option<String>,
     /// The data stream ID of the data source that created the points in this dataset.
-    #[serde(alias="dataSourceId")]
+    #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
     /// A partial list of data points contained in the dataset, ordered by largest endTimeNanos first. This list is considered complete when retrieving a small dataset and partial when patching a dataset or retrieving a dataset that is too large to include in a single response.
     pub point: Option<Vec<DataPoint>>,
@@ -433,7 +433,7 @@ impl ResponseResult for Dataset {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDataSourcesResponse {
     /// A previously created data source.
-    #[serde(alias="dataSource")]
+    #[serde(rename="dataSource")]
     pub data_source: Vec<DataSource>,
 }
 
@@ -447,14 +447,14 @@ impl ResponseResult for ListDataSourcesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
     /// Package name for this application. This is used as a unique identifier when created by Android applications, but cannot be specified by REST clients. REST clients will have their developer project number reflected into the Data Source data stream IDs, instead of the packageName.
-    #[serde(alias="packageName")]
+    #[serde(rename="packageName")]
     pub package_name: String,
     /// Version of the application. You should update this field whenever the application changes in a way that affects the computation of the data.
     pub version: String,
     /// The name of this application. This is required for REST clients, but we do not enforce uniqueness of this name. It is provided as a matter of convenience for other developers who would like to identify which REST created an Application or Data Source.
     pub name: String,
     /// An optional URI that can be used to link back to the application.
-    #[serde(alias="detailsUrl")]
+    #[serde(rename="detailsUrl")]
     pub details_url: String,
 }
 
@@ -473,20 +473,20 @@ impl Part for Application {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Session {
     /// A timestamp that indicates when the session was last modified.
-    #[serde(alias="modifiedTimeMillis")]
+    #[serde(rename="modifiedTimeMillis")]
     pub modified_time_millis: Option<String>,
     /// An end time, in milliseconds since epoch, inclusive.
-    #[serde(alias="endTimeMillis")]
+    #[serde(rename="endTimeMillis")]
     pub end_time_millis: Option<String>,
     /// A description for this session.
     pub description: Option<String>,
     /// The type of activity this session represents.
-    #[serde(alias="activityType")]
+    #[serde(rename="activityType")]
     pub activity_type: Option<i32>,
     /// The application that created the session.
     pub application: Option<Application>,
     /// A start time, in milliseconds since epoch, inclusive.
-    #[serde(alias="startTimeMillis")]
+    #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
     /// A client-generated identifier that is unique across all sessions owned by this particular user.
     pub id: Option<String>,
@@ -510,10 +510,10 @@ impl ResponseResult for Session {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListSessionsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
-    #[serde(alias="deletedSession")]
+    #[serde(rename="deletedSession")]
     pub deleted_session: Vec<Session>,
     /// Sessions with an end time that is between startTime and endTime of the request.
     pub session: Vec<Session>,
@@ -539,7 +539,7 @@ pub struct Device {
     /// Version string for the device hardware/software.
     pub version: String,
     /// A constant representing the type of the device.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
     pub uid: String,
@@ -580,29 +580,29 @@ impl Part for DataTypeField {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataPoint {
     /// Used for version checking during transformation; that is, a datapoint can only replace another datapoint that has an older computation time stamp.
-    #[serde(alias="computationTimeMillis")]
+    #[serde(rename="computationTimeMillis")]
     pub computation_time_millis: String,
     /// Indicates the last time this data point was modified. Useful only in contexts where we are listing the data changes, rather than representing the current state of the data.
-    #[serde(alias="modifiedTimeMillis")]
+    #[serde(rename="modifiedTimeMillis")]
     pub modified_time_millis: String,
     /// The start time of the interval represented by this data point, in nanoseconds since epoch.
-    #[serde(alias="startTimeNanos")]
+    #[serde(rename="startTimeNanos")]
     pub start_time_nanos: String,
     /// The data type defining the format of the values in this data point.
-    #[serde(alias="dataTypeName")]
+    #[serde(rename="dataTypeName")]
     pub data_type_name: String,
     /// Values of each data type field for the data point. It is expected that each value corresponding to a data type field will occur in the same order that the field is listed with in the data type specified in a data source.
     /// 
     /// Only one of integer and floating point fields will be populated, depending on the format enum value within data source's type field.
     pub value: Vec<Value>,
     /// The end time of the interval represented by this data point, in nanoseconds since epoch.
-    #[serde(alias="endTimeNanos")]
+    #[serde(rename="endTimeNanos")]
     pub end_time_nanos: String,
     /// If the data point is contained in a dataset for a derived data source, this field will be populated with the data source stream ID that created the data point originally.
-    #[serde(alias="originDataSourceId")]
+    #[serde(rename="originDataSourceId")]
     pub origin_data_source_id: String,
     /// The raw timestamp from the original SensorEvent.
-    #[serde(alias="rawTimestampNanos")]
+    #[serde(rename="rawTimestampNanos")]
     pub raw_timestamp_nanos: String,
 }
 
@@ -634,10 +634,10 @@ pub struct DataSource {
     /// An end-user visible name for this data source.
     pub name: Option<String>,
     /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.
-    #[serde(alias="dataStreamName")]
+    #[serde(rename="dataStreamName")]
     pub data_stream_name: Option<String>,
     /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: Option<DataType>,
     /// A unique identifier for the data stream produced by this data source. The identifier includes:
     /// 
@@ -654,10 +654,10 @@ pub struct DataSource {
     /// When any of the optional fields that comprise of the data stream ID are blank, they will be omitted from the data stream ID. The minnimum viable data stream ID would be: type:dataType.name:developer project number
     /// 
     /// Finally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.
-    #[serde(alias="dataStreamId")]
+    #[serde(rename="dataStreamId")]
     pub data_stream_id: Option<String>,
     /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
 }
 

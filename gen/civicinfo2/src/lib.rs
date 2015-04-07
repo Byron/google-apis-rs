@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Civic Info* crate version *0.1.3+20150302*, where *20150302* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Civic Info* crate version *0.1.4+20150302*, where *20150302* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Civic Info* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/civic-information).
@@ -283,7 +283,7 @@ impl<'a, C, NC, A> CivicInfo<C, NC, A>
         CivicInfo {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -299,7 +299,7 @@ impl<'a, C, NC, A> CivicInfo<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -320,7 +320,7 @@ impl<'a, C, NC, A> CivicInfo<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdministrationRegion {
     /// The election administration body for this area.
-    #[serde(alias="electionAdministrationBody")]
+    #[serde(rename="electionAdministrationBody")]
     pub election_administration_body: AdministrativeBody,
     /// The city or county that provides election information for this voter. This object can have the same elements as state.
     pub local_jurisdiction: Option<Box<AdministrationRegion>>,
@@ -344,7 +344,7 @@ pub struct Official {
     /// The official's name.
     pub name: String,
     /// A URL for a photo of the official.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
     /// The official's public contact phone numbers.
     pub phones: Vec<String>,
@@ -409,17 +409,17 @@ pub struct Candidate {
     /// The candidate's name.
     pub name: String,
     /// A URL for a photo of the candidate.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
     /// The URL for the candidate's campaign web site.
-    #[serde(alias="candidateUrl")]
+    #[serde(rename="candidateUrl")]
     pub candidate_url: String,
     /// A list of known (social) media channels for this candidate.
     pub channels: Vec<Channel>,
     /// The voice phone number for the candidate's campaign office.
     pub phone: String,
     /// The order the candidate appears on the ballot for this contest.
-    #[serde(alias="orderOnBallot")]
+    #[serde(rename="orderOnBallot")]
     pub order_on_ballot: String,
     /// The full name of the party the candidate is a member of.
     pub party: String,
@@ -441,26 +441,26 @@ pub struct Contest {
     /// A list of sources for this contest. If multiple sources are listed, the data has been aggregated from those sources.
     pub sources: Vec<Source>,
     /// If this is a partisan election, the name of the party it is for.
-    #[serde(alias="primaryParty")]
+    #[serde(rename="primaryParty")]
     pub primary_party: String,
     /// A description of any additional eligibility requirements for voting in this contest.
-    #[serde(alias="electorateSpecifications")]
+    #[serde(rename="electorateSpecifications")]
     pub electorate_specifications: String,
     /// The number of candidates that will be elected to office in this contest.
-    #[serde(alias="numberElected")]
+    #[serde(rename="numberElected")]
     pub number_elected: String,
     /// A link to the referendum. This field is only populated for contests of type 'Referendum'.
-    #[serde(alias="referendumUrl")]
+    #[serde(rename="referendumUrl")]
     pub referendum_url: String,
     /// The title of the referendum (e.g. 'Proposition 42'). This field is only populated for contests of type 'Referendum'.
-    #[serde(alias="referendumTitle")]
+    #[serde(rename="referendumTitle")]
     pub referendum_title: String,
     /// An ID for this object. IDs may change in future requests and should not be cached. Access to this field requires special access that can be requested from the Request more link on the Quotas page.
     pub id: String,
     /// "Yes" or "No" depending on whether this a contest being held outside the normal election cycle.
     pub special: String,
     /// The number of candidates that a voter may vote for in this contest.
-    #[serde(alias="numberVotingFor")]
+    #[serde(rename="numberVotingFor")]
     pub number_voting_for: String,
     /// Information about the electoral district that this contest is in.
     pub district: ElectoralDistrict,
@@ -469,15 +469,15 @@ pub struct Contest {
     /// The levels of government of the office for this contest. There may be more than one in cases where a jurisdiction effectively acts at two different levels of government; for example, the mayor of the District of Columbia acts at "locality" level, but also effectively at both "administrative-area-2" and "administrative-area-1".
     pub level: Vec<String>,
     /// A number specifying the position of this contest on the voter's ballot.
-    #[serde(alias="ballotPlacement")]
+    #[serde(rename="ballotPlacement")]
     pub ballot_placement: String,
     /// A brief description of the referendum. This field is only populated for contests of type 'Referendum'.
-    #[serde(alias="referendumSubtitle")]
+    #[serde(rename="referendumSubtitle")]
     pub referendum_subtitle: String,
     /// The candidate choices for this contest.
     pub candidates: Vec<Candidate>,
     /// The type of contest. Usually this will be 'General', 'Primary', or 'Run-off' for contests with candidates. For referenda this will be 'Referendum'.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -524,7 +524,7 @@ pub struct RepresentativeInfoResponse {
     /// Elected offices referenced by the divisions listed above. Will only be present if includeOffices was true in the request.
     pub offices: Vec<Office>,
     /// The normalized version of the requested address
-    #[serde(alias="normalizedInput")]
+    #[serde(rename="normalizedInput")]
     pub normalized_input: SimpleAddressType,
 }
 
@@ -553,15 +553,15 @@ impl Part for Source {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ElectionOfficial {
     /// The fax number of the election official.
-    #[serde(alias="faxNumber")]
+    #[serde(rename="faxNumber")]
     pub fax_number: String,
     /// The email address of the election official.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: String,
     /// The full name of the election official.
     pub name: String,
     /// The office phone number of the election official.
-    #[serde(alias="officePhoneNumber")]
+    #[serde(rename="officePhoneNumber")]
     pub office_phone_number: String,
     /// The title of the election official.
     pub title: String,
@@ -577,41 +577,41 @@ impl Part for ElectionOfficial {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdministrativeBody {
     /// A URL provided by this administrative body for information on absentee voting.
-    #[serde(alias="absenteeVotingInfoUrl")]
+    #[serde(rename="absenteeVotingInfoUrl")]
     pub absentee_voting_info_url: String,
     /// A URL provided by this administrative body for looking up where to vote.
-    #[serde(alias="votingLocationFinderUrl")]
+    #[serde(rename="votingLocationFinderUrl")]
     pub voting_location_finder_url: String,
     /// The name of this election administrative body.
     pub name: String,
     /// A URL provided by this administrative body for confirming that the voter is registered to vote.
-    #[serde(alias="electionRegistrationConfirmationUrl")]
+    #[serde(rename="electionRegistrationConfirmationUrl")]
     pub election_registration_confirmation_url: String,
     /// A URL provided by this administrative body for looking up general election information.
-    #[serde(alias="electionInfoUrl")]
+    #[serde(rename="electionInfoUrl")]
     pub election_info_url: String,
     /// A URL provided by this administrative body for looking up how to register to vote.
-    #[serde(alias="electionRegistrationUrl")]
+    #[serde(rename="electionRegistrationUrl")]
     pub election_registration_url: String,
     /// The election officials for this election administrative body.
-    #[serde(alias="electionOfficials")]
+    #[serde(rename="electionOfficials")]
     pub election_officials: Vec<ElectionOfficial>,
     /// The mailing address of this administrative body.
-    #[serde(alias="correspondenceAddress")]
+    #[serde(rename="correspondenceAddress")]
     pub correspondence_address: SimpleAddressType,
     /// A URL provided by this administrative body describing election rules to the voter.
-    #[serde(alias="electionRulesUrl")]
+    #[serde(rename="electionRulesUrl")]
     pub election_rules_url: String,
     /// A description of the services this administrative body may provide.
     pub voter_services: Vec<String>,
     /// A URL provided by this administrative body to give contest information to the voter.
-    #[serde(alias="ballotInfoUrl")]
+    #[serde(rename="ballotInfoUrl")]
     pub ballot_info_url: String,
     /// A description of the hours of operation for this administrative body.
-    #[serde(alias="hoursOfOperation")]
+    #[serde(rename="hoursOfOperation")]
     pub hours_of_operation: String,
     /// The physical address of this administrative body.
-    #[serde(alias="physicalAddress")]
+    #[serde(rename="physicalAddress")]
     pub physical_address: SimpleAddressType,
 }
 
@@ -625,7 +625,7 @@ impl Part for AdministrativeBody {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Channel {
     /// The type of channel. The following is a list of types of channels, but is not exhaustive. More channel types may be added at a later time. One of: GooglePlus, YouTube, Facebook, Twitter
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The unique public identifier for the candidate's channel.
     pub id: String,
@@ -649,10 +649,10 @@ pub struct Office {
     /// The roles which this office fulfills. Roles are not meant to be exhaustive, or to exactly specify the entire set of responsibilities of a given office, but are meant to be rough categories that are useful for general selection from or sorting of a list of offices.
     pub roles: Vec<String>,
     /// The OCD ID of the division with which this office is associated.
-    #[serde(alias="divisionId")]
+    #[serde(rename="divisionId")]
     pub division_id: String,
     /// List of indices in the officials array of people who presently hold this office.
-    #[serde(alias="officialIndices")]
+    #[serde(rename="officialIndices")]
     pub official_indices: Vec<u32>,
 }
 
@@ -666,7 +666,7 @@ impl Part for Office {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DivisionSearchResult {
     /// The unique Open Civic Data identifier for this division.
-    #[serde(alias="ocdId")]
+    #[serde(rename="ocdId")]
     pub ocd_id: String,
     /// The name of the division.
     pub name: String,
@@ -684,7 +684,7 @@ impl Part for DivisionSearchResult {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SimpleAddressType {
     /// The name of the location.
-    #[serde(alias="locationName")]
+    #[serde(rename="locationName")]
     pub location_name: String,
     /// The city or town for the address.
     pub city: String,
@@ -710,14 +710,14 @@ impl Part for SimpleAddressType {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GeographicDivision {
     /// List of indices in the offices array, one for each office elected from this division. Will only be present if includeOffices was true (or absent) in the request.
-    #[serde(alias="officeIndices")]
+    #[serde(rename="officeIndices")]
     pub office_indices: Vec<u32>,
     /// Any other valid OCD IDs that refer to the same division.
     /// 
     /// Because OCD IDs are meant to be human-readable and at least somewhat predictable, there are occasionally several identifiers for a single division. These identifiers are defined to be equivalent to one another, and one is always indicated as the primary identifier. The primary identifier will be returned in ocd_id above, and any other equivalent valid identifiers will be returned in this list.
     /// 
     /// For example, if this division's OCD ID is ocd-division/country:us/district:dc, this will contain ocd-division/country:us/state:dc.
-    #[serde(alias="alsoKnownAs")]
+    #[serde(rename="alsoKnownAs")]
     pub also_known_as: Vec<String>,
     /// The name of the division.
     pub name: String,
@@ -733,13 +733,13 @@ impl Part for GeographicDivision {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PollingLocation {
     /// The first date that this early vote site or drop off location may be used. This field is not populated for polling locations.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// A description of when this location is open.
-    #[serde(alias="pollingHours")]
+    #[serde(rename="pollingHours")]
     pub polling_hours: String,
     /// The last date that this early vote site or drop off location may be used. This field is not populated for polling locations.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// The name of the early vote site or drop off location. This field is not populated for polling locations.
     pub name: String,
@@ -750,7 +750,7 @@ pub struct PollingLocation {
     /// A list of sources for this location. If multiple sources are listed the data has been aggregated from those sources.
     pub sources: Vec<Source>,
     /// The services provided by this early vote site or drop off location. This field is not populated for polling locations.
-    #[serde(alias="voterServices")]
+    #[serde(rename="voterServices")]
     pub voter_services: String,
     /// An ID for this object. IDs may change in future requests and should not be cached. Access to this field requires special access that can be requested from the Request more link on the Quotas page.
     pub id: String,
@@ -793,28 +793,28 @@ impl ResponseResult for RepresentativeInfoData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VoterInfoResponse {
     /// Locations where the voter is eligible to vote early, prior to election day.
-    #[serde(alias="earlyVoteSites")]
+    #[serde(rename="earlyVoteSites")]
     pub early_vote_sites: Vec<PollingLocation>,
     /// Locations where a voter is eligible to drop off a completed ballot. The voter must have received and completed a ballot prior to arriving at the location. The location may not have ballots available on the premises. These locations could be open on or before election day as indicated in the pollingHours field.
-    #[serde(alias="dropOffLocations")]
+    #[serde(rename="dropOffLocations")]
     pub drop_off_locations: Vec<PollingLocation>,
     /// If no election ID was specified in the query, and there was more than one election with data for the given voter, this will contain information about the other elections that could apply.
-    #[serde(alias="otherElections")]
+    #[serde(rename="otherElections")]
     pub other_elections: Vec<Election>,
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#voterInfoResponse".
     pub kind: String,
     /// The normalized version of the requested address
-    #[serde(alias="normalizedInput")]
+    #[serde(rename="normalizedInput")]
     pub normalized_input: SimpleAddressType,
     /// Local Election Information for the state that the voter votes in. For the US, there will only be one element in this array.
     pub state: Vec<AdministrationRegion>,
     /// no description provided
-    #[serde(alias="precinctId")]
+    #[serde(rename="precinctId")]
     pub precinct_id: String,
     /// The election that was queried.
     pub election: Election,
     /// Locations where the voter is eligible to vote on election day.
-    #[serde(alias="pollingLocations")]
+    #[serde(rename="pollingLocations")]
     pub polling_locations: Vec<PollingLocation>,
     /// Contests that will appear on the voter's ballot.
     pub contests: Vec<Contest>,
@@ -836,7 +836,7 @@ impl ResponseResult for VoterInfoResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Election {
     /// Day of the election in YYYY-MM-DD format.
-    #[serde(alias="electionDay")]
+    #[serde(rename="electionDay")]
     pub election_day: Option<String>,
     /// The unique ID of this election.
     pub id: Option<String>,

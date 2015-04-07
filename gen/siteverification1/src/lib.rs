@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *siteVerification* crate version *0.1.3+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *siteVerification* crate version *0.1.4+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *siteVerification* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/site-verification/).
@@ -315,7 +315,7 @@ impl<'a, C, NC, A> SiteVerification<C, NC, A>
         SiteVerification {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +325,7 @@ impl<'a, C, NC, A> SiteVerification<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,7 +366,7 @@ pub struct SiteVerificationWebResourceResourceSite {
     /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.
     pub identifier: String,
     /// The site type. Can be SITE or INET_DOMAIN (domain name).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -386,7 +386,7 @@ impl Part for SiteVerificationWebResourceResourceSite {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SiteVerificationWebResourceGettokenRequest {
     /// The verification method that will be used to verify this site. For sites, 'FILE' or 'META' methods may be used. For domains, only 'DNS' may be used.
-    #[serde(alias="verificationMethod")]
+    #[serde(rename="verificationMethod")]
     pub verification_method: Option<String>,
     /// The site for which a verification token will be generated.
     pub site: Option<SiteVerificationWebResourceGettokenRequestSite>,
@@ -404,7 +404,7 @@ pub struct SiteVerificationWebResourceGettokenRequestSite {
     /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.
     pub identifier: String,
     /// The type of resource to be verified. Can be SITE or INET_DOMAIN (domain name).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 

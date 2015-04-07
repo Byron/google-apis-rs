@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Maps Engine* crate version *0.1.3+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Maps Engine* crate version *0.1.4+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Maps Engine* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/maps-engine/).
@@ -364,7 +364,7 @@ impl<'a, C, NC, A> MapsEngine<C, NC, A>
         MapsEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -392,7 +392,7 @@ impl<'a, C, NC, A> MapsEngine<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -417,22 +417,22 @@ pub struct RasterCollectionsRaster {
     /// Tags of this Raster.
     pub tags: Vec<String>,
     /// The ID of the project that this Raster is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: String,
     /// The name of this Raster, supplied by the author.
     pub name: String,
     /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.
     pub bbox: Vec<f64>,
     /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: String,
     /// A globally unique ID, used to refer to this Raster.
     pub id: String,
     /// The type of this Raster. Always "image" today.
-    #[serde(alias="rasterType")]
+    #[serde(rename="rasterType")]
     pub raster_type: String,
 }
 
@@ -446,18 +446,18 @@ impl Part for RasterCollectionsRaster {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DisplayRule {
     /// The zoom levels that this display rule apply.
-    #[serde(alias="zoomLevels")]
+    #[serde(rename="zoomLevels")]
     pub zoom_levels: ZoomLevels,
     /// Style applied to points. Required for Point Geometry.
-    #[serde(alias="pointOptions")]
+    #[serde(rename="pointOptions")]
     pub point_options: PointStyle,
     /// Display rule name. Name is not unique and cannot be used for identification purpose.
     pub name: String,
     /// Style applied to polygons. Required for Polygon Geometry.
-    #[serde(alias="polygonOptions")]
+    #[serde(rename="polygonOptions")]
     pub polygon_options: PolygonStyle,
     /// Style applied to lines. Required for LineString Geometry.
-    #[serde(alias="lineOptions")]
+    #[serde(rename="lineOptions")]
     pub line_options: LineStyle,
     /// This display rule will only be applied to features that match all of the filters here. If filters is empty, then the rule applies to all features.
     pub filters: Vec<Filter>,
@@ -480,7 +480,7 @@ pub struct FeaturesBatchDeleteRequest {
     /// no description provided
     pub gx_ids: Option<Vec<String>>,
     /// no description provided
-    #[serde(alias="primaryKeys")]
+    #[serde(rename="primaryKeys")]
     pub primary_keys: Option<Vec<String>>,
 }
 
@@ -528,29 +528,29 @@ pub struct Asset {
     /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.
     pub tags: Vec<String>,
     /// The ID of the project to which the asset belongs.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// The creation time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: String,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: bool,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: String,
     /// The email address of the creator of this asset. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: String,
     /// A rectangular bounding box which contains all of the data in this asset. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Vec<f64>,
     /// The email address of the last modifier of this asset. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: String,
     /// The last modified time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: String,
     /// The type of asset. One of raster, rasterCollection, table, map, or layer.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The asset's globally unique ID.
     pub id: String,
@@ -574,10 +574,10 @@ impl ResponseResult for Asset {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RasterCollectionsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
-    #[serde(alias="rasterCollections")]
+    #[serde(rename="rasterCollections")]
     pub raster_collections: Vec<RasterCollection>,
 }
 
@@ -591,7 +591,7 @@ impl ResponseResult for RasterCollectionsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiPoint {
     /// Identifies this object as a GeoJsonMultiPoint.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of at least two GeoJsonPoint coordinate arrays.
     pub coordinates: Vec<GeoJsonPosition>,
@@ -607,7 +607,7 @@ impl Part for GeoJsonMultiPoint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiLineString {
     /// Identifies this object as a GeoJsonMultiLineString.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of at least two GeoJsonLineString coordinate arrays.
     pub coordinates: Vec<Vec<GeoJsonPosition>>,
@@ -651,7 +651,7 @@ impl ResponseResult for RasterCollectionsRastersBatchDeleteResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableColumn {
     /// The type of data stored in this column.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The column name.
     pub name: String,
@@ -690,13 +690,13 @@ impl ResponseResult for ProjectsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FeaturesListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// An indicator of the maximum rate at which queries may be made, if all queries were as expensive as this query.
-    #[serde(alias="allowedQueriesPerSecond")]
+    #[serde(rename="allowedQueriesPerSecond")]
     pub allowed_queries_per_second: f64,
     /// no description provided
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Resources returned.
     pub features: Vec<Feature>,
@@ -738,7 +738,7 @@ impl ResponseResult for PermissionsBatchUpdateResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FeaturesBatchInsertRequest {
     /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.
-    #[serde(alias="normalizeGeometries")]
+    #[serde(rename="normalizeGeometries")]
     pub normalize_geometries: Option<bool>,
     /// no description provided
     pub features: Option<Vec<Feature>>,
@@ -759,7 +759,7 @@ impl RequestValue for FeaturesBatchInsertRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RastersListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub rasters: Vec<Raster>,
@@ -775,7 +775,7 @@ impl ResponseResult for RastersListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonLineString {
     /// Identifies this object as a GeoJsonLineString.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of two or more positions, representing a line.
     pub coordinates: Vec<GeoJsonPosition>,
@@ -791,13 +791,13 @@ impl Part for GeoJsonLineString {}
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum MapItem {
     /// no description provided
-    #[serde(alias="folder")]
+    #[serde(rename="folder")]
     Folder(MapFolder),
     /// no description provided
-    #[serde(alias="kmlLink")]
+    #[serde(rename="kmlLink")]
     KmlLink(MapKmlLink),
     /// no description provided
-    #[serde(alias="layer")]
+    #[serde(rename="layer")]
     Layer(MapLayer),
 }
 
@@ -840,45 +840,45 @@ pub struct Raster {
     /// Tags of this Raster.
     pub tags: Option<Tags>,
     /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="draftAccessList")]
+    #[serde(rename="draftAccessList")]
     pub draft_access_list: Option<String>,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
     /// The email address of the creator of this raster. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: Option<String>,
     /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.
     pub bbox: Option<Vec<f64>>,
     /// The email address of the last modifier of this raster. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
     /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// A globally unique ID, used to refer to this Raster.
     pub id: Option<String>,
     /// The name of this Raster, supplied by the author.
     pub name: Option<String>,
     /// The processing status of this Raster.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The ID of the project that this Raster is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
     /// The acquisition time of this Raster.
-    #[serde(alias="acquisitionTime")]
+    #[serde(rename="acquisitionTime")]
     pub acquisition_time: Option<AcquisitionTime>,
     /// The mask processing type of this Raster.
-    #[serde(alias="maskType")]
+    #[serde(rename="maskType")]
     pub mask_type: Option<String>,
     /// The type of this Raster. Always "image" today.
-    #[serde(alias="rasterType")]
+    #[serde(rename="rasterType")]
     pub raster_type: Option<String>,
 }
 
@@ -898,14 +898,14 @@ pub struct MapFolder {
     /// The name of this MapFolder.
     pub name: String,
     /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
-    #[serde(alias="defaultViewport")]
+    #[serde(rename="defaultViewport")]
     pub default_viewport: Vec<f64>,
     /// no description provided
     pub contents: Vec<MapItem>,
     /// The expandability setting of this MapFolder. If true, the folder can be expanded.
     pub expandable: bool,
     /// Identifies this object as a MapFolder.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The visibility setting of this MapFolder. One of "defaultOn" or "defaultOff".
     pub visibility: String,
@@ -921,7 +921,7 @@ impl Part for MapFolder {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiPolygon {
     /// Identifies this object as a GeoJsonMultiPolygon.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of at least two GeoJsonPolygon coordinate arrays.
     pub coordinates: Vec<Vec<Vec<GeoJsonPosition>>>,
@@ -964,10 +964,10 @@ pub struct MapLayer {
     /// The name of this MapLayer.
     pub name: String,
     /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
-    #[serde(alias="defaultViewport")]
+    #[serde(rename="defaultViewport")]
     pub default_viewport: Vec<f64>,
     /// Identifies this object as a MapLayer.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The ID of this MapLayer. This ID can be used to request more details about the layer.
     pub id: String,
@@ -1009,21 +1009,21 @@ pub struct RasterCollection {
     /// Tags of this RasterCollection.
     pub tags: Option<Tags>,
     /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="draftAccessList")]
+    #[serde(rename="draftAccessList")]
     pub draft_access_list: Option<String>,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
     /// The email address of the creator of this raster collection. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: Option<String>,
     /// A rectangular bounding box which contains all of the data in this RasterCollection. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
     /// The email address of the last modifier of this raster collection. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
     /// The last modified time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// A globally unique ID, used to refer to this RasterCollection.
     pub id: Option<String>,
@@ -1032,18 +1032,18 @@ pub struct RasterCollection {
     /// The name of this RasterCollection, supplied by the author.
     pub name: Option<String>,
     /// The processing status of this RasterCollection.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The ID of the project that this RasterCollection is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The creation time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
     /// The type of rasters contained within this RasterCollection.
-    #[serde(alias="rasterType")]
+    #[serde(rename="rasterType")]
     pub raster_type: Option<String>,
 }
 
@@ -1059,7 +1059,7 @@ impl ResponseResult for RasterCollection {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonPolygon {
     /// Identifies this object as a GeoJsonPolygon.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of LinearRings. A LinearRing is a GeoJsonLineString which is closed (that is, the first and last GeoJsonPositions are equal), and which contains at least four GeoJsonPositions. For polygons with multiple rings, the first LinearRing is the exterior ring, and any subsequent rings are interior rings (that is, holes).
     pub coordinates: Vec<Vec<GeoJsonPosition>>,
@@ -1113,7 +1113,7 @@ pub struct Feature {
     /// The geometry member of this Feature.
     pub geometry: GeoJsonGeometry,
     /// Identifies this object as a feature.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Key/value pairs of this Feature.
     pub properties: GeoJsonProperties,
@@ -1182,7 +1182,7 @@ pub struct LayersListResponse {
     /// Resources returned.
     pub layers: Vec<Layer>,
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
 }
 
@@ -1196,7 +1196,7 @@ impl ResponseResult for LayersListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonGeometryCollection {
     /// Identifies this object as a GeoJsonGeometryCollection.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// An array of geometry objects. There must be at least 2 different types of geometries in the array.
     pub geometries: Vec<GeoJsonGeometry>,
@@ -1212,13 +1212,13 @@ impl Part for GeoJsonGeometryCollection {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MapKmlLink {
     /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
-    #[serde(alias="defaultViewport")]
+    #[serde(rename="defaultViewport")]
     pub default_viewport: Vec<f64>,
     /// Identifies this object as a MapKmlLink.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The URL to the KML file represented by this MapKmlLink.
-    #[serde(alias="kmlUrl")]
+    #[serde(rename="kmlUrl")]
     pub kml_url: String,
     /// The visibility setting of this MapKmlLink. One of "defaultOn" or "defaultOff".
     pub visibility: String,
@@ -1259,24 +1259,24 @@ pub struct Layer {
     /// Tags of this Layer.
     pub tags: Option<Tags>,
     /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="draftAccessList")]
+    #[serde(rename="draftAccessList")]
     pub draft_access_list: Option<String>,
     /// Deprecated: The type of the datasources used to build this Layer. Note: This has been replaced by layerType, but is still available for now to maintain backward compatibility.
-    #[serde(alias="datasourceType")]
+    #[serde(rename="datasourceType")]
     pub datasource_type: Option<String>,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
     /// The email address of the creator of this layer. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: Option<String>,
     /// A rectangular bounding box which contains all of the data in this Layer. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
     /// The email address of the last modifier of this layer. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
     /// The last modified time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// A globally unique ID, used to refer to this Layer.
     pub id: Option<String>,
@@ -1287,24 +1287,24 @@ pub struct Layer {
     /// The name of this Layer, supplied by the author.
     pub name: Option<String>,
     /// The processing status of this layer.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The ID of the project that this Layer is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The creation time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// The publishing status of this layer.
-    #[serde(alias="publishingStatus")]
+    #[serde(rename="publishingStatus")]
     pub publishing_status: Option<String>,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
     /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.
-    #[serde(alias="layerType")]
+    #[serde(rename="layerType")]
     pub layer_type: Option<String>,
     /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="publishedAccessList")]
+    #[serde(rename="publishedAccessList")]
     pub published_access_list: Option<String>,
 }
 
@@ -1329,7 +1329,7 @@ impl ResponseResult for Layer {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ParentsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The parent assets.
     pub parents: Vec<Parent>,
@@ -1345,13 +1345,13 @@ impl ResponseResult for ParentsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VectorStyle {
     /// Individual feature info, this is called Info Window in Maps Engine UI. If not provided, a default template with all attributes will be generated.
-    #[serde(alias="featureInfo")]
+    #[serde(rename="featureInfo")]
     pub feature_info: FeatureInfo,
     /// The type of the vector style. Currently, only displayRule is supported.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// no description provided
-    #[serde(alias="displayRules")]
+    #[serde(rename="displayRules")]
     pub display_rules: Vec<DisplayRule>,
 }
 
@@ -1370,7 +1370,7 @@ impl Part for VectorStyle {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RasterCollectionsRastersListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub rasters: Vec<RasterCollectionsRaster>,
@@ -1409,7 +1409,7 @@ impl ResponseResult for PublishResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AssetsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Assets returned.
     pub assets: Vec<Asset>,
@@ -1556,10 +1556,10 @@ pub struct PublishedMap {
     /// The description of this Map, supplied by the author.
     pub description: String,
     /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
-    #[serde(alias="defaultViewport")]
+    #[serde(rename="defaultViewport")]
     pub default_viewport: LatLngBox,
     /// The ID of the project that this Map is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// A globally unique ID, used to refer to this Map.
     pub id: String,
@@ -1584,14 +1584,14 @@ impl ResponseResult for PublishedMap {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedLayer {
     /// The ID of the project that this Layer is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// The name of this Layer, supplied by the author.
     pub name: String,
     /// The description of this Layer, supplied by the author.
     pub description: String,
     /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.
-    #[serde(alias="layerType")]
+    #[serde(rename="layerType")]
     pub layer_type: String,
     /// A globally unique ID, used to refer to this Layer.
     pub id: String,
@@ -1622,7 +1622,7 @@ impl Part for GeoJsonProperties {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FeaturesBatchPatchRequest {
     /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.
-    #[serde(alias="normalizeGeometries")]
+    #[serde(rename="normalizeGeometries")]
     pub normalize_geometries: Option<bool>,
     /// no description provided
     pub features: Option<Vec<Feature>>,
@@ -1657,10 +1657,10 @@ impl Part for LineStyle {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schema {
     /// The name of the column that contains a feature's geometry. This field can be omitted during table create; Google Maps Engine supports only a single geometry column, which must be named geometry and be the first object in the columns array.
-    #[serde(alias="primaryGeometry")]
+    #[serde(rename="primaryGeometry")]
     pub primary_geometry: String,
     /// The name of the column that contains the unique identifier of a Feature.
-    #[serde(alias="primaryKey")]
+    #[serde(rename="primaryKey")]
     pub primary_key: String,
     /// An array of TableColumn objects. The first object in the array must be named geometry and be of type points, lineStrings, polygons, or mixedGeometry.
     pub columns: Vec<TableColumn>,
@@ -1694,26 +1694,26 @@ pub struct Map {
     /// The description of this Map, supplied by the author.
     pub description: Option<String>,
     /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
-    #[serde(alias="defaultViewport")]
+    #[serde(rename="defaultViewport")]
     pub default_viewport: Option<LatLngBox>,
     /// Tags of this Map.
     pub tags: Option<Tags>,
     /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="draftAccessList")]
+    #[serde(rename="draftAccessList")]
     pub draft_access_list: Option<String>,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
     /// The email address of the creator of this map. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: Option<String>,
     /// A rectangular bounding box which contains all of the data in this Map. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
     /// The email address of the last modifier of this map. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
     /// The last modified time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// A globally unique ID, used to refer to this Map.
     pub id: Option<String>,
@@ -1722,23 +1722,23 @@ pub struct Map {
     /// The name of this Map, supplied by the author.
     pub name: Option<String>,
     /// The processing status of this map. Map processing is automatically started once a map becomes ready for processing.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The ID of the project that this Map is in.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Deprecated: An array containing the available versions of this Map. Currently may only contain "published". The publishingStatus field should be used instead.
     pub versions: Option<Vec<String>>,
     /// The creation time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// The publishing status of this map.
-    #[serde(alias="publishingStatus")]
+    #[serde(rename="publishingStatus")]
     pub publishing_status: Option<String>,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
     /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="publishedAccessList")]
+    #[serde(rename="publishedAccessList")]
     pub published_access_list: Option<String>,
 }
 
@@ -1768,7 +1768,7 @@ pub struct Permission {
     /// The type of access granted to this user or group.
     pub role: String,
     /// The account type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Indicates whether a public asset is listed and can be found via a web search (value true), or is visible only to people who have a link to the asset (value false).
     pub discoverable: bool,
@@ -1823,7 +1823,7 @@ impl Part for ZoomLevels {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct IconsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub icons: Vec<Icon>,
@@ -1841,13 +1841,13 @@ pub struct ScalingFunction {
     /// Name of the numeric column used to scale a shape.
     pub column: String,
     /// The range of values to display across the size range.
-    #[serde(alias="valueRange")]
+    #[serde(rename="valueRange")]
     pub value_range: ValueRange,
     /// The range of shape sizes, in pixels. For circles, the size corresponds to the diameter.
-    #[serde(alias="sizeRange")]
+    #[serde(rename="sizeRange")]
     pub size_range: SizeRange,
     /// The type of scaling function to use. Defaults to SQRT. Currently only linear and square root scaling are supported.
-    #[serde(alias="scalingType")]
+    #[serde(rename="scalingType")]
     pub scaling_type: String,
 }
 
@@ -1963,7 +1963,7 @@ impl Part for SizeRange {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TablesListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub tables: Vec<Table>,
@@ -2074,7 +2074,7 @@ pub struct PublishedLayersListResponse {
     /// Resources returned.
     pub layers: Vec<PublishedLayer>,
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
 }
 
@@ -2090,10 +2090,10 @@ pub struct LabelStyle {
     /// Opacity of the text.
     pub opacity: f64,
     /// Font weight of the label, defaults to 'normal'.
-    #[serde(alias="fontWeight")]
+    #[serde(rename="fontWeight")]
     pub font_weight: String,
     /// Font style of the label, defaults to 'normal'.
-    #[serde(alias="fontStyle")]
+    #[serde(rename="fontStyle")]
     pub font_style: String,
     /// Outline color of the text.
     pub outline: Color,
@@ -2115,7 +2115,7 @@ impl Part for LabelStyle {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonPoint {
     /// Identifies this object as a GeoJsonPoint.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// A single GeoJsonPosition, specifying the location of the point.
     pub coordinates: GeoJsonPosition,
@@ -2131,12 +2131,12 @@ impl Part for GeoJsonPoint {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IconStyle {
     /// The function used to scale shapes. Required when a scaledShape is specified.
-    #[serde(alias="scalingFunction")]
+    #[serde(rename="scalingFunction")]
     pub scaling_function: ScalingFunction,
     /// Custom icon id.
     pub id: String,
     /// A scalable shape.
-    #[serde(alias="scaledShape")]
+    #[serde(rename="scaledShape")]
     pub scaled_shape: ScaledShape,
     /// Stock icon name. To use a stock icon, prefix it with 'gx_'. See Stock icon names for valid icon names. For example, to specify small_red, set name to 'gx_small_red'.
     pub name: String,
@@ -2169,7 +2169,7 @@ pub struct File {
     /// The name of the file.
     pub filename: String,
     /// The upload status of the file.
-    #[serde(alias="uploadStatus")]
+    #[serde(rename="uploadStatus")]
     pub upload_status: String,
     /// The size of the file in bytes.
     pub size: String,
@@ -2190,7 +2190,7 @@ impl Part for File {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedMapsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub maps: Vec<PublishedMap>,
@@ -2233,42 +2233,42 @@ pub struct Table {
     /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.
     pub tags: Option<Tags>,
     /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="draftAccessList")]
+    #[serde(rename="draftAccessList")]
     pub draft_access_list: Option<String>,
     /// If true, WRITERs of the asset are able to edit the asset permissions.
-    #[serde(alias="writersCanEditPermissions")]
+    #[serde(rename="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
     /// The email address of the creator of this table. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="creatorEmail")]
+    #[serde(rename="creatorEmail")]
     pub creator_email: Option<String>,
     /// A rectangular bounding box which contains all of the data in this Table. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
     /// The email address of the last modifier of this table. This is only returned on GET requests and not LIST requests.
-    #[serde(alias="lastModifierEmail")]
+    #[serde(rename="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
     /// The last modified time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// A globally unique ID, used to refer to this table.
     pub id: Option<String>,
     /// The name of this table, supplied by the author.
     pub name: Option<String>,
     /// The processing status of this table.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The ID of the project to which the table belongs.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// The creation time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// Encoding of the uploaded files. Valid values include UTF-8, CP1251, ISO 8859-1, and Shift_JIS.
-    #[serde(alias="sourceEncoding")]
+    #[serde(rename="sourceEncoding")]
     pub source_encoding: Option<String>,
     /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
     /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
-    #[serde(alias="publishedAccessList")]
+    #[serde(rename="publishedAccessList")]
     pub published_access_list: Option<String>,
     /// The schema for this table. Note: The schema is returned in response to a get request but not a list request. After requesting a list of tables, you'll need to send a get request to retrieve the schema for each table.
     pub schema: Option<Schema>,
@@ -2291,7 +2291,7 @@ impl ResponseResult for Table {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MapsListResponse {
     /// Next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Resources returned.
     pub maps: Vec<Map>,

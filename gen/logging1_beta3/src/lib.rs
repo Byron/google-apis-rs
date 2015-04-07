@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *logging* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3).
 //! # Features
 //! 
@@ -310,7 +310,7 @@ impl<'a, C, NC, A> Logging<C, NC, A>
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -320,7 +320,7 @@ impl<'a, C, NC, A> Logging<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -360,7 +360,7 @@ pub struct LogError {
     /// The description of the last error observed.
     pub status: Status,
     /// The last time the error was observed, in nanoseconds since the Unix epoch.
-    #[serde(alias="timeNanos")]
+    #[serde(rename="timeNanos")]
     pub time_nanos: String,
     /// The resource associated with the error. It may be different from the sink destination. For example, the sink may point to a BigQuery dataset, but the error may refer to a table resource inside the dataset.
     pub resource: String,
@@ -376,10 +376,10 @@ impl Part for LogError {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Log {
     /// Type URL describing the expected payload type for the log.
-    #[serde(alias="payloadType")]
+    #[serde(rename="payloadType")]
     pub payload_type: String,
     /// Name used when displaying the log to the user (for example, in a UI). Example: `"activity_log"`
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// REQUIRED: The log's name name. Example: `"compute.googleapis.com/activity_log"`.
     pub name: String,
@@ -400,7 +400,7 @@ impl Part for Log {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListLogsResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of logs, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogs`. If `nextPageToken` is empty, then there are no more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of log resources.
     pub logs: Vec<Log>,
@@ -416,7 +416,7 @@ impl ResponseResult for ListLogsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LogService {
     /// Label keys used when labeling log entries for this service. The order of the keys is significant, with higher priority keys coming earlier in the list.
-    #[serde(alias="indexKeys")]
+    #[serde(rename="indexKeys")]
     pub index_keys: Vec<String>,
     /// The service's name.
     pub name: String,
@@ -470,7 +470,7 @@ impl ResponseResult for ListLogSinksResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct WriteLogEntriesRequest {
     /// Metadata labels that apply to all entries in this request. If one of the log entries contains a (key, value) with the same key that is in `commonLabels`, then the entry's (key, value) overrides the one in `commonLabels`.
-    #[serde(alias="commonLabels")]
+    #[serde(rename="commonLabels")]
     pub common_labels: Option<HashMap<String, String>>,
     /// Log entries to insert.
     pub entries: Option<Vec<LogEntry>>,
@@ -491,10 +491,10 @@ impl RequestValue for WriteLogEntriesRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListLogServicesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of services, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServices`. If `nextPageToken` is empty, then there are no more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of log services.
-    #[serde(alias="logServices")]
+    #[serde(rename="logServices")]
     pub log_services: Vec<LogService>,
 }
 
@@ -508,18 +508,18 @@ impl ResponseResult for ListLogServicesResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct LogEntry {
     /// The log entry payload, represented as a protocol buffer that is expressed as a JSON object. You can only pass `protoPayload` values that belong to a set of approved types.
-    #[serde(alias="protoPayload")]
+    #[serde(rename="protoPayload")]
     pub proto_payload: HashMap<String, String>,
     /// The log to which this entry belongs. When a log entry is ingested, the value of this field is set by the logging system.
     pub log: String,
     /// The log entry payload, represented as a text string.
-    #[serde(alias="textPayload")]
+    #[serde(rename="textPayload")]
     pub text_payload: String,
     /// A unique ID for the log entry. If you provide this field, the logging service considers other log entries in the same log with the same ID as duplicates which can be removed.
-    #[serde(alias="insertId")]
+    #[serde(rename="insertId")]
     pub insert_id: String,
     /// The log entry payload, represented as a structure that is expressed as a JSON object.
-    #[serde(alias="structPayload")]
+    #[serde(rename="structPayload")]
     pub struct_payload: HashMap<String, String>,
     /// Information about the log entry.
     pub metadata: LogEntryMetadata,
@@ -545,13 +545,13 @@ pub struct LogEntryMetadata {
     /// A set of (key, value) data that provides additional information about the log entry. If the log entry is from one of the Google Cloud Platform sources listed below, the indicated (key, value) information must be provided: Google App Engine, service_name `appengine.googleapis.com`: "appengine.googleapis.com/module_id",  "appengine.googleapis.com/version_id",  and one of: "appengine.googleapis.com/replica_index",  "appengine.googleapis.com/clone_id",  or else provide the following Compute Engine labels: Google Compute Engine, service_name `compute.googleapis.com`: "compute.googleapis.com/resource_type", "instance" "compute.googleapis.com/resource_id",
     pub labels: HashMap<String, String>,
     /// The fully-qualified email address of the authenticated user that performed or requested the action represented by the log entry. If the log entry does not apply to an action taken by an authenticated user, then the field should be empty.
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: String,
     /// The API name of the Google Cloud Platform service that created the log entry. For example, `"compute.googleapis.com"`.
-    #[serde(alias="serviceName")]
+    #[serde(rename="serviceName")]
     pub service_name: String,
     /// The project ID of the Google Cloud Platform service that created the log entry.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
 }
 
@@ -570,10 +570,10 @@ impl Part for LogEntryMetadata {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListLogServiceIndexesResponse {
     /// If there are more results, then `nextPageToken` is returned in the response. To get the next batch of indexes, use the value of `nextPageToken` as `pageToken` in the next call of `ListLogServiceIndexess`. If `nextPageToken` is empty, then there are no more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of log service index prefixes.
-    #[serde(alias="serviceIndexPrefixes")]
+    #[serde(rename="serviceIndexPrefixes")]
     pub service_index_prefixes: Vec<String>,
 }
 

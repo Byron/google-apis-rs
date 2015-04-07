@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *coordinate* crate version *0.1.3+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *coordinate* crate version *0.1.4+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *coordinate* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/coordinate/).
@@ -346,7 +346,7 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
         Coordinate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -371,7 +371,7 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -397,14 +397,14 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LocationListResponse {
     /// A token to provide to get the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Locations in the collection.
     pub items: Vec<LocationRecord>,
     /// Identifies this object as a list of locations.
     pub kind: String,
     /// Pagination information for token pagination.
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
 }
 
@@ -472,10 +472,10 @@ impl ResponseResult for CustomFieldDefListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TokenPagination {
     /// A token to provide to get the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A token to provide to get the previous page of results.
-    #[serde(alias="previousPageToken")]
+    #[serde(rename="previousPageToken")]
     pub previous_page_token: String,
     /// Identifies this object as pagination information.
     pub kind: String,
@@ -495,7 +495,7 @@ pub struct Location {
     /// Identifies this object as a location.
     pub kind: String,
     /// Address.
-    #[serde(alias="addressLine")]
+    #[serde(rename="addressLine")]
     pub address_line: Vec<String>,
     /// Longitude.
     pub lng: f64,
@@ -530,7 +530,7 @@ pub struct JobState {
     /// Identifies this object as a job state.
     pub kind: String,
     /// Customer name.
-    #[serde(alias="customerName")]
+    #[serde(rename="customerName")]
     pub customer_name: String,
     /// Job title.
     pub title: String,
@@ -539,14 +539,14 @@ pub struct JobState {
     /// Email address of the assignee, or the string "DELETED_USER" if the account is no longer available.
     pub assignee: String,
     /// Customer phone number.
-    #[serde(alias="customerPhoneNumber")]
+    #[serde(rename="customerPhoneNumber")]
     pub customer_phone_number: String,
     /// Job location.
     pub location: Location,
     /// Job progress.
     pub progress: String,
     /// Custom fields.
-    #[serde(alias="customFields")]
+    #[serde(rename="customFields")]
     pub custom_fields: CustomFields,
 }
 
@@ -562,7 +562,7 @@ pub struct CustomFields {
     /// Identifies this object as a collection of custom fields.
     pub kind: String,
     /// Collection of custom fields.
-    #[serde(alias="customField")]
+    #[serde(rename="customField")]
     pub custom_field: Vec<CustomField>,
 }
 
@@ -598,10 +598,10 @@ pub struct LocationRecord {
     /// Latitude.
     pub latitude: f64,
     /// The collection time in milliseconds since the epoch.
-    #[serde(alias="collectionTime")]
+    #[serde(rename="collectionTime")]
     pub collection_time: String,
     /// The location accuracy in meters. This is the radius of a 95% confidence interval around the location measurement.
-    #[serde(alias="confidenceRadius")]
+    #[serde(rename="confidenceRadius")]
     pub confidence_radius: f64,
     /// Identifies this object as a location.
     pub kind: String,
@@ -630,13 +630,13 @@ pub struct Schedule {
     /// Identifies this object as a job schedule.
     pub kind: Option<String>,
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
-    #[serde(alias="allDay")]
+    #[serde(rename="allDay")]
     pub all_day: Option<bool>,
     /// Scheduled start time in milliseconds since epoch.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// Scheduled end time in milliseconds since epoch.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: Option<String>,
 }
 
@@ -676,7 +676,7 @@ impl ResponseResult for TeamListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobListResponse {
     /// A token to provide to get the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Jobs in the collection.
     pub items: Vec<Job>,
@@ -720,7 +720,7 @@ pub struct Job {
     /// Identifies this object as a job.
     pub kind: Option<String>,
     /// List of job changes since it was created. The first change corresponds to the state of the job when it was created.
-    #[serde(alias="jobChange")]
+    #[serde(rename="jobChange")]
     pub job_change: Option<Vec<JobChange>>,
     /// Job id.
     pub id: Option<String>,
@@ -746,10 +746,10 @@ pub struct CustomFieldDef {
     /// Custom field name.
     pub name: String,
     /// Custom field type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Whether the field is required for checkout.
-    #[serde(alias="requiredForCheckout")]
+    #[serde(rename="requiredForCheckout")]
     pub required_for_checkout: bool,
     /// Whether the field is enabled.
     pub enabled: bool,
@@ -769,7 +769,7 @@ pub struct CustomField {
     /// Identifies this object as a custom field.
     pub kind: String,
     /// Custom field id.
-    #[serde(alias="customFieldId")]
+    #[serde(rename="customFieldId")]
     pub custom_field_id: String,
     /// Custom field value.
     pub value: String,

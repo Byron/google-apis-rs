@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *0.1.3+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Tag Manager* crate version *0.1.4+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -379,7 +379,7 @@ impl<'a, C, NC, A> TagManager<C, NC, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -389,7 +389,7 @@ impl<'a, C, NC, A> TagManager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -448,30 +448,30 @@ impl Part for AccountAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     /// The start timestamp in milliseconds to schedule a tag.
-    #[serde(alias="scheduleStartMs")]
+    #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a tag.
-    #[serde(alias="scheduleEndMs")]
+    #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// The Tag ID uniquely identifies the GTM Tag.
-    #[serde(alias="tagId")]
+    #[serde(rename="tagId")]
     pub tag_id: Option<String>,
     /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire.
-    #[serde(alias="blockingRuleId")]
+    #[serde(rename="blockingRuleId")]
     pub blocking_rule_id: Option<Vec<String>>,
     /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.
     pub fingerprint: Option<String>,
     /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false.
-    #[serde(alias="firingRuleId")]
+    #[serde(rename="firingRuleId")]
     pub firing_rule_id: Option<Vec<String>>,
     /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.
-    #[serde(alias="firingTriggerId")]
+    #[serde(rename="firingTriggerId")]
     pub firing_trigger_id: Option<Vec<String>>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Tag display name.
     pub name: Option<String>,
@@ -482,13 +482,13 @@ pub struct Tag {
     /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.
     pub priority: Option<Parameter>,
     /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).
-    #[serde(alias="liveOnly")]
+    #[serde(rename="liveOnly")]
     pub live_only: Option<bool>,
     /// GTM Tag Type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.
-    #[serde(alias="blockingTriggerId")]
+    #[serde(rename="blockingTriggerId")]
     pub blocking_trigger_id: Option<Vec<String>>,
 }
 
@@ -510,34 +510,34 @@ impl ResponseResult for Tag {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Container {
     /// Container Time Zone ID.
-    #[serde(alias="timeZoneId")]
+    #[serde(rename="timeZoneId")]
     pub time_zone_id: Option<String>,
     /// List of enabled built-in variables. Valid values include: pageUrl, pageHostname, pagePath, referrer, event, clickElement, clickClasses, clickId, clickTarget, clickUrl, clickText, formElement, formClasses, formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine, newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState, historySource, containerVersion, debugMode, randomNumber, containerId.
-    #[serde(alias="enabledBuiltInVariable")]
+    #[serde(rename="enabledBuiltInVariable")]
     pub enabled_built_in_variable: Option<Vec<String>>,
     /// Container Country ID.
-    #[serde(alias="timeZoneCountryId")]
+    #[serde(rename="timeZoneCountryId")]
     pub time_zone_country_id: Option<i64>,
     /// Container Public ID.
-    #[serde(alias="publicId")]
+    #[serde(rename="publicId")]
     pub public_id: Option<String>,
     /// The Container ID uniquely identifies the GTM Container.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Optional list of domain names associated with the Container.
-    #[serde(alias="domainName")]
+    #[serde(rename="domainName")]
     pub domain_name: Option<Vec<String>>,
     /// Container Notes.
     pub notes: Option<String>,
     /// Container display name.
     pub name: Option<String>,
     /// List of Usage Contexts for the Container. Valid values include: web, android, ios.
-    #[serde(alias="usageContext")]
+    #[serde(rename="usageContext")]
     pub usage_context: Option<Vec<String>>,
     /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -577,16 +577,16 @@ impl ResponseResult for ListContainersResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Macro {
     /// The start timestamp in milliseconds to schedule a macro.
-    #[serde(alias="scheduleStartMs")]
+    #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a macro.
-    #[serde(alias="scheduleEndMs")]
+    #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// The Macro ID uniquely identifies the GTM Macro.
-    #[serde(alias="macroId")]
+    #[serde(rename="macroId")]
     pub macro_id: Option<String>,
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// The macro's parameters.
     pub parameter: Option<Vec<Parameter>>,
@@ -595,16 +595,16 @@ pub struct Macro {
     /// The fingerprint of the GTM Macro as computed at storage time. This value is recomputed whenever the macro is modified.
     pub fingerprint: Option<String>,
     /// For mobile containers only: A list of rule IDs for disabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
-    #[serde(alias="disablingRuleId")]
+    #[serde(rename="disablingRuleId")]
     pub disabling_rule_id: Option<Vec<String>>,
     /// For mobile containers only: A list of rule IDs for enabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
-    #[serde(alias="enablingRuleId")]
+    #[serde(rename="enablingRuleId")]
     pub enabling_rule_id: Option<Vec<String>>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// GTM Macro Type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Macro display name.
     pub name: Option<String>,
@@ -689,10 +689,10 @@ impl ResponseResult for ListVariablesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Whether the account shares data anonymously with Google and others.
-    #[serde(alias="shareData")]
+    #[serde(rename="shareData")]
     pub share_data: Option<bool>,
     /// The Account ID uniquely identifies the GTM Account.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Account display name.
     pub name: Option<String>,
@@ -719,12 +719,12 @@ impl ResponseResult for Account {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Rule {
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Rule display name.
     pub name: Option<String>,
     /// The Rule ID uniquely identifies the GTM Rule.
-    #[serde(alias="ruleId")]
+    #[serde(rename="ruleId")]
     pub rule_id: Option<String>,
     /// User notes on how to apply this rule in the container.
     pub notes: Option<String>,
@@ -733,7 +733,7 @@ pub struct Rule {
     /// The list of conditions that make up this rule (implicit AND between them).
     pub condition: Option<Vec<Condition>>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -771,10 +771,10 @@ impl ResponseResult for ListAccountsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishContainerVersionResponse {
     /// The container version created.
-    #[serde(alias="containerVersion")]
+    #[serde(rename="containerVersion")]
     pub container_version: ContainerVersion,
     /// Compiler errors or not.
-    #[serde(alias="compilerError")]
+    #[serde(rename="compilerError")]
     pub compiler_error: bool,
 }
 
@@ -795,53 +795,53 @@ impl ResponseResult for PublishContainerVersionResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Trigger {
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
-    #[serde(alias="uniqueTriggerId")]
+    #[serde(rename="uniqueTriggerId")]
     pub unique_trigger_id: Option<Parameter>,
     /// The Trigger ID uniquely identifies the GTM Trigger.
-    #[serde(alias="triggerId")]
+    #[serde(rename="triggerId")]
     pub trigger_id: Option<String>,
     /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
     pub fingerprint: Option<String>,
     /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.
-    #[serde(alias="enableAllVideos")]
+    #[serde(rename="enableAllVideos")]
     pub enable_all_videos: Option<Parameter>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Name of the GTM event that is fired. Only valid for Timer triggers.
-    #[serde(alias="eventName")]
+    #[serde(rename="eventName")]
     pub event_name: Option<Parameter>,
     /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.
-    #[serde(alias="videoPercentageList")]
+    #[serde(rename="videoPercentageList")]
     pub video_percentage_list: Option<Parameter>,
     /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
-    #[serde(alias="waitForTags")]
+    #[serde(rename="waitForTags")]
     pub wait_for_tags: Option<Parameter>,
     /// Trigger display name.
     pub name: Option<String>,
     /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
     pub interval: Option<Parameter>,
     /// Used in the case of auto event tracking.
-    #[serde(alias="autoEventFilter")]
+    #[serde(rename="autoEventFilter")]
     pub auto_event_filter: Option<Vec<Condition>>,
     /// The trigger will only fire iff all Conditions are true.
     pub filter: Option<Vec<Condition>>,
     /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
-    #[serde(alias="waitForTagsTimeout")]
+    #[serde(rename="waitForTagsTimeout")]
     pub wait_for_tags_timeout: Option<Parameter>,
     /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
     pub limit: Option<Parameter>,
     /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
-    #[serde(alias="checkValidation")]
+    #[serde(rename="checkValidation")]
     pub check_validation: Option<Parameter>,
     /// Used in the case of custom event, which is fired iff all Conditions are true.
-    #[serde(alias="customEventFilter")]
+    #[serde(rename="customEventFilter")]
     pub custom_event_filter: Option<Vec<Condition>>,
     /// Defines the data layer event that causes this trigger.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
@@ -861,10 +861,10 @@ impl ResponseResult for Trigger {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreateContainerVersionResponse {
     /// The container version created.
-    #[serde(alias="containerVersion")]
+    #[serde(rename="containerVersion")]
     pub container_version: ContainerVersion,
     /// Compiler errors or not.
-    #[serde(alias="compilerError")]
+    #[serde(rename="compilerError")]
     pub compiler_error: bool,
 }
 
@@ -896,7 +896,7 @@ impl ResponseResult for ListRulesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerAccess {
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: String,
     /// List of Container permissions. Valid container permissions are: read, edit, delete, publish.
     pub permission: Vec<String>,
@@ -919,19 +919,19 @@ impl Part for ContainerAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserAccess {
     /// GTM Container access permissions.
-    #[serde(alias="containerAccess")]
+    #[serde(rename="containerAccess")]
     pub container_access: Option<Vec<ContainerAccess>>,
     /// GTM Account access permissions.
-    #[serde(alias="accountAccess")]
+    #[serde(rename="accountAccess")]
     pub account_access: Option<AccountAccess>,
     /// User's email address.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
     /// Account Permission ID.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: Option<String>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -959,7 +959,7 @@ pub struct Parameter {
     /// - list: A list of parameters should be specified 
     /// - map: A map of parameters should be specified 
     /// - template: The value represents any text; this can include macro references (even macro references that might return non-string types)
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -996,7 +996,7 @@ impl ResponseResult for ListTagsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListAccountUsersResponse {
     /// All GTM AccountUsers of a GTM Account.
-    #[serde(alias="userAccess")]
+    #[serde(rename="userAccess")]
     pub user_access: Vec<UserAccess>,
 }
 
@@ -1019,7 +1019,7 @@ pub struct CreateContainerVersionRequestVersionOptions {
     /// The name of the container version to be created.
     pub name: Option<String>,
     /// The creation of this version may be for quick preview and shouldn't be saved.
-    #[serde(alias="quickPreview")]
+    #[serde(rename="quickPreview")]
     pub quick_preview: Option<bool>,
 }
 
@@ -1055,28 +1055,28 @@ pub struct ContainerVersionHeader {
     /// A value of true indicates this container version has been deleted.
     pub deleted: bool,
     /// Number of macros in the container version.
-    #[serde(alias="numMacros")]
+    #[serde(rename="numMacros")]
     pub num_macros: String,
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: String,
     /// Number of tags in the container version.
-    #[serde(alias="numTags")]
+    #[serde(rename="numTags")]
     pub num_tags: String,
     /// Number of rules in the container version.
-    #[serde(alias="numRules")]
+    #[serde(rename="numRules")]
     pub num_rules: String,
     /// The Container Version ID uniquely identifies the GTM Container Version.
-    #[serde(alias="containerVersionId")]
+    #[serde(rename="containerVersionId")]
     pub container_version_id: String,
     /// Number of triggers in the container version.
-    #[serde(alias="numTriggers")]
+    #[serde(rename="numTriggers")]
     pub num_triggers: String,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// Number of variables in the container version.
-    #[serde(alias="numVariables")]
+    #[serde(rename="numVariables")]
     pub num_variables: String,
 }
 
@@ -1100,14 +1100,14 @@ pub struct ContainerVersion {
     /// The container that this version was taken from.
     pub container: Option<Container>,
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// The triggers in the container that this version was taken from.
     pub trigger: Option<Vec<Trigger>>,
     /// A value of true indicates this container version has been deleted.
     pub deleted: Option<bool>,
     /// The macros in the container that this version was taken from.
-    #[serde(alias="macro")]
+    #[serde(rename="macro")]
     pub macro_: Option<Vec<Macro>>,
     /// User notes on how to apply this container version in the container.
     pub notes: Option<String>,
@@ -1116,14 +1116,14 @@ pub struct ContainerVersion {
     /// The tags in the container that this version was taken from.
     pub tag: Option<Vec<Tag>>,
     /// The Container Version ID uniquely identifies the GTM Container Version.
-    #[serde(alias="containerVersionId")]
+    #[serde(rename="containerVersionId")]
     pub container_version_id: Option<String>,
     /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
     pub fingerprint: Option<String>,
     /// The variables in the container that this version was taken from.
     pub variable: Option<Vec<Variable>>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Container version display name.
     pub name: Option<String>,
@@ -1145,10 +1145,10 @@ impl ResponseResult for ContainerVersion {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListContainerVersionsResponse {
     /// All container version headers of a GTM Container.
-    #[serde(alias="containerVersionHeader")]
+    #[serde(rename="containerVersionHeader")]
     pub container_version_header: Vec<ContainerVersionHeader>,
     /// All versions of a GTM Container.
-    #[serde(alias="containerVersion")]
+    #[serde(rename="containerVersion")]
     pub container_version: Vec<ContainerVersion>,
 }
 
@@ -1169,10 +1169,10 @@ impl ResponseResult for ListContainerVersionsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
     /// The start timestamp in milliseconds to schedule a variable.
-    #[serde(alias="scheduleStartMs")]
+    #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a variable.
-    #[serde(alias="scheduleEndMs")]
+    #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// Variable display name.
     pub name: Option<String>,
@@ -1181,24 +1181,24 @@ pub struct Variable {
     /// User notes on how to apply this variable in the container.
     pub notes: Option<String>,
     /// GTM Container ID.
-    #[serde(alias="containerId")]
+    #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.
-    #[serde(alias="enablingTriggerId")]
+    #[serde(rename="enablingTriggerId")]
     pub enabling_trigger_id: Option<Vec<String>>,
     /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.
     pub fingerprint: Option<String>,
     /// GTM Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// GTM Variable Type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.
-    #[serde(alias="disablingTriggerId")]
+    #[serde(rename="disablingTriggerId")]
     pub disabling_trigger_id: Option<Vec<String>>,
     /// The Variable ID uniquely identifies the GTM Variable.
-    #[serde(alias="variableId")]
+    #[serde(rename="variableId")]
     pub variable_id: Option<String>,
 }
 
@@ -1219,7 +1219,7 @@ pub struct Condition {
     /// - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.
     pub parameter: Vec<Parameter>,
     /// The type of operator for this condition.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 

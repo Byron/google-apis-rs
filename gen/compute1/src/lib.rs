@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *compute* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
@@ -446,7 +446,7 @@ impl<'a, C, NC, A> Compute<C, NC, A>
         Compute {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -540,7 +540,7 @@ impl<'a, C, NC, A> Compute<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -561,7 +561,7 @@ impl<'a, C, NC, A> Compute<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VpnTunnelsScopedList {
     /// List of vpn tunnels contained in this scope.
-    #[serde(alias="vpnTunnels")]
+    #[serde(rename="vpnTunnels")]
     pub vpn_tunnels: Vec<VpnTunnel>,
     /// Informational warning which replaces the list of addresses when the list is empty.
     pub warning: VpnTunnelsScopedListWarning,
@@ -586,7 +586,7 @@ pub struct SerialPortOutput {
     /// [Output Only] The contents of the console output.
     pub contents: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -620,7 +620,7 @@ impl Part for OperationsScopedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlMapList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of UrlMap resources.
     pub items: Vec<UrlMap>,
@@ -629,7 +629,7 @@ pub struct UrlMapList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -692,20 +692,20 @@ pub struct DiskType {
     /// [Output Only] URL of the zone where the disk type resides.
     pub zone: String,
     /// [Output Only] An optional textual description of the valid disk size, such as "10GB-10TB".
-    #[serde(alias="validDiskSize")]
+    #[serde(rename="validDiskSize")]
     pub valid_disk_size: String,
     /// [Output Only] The deprecation status associated with this disk type.
     pub deprecated: DeprecationStatus,
     /// [Output Only] Server defined default disk size in GB.
-    #[serde(alias="defaultDiskSizeGb")]
+    #[serde(rename="defaultDiskSizeGb")]
     pub default_disk_size_gb: String,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output Only] Name of the resource.
     pub name: String,
@@ -743,12 +743,12 @@ impl ResponseResult for DiskType {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
     /// [Output Only] The CPU platform used by this instance.
-    #[serde(alias="cpuPlatform")]
+    #[serde(rename="cpuPlatform")]
     pub cpu_platform: Option<String>,
     /// [Output Only] The status of the instance. One of the following values: PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED, TERMINATED.
     pub status: Option<String>,
     /// Allows this instance to send and receive packets with non-matching destination or source IPs. This is required if you plan to use this instance to forward routes. For more information, see Enabling IP Forwarding.
-    #[serde(alias="canIpForward")]
+    #[serde(rename="canIpForward")]
     pub can_ip_forward: Option<bool>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
@@ -759,18 +759,18 @@ pub struct Instance {
     /// Full or partial URL of the machine type resource to use for this instance. This is provided by the client when the instance is created. For example, the following is a valid partial url:
     /// 
     /// zones/zone/machineTypes/machine-type
-    #[serde(alias="machineType")]
+    #[serde(rename="machineType")]
     pub machine_type: Option<String>,
     /// A list of service accounts, with their specified scopes, authorized for this instance. Service accounts generate access tokens that can be accessed through the metadata server and used to authenticate applications on the instance. See Authenticating from Google Compute Engine for more information.
-    #[serde(alias="serviceAccounts")]
+    #[serde(rename="serviceAccounts")]
     pub service_accounts: Option<Vec<ServiceAccount>>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services, such as connecting to the internet.
-    #[serde(alias="networkInterfaces")]
+    #[serde(rename="networkInterfaces")]
     pub network_interfaces: Option<Vec<NetworkInterface>>,
     /// [Output Only] Type of the resource. Always compute#instance for instances.
     pub kind: Option<String>,
@@ -781,10 +781,10 @@ pub struct Instance {
     /// Array of disks associated with this instance. Persistent disks must be created before you can assign them.
     pub disks: Option<Vec<AttachedDisk>>,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Output Only] An optional, human-readable explanation of the status.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
     /// The metadata key/value pairs assigned to this instance. This includes custom metadata and predefined keys.
     pub metadata: Option<Metadata>,
@@ -802,7 +802,7 @@ impl ResponseResult for Instance {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MachineTypesScopedList {
     /// [Output Only] List of machine types contained in this scope.
-    #[serde(alias="machineTypes")]
+    #[serde(rename="machineTypes")]
     pub machine_types: Vec<MachineType>,
     /// [Output Only] An informational warning that appears when the machine types list is empty.
     pub warning: MachineTypesScopedListWarning,
@@ -823,7 +823,7 @@ impl Part for MachineTypesScopedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VpnTunnelAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped vpn tunnel lists.
     pub items: HashMap<String, VpnTunnelsScopedList>,
@@ -832,7 +832,7 @@ pub struct VpnTunnelAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -851,7 +851,7 @@ impl ResponseResult for VpnTunnelAggregatedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped operation lists.
     pub items: HashMap<String, OperationsScopedList>,
@@ -860,7 +860,7 @@ pub struct OperationAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -879,7 +879,7 @@ impl ResponseResult for OperationAggregatedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImageList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of Image resources.
     pub items: Vec<Image>,
@@ -888,7 +888,7 @@ pub struct ImageList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1009,15 +1009,15 @@ pub struct TargetHttpProxy {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// URL to the UrlMap resource that defines the mapping from URL to the BackendService.
-    #[serde(alias="urlMap")]
+    #[serde(rename="urlMap")]
     pub url_map: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -1039,7 +1039,7 @@ impl ResponseResult for TargetHttpProxy {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DiskAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped disk lists.
     pub items: HashMap<String, DisksScopedList>,
@@ -1048,7 +1048,7 @@ pub struct DiskAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1084,10 +1084,10 @@ impl Part for AddressesScopedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MachineType {
     /// [Output Only] The tumber of CPUs exposed to the instance.
-    #[serde(alias="guestCpus")]
+    #[serde(rename="guestCpus")]
     pub guest_cpus: i32,
     /// [Deprecated] This property is deprecated and will never be populated with any relevant values.
-    #[serde(alias="imageSpaceGb")]
+    #[serde(rename="imageSpaceGb")]
     pub image_space_gb: i32,
     /// Type of the resource.
     pub kind: String,
@@ -1096,26 +1096,26 @@ pub struct MachineType {
     /// [Output Only] The name of the zone where the machine type resides, such as us-central1-a.
     pub zone: String,
     /// [Output Only] Maximum total persistent disks size (GB) allowed.
-    #[serde(alias="maximumPersistentDisksSizeGb")]
+    #[serde(rename="maximumPersistentDisksSizeGb")]
     pub maximum_persistent_disks_size_gb: String,
     /// [Output Only] The deprecation status associated with this machine type.
     pub deprecated: DeprecationStatus,
     /// [Output Only] Maximum persistent disks allowed.
-    #[serde(alias="maximumPersistentDisks")]
+    #[serde(rename="maximumPersistentDisks")]
     pub maximum_persistent_disks: i32,
     /// [Output Only] The amount of physical memory available to the instance, defined in MB.
-    #[serde(alias="memoryMb")]
+    #[serde(rename="memoryMb")]
     pub memory_mb: i32,
     /// [Output Only] List of extended scratch disks assigned to the instance.
-    #[serde(alias="scratchDisks")]
+    #[serde(rename="scratchDisks")]
     pub scratch_disks: Vec<MachineTypeScratchDisks>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output Only] Name of the resource.
     pub name: String,
@@ -1170,7 +1170,7 @@ impl Part for InstancesScopedListWarningData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AddressList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Address resources.
     pub items: Vec<Address>,
@@ -1179,7 +1179,7 @@ pub struct AddressList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1198,7 +1198,7 @@ impl ResponseResult for AddressList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DiskTypeList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Disk Type resources.
     pub items: Vec<DiskType>,
@@ -1207,7 +1207,7 @@ pub struct DiskTypeList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1242,7 +1242,7 @@ impl Part for TargetVpnGatewaysScopedListWarningData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AddressAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped address lists.
     pub items: HashMap<String, AddressesScopedList>,
@@ -1251,7 +1251,7 @@ pub struct AddressAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1265,16 +1265,16 @@ impl ResponseResult for AddressAggregatedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlMapValidationResult {
     /// no description provided
-    #[serde(alias="testFailures")]
+    #[serde(rename="testFailures")]
     pub test_failures: Vec<TestFailure>,
     /// no description provided
-    #[serde(alias="loadErrors")]
+    #[serde(rename="loadErrors")]
     pub load_errors: Vec<String>,
     /// Whether the given UrlMap can be successfully loaded. If false, 'loadErrors' indicates the reasons.
-    #[serde(alias="loadSucceeded")]
+    #[serde(rename="loadSucceeded")]
     pub load_succeeded: bool,
     /// If successfully loaded, this field indicates whether the test passed. If false, 'testFailures's indicate the reason of failure.
-    #[serde(alias="testPassed")]
+    #[serde(rename="testPassed")]
     pub test_passed: bool,
 }
 
@@ -1306,10 +1306,10 @@ impl Part for TargetPoolsScopedListWarning {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PathMatcher {
     /// The URL to the BackendService resource. This will be used if none of the 'pathRules' defined by this PathMatcher is met by the URL's path portion.
-    #[serde(alias="defaultService")]
+    #[serde(rename="defaultService")]
     pub default_service: String,
     /// The list of path rules.
-    #[serde(alias="pathRules")]
+    #[serde(rename="pathRules")]
     pub path_rules: Vec<PathRule>,
     /// no description provided
     pub description: String,
@@ -1348,7 +1348,7 @@ impl Part for TargetInstancesScopedListWarningData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SnapshotList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of Snapshot resources.
     pub items: Vec<Snapshot>,
@@ -1357,7 +1357,7 @@ pub struct SnapshotList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1389,12 +1389,12 @@ pub struct Region {
     /// [Output Only] A list of zones available in this region, in the form of resource URLs.
     pub zones: Vec<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server .
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output Only] Name of the resource.
     pub name: String,
@@ -1454,20 +1454,20 @@ pub struct Project {
     /// An optional textual description of the resource.
     pub description: String,
     /// Metadata key/value pairs available to all instances contained in this project. See Custom metadata for more information.
-    #[serde(alias="commonInstanceMetadata")]
+    #[serde(rename="commonInstanceMetadata")]
     pub common_instance_metadata: Metadata,
     /// [Output Only] Quotas assigned to this project.
     pub quotas: Vec<Quota>,
     /// The location in Cloud Storage and naming method of the daily usage report.
-    #[serde(alias="usageExportLocation")]
+    #[serde(rename="usageExportLocation")]
     pub usage_export_location: UsageExportLocation,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Name of the resource.
     pub name: String,
@@ -1512,31 +1512,31 @@ pub struct Snapshot {
     /// Type of the resource.
     pub kind: Option<String>,
     /// A size of the the storage used by the snapshot. As snapshots share storage this number is expected to change with snapshot creation/deletion.
-    #[serde(alias="storageBytes")]
+    #[serde(rename="storageBytes")]
     pub storage_bytes: Option<String>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// The source disk used to create this snapshot.
-    #[serde(alias="sourceDisk")]
+    #[serde(rename="sourceDisk")]
     pub source_disk: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// The 'id' value of the disk used to create this snapshot. This value may be used to determine whether the snapshot was taken from the current or a previous instance of a given disk name.
-    #[serde(alias="sourceDiskId")]
+    #[serde(rename="sourceDiskId")]
     pub source_disk_id: Option<String>,
     /// Size of the persistent disk snapshot, specified in GB (output only).
-    #[serde(alias="diskSizeGb")]
+    #[serde(rename="diskSizeGb")]
     pub disk_size_gb: Option<String>,
     /// Public visible licenses.
     pub licenses: Option<Vec<String>>,
     /// An indicator whether storageBytes is in a stable state, or it is being adjusted as a result of shared storage reallocation.
-    #[serde(alias="storageBytesStatus")]
+    #[serde(rename="storageBytesStatus")]
     pub storage_bytes_status: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -1556,7 +1556,7 @@ pub struct DiskTypesScopedList {
     /// [Output Only] Informational warning which replaces the list of disk types when the list is empty.
     pub warning: DiskTypesScopedListWarning,
     /// [Output Only] List of disk types contained in this scope.
-    #[serde(alias="diskTypes")]
+    #[serde(rename="diskTypes")]
     pub disk_types: Vec<DiskType>,
 }
 
@@ -1587,7 +1587,7 @@ pub struct BackendService {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// How many seconds to wait for the backend before considering it a failed request. Default is 30 seconds.
-    #[serde(alias="timeoutSec")]
+    #[serde(rename="timeoutSec")]
     pub timeout_sec: Option<i32>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
@@ -1596,18 +1596,18 @@ pub struct BackendService {
     /// Fingerprint of this resource. A hash of the contents stored in this object. This field is used in optimistic locking. This field will be ignored when inserting a BackendService. An up-to-date fingerprint must be provided in order to update the BackendService.
     pub fingerprint: Option<String>,
     /// Name of backend port. The same name should appear in the resource views referenced by this service. Required.
-    #[serde(alias="portName")]
+    #[serde(rename="portName")]
     pub port_name: Option<String>,
     /// The list of URLs to the HttpHealthCheck resource for health checking this BackendService. Currently at most one health check can be specified, and a health check is required.
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Option<Vec<String>>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Deprecated in favor of port_name. The TCP port to connect on the backend. The default value is 80.
     pub port: Option<i32>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -1630,7 +1630,7 @@ impl ResponseResult for BackendService {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetVpnGatewayAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A map of scoped target vpn gateway lists.
     pub items: HashMap<String, TargetVpnGatewaysScopedList>,
@@ -1639,7 +1639,7 @@ pub struct TargetVpnGatewayAggregatedList {
     /// [Output Only] Unique identifier for the resource. Defined by the server.
     pub id: String,
     /// [Output Only] Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1676,7 +1676,7 @@ impl RequestValue for ResourceGroupReference {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MachineTypeList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Machine Type resources.
     pub items: Vec<MachineType>,
@@ -1685,7 +1685,7 @@ pub struct MachineTypeList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1737,7 +1737,7 @@ impl Part for OperationWarningsData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ForwardingRuleList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of ForwardingRule resources.
     pub items: Vec<ForwardingRule>,
@@ -1746,7 +1746,7 @@ pub struct ForwardingRuleList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1783,7 +1783,7 @@ impl Part for ForwardingRulesScopedListWarning {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FirewallList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Firewall resources.
     pub items: Vec<Firewall>,
@@ -1792,7 +1792,7 @@ pub struct FirewallList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1859,27 +1859,27 @@ pub struct Firewall {
     /// A list of instance tags which this rule applies to. One or both of sourceRanges and sourceTags may be set.
     /// 
     /// If both properties are set, an inbound connection is allowed if the range or the tag of the source matches the sourceRanges OR matches the sourceTags property; the connection does not need to match both properties.
-    #[serde(alias="sourceTags")]
+    #[serde(rename="sourceTags")]
     pub source_tags: Option<Vec<String>>,
     /// The IP address blocks that this rule applies to, expressed in CIDR format. One or both of sourceRanges and sourceTags may be set.
     /// 
     /// If both properties are set, an inbound connection is allowed if the range or the tag of the source matches the sourceRanges OR matches the sourceTags property; the connection does not need to match both properties.
-    #[serde(alias="sourceRanges")]
+    #[serde(rename="sourceRanges")]
     pub source_ranges: Option<Vec<String>>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     pub name: Option<String>,
     /// A list of instance tags indicating sets of instances located on network which may make network connections as specified in allowed[]. If no targetTags are specified, the firewall rule applies to all instances on the specified network.
-    #[serde(alias="targetTags")]
+    #[serde(rename="targetTags")]
     pub target_tags: Option<Vec<String>>,
     /// The list of rules specified by this firewall. Each rule specifies a protocol and port-range tuple that describes a permitted connection.
     pub allowed: Option<Vec<FirewallAllowed>>,
     /// [Output Only] Creation timestamp in RFC3339text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// URL of the network resource for this firewall rule. This field is required for creating an instance but optional when creating a firewall rule. If not specified when creating a firewall rule, the default network is used:
     /// global/networks/default
@@ -1906,7 +1906,7 @@ pub struct HostRule {
     /// no description provided
     pub description: String,
     /// The name of the PathMatcher to match the path portion of the URL, if the this HostRule matches the URL's host portion.
-    #[serde(alias="pathMatcher")]
+    #[serde(rename="pathMatcher")]
     pub path_matcher: String,
 }
 
@@ -1927,7 +1927,7 @@ impl Part for HostRule {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
     /// [Output Only] A token used to continue a truncate.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] The operation resources.
     pub items: Vec<Operation>,
@@ -1936,7 +1936,7 @@ pub struct OperationList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1959,7 +1959,7 @@ impl ResponseResult for OperationList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetInstance {
     /// NAT option controlling how IPs are NAT'ed to the VM. Currently only NO_NAT (default value) is supported.
-    #[serde(alias="natPolicy")]
+    #[serde(rename="natPolicy")]
     pub nat_policy: Option<String>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
@@ -1970,12 +1970,12 @@ pub struct TargetInstance {
     /// The URL to the instance that terminates the relevant traffic.
     pub instance: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -2007,33 +2007,33 @@ pub struct HttpHealthCheck {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// How long (in seconds) to wait before claiming failure. The default value is 5 seconds. It is invalid for timeoutSec to have greater value than checkIntervalSec.
-    #[serde(alias="timeoutSec")]
+    #[serde(rename="timeoutSec")]
     pub timeout_sec: Option<i32>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
     /// How often (in seconds) to send a health check. The default value is 5 seconds.
-    #[serde(alias="checkIntervalSec")]
+    #[serde(rename="checkIntervalSec")]
     pub check_interval_sec: Option<i32>,
     /// A so-far healthy VM will be marked unhealthy after this many consecutive failures. The default value is 2.
-    #[serde(alias="unhealthyThreshold")]
+    #[serde(rename="unhealthyThreshold")]
     pub unhealthy_threshold: Option<i32>,
     /// A so-far unhealthy VM will be marked healthy after this many consecutive successes. The default value is 2.
-    #[serde(alias="healthyThreshold")]
+    #[serde(rename="healthyThreshold")]
     pub healthy_threshold: Option<i32>,
     /// The value of the host header in the HTTP health check request. If left empty (default value), the public IP on behalf of which this health check is performed will be used.
     pub host: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// The TCP port number for the HTTP health check request. The default value is 80.
     pub port: Option<i32>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The request path of the HTTP health check request. The default value is "/".
-    #[serde(alias="requestPath")]
+    #[serde(rename="requestPath")]
     pub request_path: Option<String>,
 }
 
@@ -2061,18 +2061,18 @@ pub struct Network {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16. Provided by the client when the network is created.
-    #[serde(alias="IPv4Range")]
+    #[serde(rename="IPv4Range")]
     pub i_pv4_range: Option<String>,
     /// A gateway address for default routing to other networks. This value is read only and is selected by the Google Compute Engine, typically as the first usable address in the IPv4Range.
-    #[serde(alias="gatewayIPv4")]
+    #[serde(rename="gatewayIPv4")]
     pub gateway_i_pv4: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     pub name: Option<String>,
@@ -2095,7 +2095,7 @@ impl ResponseResult for Network {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DiskTypeAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped disk type lists.
     pub items: HashMap<String, DiskTypesScopedList>,
@@ -2104,7 +2104,7 @@ pub struct DiskTypeAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2132,12 +2132,12 @@ pub struct InstanceTemplate {
     /// Name of the instance template resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035
     pub name: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// The instance properties portion of this instance template resource.
     pub properties: Option<InstanceProperties>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
@@ -2157,10 +2157,10 @@ pub struct HealthStatus {
     /// URL of the instance resource.
     pub instance: String,
     /// Health state of the instance.
-    #[serde(alias="healthState")]
+    #[serde(rename="healthState")]
     pub health_state: String,
     /// The IP address represented by this resource.
-    #[serde(alias="ipAddress")]
+    #[serde(rename="ipAddress")]
     pub ip_address: String,
     /// The port on the instance.
     pub port: i32,
@@ -2181,7 +2181,7 @@ impl Part for HealthStatus {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MachineTypeAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped machine type lists.
     pub items: HashMap<String, MachineTypesScopedList>,
@@ -2190,7 +2190,7 @@ pub struct MachineTypeAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2222,7 +2222,7 @@ impl ResponseResult for UrlMapsValidateResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ForwardingRulesScopedList {
     /// List of forwarding rules contained in this scope.
-    #[serde(alias="forwardingRules")]
+    #[serde(rename="forwardingRules")]
     pub forwarding_rules: Vec<ForwardingRule>,
     /// Informational warning which replaces the list of forwarding rules when the list is empty.
     pub warning: ForwardingRulesScopedListWarning,
@@ -2243,7 +2243,7 @@ impl Part for ForwardingRulesScopedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RouteList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of Route resources.
     pub items: Vec<Route>,
@@ -2252,7 +2252,7 @@ pub struct RouteList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2281,12 +2281,12 @@ pub struct Disk {
     /// - https://www.googleapis.com/compute/v1/projects/project/global/snapshots/snapshot 
     /// - projects/project/global/snapshots/snapshot 
     /// - global/snapshots/snapshot
-    #[serde(alias="sourceSnapshot")]
+    #[serde(rename="sourceSnapshot")]
     pub source_snapshot: Option<String>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// The ID value of the image used to create this disk. This value identifies the exact image that was used to create this persistent disk. For example, if you created the persistent disk from an image that was later deleted and recreated under the same name, the source image ID would identify the exact version of the image that was used.
-    #[serde(alias="sourceImageId")]
+    #[serde(rename="sourceImageId")]
     pub source_image_id: Option<String>,
     /// Any applicable publicly visible licenses.
     pub licenses: Option<Vec<String>>,
@@ -2301,13 +2301,13 @@ pub struct Disk {
     /// projects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD 
     /// 
     /// where vYYYYMMDD is the image version. The fully-qualified URL will also work in both cases.
-    #[serde(alias="sourceImage")]
+    #[serde(rename="sourceImage")]
     pub source_image: Option<String>,
     /// [Output Only] The unique ID of the snapshot used to create this disk. This value identifies the exact snapshot that was used to create this persistent disk. For example, if you created the persistent disk from a snapshot that was later deleted and recreated under the same name, the source snapshot ID would identify the exact version of the snapshot that was used.
-    #[serde(alias="sourceSnapshotId")]
+    #[serde(rename="sourceSnapshotId")]
     pub source_snapshot_id: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
@@ -2318,17 +2318,17 @@ pub struct Disk {
     /// Size of the persistent disk, specified in GB. You can specify this field when creating a persistent disk using the sourceImage or sourceSnapshot parameter, or specify it alone to create an empty persistent disk.
     /// 
     /// If you specify this field along with sourceImage or sourceSnapshot, the value of sizeGb must not be less than the size of the sourceImage or the size of the snapshot.
-    #[serde(alias="sizeGb")]
+    #[serde(rename="sizeGb")]
     pub size_gb: Option<String>,
     /// [Output Only] URL of the zone where the disk resides.
     pub zone: Option<String>,
     /// URL of the disk type resource describing which disk type to use to create the disk; provided by the client when the disk is created.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Internal use only.
     pub options: Option<String>,
     /// [Output Only] Server-defined fully-qualified URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -2365,7 +2365,7 @@ impl Part for VpnTunnelsScopedListWarningData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetHttpProxyList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of TargetHttpProxy resources.
     pub items: Vec<TargetHttpProxy>,
@@ -2374,7 +2374,7 @@ pub struct TargetHttpProxyList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2397,41 +2397,41 @@ impl ResponseResult for TargetHttpProxyList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VpnTunnel {
     /// [Output Only] Detailed status message for the VPN tunnel.
-    #[serde(alias="detailedStatus")]
+    #[serde(rename="detailedStatus")]
     pub detailed_status: Option<String>,
     /// IKE protocol version to use when establishing the VPN tunnel with peer VPN gateway. Acceptable IKE versions are 1 or 2. Default version is 2.
-    #[serde(alias="ikeVersion")]
+    #[serde(rename="ikeVersion")]
     pub ike_version: Option<i32>,
     /// [Output Only] Type of resource. Always compute#vpnTunnel for VPN tunnels.
     pub kind: Option<String>,
     /// An optional textual description of the resource. Provided by the client when the resource is created.
     pub description: Option<String>,
     /// IP address of the peer VPN gateway.
-    #[serde(alias="peerIp")]
+    #[serde(rename="peerIp")]
     pub peer_ip: Option<String>,
     /// [Output Only] URL of the region where the VPN tunnel resides.
     pub region: Option<String>,
     /// IKE networks to use when establishing the VPN tunnel with peer VPN gateway. The value should be a CIDR formatted string, for example: 192.168.0.0/16. The ranges should be disjoint.
-    #[serde(alias="ikeNetworks")]
+    #[serde(rename="ikeNetworks")]
     pub ike_networks: Option<Vec<String>>,
     /// [Output Only] The status of the VPN tunnel.
     pub status: Option<String>,
     /// Hash of the shared secret.
-    #[serde(alias="sharedSecretHash")]
+    #[serde(rename="sharedSecretHash")]
     pub shared_secret_hash: Option<String>,
     /// URL of the VPN gateway to which this VPN tunnel is associated. Provided by the client when the VPN tunnel is created.
-    #[serde(alias="targetVpnGateway")]
+    #[serde(rename="targetVpnGateway")]
     pub target_vpn_gateway: Option<String>,
     /// Shared secret used to set the secure session between the GCE VPN gateway and the peer VPN gateway.
-    #[serde(alias="sharedSecret")]
+    #[serde(rename="sharedSecret")]
     pub shared_secret: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource. Defined by the server.
     pub id: Option<String>,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long and comply with RFC1035.
     pub name: Option<String>,
@@ -2498,7 +2498,7 @@ impl Part for DisksScopedListWarning {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetVpnGatewayList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of TargetVpnGateway resources.
     pub items: Vec<TargetVpnGateway>,
@@ -2507,7 +2507,7 @@ pub struct TargetVpnGatewayList {
     /// [Output Only] Unique identifier for the resource. Defined by the server.
     pub id: String,
     /// [Output Only] Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2533,19 +2533,19 @@ pub struct Zone {
     /// [Output Only] Textual description of the resource.
     pub description: String,
     /// [Output Only] Any scheduled maintenance windows for this zone. When the zone is in a maintenance window, all resources which reside in the zone will be unavailable. For more information, see Maintenance Windows
-    #[serde(alias="maintenanceWindows")]
+    #[serde(rename="maintenanceWindows")]
     pub maintenance_windows: Vec<ZoneMaintenanceWindows>,
     /// [Output Only] The deprecation status associated with this zone.
     pub deprecated: DeprecationStatus,
     /// [Output Only] Full URL reference to the region which hosts the zone.
     pub region: String,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output Only] Name of the resource.
     pub name: String,
@@ -2578,25 +2578,25 @@ pub struct ForwardingRule {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// Applicable only when 'IPProtocol' is 'TCP', 'UDP' or 'SCTP', only packets addressed to ports in the specified range will be forwarded to 'target'. If 'portRange' is left empty (default value), all ports are forwarded. Forwarding rules with the same [IPAddress, IPProtocol] pair must have disjoint port ranges.
-    #[serde(alias="portRange")]
+    #[serde(rename="portRange")]
     pub port_range: Option<String>,
     /// URL of the region where the regional forwarding rule resides (output only). This field is not applicable to global forwarding rules.
     pub region: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// The IP protocol to which this rule applies, valid options are 'TCP', 'UDP', 'ESP', 'AH' or 'SCTP'.
-    #[serde(alias="IPProtocol")]
+    #[serde(rename="IPProtocol")]
     pub ip_protocol: Option<String>,
     /// Value of the reserved IP address that this forwarding rule is serving on behalf of. For global forwarding rules, the address must be a global IP; for regional forwarding rules, the address must live in the same region as the forwarding rule. If left empty (default value), an ephemeral IP from the same scope (global or regional) will be assigned.
-    #[serde(alias="IPAddress")]
+    #[serde(rename="IPAddress")]
     pub ip_address: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The URL of the target resource to receive the matched traffic. For regional forwarding rules, this target must live in the same region as the forwarding rule. For global forwarding rules, this target must be a global TargetHttpProxy resource.
     pub target: Option<String>,
@@ -2621,12 +2621,12 @@ pub struct AccessConfig {
     /// [Output Only] Type of the resource. Always compute#accessConfig for access configs.
     pub kind: Option<String>,
     /// The type of configuration. The default and only option is ONE_TO_ONE_NAT.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Name of this access configuration.
     pub name: Option<String>,
     /// An external IP address associated with this instance. Specify an unused static external IP address available to the project or leave this field undefined to use an IP from a shared ephemeral IP address pool. If you specify a static external IP address, it must live in the same region as the zone of the instance.
-    #[serde(alias="natIP")]
+    #[serde(rename="natIP")]
     pub nat_ip: Option<String>,
 }
 
@@ -2645,7 +2645,7 @@ impl RequestValue for AccessConfig {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UrlMapReference {
     /// no description provided
-    #[serde(alias="urlMap")]
+    #[serde(rename="urlMap")]
     pub url_map: Option<String>,
 }
 
@@ -2659,7 +2659,7 @@ impl RequestValue for UrlMapReference {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MachineTypeScratchDisks {
     /// Size of the scratch disk, defined in GB.
-    #[serde(alias="diskGb")]
+    #[serde(rename="diskGb")]
     pub disk_gb: i32,
 }
 
@@ -2679,7 +2679,7 @@ impl Part for MachineTypeScratchDisks {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetInstanceAggregatedList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A map of scoped target instance lists.
     pub items: HashMap<String, TargetInstancesScopedList>,
@@ -2688,7 +2688,7 @@ pub struct TargetInstanceAggregatedList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2707,10 +2707,10 @@ impl ResponseResult for TargetInstanceAggregatedList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageExportLocation {
     /// The name of an existing bucket in Cloud Storage where the usage report object is stored. The Google Service Account is granted write access to this bucket. This is just the bucket name, with no gs:// or https://storage.googleapis.com/ in front of it.
-    #[serde(alias="bucketName")]
+    #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
     /// An optional prefix for the name of the usage report object stored in bucketName. If not supplied, defaults to usage. The report is stored as a CSV file named report_name_prefix_gce_YYYYMMDD.csv where YYYYMMDD is the day of the usage according to Pacific Time. If you supply a prefix, it should conform to Cloud Storage object naming conventions.
-    #[serde(alias="reportNamePrefix")]
+    #[serde(rename="reportNamePrefix")]
     pub report_name_prefix: Option<String>,
 }
 
@@ -2742,7 +2742,7 @@ impl Part for AddressesScopedListWarning {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct HealthCheckReference {
     /// no description provided
-    #[serde(alias="healthCheck")]
+    #[serde(rename="healthCheck")]
     pub health_check: String,
 }
 
@@ -2763,7 +2763,7 @@ pub struct TargetPoolInstanceHealth {
     /// Type of resource.
     pub kind: String,
     /// no description provided
-    #[serde(alias="healthStatus")]
+    #[serde(rename="healthStatus")]
     pub health_status: Vec<HealthStatus>,
 }
 
@@ -2796,13 +2796,13 @@ pub struct TargetVpnGateway {
     /// Name of the resource. Provided by the client when the resource is created. The name must be 1-63 characters long and comply with RFC1035.
     pub name: Option<String>,
     /// [Output Only] A list of URLs to the ForwardingRule resources. ForwardingRules are created using compute.forwardingRules.insert and associated to a VPN gateway.
-    #[serde(alias="forwardingRules")]
+    #[serde(rename="forwardingRules")]
     pub forwarding_rules: Option<Vec<String>>,
     /// [Output Only] Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource. Defined by the server.
     pub id: Option<String>,
@@ -2829,7 +2829,7 @@ impl ResponseResult for TargetVpnGateway {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceAggregatedList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A map of scoped instance lists.
     pub items: HashMap<String, InstancesScopedList>,
@@ -2838,7 +2838,7 @@ pub struct InstanceAggregatedList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -2895,7 +2895,7 @@ pub struct BackendServiceGroupHealth {
     /// Type of resource.
     pub kind: String,
     /// no description provided
-    #[serde(alias="healthStatus")]
+    #[serde(rename="healthStatus")]
     pub health_status: Vec<HealthStatus>,
 }
 
@@ -2935,13 +2935,13 @@ pub struct InstanceMoveRequest {
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone/instances/instance 
     /// - projects/project/zones/zone/instances/instance 
     /// - zones/zone/instances/instance
-    #[serde(alias="targetInstance")]
+    #[serde(rename="targetInstance")]
     pub target_instance: Option<String>,
     /// The URL of the destination zone to move the instance to. This can be a full or partial URL. For example, the following are all valid URLs to a zone:  
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone 
     /// - projects/project/zones/zone 
     /// - zones/zone
-    #[serde(alias="destinationZone")]
+    #[serde(rename="destinationZone")]
     pub destination_zone: Option<String>,
 }
 
@@ -2963,13 +2963,13 @@ pub struct DiskMoveRequest {
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone/disks/disk 
     /// - projects/project/zones/zone/disks/disk 
     /// - zones/zone/disks/disk
-    #[serde(alias="targetDisk")]
+    #[serde(rename="targetDisk")]
     pub target_disk: Option<String>,
     /// The URL of the destination zone to move the disk to. This can be a full or partial URL. For example, the following are all valid URLs to a zone:  
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone 
     /// - projects/project/zones/zone 
     /// - zones/zone
-    #[serde(alias="destinationZone")]
+    #[serde(rename="destinationZone")]
     pub destination_zone: Option<String>,
 }
 
@@ -2985,10 +2985,10 @@ impl RequestValue for DiskMoveRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttachedDiskInitializeParams {
     /// Specifies the size of the disk in base-2 GB.
-    #[serde(alias="diskSizeGb")]
+    #[serde(rename="diskSizeGb")]
     pub disk_size_gb: String,
     /// Specifies the disk name. If not specified, the default is to use the name of the instance.
-    #[serde(alias="diskName")]
+    #[serde(rename="diskName")]
     pub disk_name: String,
     /// A source image used to create the disk. You can provide a private (custom) image, and Compute Engine will use the corresponding image from your project. For example:
     /// 
@@ -2999,7 +2999,7 @@ pub struct AttachedDiskInitializeParams {
     /// projects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD 
     /// 
     /// where vYYYYMMDD is the image version. The fully-qualified URL will also work in both cases.
-    #[serde(alias="sourceImage")]
+    #[serde(rename="sourceImage")]
     pub source_image: String,
     /// Specifies the disk type to use to create the instance. If not specified, the default is pd-standard, specified using the full URL. For example:
     /// 
@@ -3009,7 +3009,7 @@ pub struct AttachedDiskInitializeParams {
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone/diskTypes/diskType 
     /// - projects/project/zones/zone/diskTypes/diskType 
     /// - zones/zone/diskTypes/diskType
-    #[serde(alias="diskType")]
+    #[serde(rename="diskType")]
     pub disk_type: String,
 }
 
@@ -3023,12 +3023,12 @@ impl Part for AttachedDiskInitializeParams {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneMaintenanceWindows {
     /// [Output Only] Ending time of the maintenance window, in RFC3339 format.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// [Output Only] Textual description of the maintenance window.
     pub description: String,
     /// [Output Only] Starting time of the maintenance window, in RFC3339 format.
-    #[serde(alias="beginTime")]
+    #[serde(rename="beginTime")]
     pub begin_time: String,
     /// [Output Only] Name of the maintenance window.
     pub name: String,
@@ -3050,7 +3050,7 @@ impl Part for ZoneMaintenanceWindows {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Instance resources.
     pub items: Vec<Instance>,
@@ -3059,7 +3059,7 @@ pub struct InstanceList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3092,7 +3092,7 @@ pub struct TargetPool {
     /// If set, 'backupPool' must also be set. They together define the fallback behavior of the primary target pool: if the ratio of the healthy VMs in the primary pool is at or below this number, traffic arriving at the load-balanced IP will be directed to the backup pool.
     /// 
     /// In case where 'failoverRatio' is not set or all the VMs in the backup pool are unhealthy, the traffic will be directed back to the primary pool in the "force" mode, where traffic will be spread to the healthy VMs with the best effort, or to all VMs when no VM is healthy.
-    #[serde(alias="failoverRatio")]
+    #[serde(rename="failoverRatio")]
     pub failover_ratio: Option<f32>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
@@ -3101,7 +3101,7 @@ pub struct TargetPool {
     /// Type of the resource.
     pub kind: Option<String>,
     /// Sesssion affinity option, must be one of the following values: 'NONE': Connections from the same client IP may go to any VM in the pool; 'CLIENT_IP': Connections from the same client IP will go to the same VM in the pool while that VM remains healthy. 'CLIENT_IP_PROTO': Connections from the same client IP with the same IP protocol will go to the same VM in the pool while that VM remains healthy.
-    #[serde(alias="sessionAffinity")]
+    #[serde(rename="sessionAffinity")]
     pub session_affinity: Option<String>,
     /// A list of resource URLs to the member VMs serving this pool. They must live in zones contained in the same region as this pool.
     pub instances: Option<Vec<String>>,
@@ -3110,18 +3110,18 @@ pub struct TargetPool {
     /// 'backupPool' and 'failoverRatio' together define the fallback behavior of the primary target pool: if the ratio of the healthy VMs in the primary pool is at or below 'failoverRatio', traffic arriving at the load-balanced IP will be directed to the backup pool.
     /// 
     /// In case where 'failoverRatio' and 'backupPool' are not set, or all the VMs in the backup pool are unhealthy, the traffic will be directed back to the primary pool in the "force" mode, where traffic will be spread to the healthy VMs with the best effort, or to all VMs when no VM is healthy.
-    #[serde(alias="backupPool")]
+    #[serde(rename="backupPool")]
     pub backup_pool: Option<String>,
     /// A list of URLs to the HttpHealthCheck resource. A member VM in this pool is considered healthy if and only if all specified health checks pass. An empty list means all member VMs will be considered healthy at all times.
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Option<Vec<String>>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -3190,12 +3190,12 @@ pub struct Address {
     /// The static external IP address represented by this resource.
     pub address: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Output Only] The URLs of the resources that are using this address.
     pub users: Option<Vec<String>>,
@@ -3226,7 +3226,7 @@ impl Part for OperationError {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallAllowed {
     /// The IP protocol that is allowed for this rule. The protocol type is required when creating a firewall. This value can either be one of the following well known protocol strings (tcp, udp, icmp, esp, ah, sctp), or the IP protocol number.
-    #[serde(alias="IPProtocol")]
+    #[serde(rename="IPProtocol")]
     pub ip_protocol: String,
     /// An optional list of ports which are allowed. This field is only applicable for UDP or TCP protocol. Each entry must be either an integer or a range. If not specified, connections through any port are allowed
     /// 
@@ -3250,7 +3250,7 @@ impl Part for FirewallAllowed {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TargetPoolsAddHealthCheckRequest {
     /// Health check URLs to be added to targetPool.
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Option<Vec<HealthCheckReference>>,
 }
 
@@ -3269,7 +3269,7 @@ impl RequestValue for TargetPoolsAddHealthCheckRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct NetworkList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Network resources.
     pub items: Vec<Network>,
@@ -3278,7 +3278,7 @@ pub struct NetworkList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource .
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3297,7 +3297,7 @@ impl ResponseResult for NetworkList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Zone resources.
     pub items: Vec<Zone>,
@@ -3306,7 +3306,7 @@ pub struct ZoneList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3361,7 +3361,7 @@ impl RequestValue for InstanceReference {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceTemplateList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of InstanceTemplate resources.
     pub items: Vec<InstanceTemplate>,
@@ -3370,7 +3370,7 @@ pub struct InstanceTemplateList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3389,7 +3389,7 @@ impl ResponseResult for InstanceTemplateList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetInstanceList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of TargetInstance resources.
     pub items: Vec<TargetInstance>,
@@ -3398,7 +3398,7 @@ pub struct TargetInstanceList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3417,7 +3417,7 @@ impl ResponseResult for TargetInstanceList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HttpHealthCheckList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of HttpHealthCheck resources.
     pub items: Vec<HttpHealthCheck>,
@@ -3426,7 +3426,7 @@ pub struct HttpHealthCheckList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3445,14 +3445,14 @@ impl ResponseResult for HttpHealthCheckList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct License {
     /// If true, the customer will be charged license fee for running software that contains this license on an instance.
-    #[serde(alias="chargesUseFee")]
+    #[serde(rename="chargesUseFee")]
     pub charges_use_fee: bool,
     /// [Output Only] Type of resource. Always compute#license for licenses.
     pub kind: String,
     /// Name of the resource. The name must be 1-63 characters long, and comply with RCF1035.
     pub name: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3474,17 +3474,17 @@ pub struct AttachedDisk {
     /// Specifies a unique device name of your choice that is reflected into the /dev/ tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance.
     /// 
     /// If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disks-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.
-    #[serde(alias="deviceName")]
+    #[serde(rename="deviceName")]
     pub device_name: Option<String>,
     /// [Output Only] Type of the resource. Always compute#attachedDisk for attached disks.
     pub kind: Option<String>,
     /// [Input Only] Specifies the parameters for a new disk that will be created alongside the new instance. Use initialization parameters to create boot disks or local SSDs attached to the new instance.
     /// 
     /// This property is mutually exclusive with the source property; you can only define one or the other, but not both.
-    #[serde(alias="initializeParams")]
+    #[serde(rename="initializeParams")]
     pub initialize_params: Option<AttachedDiskInitializeParams>,
     /// Specifies whether the disk will be auto-deleted when the instance is deleted (but not when the disk is detached from the instance).
-    #[serde(alias="autoDelete")]
+    #[serde(rename="autoDelete")]
     pub auto_delete: Option<bool>,
     /// Assigns a zero-based index to this disk, where 0 is reserved for the boot disk. For example, if you have many disks attached to an instance, each disk would have a unique index number. If not specified, the server will choose an appropriate value.
     pub index: Option<i32>,
@@ -3497,7 +3497,7 @@ pub struct AttachedDisk {
     /// [Output Only] Any valid publicly visible licenses.
     pub licenses: Option<Vec<String>>,
     /// Specifies the type of the disk, either SCRATCH or PERSISTENT. If not specified, the default is PERSISTENT.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Specifies a valid partial or full URL to an existing Persistent Disk resource. This field is only applicable for persistent disks.
     pub source: Option<String>,
@@ -3538,25 +3538,25 @@ impl Part for Quota {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Route {
     /// The URL to a gateway that should handle matching packets.
-    #[serde(alias="nextHopGateway")]
+    #[serde(rename="nextHopGateway")]
     pub next_hop_gateway: Option<String>,
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// A list of instance tags to which this route applies.
     pub tags: Option<Vec<String>>,
     /// The URL of the local network if it should handle matching packets.
-    #[serde(alias="nextHopNetwork")]
+    #[serde(rename="nextHopNetwork")]
     pub next_hop_network: Option<String>,
     /// Which packets does this route apply to?
-    #[serde(alias="destRange")]
+    #[serde(rename="destRange")]
     pub dest_range: Option<String>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// The network IP address of an instance that should handle matching packets.
-    #[serde(alias="nextHopIp")]
+    #[serde(rename="nextHopIp")]
     pub next_hop_ip: Option<String>,
     /// URL of the network to which this route is applied; provided by the client when the route is created.
     pub network: Option<String>,
@@ -3565,17 +3565,17 @@ pub struct Route {
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
     /// The URL to an instance that should handle matching packets.
-    #[serde(alias="nextHopInstance")]
+    #[serde(rename="nextHopInstance")]
     pub next_hop_instance: Option<String>,
     /// If potential misconfigurations are detected for this route, this field will be populated with warning messages.
     pub warnings: Option<Vec<RouteWarnings>>,
     /// Breaks ties between Routes of equal specificity. Routes with smaller values win when tied with routes with larger values.
     pub priority: Option<u32>,
     /// The URL to a VpnTunnel that should handle matching packets.
-    #[serde(alias="nextHopVpnTunnel")]
+    #[serde(rename="nextHopVpnTunnel")]
     pub next_hop_vpn_tunnel: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -3591,7 +3591,7 @@ impl ResponseResult for Route {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetVpnGatewaysScopedList {
     /// [Output Only] List of target vpn gateways contained in this scope.
-    #[serde(alias="targetVpnGateways")]
+    #[serde(rename="targetVpnGateways")]
     pub target_vpn_gateways: Vec<TargetVpnGateway>,
     /// [Output Only] Informational warning which replaces the list of addresses when the list is empty.
     pub warning: TargetVpnGatewaysScopedListWarning,
@@ -3643,10 +3643,10 @@ impl RequestValue for TargetReference {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkInterface {
     /// An array of configurations for this interface. Currently, <codeONE_TO_ONE_NAT is the only access config supported. If there are no accessConfigs specified, then this instance will have no external internet access.
-    #[serde(alias="accessConfigs")]
+    #[serde(rename="accessConfigs")]
     pub access_configs: Vec<AccessConfig>,
     /// [Output Only] An optional IPV4 internal network address assigned to the instance for this network interface.
-    #[serde(alias="networkIP")]
+    #[serde(rename="networkIP")]
     pub network_ip: String,
     /// [Output Only] The name of the network interface, generated by the server. For network devices, these are eth0, eth1, etc.
     pub name: String,
@@ -3676,7 +3676,7 @@ impl Part for NetworkInterface {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ForwardingRuleAggregatedList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A map of scoped forwarding rule lists.
     pub items: HashMap<String, ForwardingRulesScopedList>,
@@ -3685,7 +3685,7 @@ pub struct ForwardingRuleAggregatedList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3701,12 +3701,12 @@ pub struct TestFailure {
     /// no description provided
     pub path: String,
     /// no description provided
-    #[serde(alias="actualService")]
+    #[serde(rename="actualService")]
     pub actual_service: String,
     /// no description provided
     pub host: String,
     /// no description provided
-    #[serde(alias="expectedService")]
+    #[serde(rename="expectedService")]
     pub expected_service: String,
 }
 
@@ -3725,7 +3725,7 @@ impl Part for TestFailure {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VpnTunnelList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of VpnTunnel resources.
     pub items: Vec<VpnTunnel>,
@@ -3734,7 +3734,7 @@ pub struct VpnTunnelList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3753,7 +3753,7 @@ impl ResponseResult for VpnTunnelList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetPoolAggregatedList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A map of scoped target pool lists.
     pub items: HashMap<String, TargetPoolsScopedList>,
@@ -3762,7 +3762,7 @@ pub struct TargetPoolAggregatedList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -3776,7 +3776,7 @@ impl ResponseResult for TargetPoolAggregatedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetInstancesScopedList {
     /// List of target instances contained in this scope.
-    #[serde(alias="targetInstances")]
+    #[serde(rename="targetInstances")]
     pub target_instances: Vec<TargetInstance>,
     /// Informational warning which replaces the list of addresses when the list is empty.
     pub warning: TargetInstancesScopedListWarning,
@@ -3807,25 +3807,25 @@ pub struct UrlMap {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// The URL of the BackendService resource if none of the hostRules match.
-    #[serde(alias="defaultService")]
+    #[serde(rename="defaultService")]
     pub default_service: Option<String>,
     /// The list of expected URL mappings. Request to update this UrlMap will succeed only all of the test cases pass.
     pub tests: Option<Vec<UrlMapTest>>,
     /// The list of HostRules to use against the URL.
-    #[serde(alias="hostRules")]
+    #[serde(rename="hostRules")]
     pub host_rules: Option<Vec<HostRule>>,
     /// Fingerprint of this resource. A hash of the contents stored in this object. This field is used in optimistic locking. This field will be ignored when inserting a UrlMap. An up-to-date fingerprint must be provided in order to update the UrlMap.
     pub fingerprint: Option<String>,
     /// The list of named PathMatchers to use against the URL.
-    #[serde(alias="pathMatchers")]
+    #[serde(rename="pathMatchers")]
     pub path_matchers: Option<Vec<PathMatcher>>,
     /// Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.
     pub name: Option<String>,
@@ -3940,26 +3940,26 @@ pub struct Operation {
     /// [Output Only] Status of the operation. Can be one of the following: PENDING, RUNNING, or DONE.
     pub status: String,
     /// [Output Only] The time that this operation was requested. This is in RFC3339 text format.
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// [Output Only] If warning messages are generated during processing of the operation, this field will be populated.
     pub warnings: Vec<OperationWarnings>,
     /// [Output Only] If errors are generated during processing of the operation, this field will be populated.
     pub error: OperationError,
     /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// [Output Only] URL of the resource the operation is mutating.
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// [Output Only] The time that this operation was started by the server. This is in RFC3339 text format.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// [Output Only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project
-    #[serde(alias="clientOperationId")]
+    #[serde(rename="clientOperationId")]
     pub client_operation_id: String,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
@@ -3972,24 +3972,24 @@ pub struct Operation {
     /// [Output Only] URL of the region where the operation resides. Only applicable for regional resources.
     pub region: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output Only] Type of the operation, such as insert, update, and delete.
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// [Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as NOT FOUND.
-    #[serde(alias="httpErrorMessage")]
+    #[serde(rename="httpErrorMessage")]
     pub http_error_message: String,
     /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
     pub progress: i32,
     /// [Output Only] The time that this operation was completed. This is in RFC3339 text format.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// [Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as 404.
-    #[serde(alias="httpErrorStatusCode")]
+    #[serde(rename="httpErrorStatusCode")]
     pub http_error_status_code: i32,
     /// [Output Only] An optional textual description of the current status of the operation.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// [Output Only] User who requested the operation, for example: user@example.com.
     pub user: String,
@@ -4028,7 +4028,7 @@ impl RequestValue for TargetPoolsRemoveInstanceRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TargetPoolList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of TargetPool resources.
     pub items: Vec<TargetPool>,
@@ -4037,7 +4037,7 @@ pub struct TargetPoolList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -4051,7 +4051,7 @@ impl ResponseResult for TargetPoolList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceProperties {
     /// Allows instances created based on this template to send packets with source IP addresses other than their own and receive packets with destination IP addresses other than their own. If these instances will be used as an IP gateway or it will be set as the next-hop in a Route resource, say true. If unsure, leave this set to false.
-    #[serde(alias="canIpForward")]
+    #[serde(rename="canIpForward")]
     pub can_ip_forward: bool,
     /// An optional textual description for the instances created based on the instance template resource; provided by the client when the template is created.
     pub description: String,
@@ -4062,13 +4062,13 @@ pub struct InstanceProperties {
     /// Scheduling options for the instances created based on this template.
     pub scheduling: Scheduling,
     /// Name of the machine type resource describing which machine type to use to host the instances created based on this template; provided by the client when the instance template is created.
-    #[serde(alias="machineType")]
+    #[serde(rename="machineType")]
     pub machine_type: String,
     /// A list of service accounts each with specified scopes, for which access tokens are to be made available to the instances created based on this template, through metadata queries.
-    #[serde(alias="serviceAccounts")]
+    #[serde(rename="serviceAccounts")]
     pub service_accounts: Vec<ServiceAccount>,
     /// Array of configurations for this interface. This specifies how this interface is configured to interact with other network services, such as connecting to the internet. Currently, ONE_TO_ONE_NAT is the only access config supported. If there are no accessConfigs specified, then this instances created based based on this template will have no external internet access.
-    #[serde(alias="networkInterfaces")]
+    #[serde(rename="networkInterfaces")]
     pub network_interfaces: Vec<NetworkInterface>,
     /// Metadata key/value pairs assigned to instances created based on this template. Consists of custom metadata or predefined keys; see Instance documentation for more information.
     pub metadata: Metadata,
@@ -4089,7 +4089,7 @@ impl Part for InstanceProperties {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TargetPoolsRemoveHealthCheckRequest {
     /// Health check URLs to be removed from targetPool.
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Option<Vec<HealthCheckReference>>,
 }
 
@@ -4151,39 +4151,39 @@ pub struct Image {
     /// Textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// The parameters of the raw disk image.
-    #[serde(alias="rawDisk")]
+    #[serde(rename="rawDisk")]
     pub raw_disk: Option<ImageRawDisk>,
     /// The deprecation status associated with this image.
     pub deprecated: Option<DeprecationStatus>,
     /// Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     pub name: Option<String>,
     /// Size of the image tar.gz archive stored in Google Cloud Storage (in bytes).
-    #[serde(alias="archiveSizeBytes")]
+    #[serde(rename="archiveSizeBytes")]
     pub archive_size_bytes: Option<String>,
     /// The ID value of the disk used to create this image. This value may be used to determine whether the image was taken from the current or a previous instance of a given disk name.
-    #[serde(alias="sourceDiskId")]
+    #[serde(rename="sourceDiskId")]
     pub source_disk_id: Option<String>,
     /// Size of the image when restored onto a persistent disk (in GB).
-    #[serde(alias="diskSizeGb")]
+    #[serde(rename="diskSizeGb")]
     pub disk_size_gb: Option<String>,
     /// URL of the The source disk used to create this image. This can be a full or valid partial URL. You must provide either this property or the rawDisk.source property but not both to create an image. For example, the following are valid values:  
     /// - https://www.googleapis.com/compute/v1/projects/project/zones/zone/disk/disk 
     /// - projects/project/zones/zone/disk/disk 
     /// - zones/zone/disks/disk
-    #[serde(alias="sourceDisk")]
+    #[serde(rename="sourceDisk")]
     pub source_disk: Option<String>,
     /// Any applicable publicly visible licenses.
     pub licenses: Option<Vec<String>>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The type of the image used to create this disk. The default and only value is RAW
-    #[serde(alias="sourceType")]
+    #[serde(rename="sourceType")]
     pub source_type: Option<String>,
 }
 
@@ -4204,7 +4204,7 @@ impl ResponseResult for Image {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DiskList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of persistent disks.
     pub items: Vec<Disk>,
@@ -4213,7 +4213,7 @@ pub struct DiskList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -4227,12 +4227,12 @@ impl ResponseResult for DiskList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageRawDisk {
     /// The format used to encode and transmit the block device, which should be TAR. This is just a container and transmission format and not a runtime format. Provided by the client when the disk image is created.
-    #[serde(alias="containerType")]
+    #[serde(rename="containerType")]
     pub container_type: String,
     /// The full Google Cloud Storage URL where the disk image is stored. You must provide either this property or the sourceDisk property but not both.
     pub source: String,
     /// An optional SHA1 checksum of the disk image before unpackaging; provided by the client when the disk image is created.
-    #[serde(alias="sha1Checksum")]
+    #[serde(rename="sha1Checksum")]
     pub sha1_checksum: String,
 }
 
@@ -4268,7 +4268,7 @@ impl Part for OperationsScopedListWarningData {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BackendServiceList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of BackendService resources.
     pub items: Vec<BackendService>,
@@ -4277,7 +4277,7 @@ pub struct BackendServiceList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -4348,10 +4348,10 @@ impl Part for RouteWarnings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Scheduling {
     /// Specifies whether the instance should be automatically restarted if it is terminated by Compute Engine (not terminated by a user).
-    #[serde(alias="automaticRestart")]
+    #[serde(rename="automaticRestart")]
     pub automatic_restart: Option<bool>,
     /// Defines the maintenance behavior for this instance. The default behavior is MIGRATE. For more information, see Setting maintenance behavior.
-    #[serde(alias="onHostMaintenance")]
+    #[serde(rename="onHostMaintenance")]
     pub on_host_maintenance: Option<String>,
 }
 
@@ -4367,7 +4367,7 @@ pub struct TargetPoolsScopedList {
     /// Informational warning which replaces the list of addresses when the list is empty.
     pub warning: TargetPoolsScopedListWarning,
     /// List of target pools contained in this scope.
-    #[serde(alias="targetPools")]
+    #[serde(rename="targetPools")]
     pub target_pools: Vec<TargetPool>,
 }
 
@@ -4386,7 +4386,7 @@ impl Part for TargetPoolsScopedList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RegionList {
     /// [Output Only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// [Output Only] A list of Region resources.
     pub items: Vec<Region>,
@@ -4395,7 +4395,7 @@ pub struct RegionList {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Server defined URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -4409,23 +4409,23 @@ impl ResponseResult for RegionList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Backend {
     /// The multiplier (a value between 0 and 1e6) of the max capacity (CPU or RPS, depending on 'balancingMode') the group should serve up to. 0 means the group is totally drained. Default value is 1. Valid range is [0, 1e6].
-    #[serde(alias="capacityScaler")]
+    #[serde(rename="capacityScaler")]
     pub capacity_scaler: f32,
     /// The max RPS of the group. Can be used with either balancing mode, but required if RATE mode. For RATE mode, either maxRate or maxRatePerInstance must be set.
-    #[serde(alias="maxRate")]
+    #[serde(rename="maxRate")]
     pub max_rate: i32,
     /// URL of a zonal Cloud Resource View resource. This resource view defines the list of instances that serve traffic. Member virtual machine instances from each resource view must live in the same zone as the resource view itself. No two backends in a backend service are allowed to use same Resource View resource.
     pub group: String,
     /// An optional textual description of the resource, which is provided by the client when the resource is created.
     pub description: String,
     /// Used when 'balancingMode' is UTILIZATION. This ratio defines the CPU utilization target for the group. The default is 0.8. Valid range is [0, 1].
-    #[serde(alias="maxUtilization")]
+    #[serde(rename="maxUtilization")]
     pub max_utilization: f32,
     /// The max RPS that a single backed instance can handle. This is used to calculate the capacity of the group. Can be used in either balancing mode. For RATE mode, either maxRate or maxRatePerInstance must be set.
-    #[serde(alias="maxRatePerInstance")]
+    #[serde(rename="maxRatePerInstance")]
     pub max_rate_per_instance: f32,
     /// The balancing mode of this backend, default is UTILIZATION.
-    #[serde(alias="balancingMode")]
+    #[serde(rename="balancingMode")]
     pub balancing_mode: String,
 }
 

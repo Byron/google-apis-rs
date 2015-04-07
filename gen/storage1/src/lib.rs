@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *storage* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -358,7 +358,7 @@ impl<'a, C, NC, A> Storage<C, NC, A>
         Storage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -383,7 +383,7 @@ impl<'a, C, NC, A> Storage<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -440,7 +440,7 @@ impl Part for BucketLifecycleRule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControlProjectTeam {
     /// The project number.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: String,
     /// The team. Can be owners, editors, or viewers.
     pub team: String,
@@ -457,15 +457,15 @@ impl Part for ObjectAccessControlProjectTeam {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleCondition {
     /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.
-    #[serde(alias="isLive")]
+    #[serde(rename="isLive")]
     pub is_live: bool,
     /// Relevant only for versioned objects. If the value is N, this condition is satisfied when there are at least N versions (including the live version) newer than this version of the object.
-    #[serde(alias="numNewerVersions")]
+    #[serde(rename="numNewerVersions")]
     pub num_newer_versions: i32,
     /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
     pub age: i32,
     /// A date in RFC 3339 format with only the date part (for instance, "2013-01-15"). This condition is satisfied when an object is created before midnight of the specified date in UTC.
-    #[serde(alias="createdBefore")]
+    #[serde(rename="createdBefore")]
     pub created_before: String,
 }
 
@@ -480,10 +480,10 @@ impl Part for BucketLifecycleRuleCondition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketWebsite {
     /// The custom object to return when a requested resource is not found.
-    #[serde(alias="notFoundPage")]
+    #[serde(rename="notFoundPage")]
     pub not_found_page: String,
     /// Behaves as the bucket's directory index where missing objects are treated as potential directories.
-    #[serde(alias="mainPageSuffix")]
+    #[serde(rename="mainPageSuffix")]
     pub main_page_suffix: String,
 }
 
@@ -504,12 +504,12 @@ impl Part for BucketWebsite {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// A version-specific identifier for the watched resource.
-    #[serde(alias="resourceUri")]
+    #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
@@ -522,7 +522,7 @@ pub struct Channel {
     /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
     /// The type of delivery mechanism used for this channel.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
@@ -540,10 +540,10 @@ impl ResponseResult for Channel {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLogging {
     /// A prefix for log object names.
-    #[serde(alias="logObjectPrefix")]
+    #[serde(rename="logObjectPrefix")]
     pub log_object_prefix: String,
     /// The destination bucket where the current bucket's logs should be placed.
-    #[serde(alias="logBucket")]
+    #[serde(rename="logBucket")]
     pub log_bucket: String,
 }
 
@@ -599,47 +599,47 @@ impl Part for BucketVersioning {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Object {
     /// The link to this object.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The creation or modification time of the object in RFC 3339 format. For buckets with versioning enabled, changing an object's metadata does not change this property.
     pub updated: Option<String>,
     /// Content-Type of the object data.
-    #[serde(alias="contentType")]
+    #[serde(rename="contentType")]
     pub content_type: Option<String>,
     /// Content-Language of the object data.
-    #[serde(alias="contentLanguage")]
+    #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// The content generation of this object. Used for object versioning.
     pub generation: Option<String>,
     /// Number of underlying components that make up this object. Components are accumulated by compose operations.
-    #[serde(alias="componentCount")]
+    #[serde(rename="componentCount")]
     pub component_count: Option<i32>,
     /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
     pub metageneration: Option<String>,
     /// Media download link.
-    #[serde(alias="mediaLink")]
+    #[serde(rename="mediaLink")]
     pub media_link: Option<String>,
     /// The owner of the object. This will always be the uploader of the object.
     pub owner: Option<ObjectOwner>,
     /// Cache-Control directive for the object data.
-    #[serde(alias="cacheControl")]
+    #[serde(rename="cacheControl")]
     pub cache_control: Option<String>,
     /// Content-Encoding of the object data.
-    #[serde(alias="contentEncoding")]
+    #[serde(rename="contentEncoding")]
     pub content_encoding: Option<String>,
     /// The ID of the object.
     pub id: Option<String>,
     /// Content-Length of the data in bytes.
     pub size: Option<String>,
     /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
-    #[serde(alias="timeDeleted")]
+    #[serde(rename="timeDeleted")]
     pub time_deleted: Option<String>,
     /// The kind of item this is. For objects, this is always storage#object.
     pub kind: Option<String>,
     /// The name of this object. Required if not specified by URL parameter.
     pub name: Option<String>,
     /// MD5 hash of the data; encoded using base64.
-    #[serde(alias="md5Hash")]
+    #[serde(rename="md5Hash")]
     pub md5_hash: Option<String>,
     /// The name of the bucket containing this object.
     pub bucket: Option<String>,
@@ -650,10 +650,10 @@ pub struct Object {
     /// HTTP 1.1 Entity tag for the object.
     pub etag: Option<String>,
     /// Storage class of the object.
-    #[serde(alias="storageClass")]
+    #[serde(rename="storageClass")]
     pub storage_class: Option<String>,
     /// Content-Disposition of the object data.
-    #[serde(alias="contentDisposition")]
+    #[serde(rename="contentDisposition")]
     pub content_disposition: Option<String>,
     /// User-provided metadata, in key/value pairs.
     pub metadata: Option<HashMap<String, String>>,
@@ -676,7 +676,7 @@ impl ResponseResult for Object {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Objects {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of items.
     pub items: Vec<Object>,
@@ -698,12 +698,12 @@ pub struct BucketCors {
     /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".
     pub origin: Vec<String>,
     /// The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.
-    #[serde(alias="responseHeader")]
+    #[serde(rename="responseHeader")]
     pub response_header: Vec<String>,
     /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".
     pub method: Vec<String>,
     /// The value, in seconds, to return in the  Access-Control-Max-Age header used in preflight responses.
-    #[serde(alias="maxAgeSeconds")]
+    #[serde(rename="maxAgeSeconds")]
     pub max_age_seconds: i32,
 }
 
@@ -739,7 +739,7 @@ impl ResponseResult for ObjectAccessControls {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControlProjectTeam {
     /// The project number.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: String,
     /// The team. Can be owners, editors, or viewers.
     pub team: String,
@@ -756,7 +756,7 @@ impl Part for BucketAccessControlProjectTeam {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ComposeRequestSourceObjectsObjectPreconditions {
     /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.
-    #[serde(alias="ifGenerationMatch")]
+    #[serde(rename="ifGenerationMatch")]
     pub if_generation_match: String,
 }
 
@@ -775,7 +775,7 @@ pub struct ComposeRequestSourceObjects {
     /// The source object's name. The source object's bucket is implicitly the destination bucket.
     pub name: String,
     /// Conditions that must be met for this operation to execute.
-    #[serde(alias="objectPreconditions")]
+    #[serde(rename="objectPreconditions")]
     pub object_preconditions: ComposeRequestSourceObjectsObjectPreconditions,
 }
 
@@ -802,12 +802,12 @@ pub struct Bucket {
     /// The bucket's website configuration.
     pub website: Option<BucketWebsite>,
     /// Creation time of the bucket in RFC 3339 format.
-    #[serde(alias="timeCreated")]
+    #[serde(rename="timeCreated")]
     pub time_created: Option<String>,
     /// The bucket's versioning configuration.
     pub versioning: Option<BucketVersioning>,
     /// Default access controls to apply to new objects when no ACL is provided.
-    #[serde(alias="defaultObjectAcl")]
+    #[serde(rename="defaultObjectAcl")]
     pub default_object_acl: Option<Vec<ObjectAccessControl>>,
     /// The metadata generation of this bucket.
     pub metageneration: Option<String>,
@@ -826,17 +826,17 @@ pub struct Bucket {
     /// The name of the bucket.
     pub name: Option<String>,
     /// The project number of the project the bucket belongs to.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
     /// HTTP 1.1 Entity tag for the bucket.
     pub etag: Option<String>,
     /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include STANDARD, NEARLINE and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. For more information, see storage classes.
-    #[serde(alias="storageClass")]
+    #[serde(rename="storageClass")]
     pub storage_class: Option<String>,
     /// The bucket's lifecycle configuration. See lifecycle management for more information.
     pub lifecycle: Option<BucketLifecycle>,
     /// The URI of this bucket.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
     pub location: Option<String>,
@@ -889,15 +889,15 @@ pub struct BucketAccessControl {
     /// The access permission for the entity. Can be READER, WRITER, or OWNER.
     pub role: Option<String>,
     /// The ID for the entity, if any.
-    #[serde(alias="entityId")]
+    #[serde(rename="entityId")]
     pub entity_id: Option<String>,
     /// The project team associated with the entity, if any.
-    #[serde(alias="projectTeam")]
+    #[serde(rename="projectTeam")]
     pub project_team: Option<BucketAccessControlProjectTeam>,
     /// The ID of the access-control entry.
     pub id: Option<String>,
     /// The link to this access-control entry.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -956,15 +956,15 @@ pub struct ObjectAccessControl {
     /// The access permission for the entity. Can be READER or OWNER.
     pub role: Option<String>,
     /// The ID for the entity, if any.
-    #[serde(alias="entityId")]
+    #[serde(rename="entityId")]
     pub entity_id: Option<String>,
     /// The project team associated with the entity, if any.
-    #[serde(alias="projectTeam")]
+    #[serde(rename="projectTeam")]
     pub project_team: Option<ObjectAccessControlProjectTeam>,
     /// The ID of the access-control entry.
     pub id: Option<String>,
     /// The link to this access-control entry.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -980,7 +980,7 @@ impl ResponseResult for ObjectAccessControl {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectOwner {
     /// The ID for the entity.
-    #[serde(alias="entityId")]
+    #[serde(rename="entityId")]
     pub entity_id: String,
     /// The entity, in the form user-userId.
     pub entity: String,
@@ -997,7 +997,7 @@ impl Part for ObjectOwner {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleAction {
     /// Type of the action. Currently, only Delete is supported.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -1012,7 +1012,7 @@ impl Part for BucketLifecycleRuleAction {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketOwner {
     /// The ID for the entity.
-    #[serde(alias="entityId")]
+    #[serde(rename="entityId")]
     pub entity_id: String,
     /// The entity, in the form project-owner-projectId.
     pub entity: String,
@@ -1038,7 +1038,7 @@ pub struct ComposeRequest {
     /// Properties of the resulting object.
     pub destination: Option<Object>,
     /// The list of source objects that will be concatenated into a single object.
-    #[serde(alias="sourceObjects")]
+    #[serde(rename="sourceObjects")]
     pub source_objects: Option<Vec<ComposeRequestSourceObjects>>,
 }
 
@@ -1057,7 +1057,7 @@ impl RequestValue for ComposeRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Buckets {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of items.
     pub items: Vec<Bucket>,

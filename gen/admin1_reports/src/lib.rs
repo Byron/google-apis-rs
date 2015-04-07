@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *0.1.3+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *reports* crate version *0.1.4+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -340,7 +340,7 @@ impl<'a, C, NC, A> Reports<C, NC, A>
         Reports {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -359,7 +359,7 @@ impl<'a, C, NC, A> Reports<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -385,7 +385,7 @@ impl<'a, C, NC, A> Reports<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activities {
     /// Token for retrieving the next page
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Each record in read response.
     pub items: Vec<Activity>,
@@ -442,21 +442,21 @@ impl Part for UsageReport {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportParameters {
     /// Nested message value of the parameter.
-    #[serde(alias="msgValue")]
+    #[serde(rename="msgValue")]
     pub msg_value: Vec<HashMap<String, String>>,
     /// RFC 3339 formatted value of the parameter.
-    #[serde(alias="datetimeValue")]
+    #[serde(rename="datetimeValue")]
     pub datetime_value: String,
     /// The name of the parameter.
     pub name: String,
     /// String value of the parameter.
-    #[serde(alias="stringValue")]
+    #[serde(rename="stringValue")]
     pub string_value: String,
     /// Boolean value of the parameter.
-    #[serde(alias="boolValue")]
+    #[serde(rename="boolValue")]
     pub bool_value: bool,
     /// Integral value of the parameter.
-    #[serde(alias="intValue")]
+    #[serde(rename="intValue")]
     pub int_value: String,
 }
 
@@ -471,14 +471,14 @@ impl Part for UsageReportParameters {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityActor {
     /// Obfuscated user id of the user.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// Email address of the user.
     pub email: String,
     /// For OAuth 2LO API requests, consumer_key of the requestor.
     pub key: String,
     /// User or OAuth 2LO request.
-    #[serde(alias="callerType")]
+    #[serde(rename="callerType")]
     pub caller_type: String,
 }
 
@@ -493,13 +493,13 @@ impl Part for ActivityActor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityId {
     /// Application name to which the event belongs.
-    #[serde(alias="applicationName")]
+    #[serde(rename="applicationName")]
     pub application_name: String,
     /// Unique qualifier if multiple events have the same time.
-    #[serde(alias="uniqueQualifier")]
+    #[serde(rename="uniqueQualifier")]
     pub unique_qualifier: String,
     /// Obfuscated customer ID of the source customer.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: String,
     /// Time of occurrence of the activity.
     pub time: String,
@@ -540,14 +540,14 @@ impl Part for UsageReportsWarnings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReports {
     /// Token for retrieving the next page
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The kind of object.
     pub kind: String,
     /// ETag of the resource.
     pub etag: String,
     /// Various application parameter records.
-    #[serde(alias="usageReports")]
+    #[serde(rename="usageReports")]
     pub usage_reports: Vec<UsageReport>,
     /// Warnings if any.
     pub warnings: Vec<UsageReportsWarnings>,
@@ -569,10 +569,10 @@ pub struct Activity {
     /// Activity events.
     pub events: Vec<ActivityEvents>,
     /// IP Address of the user doing the action.
-    #[serde(alias="ipAddress")]
+    #[serde(rename="ipAddress")]
     pub ip_address: String,
     /// Domain of source customer.
-    #[serde(alias="ownerDomain")]
+    #[serde(rename="ownerDomain")]
     pub owner_domain: String,
     /// User doing the action.
     pub actor: ActivityActor,
@@ -590,18 +590,18 @@ impl Part for Activity {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityEventsParameters {
     /// Boolean value of the parameter.
-    #[serde(alias="boolValue")]
+    #[serde(rename="boolValue")]
     pub bool_value: bool,
     /// Multi-string value of the parameter.
-    #[serde(alias="multiValue")]
+    #[serde(rename="multiValue")]
     pub multi_value: Vec<String>,
     /// The name of the parameter.
     pub name: String,
     /// Multi-int value of the parameter.
-    #[serde(alias="multiIntValue")]
+    #[serde(rename="multiIntValue")]
     pub multi_int_value: Vec<String>,
     /// Integral value of the parameter.
-    #[serde(alias="intValue")]
+    #[serde(rename="intValue")]
     pub int_value: String,
     /// String value of the parameter.
     pub value: String,
@@ -618,7 +618,7 @@ impl Part for ActivityEventsParameters {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityEvents {
     /// Type of event.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Name of event.
     pub name: String,
@@ -637,16 +637,16 @@ impl Part for ActivityEvents {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportEntity {
     /// Obfuscated user id for the record.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// user's email.
-    #[serde(alias="userEmail")]
+    #[serde(rename="userEmail")]
     pub user_email: String,
     /// The type of item, can be a customer or user.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Obfuscated customer id for the record.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: String,
 }
 
@@ -667,12 +667,12 @@ impl Part for UsageReportEntity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// A version-specific identifier for the watched resource.
-    #[serde(alias="resourceUri")]
+    #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
@@ -685,7 +685,7 @@ pub struct Channel {
     /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
     /// The type of delivery mechanism used for this channel.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,

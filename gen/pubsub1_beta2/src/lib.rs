@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *pubsub* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
@@ -313,7 +313,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -323,7 +323,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -349,7 +349,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTopicSubscriptionsResponse {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub subscriptions: Vec<String>,
@@ -365,7 +365,7 @@ impl ResponseResult for ListTopicSubscriptionsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReceivedMessage {
     /// no description provided
-    #[serde(alias="ackId")]
+    #[serde(rename="ackId")]
     pub ack_id: String,
     /// no description provided
     pub message: PubsubMessage,
@@ -386,7 +386,7 @@ impl Part for ReceivedMessage {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AcknowledgeRequest {
     /// no description provided
-    #[serde(alias="ackIds")]
+    #[serde(rename="ackIds")]
     pub ack_ids: Option<Vec<String>>,
 }
 
@@ -405,10 +405,10 @@ impl RequestValue for AcknowledgeRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyAckDeadlineRequest {
     /// no description provided
-    #[serde(alias="ackDeadlineSeconds")]
+    #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
     /// no description provided
-    #[serde(alias="ackId")]
+    #[serde(rename="ackId")]
     pub ack_id: Option<String>,
 }
 
@@ -445,7 +445,7 @@ impl RequestValue for PublishRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListSubscriptionsResponse {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub subscriptions: Vec<Subscription>,
@@ -466,7 +466,7 @@ impl ResponseResult for ListSubscriptionsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTopicsResponse {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub topics: Vec<Topic>,
@@ -487,7 +487,7 @@ impl ResponseResult for ListTopicsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyPushConfigRequest {
     /// no description provided
-    #[serde(alias="pushConfig")]
+    #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
 }
 
@@ -525,10 +525,10 @@ impl ResponseResult for Empty {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PullRequest {
     /// no description provided
-    #[serde(alias="returnImmediately")]
+    #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
     /// no description provided
-    #[serde(alias="maxMessages")]
+    #[serde(rename="maxMessages")]
     pub max_messages: Option<i32>,
 }
 
@@ -544,7 +544,7 @@ pub struct PushConfig {
     /// no description provided
     pub attributes: HashMap<String, String>,
     /// no description provided
-    #[serde(alias="pushEndpoint")]
+    #[serde(rename="pushEndpoint")]
     pub push_endpoint: String,
 }
 
@@ -583,7 +583,7 @@ impl ResponseResult for Topic {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishResponse {
     /// no description provided
-    #[serde(alias="messageIds")]
+    #[serde(rename="messageIds")]
     pub message_ids: Vec<String>,
 }
 
@@ -602,7 +602,7 @@ impl ResponseResult for PublishResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PullResponse {
     /// no description provided
-    #[serde(alias="receivedMessages")]
+    #[serde(rename="receivedMessages")]
     pub received_messages: Vec<ReceivedMessage>,
 }
 
@@ -620,7 +620,7 @@ pub struct PubsubMessage {
     /// no description provided
     pub data: String,
     /// no description provided
-    #[serde(alias="messageId")]
+    #[serde(rename="messageId")]
     pub message_id: String,
 }
 
@@ -640,12 +640,12 @@ impl Part for PubsubMessage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
     /// no description provided
-    #[serde(alias="ackDeadlineSeconds")]
+    #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
     /// no description provided
     pub topic: Option<String>,
     /// no description provided
-    #[serde(alias="pushConfig")]
+    #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
     /// no description provided
     pub name: Option<String>,

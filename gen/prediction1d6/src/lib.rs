@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *prediction* crate version *0.1.3+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *prediction* crate version *0.1.4+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *prediction* *v1d6* API can be found at the
 //! [official documentation site](https://developers.google.com/prediction/docs/developer-guide).
@@ -324,7 +324,7 @@ impl<'a, C, NC, A> Prediction<C, NC, A>
         Prediction {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -337,7 +337,7 @@ impl<'a, C, NC, A> Prediction<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -379,22 +379,22 @@ impl Part for AnalyzeDataDescriptionFeaturesCategoricalValues {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Insert {
     /// Google storage location of the training data file.
-    #[serde(alias="storageDataLocation")]
+    #[serde(rename="storageDataLocation")]
     pub storage_data_location: Option<String>,
     /// Type of predictive model (classification or regression).
-    #[serde(alias="modelType")]
+    #[serde(rename="modelType")]
     pub model_type: Option<String>,
     /// Google storage location of the pmml model file.
-    #[serde(alias="storagePMMLModelLocation")]
+    #[serde(rename="storagePMMLModelLocation")]
     pub storage_pmml_model_location: Option<String>,
     /// The Id of the model to be copied over.
-    #[serde(alias="sourceModel")]
+    #[serde(rename="sourceModel")]
     pub source_model: Option<String>,
     /// Google storage location of the preprocessing pmml file.
-    #[serde(alias="storagePMMLLocation")]
+    #[serde(rename="storagePMMLLocation")]
     pub storage_pmml_location: Option<String>,
     /// Instances to train model on.
-    #[serde(alias="trainingInstances")]
+    #[serde(rename="trainingInstances")]
     pub training_instances: Option<Vec<InsertTrainingInstances>>,
     /// The unique name for the predictive model.
     pub id: Option<String>,
@@ -412,7 +412,7 @@ impl RequestValue for Insert {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescription {
     /// Description of the output value or label.
-    #[serde(alias="outputFeature")]
+    #[serde(rename="outputFeature")]
     pub output_feature: AnalyzeDataDescriptionOutputFeature,
     /// Description of the input features in the data set.
     pub features: Vec<AnalyzeDataDescriptionFeatures>,
@@ -452,14 +452,14 @@ impl Part for AnalyzeDataDescriptionFeaturesNumeric {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct List {
     /// Pagination token to fetch the next page, if one exists.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of models.
     pub items: Vec<Insert2>,
     /// What kind of resource this is.
     pub kind: String,
     /// A URL to re-request this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -473,7 +473,7 @@ impl ResponseResult for List {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InputInput {
     /// A list of input features, these can be strings or doubles.
-    #[serde(alias="csvInstance")]
+    #[serde(rename="csvInstance")]
     pub csv_instance: Vec<String>,
 }
 
@@ -549,18 +549,18 @@ pub struct Output {
     /// What kind of resource this is.
     pub kind: String,
     /// A list of class labels with their estimated probabilities (Categorical models only).
-    #[serde(alias="outputMulti")]
+    #[serde(rename="outputMulti")]
     pub output_multi: Vec<OutputOutputMulti>,
     /// The most likely class label (Categorical models only).
-    #[serde(alias="outputLabel")]
+    #[serde(rename="outputLabel")]
     pub output_label: String,
     /// The unique name for the predictive model.
     pub id: String,
     /// A URL to re-request this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// The estimated regression value (Regression models only).
-    #[serde(alias="outputValue")]
+    #[serde(rename="outputValue")]
     pub output_value: String,
 }
 
@@ -583,15 +583,15 @@ pub struct Analyze {
     /// List of errors with the data.
     pub errors: Vec<HashMap<String, String>>,
     /// Description of the data the model was trained on.
-    #[serde(alias="dataDescription")]
+    #[serde(rename="dataDescription")]
     pub data_description: AnalyzeDataDescription,
     /// Description of the model.
-    #[serde(alias="modelDescription")]
+    #[serde(rename="modelDescription")]
     pub model_description: AnalyzeModelDescription,
     /// The unique name for the predictive model.
     pub id: String,
     /// A URL to re-request this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -616,30 +616,30 @@ pub struct Insert2 {
     /// Insert time of the model (as a RFC 3339 timestamp).
     pub created: String,
     /// Google storage location of the preprocessing pmml file.
-    #[serde(alias="storagePMMLLocation")]
+    #[serde(rename="storagePMMLLocation")]
     pub storage_pmml_location: String,
     /// Google storage location of the pmml model file.
-    #[serde(alias="storagePMMLModelLocation")]
+    #[serde(rename="storagePMMLModelLocation")]
     pub storage_pmml_model_location: String,
     /// Type of predictive model (CLASSIFICATION or REGRESSION).
-    #[serde(alias="modelType")]
+    #[serde(rename="modelType")]
     pub model_type: String,
     /// Google storage location of the training data file.
-    #[serde(alias="storageDataLocation")]
+    #[serde(rename="storageDataLocation")]
     pub storage_data_location: String,
     /// A URL to re-request this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Model metadata.
-    #[serde(alias="modelInfo")]
+    #[serde(rename="modelInfo")]
     pub model_info: Insert2ModelInfo,
     /// Training completion time (as a RFC 3339 timestamp).
-    #[serde(alias="trainingComplete")]
+    #[serde(rename="trainingComplete")]
     pub training_complete: String,
     /// The unique name for the predictive model.
     pub id: String,
     /// The current status of the training job. This can be one of following: RUNNING; DONE; ERROR; ERROR: TRAINING JOB NOT FOUND
-    #[serde(alias="trainingStatus")]
+    #[serde(rename="trainingStatus")]
     pub training_status: String,
 }
 
@@ -687,10 +687,10 @@ impl Part for AnalyzeDataDescriptionOutputFeature {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeModelDescription {
     /// An output confusion matrix. This shows an estimate for how this model will do in predictions. This is first indexed by the true class label. For each true class label, this provides a pair {predicted_label, count}, where count is the estimated number of times the model will predict the predicted label given the true label. Will not output if more then 100 classes (Categorical models only).
-    #[serde(alias="confusionMatrix")]
+    #[serde(rename="confusionMatrix")]
     pub confusion_matrix: HashMap<String, HashMap<String, String>>,
     /// A list of the confusion matrix row totals.
-    #[serde(alias="confusionMatrixRowTotals")]
+    #[serde(rename="confusionMatrixRowTotals")]
     pub confusion_matrix_row_totals: HashMap<String, String>,
     /// Basic information about the model.
     pub modelinfo: Insert2,
@@ -707,22 +707,22 @@ impl Part for AnalyzeModelDescription {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Insert2ModelInfo {
     /// Number of valid data instances used in the trained model.
-    #[serde(alias="numberInstances")]
+    #[serde(rename="numberInstances")]
     pub number_instances: String,
     /// Estimated accuracy of model taking utility weights into account (Categorical models only).
-    #[serde(alias="classWeightedAccuracy")]
+    #[serde(rename="classWeightedAccuracy")]
     pub class_weighted_accuracy: String,
     /// Number of class labels in the trained model (Categorical models only).
-    #[serde(alias="numberLabels")]
+    #[serde(rename="numberLabels")]
     pub number_labels: String,
     /// A number between 0.0 and 1.0, where 1.0 is 100% accurate. This is an estimate, based on the amount and quality of the training data, of the estimated prediction accuracy. You can use this is a guide to decide whether the results are accurate enough for your needs. This estimate will be more reliable if your real input data is similar to your training data (Categorical models only).
-    #[serde(alias="classificationAccuracy")]
+    #[serde(rename="classificationAccuracy")]
     pub classification_accuracy: String,
     /// An estimated mean squared error. The can be used to measure the quality of the predicted model (Regression models only).
-    #[serde(alias="meanSquaredError")]
+    #[serde(rename="meanSquaredError")]
     pub mean_squared_error: String,
     /// Type of predictive model (CLASSIFICATION or REGRESSION).
-    #[serde(alias="modelType")]
+    #[serde(rename="modelType")]
     pub model_type: String,
 }
 
@@ -776,7 +776,7 @@ pub struct Update {
     /// The generic output value - could be regression or class label.
     pub output: Option<String>,
     /// The input features for this instance.
-    #[serde(alias="csvInstance")]
+    #[serde(rename="csvInstance")]
     pub csv_instance: Option<Vec<String>>,
 }
 
@@ -792,7 +792,7 @@ pub struct InsertTrainingInstances {
     /// The generic output value - could be regression or class label.
     pub output: String,
     /// The input features for this instance.
-    #[serde(alias="csvInstance")]
+    #[serde(rename="csvInstance")]
     pub csv_instance: Vec<String>,
 }
 

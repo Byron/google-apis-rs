@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plus* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *plus* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *plus* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/api/).
@@ -322,7 +322,7 @@ impl<'a, C, NC, A> Plus<C, NC, A>
         Plus {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -341,7 +341,7 @@ impl<'a, C, NC, A> Plus<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -380,10 +380,10 @@ impl Part for ActivityObjectAttachmentsThumbnails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityActorName {
     /// The given name ("first name") of the actor.
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
     /// The family name ("last name") of the actor.
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
 }
 
@@ -404,7 +404,7 @@ impl Part for ActivityActorName {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies this resource as a collection of activities. Value: "plus#activityFeed".
     pub kind: String,
@@ -415,14 +415,14 @@ pub struct ActivityFeed {
     /// The time at which this collection of activities was last updated. Formatted as an RFC 3339 timestamp.
     pub updated: String,
     /// Link to the next page of activities.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// ETag of this response for caching purposes.
     pub etag: String,
     /// The ID of this collection of activities. Deprecated.
     pub id: String,
     /// Link to this activity resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -440,7 +440,7 @@ pub struct PersonUrls {
     /// - "contributor" - URL to a site for which this person is a contributor. 
     /// - "website" - URL for this Google+ Page's primary website. 
     /// - "other" - Other URL.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The URL value.
     pub value: String,
@@ -463,7 +463,7 @@ pub struct PersonEmails {
     /// - "home" - Home email address. 
     /// - "work" - Work email address. 
     /// - "other" - Other.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The email address.
     pub value: String,
@@ -480,10 +480,10 @@ impl Part for PersonEmails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PersonOrganizations {
     /// The date that the person joined this organization.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// The date that the person left this organization.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// A short description of the person's role in this organization. Deprecated.
     pub description: String,
@@ -498,7 +498,7 @@ pub struct PersonOrganizations {
     /// The type of organization. Possible values include, but are not limited to, the following values:  
     /// - "work" - Work. 
     /// - "school" - School.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The name of the organization.
     pub name: String,
@@ -515,10 +515,10 @@ impl Part for PersonOrganizations {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityObjectReplies {
     /// Total number of comments on this activity.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: u32,
     /// The URL for the collection of comments in reply to this activity.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -535,7 +535,7 @@ pub struct ActivityObjectAttachmentsEmbed {
     /// URL of the link.
     pub url: String,
     /// Media type of the link.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -550,7 +550,7 @@ impl Part for ActivityObjectAttachmentsEmbed {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlusAclentryResource {
     /// A descriptive name for this entry. Suitable for display.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The type of entry describing to whom access is granted. Possible values are:  
     /// - "person" - Access to an individual. 
@@ -559,7 +559,7 @@ pub struct PlusAclentryResource {
     /// - "extendedCircles" - Access to members of all the person's circles, plus all of the people in their circles. 
     /// - "domain" - Access to members of the person's Google Apps domain. 
     /// - "public" - Access to anyone on the web.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The ID of the entry. For entries of type "person" or "circle", this is the ID of the resource. For other types, this property is not set.
     pub id: String,
@@ -594,10 +594,10 @@ pub struct CommentObject {
     pub content: String,
     /// The object type of this comment. Possible values are:  
     /// - "comment" - A comment in reply to an activity.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
     /// The content (text) as provided by the author, stored without any HTML formatting. When creating or updating a comment, this value must be supplied as plain text in the request.
-    #[serde(alias="originalContent")]
+    #[serde(rename="originalContent")]
     pub original_content: String,
 }
 
@@ -612,44 +612,44 @@ impl Part for CommentObject {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ItemScope {
     /// The start date and time of the event (in ISO 8601 date format).
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// The end date and time of the event (in ISO 8601 date format).
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// The text that is the result of the app activity. For example, if a user leaves a review of a restaurant, this might be the text of the review.
     pub text: String,
     /// A URL to the image that represents this result. For example, if a user writes a review of a restaurant and attaches a photo of their meal, you might use that photo as the result.image.
     pub image: String,
     /// Review rating.
-    #[serde(alias="reviewRating")]
+    #[serde(rename="reviewRating")]
     pub review_rating: Option<Box<ItemScope>>,
     /// Date of birth.
-    #[serde(alias="birthDate")]
+    #[serde(rename="birthDate")]
     pub birth_date: String,
     /// The initial date that the result was published. For example, a user writes a comment on a blog, which has a result.dateCreated of when they submit it. If the blog users comment moderation, the result.datePublished value would match the date when the owner approved the message.
-    #[serde(alias="datePublished")]
+    #[serde(rename="datePublished")]
     pub date_published: String,
     /// Address locality.
-    #[serde(alias="addressLocality")]
+    #[serde(rename="addressLocality")]
     pub address_locality: String,
     /// The duration of the item (movie, audio recording, event, etc.) in ISO 8601 date format.
     pub duration: String,
     /// An additional name for a Person, can be used for a middle name.
-    #[serde(alias="additionalName")]
+    #[serde(rename="additionalName")]
     pub additional_name: Vec<String>,
     /// Worst possible rating value that a result might obtain. This property defines the lower bound for the ratingValue.
-    #[serde(alias="worstRating")]
+    #[serde(rename="worstRating")]
     pub worst_rating: String,
     /// A list of contributors to this result.
     pub contributor: Vec<ItemScope>,
     /// A URL to a thumbnail image that represents this result.
-    #[serde(alias="thumbnailUrl")]
+    #[serde(rename="thumbnailUrl")]
     pub thumbnail_url: String,
     /// An identifier for the object. Your app can choose how to identify objects. The object.id is required if you are writing an action that does not have a corresponding web page or object.url property.
     pub id: String,
     /// Post office box number.
-    #[serde(alias="postOfficeBoxNumber")]
+    #[serde(rename="postOfficeBoxNumber")]
     pub post_office_box_number: String,
     /// A person attending the event.
     pub attendees: Vec<ItemScope>,
@@ -658,56 +658,56 @@ pub struct ItemScope {
     /// The encoding.
     pub associated_media: Vec<ItemScope>,
     /// Best possible rating value that a result might obtain. This property defines the upper bound for the ratingValue. For example, you might have a 5 star rating scale, you would provide 5 as the value for this property.
-    #[serde(alias="bestRating")]
+    #[serde(rename="bestRating")]
     pub best_rating: String,
     /// Address country.
-    #[serde(alias="addressCountry")]
+    #[serde(rename="addressCountry")]
     pub address_country: i64,
     /// The width of the media object.
     pub width: String,
     /// Street address.
-    #[serde(alias="streetAddress")]
+    #[serde(rename="streetAddress")]
     pub street_address: String,
     /// The location of the event or organization.
     pub location: Option<Box<ItemScope>>,
     /// Latitude.
     pub latitude: f64,
     /// From http://schema.org/MusicRecording, the artist that performed this recording.
-    #[serde(alias="byArtist")]
+    #[serde(rename="byArtist")]
     pub by_artist: Option<Box<ItemScope>>,
     /// The schema.org URL that best describes the referenced object and matches the type of moment.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The date the result was last modified such as the date that a review was last edited.
-    #[serde(alias="dateModified")]
+    #[serde(rename="dateModified")]
     pub date_modified: String,
     /// File size in (mega/kilo) bytes.
-    #[serde(alias="contentSize")]
+    #[serde(rename="contentSize")]
     pub content_size: String,
     /// Actual bytes of the media object, for example the image file or video file.
-    #[serde(alias="contentUrl")]
+    #[serde(rename="contentUrl")]
     pub content_url: String,
     /// Family name. This property can be used with givenName instead of the name property.
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
     /// The string that describes the content of the result.
     pub description: String,
     /// Property of http://schema.org/TVEpisode indicating which series the episode belongs to.
-    #[serde(alias="partOfTVSeries")]
+    #[serde(rename="partOfTVSeries")]
     pub part_of_tv_series: Option<Box<ItemScope>>,
     /// The subject matter of the content.
     pub about: Option<Box<ItemScope>>,
     /// The date the result was created such as the date that a review was first created.
-    #[serde(alias="dateCreated")]
+    #[serde(rename="dateCreated")]
     pub date_created: String,
     /// Postal code.
-    #[serde(alias="postalCode")]
+    #[serde(rename="postalCode")]
     pub postal_code: String,
     /// Number of attendees.
-    #[serde(alias="attendeeCount")]
+    #[serde(rename="attendeeCount")]
     pub attendee_count: i32,
     /// From http://schema.org/MusicRecording, which album a song is in.
-    #[serde(alias="inAlbum")]
+    #[serde(rename="inAlbum")]
     pub in_album: Option<Box<ItemScope>>,
     /// Postal address.
     pub address: Option<Box<ItemScope>>,
@@ -716,10 +716,10 @@ pub struct ItemScope {
     /// Geo coordinates.
     pub geo: Option<Box<ItemScope>>,
     /// A URL pointing to a player for a specific video. In general, this is the information in the src element of an embed tag and should not be the same as the content of the loc tag.
-    #[serde(alias="embedUrl")]
+    #[serde(rename="embedUrl")]
     pub embed_url: String,
     /// The exchange traded instrument associated with a Corporation object. The tickerSymbol is expressed as an exchange and an instrument name separated by a space character. For the exchange component of the tickerSymbol attribute, we recommend using the controlled vocabulary of Market Identifier Codes (MIC) specified in ISO15022.
-    #[serde(alias="tickerSymbol")]
+    #[serde(rename="tickerSymbol")]
     pub ticker_symbol: String,
     /// The name of the result. In the example of a restaurant review, this might be the summary the user gave their review such as "Great ambiance, but overpriced."
     pub name: String,
@@ -728,7 +728,7 @@ pub struct ItemScope {
     /// From http://schema.org/MusicRecording, the audio file.
     pub audio: Option<Box<ItemScope>>,
     /// Player type that is required. For example: Flash or Silverlight.
-    #[serde(alias="playerType")]
+    #[serde(rename="playerType")]
     pub player_type: String,
     /// The main performer or performers of the event-for example, a presenter, musician, or actor.
     pub performers: Vec<ItemScope>,
@@ -741,15 +741,15 @@ pub struct ItemScope {
     /// Thumbnail image for an image or video.
     pub thumbnail: Option<Box<ItemScope>>,
     /// Address region.
-    #[serde(alias="addressRegion")]
+    #[serde(rename="addressRegion")]
     pub address_region: String,
     /// The caption for this object.
     pub caption: String,
     /// Rating value.
-    #[serde(alias="ratingValue")]
+    #[serde(rename="ratingValue")]
     pub rating_value: String,
     /// Given name. This property can be used with familyName instead of the name property.
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
 }
 
@@ -767,7 +767,7 @@ pub struct ActivityObjectAttachmentsImage {
     /// The width, in pixels, of the linked resource.
     pub width: u32,
     /// Media type of the link.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The height, in pixels, of the linked resource.
     pub height: u32,
@@ -807,7 +807,7 @@ impl Part for CommentInReplyTo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PeopleFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies this resource as a collection of people. Value: "plus#peopleFeed".
     pub kind: String,
@@ -816,12 +816,12 @@ pub struct PeopleFeed {
     /// The title of this collection of people.
     pub title: String,
     /// The total number of people available in this list. The number of people in a response might be smaller due to paging. This might not be set for all collections.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// The people in this page of results. Each item includes the id, displayName, image, and url for the person. To retrieve additional profile data, see the people.get method.
     pub items: Vec<Person>,
     /// Link to this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -839,7 +839,7 @@ pub struct CommentActor {
     /// The image representation of this actor.
     pub image: CommentActorImage,
     /// The name of this actor, suitable for display.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The ID of the actor.
     pub id: String,
@@ -860,7 +860,7 @@ pub struct ActivityActor {
     /// The image representation of the actor.
     pub image: ActivityActorImage,
     /// The name of the actor, suitable for display.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The ID of the actor's Person resource.
     pub id: String,
@@ -909,10 +909,10 @@ impl Part for PlacePosition {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityObjectPlusoners {
     /// Total number of people who +1'd this activity.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: u32,
     /// The URL for the collection of people who +1'd this activity.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -927,10 +927,10 @@ impl Part for ActivityObjectPlusoners {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PersonCoverCoverInfo {
     /// The difference between the left position of the cover image and the actual displayed cover image. Only valid for banner layout.
-    #[serde(alias="leftImageOffset")]
+    #[serde(rename="leftImageOffset")]
     pub left_image_offset: i32,
     /// The difference between the top position of the cover image and the actual displayed cover image. Only valid for banner layout.
-    #[serde(alias="topImageOffset")]
+    #[serde(rename="topImageOffset")]
     pub top_image_offset: i32,
 }
 
@@ -952,7 +952,7 @@ impl Part for PersonCoverCoverInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Moment {
     /// Time stamp of when the action occurred in RFC3339 format.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: Option<String>,
     /// Identifies this resource as a moment.
     pub kind: Option<String>,
@@ -961,7 +961,7 @@ pub struct Moment {
     /// The object on which the action was performed. Specifying this is equivalent with specifying "target". Note that responses from the server will use the "target" field instead for backward-compatibility with older clients.
     pub object: Option<ItemScope>,
     /// The schema.org type for the type of moment to write. For example, http://schema.org/AddAction. Note that responses from the server will use the Google schema type instead for backward-compatibility with older clients. For example, http://schemas.google.com/AddActivity.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The moment ID.
     pub id: Option<String>,
@@ -997,7 +997,7 @@ pub struct PersonImage {
     /// The URL of the person's profile photo. To resize the image and crop it to a square, append the query string ?sz=x, where x is the dimension in pixels of each side.
     pub url: String,
     /// Whether the person's profile photo is the default one
-    #[serde(alias="isDefault")]
+    #[serde(rename="isDefault")]
     pub is_default: bool,
 }
 
@@ -1012,7 +1012,7 @@ impl Part for PersonImage {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentPlusoners {
     /// Total number of people who +1'd this comment.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: u32,
 }
 
@@ -1027,12 +1027,12 @@ impl Part for CommentPlusoners {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityObjectAttachments {
     /// The title of the attachment, such as a photo caption or an article title.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// If the attachment is an album, this property is a list of potential additional thumbnails from the album.
     pub thumbnails: Vec<ActivityObjectAttachmentsThumbnails>,
     /// The full image URL for photo attachments.
-    #[serde(alias="fullImage")]
+    #[serde(rename="fullImage")]
     pub full_image: ActivityObjectAttachmentsFullImage,
     /// The link to the attachment, which should be of type text/html.
     pub url: String,
@@ -1049,7 +1049,7 @@ pub struct ActivityObjectAttachments {
     /// - "album" - A photo album. 
     /// - "video" - A video. 
     /// - "article" - An article, specified by a link.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
 }
 
@@ -1086,7 +1086,7 @@ pub struct ActivityObjectAttachmentsFullImage {
     /// The width, in pixels, of the linked resource.
     pub width: u32,
     /// Media type of the link.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The height, in pixels, of the linked resource.
     pub height: u32,
@@ -1103,13 +1103,13 @@ impl Part for ActivityObjectAttachmentsFullImage {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PersonCover {
     /// Extra information about the cover photo.
-    #[serde(alias="coverInfo")]
+    #[serde(rename="coverInfo")]
     pub cover_info: PersonCoverCoverInfo,
     /// The layout of the cover art. Possible values include, but are not limited to, the following values:  
     /// - "banner" - One large image banner.
     pub layout: String,
     /// The person's primary cover image.
-    #[serde(alias="coverPhoto")]
+    #[serde(rename="coverPhoto")]
     pub cover_photo: PersonCoverCoverPhoto,
 }
 
@@ -1146,7 +1146,7 @@ impl Part for Acl {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Person {
     /// The "bragging rights" line of this person.
-    #[serde(alias="braggingRights")]
+    #[serde(rename="braggingRights")]
     pub bragging_rights: String,
     /// The person's relationship status. Possible values include, but are not limited to, the following values:  
     /// - "single" - Person is single. 
@@ -1158,19 +1158,19 @@ pub struct Person {
     /// - "widowed" - Person is widowed. 
     /// - "in_domestic_partnership" - Person is in a domestic partnership. 
     /// - "in_civil_union" - Person is in a civil union.
-    #[serde(alias="relationshipStatus")]
+    #[serde(rename="relationshipStatus")]
     pub relationship_status: String,
     /// The representation of the person's profile photo.
     pub image: PersonImage,
     /// The hosted domain name for the user's Google Apps account. For instance, example.com. The plus.profile.emails.read or email scope is needed to get this domain name.
     pub domain: String,
     /// A list of places where this person has lived.
-    #[serde(alias="placesLived")]
+    #[serde(rename="placesLived")]
     pub places_lived: Vec<PersonPlacesLived>,
     /// The person's date of birth, represented as YYYY-MM-DD.
     pub birthday: String,
     /// The name of this person, which is suitable for display.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The nickname of this person.
     pub nickname: String,
@@ -1189,14 +1189,14 @@ pub struct Person {
     /// The user's preferred language for rendering.
     pub language: String,
     /// Whether this user has signed up for Google+.
-    #[serde(alias="isPlusUser")]
+    #[serde(rename="isPlusUser")]
     pub is_plus_user: bool,
     /// The person's skills.
     pub skills: String,
     /// The brief description (tagline) of this person.
     pub tagline: String,
     /// (this field is not currently used)
-    #[serde(alias="currentLocation")]
+    #[serde(rename="currentLocation")]
     pub current_location: String,
     /// The cover photo content.
     pub cover: PersonCover,
@@ -1207,7 +1207,7 @@ pub struct Person {
     /// ETag of this response for caching purposes.
     pub etag: String,
     /// If a Google+ Page, the number of people who have +1'd this page.
-    #[serde(alias="plusOneCount")]
+    #[serde(rename="plusOneCount")]
     pub plus_one_count: i32,
     /// A list of URLs for this person.
     pub urls: Vec<PersonUrls>,
@@ -1217,18 +1217,18 @@ pub struct Person {
     /// - "other" - Other.
     pub gender: String,
     /// The age range of the person. Valid ranges are 17 or younger, 18 to 20, and 21 or older. Age is determined from the user's birthday using Western age reckoning.
-    #[serde(alias="ageRange")]
+    #[serde(rename="ageRange")]
     pub age_range: PersonAgeRange,
     /// For followers who are visible, the number of people who have added this person or page to a circle.
-    #[serde(alias="circledByCount")]
+    #[serde(rename="circledByCount")]
     pub circled_by_count: i32,
     /// Type of person within Google+. Possible values include, but are not limited to, the following values:  
     /// - "person" - represents an actual person. 
     /// - "page" - represents a page.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
     /// A short biography for this person.
-    #[serde(alias="aboutMe")]
+    #[serde(rename="aboutMe")]
     pub about_me: String,
 }
 
@@ -1246,7 +1246,7 @@ pub struct ActivityObjectActor {
     /// The image representation of the original actor.
     pub image: ActivityObjectActorImage,
     /// The original actor's name, which is suitable for display.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// ID of the original actor.
     pub id: String,
@@ -1268,7 +1268,7 @@ impl Part for ActivityObjectActor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MomentsFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies this resource as a collection of moments. Value: "plus#momentsFeed".
     pub kind: String,
@@ -1279,12 +1279,12 @@ pub struct MomentsFeed {
     /// The RFC 339 timestamp for when this collection of moments was last updated.
     pub updated: String,
     /// Link to the next page of moments.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// ETag of this response for caching purposes.
     pub etag: String,
     /// Link to this page of moments.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1303,7 +1303,7 @@ impl ResponseResult for MomentsFeed {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activity {
     /// Name of the place where this activity occurred.
-    #[serde(alias="placeName")]
+    #[serde(rename="placeName")]
     pub place_name: String,
     /// The time at which this activity was last updated. Formatted as an RFC 3339 timestamp.
     pub updated: String,
@@ -1328,7 +1328,7 @@ pub struct Activity {
     /// The link to this activity.
     pub url: String,
     /// ID of the place where this activity occurred.
-    #[serde(alias="placeId")]
+    #[serde(rename="placeId")]
     pub place_id: String,
     /// The person who performed this activity.
     pub actor: ActivityActor,
@@ -1343,7 +1343,7 @@ pub struct Activity {
     /// The service provider that initially published this activity.
     pub provider: ActivityProvider,
     /// If this activity is a crosspost from another system, this property specifies the ID of the original activity.
-    #[serde(alias="crosspostSource")]
+    #[serde(rename="crosspostSource")]
     pub crosspost_source: String,
     /// The time at which this activity was initially published. Formatted as an RFC 3339 timestamp.
     pub published: String,
@@ -1364,7 +1364,7 @@ impl ResponseResult for Activity {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentFeed {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies this resource as a collection of comments. Value: "plus#commentFeed".
     pub kind: String,
@@ -1375,7 +1375,7 @@ pub struct CommentFeed {
     /// The time at which this collection of comments was last updated. Formatted as an RFC 3339 timestamp.
     pub updated: String,
     /// Link to the next page of activities.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// ETag of this response for caching purposes.
     pub etag: String,
@@ -1393,10 +1393,10 @@ impl ResponseResult for CommentFeed {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityObjectResharers {
     /// Total number of people who reshared this activity.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: u32,
     /// The URL for the collection of resharers.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1431,7 +1431,7 @@ impl Part for ActivityActorImage {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Comment {
     /// The activity this comment replied to.
-    #[serde(alias="inReplyTo")]
+    #[serde(rename="inReplyTo")]
     pub in_reply_to: Vec<CommentInReplyTo>,
     /// Identifies this resource as a comment. Value: "plus#comment".
     pub kind: String,
@@ -1453,7 +1453,7 @@ pub struct Comment {
     /// The ID of this comment.
     pub id: String,
     /// Link to this comment resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1502,21 +1502,21 @@ impl Part for PersonAgeRange {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PersonName {
     /// The honorific prefixes (such as "Dr." or "Mrs.") for this person.
-    #[serde(alias="honorificPrefix")]
+    #[serde(rename="honorificPrefix")]
     pub honorific_prefix: String,
     /// The given name (first name) of this person.
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
     /// The middle name of this person.
-    #[serde(alias="middleName")]
+    #[serde(rename="middleName")]
     pub middle_name: String,
     /// The family name (last name) of this person.
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
     /// The full name of this person, including middle names, suffixes, etc.
     pub formatted: String,
     /// The honorific suffixes (such as "Jr.") for this person.
-    #[serde(alias="honorificSuffix")]
+    #[serde(rename="honorificSuffix")]
     pub honorific_suffix: String,
 }
 
@@ -1535,7 +1535,7 @@ pub struct ActivityObjectAttachmentsThumbnailsImage {
     /// The width, in pixels, of the linked resource.
     pub width: u32,
     /// Media type of the link.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The height, in pixels, of the linked resource.
     pub height: u32,
@@ -1570,7 +1570,7 @@ pub struct ActivityObject {
     /// The media objects attached to this activity.
     pub attachments: Vec<ActivityObjectAttachments>,
     /// The content (text) as provided by the author, which is stored without any HTML formatting. When creating or updating an activity, this value must be supplied as plain text in the request.
-    #[serde(alias="originalContent")]
+    #[serde(rename="originalContent")]
     pub original_content: String,
     /// People who +1'd this activity.
     pub plusoners: ActivityObjectPlusoners,
@@ -1587,7 +1587,7 @@ pub struct ActivityObject {
     /// The type of the object. Possible values include, but are not limited to, the following values:  
     /// - "note" - Textual content. 
     /// - "activity" - A Google+ activity.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
 }
 
@@ -1606,7 +1606,7 @@ pub struct Place {
     /// Identifies this resource as a place. Value: "plus#place".
     pub kind: String,
     /// The display name of the place.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The id of the place.
     pub id: String,

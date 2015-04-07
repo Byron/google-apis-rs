@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.3+20150327*, where *20150327* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *YouTube* crate version *0.1.4+20150327*, where *20150327* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -387,7 +387,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
         YouTube {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -448,7 +448,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -474,28 +474,28 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of subscriptions that match the request criteria.
     pub items: Vec<Subscription>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -513,18 +513,18 @@ pub struct PlaylistSnippet {
     /// The playlist's title.
     pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel that published the playlist.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// Keyword tags associated with the playlist.
     pub tags: Vec<String>,
     /// The channel title of the channel that the video belongs to.
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
     /// The language of the playlist's default title and description.
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
     /// Localized title and description, read-only.
     pub localized: PlaylistLocalization,
@@ -542,16 +542,16 @@ impl Part for PlaylistSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelAuditDetails {
     /// Whether or not the channel has any copyright strikes.
-    #[serde(alias="copyrightStrikesGoodStanding")]
+    #[serde(rename="copyrightStrikesGoodStanding")]
     pub copyright_strikes_good_standing: bool,
     /// Whether or not the channel respects the community guidelines.
-    #[serde(alias="communityGuidelinesGoodStanding")]
+    #[serde(rename="communityGuidelinesGoodStanding")]
     pub community_guidelines_good_standing: bool,
     /// Whether or not the channel has any unresolved claims.
-    #[serde(alias="contentIdClaimsGoodStanding")]
+    #[serde(rename="contentIdClaimsGoodStanding")]
     pub content_id_claims_good_standing: bool,
     /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.
-    #[serde(alias="overallGoodStanding")]
+    #[serde(rename="overallGoodStanding")]
     pub overall_good_standing: bool,
 }
 
@@ -570,7 +570,7 @@ impl Part for ChannelAuditDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of thumbnails.
     pub items: Vec<ThumbnailDetails>,
@@ -579,7 +579,7 @@ pub struct ThumbnailSetResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -597,36 +597,36 @@ pub struct ChannelSettings {
     /// Specifies the channel title.
     pub title: String,
     /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
-    #[serde(alias="moderateComments")]
+    #[serde(rename="moderateComments")]
     pub moderate_comments: bool,
     /// Whether the tab to browse the videos should be displayed.
-    #[serde(alias="showBrowseView")]
+    #[serde(rename="showBrowseView")]
     pub show_browse_view: bool,
     /// Title for the featured channels tab.
-    #[serde(alias="featuredChannelsTitle")]
+    #[serde(rename="featuredChannelsTitle")]
     pub featured_channels_title: String,
     /// no description provided
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
     /// The trailer of the channel, for users that are not subscribers.
-    #[serde(alias="unsubscribedTrailer")]
+    #[serde(rename="unsubscribedTrailer")]
     pub unsubscribed_trailer: String,
     /// The list of featured channels.
-    #[serde(alias="featuredChannelsUrls")]
+    #[serde(rename="featuredChannelsUrls")]
     pub featured_channels_urls: Vec<String>,
     /// A prominent color that can be rendered on this channel page.
-    #[serde(alias="profileColor")]
+    #[serde(rename="profileColor")]
     pub profile_color: String,
     /// Which content tab users should see when viewing the channel.
-    #[serde(alias="defaultTab")]
+    #[serde(rename="defaultTab")]
     pub default_tab: String,
     /// Lists keywords associated with the channel, comma-separated.
     pub keywords: String,
     /// Whether related channels should be proposed.
-    #[serde(alias="showRelatedChannels")]
+    #[serde(rename="showRelatedChannels")]
     pub show_related_channels: bool,
     /// The ID for a Google Analytics account to track and measure traffic to the channels.
-    #[serde(alias="trackingAnalyticsAccountId")]
+    #[serde(rename="trackingAnalyticsAccountId")]
     pub tracking_analytics_account_id: String,
 }
 
@@ -642,10 +642,10 @@ pub struct CdnSettings {
     /// The format of the video stream that you are sending to Youtube.
     pub format: String,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
-    #[serde(alias="ingestionInfo")]
+    #[serde(rename="ingestionInfo")]
     pub ingestion_info: IngestionInfo,
     /// The method or protocol used to transmit the video stream.
-    #[serde(alias="ingestionType")]
+    #[serde(rename="ingestionType")]
     pub ingestion_type: String,
 }
 
@@ -664,7 +664,7 @@ impl Part for CdnSettings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of ratings that match the request criteria.
     pub items: Vec<VideoRating>,
@@ -673,7 +673,7 @@ pub struct VideoGetRatingResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -687,7 +687,7 @@ impl ResponseResult for VideoGetRatingResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsChannelItem {
     /// The resourceId object contains information that identifies the resource that was added to the channel.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -718,7 +718,7 @@ pub struct VideoRating {
     /// no description provided
     pub rating: String,
     /// no description provided
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
 }
 
@@ -737,7 +737,7 @@ impl Part for VideoRating {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.
     pub items: Vec<I18nRegion>,
@@ -746,7 +746,7 @@ pub struct I18nRegionListResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -765,28 +765,28 @@ impl ResponseResult for I18nRegionListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of live streams that match the request criteria.
     pub items: Vec<LiveStream>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -805,28 +805,28 @@ impl ResponseResult for LiveStreamListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of playlists that match the request criteria.
     pub items: Vec<Playlist>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -842,7 +842,7 @@ pub struct ChannelConversionPing {
     /// Defines the context of the ping.
     pub context: String,
     /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
-    #[serde(alias="conversionUrl")]
+    #[serde(rename="conversionUrl")]
     pub conversion_url: String,
 }
 
@@ -856,12 +856,12 @@ impl Part for ChannelConversionPing {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPromotion {
     /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
-    #[serde(alias="defaultTiming")]
+    #[serde(rename="defaultTiming")]
     pub default_timing: InvideoTiming,
     /// List of promoted items in decreasing priority.
     pub items: Vec<PromotedItem>,
     /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.
-    #[serde(alias="useSmartTiming")]
+    #[serde(rename="useSmartTiming")]
     pub use_smart_timing: bool,
     /// The spatial position within the video where the promoted item will be displayed.
     pub position: InvideoPosition,
@@ -902,7 +902,7 @@ pub struct PlaylistItem {
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<PlaylistItemContentDetails>,
     /// The ID that YouTube uses to uniquely identify the playlist item.
     pub id: Option<String>,
@@ -938,13 +938,13 @@ pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.
     pub note: String,
     /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.
-    #[serde(alias="startAt")]
+    #[serde(rename="startAt")]
     pub start_at: String,
     /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.
-    #[serde(alias="endAt")]
+    #[serde(rename="endAt")]
     pub end_at: String,
     /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
 }
 
@@ -994,14 +994,14 @@ pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
     pub uploads: String,
     /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-    #[serde(alias="watchHistory")]
+    #[serde(rename="watchHistory")]
     pub watch_history: String,
     /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     pub likes: String,
     /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     pub favorites: String,
     /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-    #[serde(alias="watchLater")]
+    #[serde(rename="watchLater")]
     pub watch_later: String,
 }
 
@@ -1029,28 +1029,28 @@ impl Part for ChannelConversionPings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetails {
     /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.
-    #[serde(alias="fileDetailsAvailability")]
+    #[serde(rename="fileDetailsAvailability")]
     pub file_details_availability: String,
     /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-    #[serde(alias="editorSuggestionsAvailability")]
+    #[serde(rename="editorSuggestionsAvailability")]
     pub editor_suggestions_availability: String,
     /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: String,
     /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-    #[serde(alias="processingIssuesAvailability")]
+    #[serde(rename="processingIssuesAvailability")]
     pub processing_issues_availability: String,
     /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
-    #[serde(alias="processingFailureReason")]
+    #[serde(rename="processingFailureReason")]
     pub processing_failure_reason: String,
     /// This value indicates whether thumbnail images have been generated for the video.
-    #[serde(alias="thumbnailsAvailability")]
+    #[serde(rename="thumbnailsAvailability")]
     pub thumbnails_availability: String,
     /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.
-    #[serde(alias="processingProgress")]
+    #[serde(rename="processingProgress")]
     pub processing_progress: VideoProcessingDetailsProcessingProgress,
     /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-    #[serde(alias="tagSuggestionsAvailability")]
+    #[serde(rename="tagSuggestionsAvailability")]
     pub tag_suggestions_availability: String,
 }
 
@@ -1064,13 +1064,13 @@ impl Part for VideoProcessingDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionContentDetails {
     /// The number of new items in the subscription since its content was last read.
-    #[serde(alias="newItemCount")]
+    #[serde(rename="newItemCount")]
     pub new_item_count: u32,
     /// The type of activity this subscription is for (only uploads, everything).
-    #[serde(alias="activityType")]
+    #[serde(rename="activityType")]
     pub activity_type: String,
     /// The approximate number of items that the subscription points to.
-    #[serde(alias="totalItemCount")]
+    #[serde(rename="totalItemCount")]
     pub total_item_count: u32,
 }
 
@@ -1089,7 +1089,7 @@ impl Part for SubscriptionContentDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of ChannelSections that match the request criteria.
     pub items: Vec<ChannelSection>,
@@ -1098,7 +1098,7 @@ pub struct ChannelSectionListResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -1131,18 +1131,18 @@ pub struct SubscriptionSnippet {
     /// The subscription's title.
     pub title: String,
     /// The id object contains information about the channel that the user subscribed to.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
     /// The ID that YouTube uses to uniquely identify the subscriber's channel.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// Channel title for the channel that the subscription belongs to.
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
 }
 
@@ -1158,36 +1158,36 @@ pub struct CaptionSnippet {
     /// The caption track's status.
     pub status: String,
     /// Indicates whether the track contains closed captions for the deaf and hard of hearing. The default value is false.
-    #[serde(alias="isCC")]
+    #[serde(rename="isCC")]
     pub is_cc: bool,
     /// The type of audio track associated with the caption track.
-    #[serde(alias="audioTrackType")]
+    #[serde(rename="audioTrackType")]
     pub audio_track_type: String,
     /// The language of the caption track. The property value is a BCP-47 language tag.
     pub language: String,
     /// The ID that YouTube uses to uniquely identify the video associated with the caption track.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
     /// Indicates whether the caption track is a draft. If the value is true, then the track is not publicly visible. The default value is false.
-    #[serde(alias="isDraft")]
+    #[serde(rename="isDraft")]
     pub is_draft: bool,
     /// Indicates whether YouTube synchronized the caption track to the audio track in the video. The value will be true if a sync was explicitly requested when the caption track was uploaded. For example, when calling the captions.insert or captions.update methods, you can set the sync parameter to true to instruct YouTube to sync the uploaded track to the video. If the value is false, YouTube uses the time codes in the uploaded caption track to determine when to display captions.
-    #[serde(alias="isAutoSynced")]
+    #[serde(rename="isAutoSynced")]
     pub is_auto_synced: bool,
     /// The date and time when the caption track was last updated. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="lastUpdated")]
+    #[serde(rename="lastUpdated")]
     pub last_updated: String,
     /// The caption track's type.
-    #[serde(alias="trackKind")]
+    #[serde(rename="trackKind")]
     pub track_kind: String,
     /// Indicates whether caption track is formatted for "easy reader," meaning it is at a third-grade level for language learners. The default value is false.
-    #[serde(alias="isEasyReader")]
+    #[serde(rename="isEasyReader")]
     pub is_easy_reader: bool,
     /// Indicates whether the caption track uses large text for the vision-impaired. The default value is false.
-    #[serde(alias="isLarge")]
+    #[serde(rename="isLarge")]
     pub is_large: bool,
     /// The reason that YouTube failed to process the caption track. This property is only present if the state property's value is failed.
-    #[serde(alias="failureReason")]
+    #[serde(rename="failureReason")]
     pub failure_reason: String,
     /// The name of the caption track. The name is intended to be visible to the user as an option during playback.
     pub name: String,
@@ -1218,13 +1218,13 @@ impl Part for I18nRegionSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPlaylistItem {
     /// The resourceId object contains information about the resource that was added to the playlist.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
     /// The value that YouTube uses to uniquely identify the playlist.
-    #[serde(alias="playlistId")]
+    #[serde(rename="playlistId")]
     pub playlist_id: String,
     /// ID of the item within the playlist.
-    #[serde(alias="playlistItemId")]
+    #[serde(rename="playlistItemId")]
     pub playlist_item_id: String,
 }
 
@@ -1238,7 +1238,7 @@ impl Part for ActivityContentDetailsPlaylistItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsComment {
     /// The resourceId object contains information that identifies the resource associated with the comment.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -1252,7 +1252,7 @@ impl Part for ActivityContentDetailsComment {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategorySnippet {
     /// no description provided
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// Description of the guide category.
     pub title: String,
@@ -1272,28 +1272,28 @@ pub struct VideoSnippet {
     /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
     pub tags: Vec<String>,
     /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The language of the videos's default snippet.
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
     /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.
-    #[serde(alias="liveBroadcastContent")]
+    #[serde(rename="liveBroadcastContent")]
     pub live_broadcast_content: String,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
     /// The video's title.
     pub title: String,
     /// The YouTube video category associated with the video.
-    #[serde(alias="categoryId")]
+    #[serde(rename="categoryId")]
     pub category_id: String,
     /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)
     pub localized: VideoLocalization,
     /// Channel title for the channel that the video belongs to.
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
 }
 
@@ -1312,10 +1312,10 @@ pub struct LiveStreamContentDetails {
     /// - A non-reusable stream can only be bound to one broadcast. 
     /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
     /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
-    #[serde(alias="isReusable")]
+    #[serde(rename="isReusable")]
     pub is_reusable: bool,
     /// The ingestion URL where the closed captions of this stream are sent.
-    #[serde(alias="closedCaptionsIngestionUrl")]
+    #[serde(rename="closedCaptionsIngestionUrl")]
     pub closed_captions_ingestion_url: String,
 }
 
@@ -1353,7 +1353,7 @@ impl Part for GuideCategory {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.
     pub items: Vec<I18nLanguage>,
@@ -1362,7 +1362,7 @@ pub struct I18nLanguageListResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -1378,7 +1378,7 @@ pub struct LocalizedProperty {
     /// no description provided
     pub default: String,
     /// The language of the default property.
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: LanguageTag,
     /// no description provided
     pub localized: Vec<LocalizedString>,
@@ -1394,25 +1394,25 @@ impl Part for LocalizedProperty {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsVideoStream {
     /// The video stream's bitrate, in bits per second.
-    #[serde(alias="bitrateBps")]
+    #[serde(rename="bitrateBps")]
     pub bitrate_bps: String,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
     pub vendor: String,
     /// The video codec that the stream uses.
     pub codec: String,
     /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.
-    #[serde(alias="widthPixels")]
+    #[serde(rename="widthPixels")]
     pub width_pixels: u32,
     /// The encoded video content's height in pixels.
-    #[serde(alias="heightPixels")]
+    #[serde(rename="heightPixels")]
     pub height_pixels: u32,
     /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.
-    #[serde(alias="aspectRatio")]
+    #[serde(rename="aspectRatio")]
     pub aspect_ratio: f64,
     /// The amount that YouTube needs to rotate the original source content to properly display the video.
     pub rotation: String,
     /// The video stream's frame rate, in frames per second.
-    #[serde(alias="frameRateFps")]
+    #[serde(rename="frameRateFps")]
     pub frame_rate_fps: f64,
 }
 
@@ -1456,31 +1456,31 @@ pub struct Channel {
     /// The status object encapsulates information about the privacy status of the channel.
     pub status: Option<ChannelStatus>,
     /// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.
-    #[serde(alias="invideoPromotion")]
+    #[serde(rename="invideoPromotion")]
     pub invideo_promotion: Option<InvideoPromotion>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".
     pub kind: Option<String>,
     /// The statistics object encapsulates statistics for the channel.
     pub statistics: Option<ChannelStatistics>,
     /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
-    #[serde(alias="contentOwnerDetails")]
+    #[serde(rename="contentOwnerDetails")]
     pub content_owner_details: Option<ChannelContentOwnerDetails>,
     /// The topicDetails object encapsulates information about Freebase topics associated with the channel.
-    #[serde(alias="topicDetails")]
+    #[serde(rename="topicDetails")]
     pub topic_details: Option<ChannelTopicDetails>,
     /// The contentDetails object encapsulates information about the channel's content.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<ChannelContentDetails>,
     /// The brandingSettings object encapsulates information about the branding of the channel.
-    #[serde(alias="brandingSettings")]
+    #[serde(rename="brandingSettings")]
     pub branding_settings: Option<ChannelBrandingSettings>,
     /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
-    #[serde(alias="conversionPings")]
+    #[serde(rename="conversionPings")]
     pub conversion_pings: Option<ChannelConversionPings>,
     /// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.
     pub snippet: Option<ChannelSnippet>,
     /// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.
-    #[serde(alias="auditDetails")]
+    #[serde(rename="auditDetails")]
     pub audit_details: Option<ChannelAuditDetails>,
     /// Etag of this resource.
     pub etag: Option<String>,
@@ -1565,28 +1565,28 @@ impl Part for SearchResult {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.
     pub items: Vec<VideoCategory>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -1600,16 +1600,16 @@ impl ResponseResult for VideoCategoryListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetailsProcessingProgress {
     /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
-    #[serde(alias="timeLeftMs")]
+    #[serde(rename="timeLeftMs")]
     pub time_left_ms: String,
     /// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
     /// 100 * parts_processed / parts_total
     /// 
     /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
-    #[serde(alias="partsProcessed")]
+    #[serde(rename="partsProcessed")]
     pub parts_processed: String,
     /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.
-    #[serde(alias="partsTotal")]
+    #[serde(rename="partsTotal")]
     pub parts_total: String,
 }
 
@@ -1628,28 +1628,28 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of videos that match the request criteria.
     pub items: Vec<Video>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -1689,10 +1689,10 @@ pub struct Subscription {
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The contentDetails object contains basic statistics about the subscription.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<SubscriptionContentDetails>,
     /// The subscriberSnippet object contains basic details about the sbuscriber.
-    #[serde(alias="subscriberSnippet")]
+    #[serde(rename="subscriberSnippet")]
     pub subscriber_snippet: Option<SubscriptionSubscriberSnippet>,
     /// The ID that YouTube uses to uniquely identify the subscription.
     pub id: Option<String>,
@@ -1726,12 +1726,12 @@ impl ToParts for Subscription {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamSnippet {
     /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The stream's description. The value cannot be longer than 10000 characters.
     pub description: String,
     /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// The stream's title. The value must be between 1 and 128 characters long.
     pub title: String,
@@ -1747,13 +1747,13 @@ impl Part for LiveStreamSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatus {
     /// Privacy status of the channel.
-    #[serde(alias="privacyStatus")]
+    #[serde(rename="privacyStatus")]
     pub privacy_status: String,
     /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.
-    #[serde(alias="isLinked")]
+    #[serde(rename="isLinked")]
     pub is_linked: bool,
     /// The long uploads status of this channel. See
-    #[serde(alias="longUploadsStatus")]
+    #[serde(rename="longUploadsStatus")]
     pub long_uploads_status: String,
 }
 
@@ -1772,28 +1772,28 @@ impl Part for ChannelStatus {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of channels that match the request criteria.
     pub items: Vec<Channel>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -1821,7 +1821,7 @@ pub struct ChannelSection {
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<ChannelSectionContentDetails>,
     /// The ID that YouTube uses to uniquely identify the channel section.
     pub id: Option<String>,
@@ -1862,28 +1862,28 @@ impl ToParts for ChannelSection {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of broadcasts that match the request criteria.
     pub items: Vec<LiveBroadcast>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -1902,7 +1902,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CaptionListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// A list of captions that match the request criteria.
     pub items: Vec<Caption>,
@@ -1911,7 +1911,7 @@ pub struct CaptionListResponse {
     /// Etag of this resource.
     pub etag: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
 }
 
@@ -1925,7 +1925,7 @@ impl ResponseResult for CaptionListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamStatus {
     /// no description provided
-    #[serde(alias="streamStatus")]
+    #[serde(rename="streamStatus")]
     pub stream_status: String,
 }
 
@@ -1939,196 +1939,196 @@ impl Part for LiveStreamStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentRating {
     /// Internal YouTube rating.
-    #[serde(alias="ytRating")]
+    #[serde(rename="ytRating")]
     pub yt_rating: String,
     /// Rating system for French Canadian TV - Regie du cinema
-    #[serde(alias="catvfrRating")]
+    #[serde(rename="catvfrRating")]
     pub catvfr_rating: String,
     /// Rating system in India - Central Board of Film Certification
-    #[serde(alias="cbfcRating")]
+    #[serde(rename="cbfcRating")]
     pub cbfc_rating: String,
     /// Rating system for Thailand - Board of Filmand Video Censors
-    #[serde(alias="bfvcRating")]
+    #[serde(rename="bfvcRating")]
     pub bfvc_rating: String,
     /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!
-    #[serde(alias="bmukkRating")]
+    #[serde(rename="bmukkRating")]
     pub bmukk_rating: String,
     /// Rating system for Switzerland - Switzerland Rating System
-    #[serde(alias="chfilmRating")]
+    #[serde(rename="chfilmRating")]
     pub chfilm_rating: String,
     /// Rating system for Taiwan - Ministry of Culture - Tawan
-    #[serde(alias="moctwRating")]
+    #[serde(rename="moctwRating")]
     pub moctw_rating: String,
     /// Rating system for Canadian TV - Canadian TV Classification System
-    #[serde(alias="catvRating")]
+    #[serde(rename="catvRating")]
     pub catv_rating: String,
     /// Rating system for Peru - Peru Rating System
-    #[serde(alias="pefilmRating")]
+    #[serde(rename="pefilmRating")]
     pub pefilm_rating: String,
     /// no description provided
-    #[serde(alias="djctqRatingReasons")]
+    #[serde(rename="djctqRatingReasons")]
     pub djctq_rating_reasons: Vec<String>,
     /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
-    #[serde(alias="incaaRating")]
+    #[serde(rename="incaaRating")]
     pub incaa_rating: String,
     /// Rating system for Israel - Israel Rating System
-    #[serde(alias="ilfilmRating")]
+    #[serde(rename="ilfilmRating")]
     pub ilfilm_rating: String,
     /// Rating system for Luxembourg - Commission de surveillance de la classification des films
-    #[serde(alias="cscfRating")]
+    #[serde(rename="cscfRating")]
     pub cscf_rating: String,
     /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry
-    #[serde(alias="fskRating")]
+    #[serde(rename="fskRating")]
     pub fsk_rating: String,
     /// Rating system in South Korea - Korea Media Rating Board
-    #[serde(alias="kmrbRating")]
+    #[serde(rename="kmrbRating")]
     pub kmrb_rating: String,
     /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification
-    #[serde(alias="djctqRating")]
+    #[serde(rename="djctqRating")]
     pub djctq_rating: String,
     /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration
-    #[serde(alias="fcoRating")]
+    #[serde(rename="fcoRating")]
     pub fco_rating: String,
     /// Rating system for Norway - Medietilsynet
-    #[serde(alias="medietilsynetRating")]
+    #[serde(rename="medietilsynetRating")]
     pub medietilsynet_rating: String,
     /// Rating system for Greece - Greece Rating System
-    #[serde(alias="grfilmRating")]
+    #[serde(rename="grfilmRating")]
     pub grfilm_rating: String,
     /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica
-    #[serde(alias="cccRating")]
+    #[serde(rename="cccRating")]
     pub ccc_rating: String,
     /// Rating system for Ireland - Raidi� Teilif�s �ireann
-    #[serde(alias="rteRating")]
+    #[serde(rename="rteRating")]
     pub rte_rating: String,
     /// Rating system in France - French Minister of Culture
-    #[serde(alias="fmocRating")]
+    #[serde(rename="fmocRating")]
     pub fmoc_rating: String,
     /// Rating system in Japan - Eiga Rinri Kanri Iinkai
-    #[serde(alias="eirinRating")]
+    #[serde(rename="eirinRating")]
     pub eirin_rating: String,
     /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos
-    #[serde(alias="cceRating")]
+    #[serde(rename="cceRating")]
     pub cce_rating: String,
     /// Rating system for Latvia - National Film Center of Latvia
-    #[serde(alias="nkclvRating")]
+    #[serde(rename="nkclvRating")]
     pub nkclv_rating: String,
     /// Rating system for South africa - Film & Publication Board
-    #[serde(alias="fpbRating")]
+    #[serde(rename="fpbRating")]
     pub fpb_rating: String,
     /// Rating system for Iceland - SMAIS
-    #[serde(alias="smaisRating")]
+    #[serde(rename="smaisRating")]
     pub smais_rating: String,
     /// Canadian Home Video Rating System
-    #[serde(alias="chvrsRating")]
+    #[serde(rename="chvrsRating")]
     pub chvrs_rating: String,
     /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni
-    #[serde(alias="agcomRating")]
+    #[serde(rename="agcomRating")]
     pub agcom_rating: String,
     /// Rating system for Colombia - MoC
-    #[serde(alias="mocRating")]
+    #[serde(rename="mocRating")]
     pub moc_rating: String,
     /// Rating system for Hungary - Rating Committee of the National Office of Film
-    #[serde(alias="rcnofRating")]
+    #[serde(rename="rcnofRating")]
     pub rcnof_rating: String,
     /// Rating system for Malaysia - Film Censorship Board of Malaysia
-    #[serde(alias="fcbmRating")]
+    #[serde(rename="fcbmRating")]
     pub fcbm_rating: String,
     /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media
-    #[serde(alias="kijkwijzerRating")]
+    #[serde(rename="kijkwijzerRating")]
     pub kijkwijzer_rating: String,
     /// Rating system for Singapore - Media Development Authority
-    #[serde(alias="mdaRating")]
+    #[serde(rename="mdaRating")]
     pub mda_rating: String,
     /// Rating system for Nigeria - National Film and Video Censors Board
-    #[serde(alias="nfvcbRating")]
+    #[serde(rename="nfvcbRating")]
     pub nfvcb_rating: String,
     /// Rating system for Venezuela - SiBCI
-    #[serde(alias="resorteviolenciaRating")]
+    #[serde(rename="resorteviolenciaRating")]
     pub resorteviolencia_rating: String,
     /// Rating system for France - Conseil sup�rieur de l?audiovisuel
-    #[serde(alias="csaRating")]
+    #[serde(rename="csaRating")]
     pub csa_rating: String,
     /// Rating system in New Zealand - Office of Film and Literature Classification
-    #[serde(alias="oflcRating")]
+    #[serde(rename="oflcRating")]
     pub oflc_rating: String,
     /// TV Parental Guidelines rating of the content.
-    #[serde(alias="tvpgRating")]
+    #[serde(rename="tvpgRating")]
     pub tvpg_rating: String,
     /// Rating system for Bulgaria - National Film Centre
-    #[serde(alias="nfrcRating")]
+    #[serde(rename="nfrcRating")]
     pub nfrc_rating: String,
     /// Rating system for Malta - Film Age-Classification Board
-    #[serde(alias="mccaaRating")]
+    #[serde(rename="mccaaRating")]
     pub mccaa_rating: String,
     /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography
-    #[serde(alias="rtcRating")]
+    #[serde(rename="rtcRating")]
     pub rtc_rating: String,
     /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo
-    #[serde(alias="mibacRating")]
+    #[serde(rename="mibacRating")]
     pub mibac_rating: String,
     /// British Board of Film Classification
-    #[serde(alias="bbfcRating")]
+    #[serde(rename="bbfcRating")]
     pub bbfc_rating: String,
     /// Rating system for Egypt - Egypt Rating System
-    #[serde(alias="egfilmRating")]
+    #[serde(rename="egfilmRating")]
     pub egfilm_rating: String,
     /// Rating system for Belgium - Belgium Rating System
-    #[serde(alias="cicfRating")]
+    #[serde(rename="cicfRating")]
     pub cicf_rating: String,
     /// Rating system for Poland - National Broadcasting Council
-    #[serde(alias="nbcplRating")]
+    #[serde(rename="nbcplRating")]
     pub nbcpl_rating: String,
     /// Rating system for Maldives - National Bureau of Classification
-    #[serde(alias="nbcRating")]
+    #[serde(rename="nbcRating")]
     pub nbc_rating: String,
     /// Motion Picture Association of America rating for the content.
-    #[serde(alias="mpaaRating")]
+    #[serde(rename="mpaaRating")]
     pub mpaa_rating: String,
     /// Rating system in Ireland - Irish Film Classification Office
-    #[serde(alias="ifcoRating")]
+    #[serde(rename="ifcoRating")]
     pub ifco_rating: String,
     /// Rating system in Australia - Australian Classification Board
-    #[serde(alias="acbRating")]
+    #[serde(rename="acbRating")]
     pub acb_rating: String,
     /// Rating system for Estonia - Estonia Rating System
-    #[serde(alias="eefilmRating")]
+    #[serde(rename="eefilmRating")]
     pub eefilm_rating: String,
     /// Rating system for Czech republic - Czech republic Rating System
-    #[serde(alias="czfilmRating")]
+    #[serde(rename="czfilmRating")]
     pub czfilm_rating: String,
     /// Rating system for Indonesia - Lembaga Sensor Film
-    #[serde(alias="lsfRating")]
+    #[serde(rename="lsfRating")]
     pub lsf_rating: String,
     /// Rating system in Russia
-    #[serde(alias="russiaRating")]
+    #[serde(rename="russiaRating")]
     pub russia_rating: String,
     /// Rating system for Kenya - Kenya Film Classification Board
-    #[serde(alias="kfcbRating")]
+    #[serde(rename="kfcbRating")]
     pub kfcb_rating: String,
     /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD
-    #[serde(alias="mtrcbRating")]
+    #[serde(rename="mtrcbRating")]
     pub mtrcb_rating: String,
     /// Rating system for Chile - Asociaci�n Nacional de Televisi�n
-    #[serde(alias="anatelRating")]
+    #[serde(rename="anatelRating")]
     pub anatel_rating: String,
     /// Rating system for Sweden - Statens medier�d (National Media Council)
-    #[serde(alias="smsaRating")]
+    #[serde(rename="smsaRating")]
     pub smsa_rating: String,
     /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA
-    #[serde(alias="cnaRating")]
+    #[serde(rename="cnaRating")]
     pub cna_rating: String,
     /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales
-    #[serde(alias="icaaRating")]
+    #[serde(rename="icaaRating")]
     pub icaa_rating: String,
     /// Rating system for Denmark - The Media Council for Children and Young People
-    #[serde(alias="mccypRating")]
+    #[serde(rename="mccypRating")]
     pub mccyp_rating: String,
     /// Rating system for Slovakia - Slovakia Rating System
-    #[serde(alias="skfilmRating")]
+    #[serde(rename="skfilmRating")]
     pub skfilm_rating: String,
     /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media
-    #[serde(alias="mekuRating")]
+    #[serde(rename="mekuRating")]
     pub meku_rating: String,
 }
 
@@ -2142,70 +2142,70 @@ impl Part for ContentRating {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).
-    #[serde(alias="bannerTvMediumImageUrl")]
+    #[serde(rename="bannerTvMediumImageUrl")]
     pub banner_tv_medium_image_url: String,
     /// The image map script for the large banner image.
-    #[serde(alias="largeBrandedBannerImageImapScript")]
+    #[serde(rename="largeBrandedBannerImageImapScript")]
     pub large_branded_banner_image_imap_script: LocalizedProperty,
     /// Banner image. Mobile size (640x175).
-    #[serde(alias="bannerMobileImageUrl")]
+    #[serde(rename="bannerMobileImageUrl")]
     pub banner_mobile_image_url: String,
     /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.
-    #[serde(alias="smallBrandedBannerImageUrl")]
+    #[serde(rename="smallBrandedBannerImageUrl")]
     pub small_branded_banner_image_url: LocalizedProperty,
     /// Banner image. Tablet size high resolution (2276x377).
-    #[serde(alias="bannerTabletHdImageUrl")]
+    #[serde(rename="bannerTabletHdImageUrl")]
     pub banner_tablet_hd_image_url: String,
     /// Banner image. Tablet size low resolution (1138x188).
-    #[serde(alias="bannerTabletLowImageUrl")]
+    #[serde(rename="bannerTabletLowImageUrl")]
     pub banner_tablet_low_image_url: String,
     /// Banner image. Mobile size medium/high resolution (960x263).
-    #[serde(alias="bannerMobileMediumHdImageUrl")]
+    #[serde(rename="bannerMobileMediumHdImageUrl")]
     pub banner_mobile_medium_hd_image_url: String,
     /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.
-    #[serde(alias="trackingImageUrl")]
+    #[serde(rename="trackingImageUrl")]
     pub tracking_image_url: String,
     /// Banner image. Mobile size high resolution (1440x395).
-    #[serde(alias="bannerMobileExtraHdImageUrl")]
+    #[serde(rename="bannerMobileExtraHdImageUrl")]
     pub banner_mobile_extra_hd_image_url: String,
     /// Banner image. Tablet size (1707x283).
-    #[serde(alias="bannerTabletImageUrl")]
+    #[serde(rename="bannerTabletImageUrl")]
     pub banner_tablet_image_url: String,
     /// Banner image. Mobile size low resolution (320x88).
-    #[serde(alias="bannerMobileLowImageUrl")]
+    #[serde(rename="bannerMobileLowImageUrl")]
     pub banner_mobile_low_image_url: String,
     /// Banner image. TV size extra high resolution (2120x1192).
-    #[serde(alias="bannerTvImageUrl")]
+    #[serde(rename="bannerTvImageUrl")]
     pub banner_tv_image_url: String,
     /// Banner image. TV size low resolution (854x480).
-    #[serde(alias="bannerTvLowImageUrl")]
+    #[serde(rename="bannerTvLowImageUrl")]
     pub banner_tv_low_image_url: String,
     /// Banner image. Tablet size extra high resolution (2560x424).
-    #[serde(alias="bannerTabletExtraHdImageUrl")]
+    #[serde(rename="bannerTabletExtraHdImageUrl")]
     pub banner_tablet_extra_hd_image_url: String,
     /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.
-    #[serde(alias="largeBrandedBannerImageUrl")]
+    #[serde(rename="largeBrandedBannerImageUrl")]
     pub large_branded_banner_image_url: LocalizedProperty,
     /// Banner image. TV size high resolution (1920x1080).
-    #[serde(alias="bannerTvHighImageUrl")]
+    #[serde(rename="bannerTvHighImageUrl")]
     pub banner_tv_high_image_url: String,
     /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.
-    #[serde(alias="backgroundImageUrl")]
+    #[serde(rename="backgroundImageUrl")]
     pub background_image_url: LocalizedProperty,
     /// The image map script for the small banner image.
-    #[serde(alias="smallBrandedBannerImageImapScript")]
+    #[serde(rename="smallBrandedBannerImageImapScript")]
     pub small_branded_banner_image_imap_script: LocalizedProperty,
     /// Banner image. Desktop size (1060x175).
-    #[serde(alias="bannerImageUrl")]
+    #[serde(rename="bannerImageUrl")]
     pub banner_image_url: String,
     /// Banner image. Mobile size high resolution (1280x360).
-    #[serde(alias="bannerMobileHdImageUrl")]
+    #[serde(rename="bannerMobileHdImageUrl")]
     pub banner_mobile_hd_image_url: String,
     /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.
-    #[serde(alias="bannerExternalUrl")]
+    #[serde(rename="bannerExternalUrl")]
     pub banner_external_url: String,
     /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.
-    #[serde(alias="watchIconImageUrl")]
+    #[serde(rename="watchIconImageUrl")]
     pub watch_icon_image_url: String,
 }
 
@@ -2219,34 +2219,34 @@ impl Part for ImageSettings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.
-    #[serde(alias="ctaType")]
+    #[serde(rename="ctaType")]
     pub cta_type: String,
     /// The URL the client should fetch to request a promoted item.
-    #[serde(alias="adTag")]
+    #[serde(rename="adTag")]
     pub ad_tag: String,
     /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.
-    #[serde(alias="destinationUrl")]
+    #[serde(rename="destinationUrl")]
     pub destination_url: String,
     /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.
-    #[serde(alias="forecastingUrl")]
+    #[serde(rename="forecastingUrl")]
     pub forecasting_url: Vec<String>,
     /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.
-    #[serde(alias="impressionUrl")]
+    #[serde(rename="impressionUrl")]
     pub impression_url: Vec<String>,
     /// The URL the client should ping to indicate that the user was shown this promoted item.
-    #[serde(alias="creativeViewUrl")]
+    #[serde(rename="creativeViewUrl")]
     pub creative_view_url: String,
     /// The ID that YouTube uses to uniquely identify the promoted video.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
     /// The text description to accompany the promoted item.
-    #[serde(alias="descriptionText")]
+    #[serde(rename="descriptionText")]
     pub description_text: String,
     /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.
-    #[serde(alias="customCtaButtonText")]
+    #[serde(rename="customCtaButtonText")]
     pub custom_cta_button_text: String,
     /// The URL the client should ping to indicate that the user clicked through on this promoted item.
-    #[serde(alias="clickTrackingUrl")]
+    #[serde(rename="clickTrackingUrl")]
     pub click_tracking_url: String,
 }
 
@@ -2260,7 +2260,7 @@ impl Part for ActivityContentDetailsPromotedItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsBulletin {
     /// The resourceId object contains information that identifies the resource associated with a bulletin post.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -2289,14 +2289,14 @@ impl Part for LocalizedString {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsAudioStream {
     /// The audio stream's bitrate, in bits per second.
-    #[serde(alias="bitrateBps")]
+    #[serde(rename="bitrateBps")]
     pub bitrate_bps: String,
     /// The audio codec that the stream uses.
     pub codec: String,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
     pub vendor: String,
     /// The number of audio channels that the stream contains.
-    #[serde(alias="channelCount")]
+    #[serde(rename="channelCount")]
     pub channel_count: u32,
 }
 
@@ -2310,17 +2310,17 @@ impl Part for VideoFileDetailsAudioStream {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngestionInfo {
     /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
-    #[serde(alias="backupIngestionAddress")]
+    #[serde(rename="backupIngestionAddress")]
     pub backup_ingestion_address: String,
     /// The HTTP or RTMP stream name that YouTube assigns to the video stream.
-    #[serde(alias="streamName")]
+    #[serde(rename="streamName")]
     pub stream_name: String,
     /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
     /// 
     /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
     /// 
     /// STREAM_URL/STREAM_NAME
-    #[serde(alias="ingestionAddress")]
+    #[serde(rename="ingestionAddress")]
     pub ingestion_address: String,
 }
 
@@ -2353,23 +2353,23 @@ impl Part for VideoCategory {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemSnippet {
     /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The item's description.
     pub description: String,
     /// The item's title.
     pub title: String,
     /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
     /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.
-    #[serde(alias="playlistId")]
+    #[serde(rename="playlistId")]
     pub playlist_id: String,
     /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// Channel title for the channel that the playlist item belongs to.
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
     /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
     pub position: u32,
@@ -2387,7 +2387,7 @@ impl Part for PlaylistItemSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsFavorite {
     /// The resourceId object contains information that identifies the resource that was marked as a favorite.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -2401,7 +2401,7 @@ impl Part for ActivityContentDetailsFavorite {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestionsTagSuggestion {
     /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
-    #[serde(alias="categoryRestricts")]
+    #[serde(rename="categoryRestricts")]
     pub category_restricts: Vec<String>,
     /// The keyword tag suggested for the video.
     pub tag: String,
@@ -2440,7 +2440,7 @@ impl ResponseResult for ChannelBannerResource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistContentDetails {
     /// The number of videos in the playlist.
-    #[serde(alias="itemCount")]
+    #[serde(rename="itemCount")]
     pub item_count: u32,
 }
 
@@ -2454,10 +2454,10 @@ impl Part for PlaylistContentDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageInfo {
     /// The number of results included in the API response.
-    #[serde(alias="resultsPerPage")]
+    #[serde(rename="resultsPerPage")]
     pub results_per_page: i32,
     /// The total number of results in the result set.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -2471,7 +2471,7 @@ impl Part for PageInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsLike {
     /// The resourceId object contains information that identifies the rated resource.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -2506,7 +2506,7 @@ pub struct Playlist {
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".
     pub kind: Option<String>,
     /// The contentDetails object contains information like video count.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<PlaylistContentDetails>,
     /// The snippet object contains basic details about the playlist, such as its title and description.
     pub snippet: Option<PlaylistSnippet>,
@@ -2555,28 +2555,28 @@ impl ToParts for Playlist {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of playlist items that match the request criteria.
     pub items: Vec<PlaylistItem>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -2605,13 +2605,13 @@ impl Part for PropertyValue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoTiming {
     /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
-    #[serde(alias="offsetMs")]
+    #[serde(rename="offsetMs")]
     pub offset_ms: String,
     /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.
-    #[serde(alias="durationMs")]
+    #[serde(rename="durationMs")]
     pub duration_ms: String,
 }
 
@@ -2654,7 +2654,7 @@ pub struct LiveStream {
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The content_details object contains information about the stream, including the closed captions ingestion URL.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<LiveStreamContentDetails>,
     /// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.
     pub cdn: Option<CdnSettings>,
@@ -2691,16 +2691,16 @@ impl ToParts for LiveStream {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSocial {
     /// The resourceId object encapsulates information that identifies the resource associated with a social network post.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
     /// An image of the post's author.
-    #[serde(alias="imageUrl")]
+    #[serde(rename="imageUrl")]
     pub image_url: String,
     /// The name of the social network.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The URL of the social network post.
-    #[serde(alias="referenceUrl")]
+    #[serde(rename="referenceUrl")]
     pub reference_url: String,
     /// The author of the social network post.
     pub author: String,
@@ -2720,19 +2720,19 @@ pub struct ActivitySnippet {
     /// The title of the resource primarily associated with the activity.
     pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel associated with the activity.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// Channel title for the channel responsible for this activity
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
     /// The type of activity that the resource describes.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.
-    #[serde(alias="groupId")]
+    #[serde(rename="groupId")]
     pub group_id: String,
     /// The description of the resource primarily associated with the activity.
     pub description: String,
@@ -2748,19 +2748,19 @@ impl Part for ActivitySnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatistics {
     /// The number of comments for the video.
-    #[serde(alias="commentCount")]
+    #[serde(rename="commentCount")]
     pub comment_count: i64,
     /// The number of times the video has been viewed.
-    #[serde(alias="viewCount")]
+    #[serde(rename="viewCount")]
     pub view_count: i64,
     /// The number of users who currently have the video marked as a favorite video.
-    #[serde(alias="favoriteCount")]
+    #[serde(rename="favoriteCount")]
     pub favorite_count: i64,
     /// The number of users who have indicated that they disliked the video by giving it a negative rating.
-    #[serde(alias="dislikeCount")]
+    #[serde(rename="dislikeCount")]
     pub dislike_count: i64,
     /// The number of users who have indicated that they liked the video by giving it a positive rating.
-    #[serde(alias="likeCount")]
+    #[serde(rename="likeCount")]
     pub like_count: i64,
 }
 
@@ -2791,10 +2791,10 @@ pub struct PromotedItem {
     /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.
     pub timing: InvideoTiming,
     /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.
-    #[serde(alias="promotedByContentOwner")]
+    #[serde(rename="promotedByContentOwner")]
     pub promoted_by_content_owner: bool,
     /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.
-    #[serde(alias="customMessage")]
+    #[serde(rename="customMessage")]
     pub custom_message: String,
     /// Identifies the promoted item.
     pub id: PromotedItemId,
@@ -2834,17 +2834,17 @@ impl Part for ChannelBrandingSettings {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InvideoBranding {
     /// no description provided
-    #[serde(alias="targetChannelId")]
+    #[serde(rename="targetChannelId")]
     pub target_channel_id: Option<String>,
     /// no description provided
     pub position: Option<InvideoPosition>,
     /// no description provided
-    #[serde(alias="imageUrl")]
+    #[serde(rename="imageUrl")]
     pub image_url: Option<String>,
     /// no description provided
     pub timing: Option<InvideoTiming>,
     /// no description provided
-    #[serde(alias="imageBytes")]
+    #[serde(rename="imageBytes")]
     pub image_bytes: Option<String>,
 }
 
@@ -2858,7 +2858,7 @@ impl RequestValue for InvideoBranding {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemStatus {
     /// This resource's privacy status.
-    #[serde(alias="privacyStatus")]
+    #[serde(rename="privacyStatus")]
     pub privacy_status: String,
 }
 
@@ -2877,28 +2877,28 @@ impl Part for PlaylistItemStatus {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.
     pub items: Vec<GuideCategory>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -2920,13 +2920,13 @@ pub struct ChannelSectionSnippet {
     /// The position of the channel section in the channel.
     pub position: u32,
     /// The ID that YouTube uses to uniquely identify the channel that published the channel section.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The type of the channel section.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The language of the channel section's default title and description.
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
 }
 
@@ -2940,10 +2940,10 @@ impl Part for ChannelSectionSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetails {
     /// no description provided
-    #[serde(alias="relatedPlaylists")]
+    #[serde(rename="relatedPlaylists")]
     pub related_playlists: ChannelContentDetailsRelatedPlaylists,
     /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
-    #[serde(alias="googlePlusUserId")]
+    #[serde(rename="googlePlusUserId")]
     pub google_plus_user_id: String,
 }
 
@@ -2982,12 +2982,12 @@ impl Part for AccessPolicy {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsRecommendation {
     /// The resourceId object contains information that identifies the recommended resource.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
     /// The reason that the resource is recommended to the user.
     pub reason: String,
     /// The seedResourceId object contains information about the resource that caused the recommendation.
-    #[serde(alias="seedResourceId")]
+    #[serde(rename="seedResourceId")]
     pub seed_resource_id: ResourceId,
 }
 
@@ -3003,12 +3003,12 @@ pub struct ActivityContentDetails {
     /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
     pub comment: ActivityContentDetailsComment,
     /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
-    #[serde(alias="playlistItem")]
+    #[serde(rename="playlistItem")]
     pub playlist_item: ActivityContentDetailsPlaylistItem,
     /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
     pub like: ActivityContentDetailsLike,
     /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
-    #[serde(alias="promotedItem")]
+    #[serde(rename="promotedItem")]
     pub promoted_item: ActivityContentDetailsPromotedItem,
     /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
     pub recommendation: ActivityContentDetailsRecommendation,
@@ -3019,7 +3019,7 @@ pub struct ActivityContentDetails {
     /// The social object contains details about a social network post. This property is only present if the snippet.type is social.
     pub social: ActivityContentDetailsSocial,
     /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
-    #[serde(alias="channelItem")]
+    #[serde(rename="channelItem")]
     pub channel_item: ActivityContentDetailsChannelItem,
     /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
     pub bulletin: ActivityContentDetailsBulletin,
@@ -3075,10 +3075,10 @@ impl ToParts for I18nRegion {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentOwnerDetails {
     /// The ID of the content owner linked to the channel.
-    #[serde(alias="contentOwner")]
+    #[serde(rename="contentOwner")]
     pub content_owner: String,
     /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="timeLinked")]
+    #[serde(rename="timeLinked")]
     pub time_linked: String,
 }
 
@@ -3092,16 +3092,16 @@ impl Part for ChannelContentOwnerDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastStatus {
     /// The broadcast's recording status.
-    #[serde(alias="recordingStatus")]
+    #[serde(rename="recordingStatus")]
     pub recording_status: String,
     /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
-    #[serde(alias="privacyStatus")]
+    #[serde(rename="privacyStatus")]
     pub privacy_status: String,
     /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
-    #[serde(alias="lifeCycleStatus")]
+    #[serde(rename="lifeCycleStatus")]
     pub life_cycle_status: String,
     /// Priority of the live broadcast event (internal state).
-    #[serde(alias="liveBroadcastPriority")]
+    #[serde(rename="liveBroadcastPriority")]
     pub live_broadcast_priority: String,
 }
 
@@ -3134,10 +3134,10 @@ pub struct VideoAgeGating {
     /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.
     pub restricted: bool,
     /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.
-    #[serde(alias="alcoholContent")]
+    #[serde(rename="alcoholContent")]
     pub alcohol_content: bool,
     /// Video game rating, if any.
-    #[serde(alias="videoGameRating")]
+    #[serde(rename="videoGameRating")]
     pub video_game_rating: String,
 }
 
@@ -3151,7 +3151,7 @@ impl Part for VideoAgeGating {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.
-    #[serde(alias="embedHtml")]
+    #[serde(rename="embedHtml")]
     pub embed_html: String,
 }
 
@@ -3165,7 +3165,7 @@ impl Part for VideoPlayer {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// The description of the channel.
     pub description: String,
@@ -3174,7 +3174,7 @@ pub struct ChannelSnippet {
     /// Localized title and description, read-only.
     pub localized: ChannelLocalization,
     /// The language of the channel's default title and description.
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: String,
     /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
@@ -3190,13 +3190,13 @@ impl Part for ChannelSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WatchSettings {
     /// The background color for the video watch page's branded area.
-    #[serde(alias="textColor")]
+    #[serde(rename="textColor")]
     pub text_color: String,
     /// An ID that uniquely identifies a playlist that displays next to the video player.
-    #[serde(alias="featuredPlaylistId")]
+    #[serde(rename="featuredPlaylistId")]
     pub featured_playlist_id: String,
     /// The text color for the video watch page's branded area.
-    #[serde(alias="backgroundColor")]
+    #[serde(rename="backgroundColor")]
     pub background_color: String,
 }
 
@@ -3222,18 +3222,18 @@ pub struct Video {
     /// The status object contains information about the video's uploading, processing, and privacy statuses.
     pub status: Option<VideoStatus>,
     /// The topicDetails object encapsulates information about Freebase topics associated with the video.
-    #[serde(alias="topicDetails")]
+    #[serde(rename="topicDetails")]
     pub topic_details: Option<VideoTopicDetails>,
     /// The monetizationDetails object encapsulates information about the monetization status of the video.
-    #[serde(alias="monetizationDetails")]
+    #[serde(rename="monetizationDetails")]
     pub monetization_details: Option<VideoMonetizationDetails>,
     /// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.
     pub suggestions: Option<VideoSuggestions>,
     /// Age restriction details related to a video.
-    #[serde(alias="ageGating")]
+    #[serde(rename="ageGating")]
     pub age_gating: Option<VideoAgeGating>,
     /// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.
-    #[serde(alias="fileDetails")]
+    #[serde(rename="fileDetails")]
     pub file_details: Option<VideoFileDetails>,
     /// The player object contains information that you would use to play the video in an embedded player.
     pub player: Option<VideoPlayer>,
@@ -3242,7 +3242,7 @@ pub struct Video {
     /// List with all localizations.
     pub localizations: Option<HashMap<String, VideoLocalization>>,
     /// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.
-    #[serde(alias="liveStreamingDetails")]
+    #[serde(rename="liveStreamingDetails")]
     pub live_streaming_details: Option<VideoLiveStreamingDetails>,
     /// The snippet object contains basic details about the video, such as its title, description, and category.
     pub snippet: Option<VideoSnippet>,
@@ -3251,23 +3251,23 @@ pub struct Video {
     /// The statistics object contains statistics about the video.
     pub statistics: Option<VideoStatistics>,
     /// The projectDetails object contains information about the project specific video metadata.
-    #[serde(alias="projectDetails")]
+    #[serde(rename="projectDetails")]
     pub project_details: Option<VideoProjectDetails>,
     /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.
-    #[serde(alias="conversionPings")]
+    #[serde(rename="conversionPings")]
     pub conversion_pings: Option<VideoConversionPings>,
     /// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
     /// 
     /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
-    #[serde(alias="processingDetails")]
+    #[serde(rename="processingDetails")]
     pub processing_details: Option<VideoProcessingDetails>,
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<VideoContentDetails>,
     /// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.
-    #[serde(alias="recordingDetails")]
+    #[serde(rename="recordingDetails")]
     pub recording_details: Option<VideoRecordingDetails>,
 }
 
@@ -3314,20 +3314,20 @@ pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.
     pub definition: String,
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
-    #[serde(alias="countryRestriction")]
+    #[serde(rename="countryRestriction")]
     pub country_restriction: AccessPolicy,
     /// Specifies the ratings that the video received under various rating schemes.
-    #[serde(alias="contentRating")]
+    #[serde(rename="contentRating")]
     pub content_rating: ContentRating,
     /// The value of captions indicates whether the video has captions or not.
     pub caption: String,
     /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.
-    #[serde(alias="regionRestriction")]
+    #[serde(rename="regionRestriction")]
     pub region_restriction: VideoContentDetailsRegionRestriction,
     /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.
     pub duration: String,
     /// The value of is_license_content indicates whether the video is licensed content.
-    #[serde(alias="licensedContent")]
+    #[serde(rename="licensedContent")]
     pub licensed_content: bool,
     /// The value of dimension indicates whether the video is available in 3D or in 2D.
     pub dimension: String,
@@ -3343,16 +3343,16 @@ impl Part for VideoContentDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItemId {
     /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: String,
     /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.
-    #[serde(alias="recentlyUploadedBy")]
+    #[serde(rename="recentlyUploadedBy")]
     pub recently_uploaded_by: String,
     /// Describes the type of the promoted item.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
 }
 
@@ -3366,36 +3366,36 @@ impl Part for PromotedItemId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetails {
     /// The uploaded video file's combined (video and audio) bitrate in bits per second.
-    #[serde(alias="bitrateBps")]
+    #[serde(rename="bitrateBps")]
     pub bitrate_bps: String,
     /// The uploaded video file's container format.
     pub container: String,
     /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
-    #[serde(alias="recordingLocation")]
+    #[serde(rename="recordingLocation")]
     pub recording_location: GeoPoint,
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
-    #[serde(alias="fileType")]
+    #[serde(rename="fileType")]
     pub file_type: String,
     /// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
     /// - Date only: YYYY-MM-DD 
     /// - Naive time: YYYY-MM-DDTHH:MM:SS 
     /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: String,
     /// The length of the uploaded video in milliseconds.
-    #[serde(alias="durationMs")]
+    #[serde(rename="durationMs")]
     pub duration_ms: String,
     /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.
-    #[serde(alias="fileName")]
+    #[serde(rename="fileName")]
     pub file_name: String,
     /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: String,
     /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
-    #[serde(alias="videoStreams")]
+    #[serde(rename="videoStreams")]
     pub video_streams: Vec<VideoFileDetailsVideoStream>,
     /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.
-    #[serde(alias="audioStreams")]
+    #[serde(rename="audioStreams")]
     pub audio_streams: Vec<VideoFileDetailsAudioStream>,
 }
 
@@ -3409,10 +3409,10 @@ impl Part for VideoFileDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.
-    #[serde(alias="cornerPosition")]
+    #[serde(rename="cornerPosition")]
     pub corner_position: String,
     /// Defines the position type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -3443,22 +3443,22 @@ pub struct VideoStatus {
     /// This value indicates if the video can be embedded on another website.
     pub embeddable: bool,
     /// The video's privacy status.
-    #[serde(alias="privacyStatus")]
+    #[serde(rename="privacyStatus")]
     pub privacy_status: String,
     /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishAt")]
+    #[serde(rename="publishAt")]
     pub publish_at: String,
     /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.
-    #[serde(alias="publicStatsViewable")]
+    #[serde(rename="publicStatsViewable")]
     pub public_stats_viewable: bool,
     /// The status of the uploaded video.
-    #[serde(alias="uploadStatus")]
+    #[serde(rename="uploadStatus")]
     pub upload_status: String,
     /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
-    #[serde(alias="rejectionReason")]
+    #[serde(rename="rejectionReason")]
     pub rejection_reason: String,
     /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
-    #[serde(alias="failureReason")]
+    #[serde(rename="failureReason")]
     pub failure_reason: String,
 }
 
@@ -3487,7 +3487,7 @@ impl Part for VideoLocalization {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSubscription {
     /// The resourceId object contains information that identifies the resource that the user subscribed to.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: ResourceId,
 }
 
@@ -3520,7 +3520,7 @@ pub struct LiveBroadcast {
     /// Etag of this resource.
     pub etag: Option<String>,
     /// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<LiveBroadcastContentDetails>,
     /// The ID that YouTube assigns to uniquely identify the broadcast.
     pub id: Option<String>,
@@ -3554,19 +3554,19 @@ impl ToParts for LiveBroadcast {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatistics {
     /// The number of comments for the channel.
-    #[serde(alias="commentCount")]
+    #[serde(rename="commentCount")]
     pub comment_count: i64,
     /// The number of subscribers that the channel has.
-    #[serde(alias="subscriberCount")]
+    #[serde(rename="subscriberCount")]
     pub subscriber_count: i64,
     /// The number of videos uploaded to the channel.
-    #[serde(alias="videoCount")]
+    #[serde(rename="videoCount")]
     pub video_count: i64,
     /// Whether or not the number of subscribers is shown for this user.
-    #[serde(alias="hiddenSubscriberCount")]
+    #[serde(rename="hiddenSubscriberCount")]
     pub hidden_subscriber_count: bool,
     /// The number of times the channel has been viewed.
-    #[serde(alias="viewCount")]
+    #[serde(rename="viewCount")]
     pub view_count: i64,
 }
 
@@ -3582,13 +3582,13 @@ pub struct ResourceId {
     /// The type of the API resource.
     pub kind: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.
-    #[serde(alias="playlistId")]
+    #[serde(rename="playlistId")]
     pub playlist_id: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
 }
 
@@ -3602,7 +3602,7 @@ impl Part for ResourceId {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsUpload {
     /// The ID that YouTube uses to uniquely identify the uploaded video.
-    #[serde(alias="videoId")]
+    #[serde(rename="videoId")]
     pub video_id: String,
 }
 
@@ -3621,28 +3621,28 @@ impl Part for ActivityContentDetailsUpload {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of activities, or events, that match the request criteria.
     pub items: Vec<Activity>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -3656,7 +3656,7 @@ impl ResponseResult for ActivityListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistPlayer {
     /// An <iframe> tag that embeds a player that will play the playlist.
-    #[serde(alias="embedHtml")]
+    #[serde(rename="embedHtml")]
     pub embed_html: String,
 }
 
@@ -3670,7 +3670,7 @@ impl Part for PlaylistPlayer {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelTopicDetails {
     /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
-    #[serde(alias="topicIds")]
+    #[serde(rename="topicIds")]
     pub topic_ids: Vec<String>,
 }
 
@@ -3684,10 +3684,10 @@ impl Part for ChannelTopicDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoRecordingDetails {
     /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
-    #[serde(alias="recordingDate")]
+    #[serde(rename="recordingDate")]
     pub recording_date: String,
     /// The text description of the location where the video was recorded.
-    #[serde(alias="locationDescription")]
+    #[serde(rename="locationDescription")]
     pub location_description: String,
     /// The geolocation information associated with the video.
     pub location: GeoPoint,
@@ -3703,7 +3703,7 @@ impl Part for VideoRecordingDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistStatus {
     /// The playlist's privacy status.
-    #[serde(alias="privacyStatus")]
+    #[serde(rename="privacyStatus")]
     pub privacy_status: String,
 }
 
@@ -3717,17 +3717,17 @@ impl Part for PlaylistStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitorStreamInfo {
     /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
-    #[serde(alias="broadcastStreamDelayMs")]
+    #[serde(rename="broadcastStreamDelayMs")]
     pub broadcast_stream_delay_ms: u32,
     /// HTML code that embeds a player that plays the monitor stream.
-    #[serde(alias="embedHtml")]
+    #[serde(rename="embedHtml")]
     pub embed_html: String,
     /// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
     /// 
     /// You need to set this value to true if you intend to have a broadcast delay for your event.
     /// 
     /// Note: This property cannot be updated once the broadcast is in the testing or live state.
-    #[serde(alias="enableMonitorStream")]
+    #[serde(rename="enableMonitorStream")]
     pub enable_monitor_stream: bool,
 }
 
@@ -3741,19 +3741,19 @@ impl Part for MonitorStreamInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLiveStreamingDetails {
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
-    #[serde(alias="concurrentViewers")]
+    #[serde(rename="concurrentViewers")]
     pub concurrent_viewers: String,
     /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="scheduledStartTime")]
+    #[serde(rename="scheduledStartTime")]
     pub scheduled_start_time: String,
     /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.
-    #[serde(alias="scheduledEndTime")]
+    #[serde(rename="scheduledEndTime")]
     pub scheduled_end_time: String,
     /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.
-    #[serde(alias="actualStartTime")]
+    #[serde(rename="actualStartTime")]
     pub actual_start_time: String,
     /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.
-    #[serde(alias="actualEndTime")]
+    #[serde(rename="actualEndTime")]
     pub actual_end_time: String,
 }
 
@@ -3767,10 +3767,10 @@ impl Part for VideoLiveStreamingDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoTopicDetails {
     /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
-    #[serde(alias="topicIds")]
+    #[serde(rename="topicIds")]
     pub topic_ids: Vec<String>,
     /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.
-    #[serde(alias="relevantTopicIds")]
+    #[serde(rename="relevantTopicIds")]
     pub relevant_topic_ids: Vec<String>,
 }
 
@@ -3835,7 +3835,7 @@ pub struct Activity {
     /// The snippet object contains basic details about the activity, including the activity's type and group ID.
     pub snippet: Option<ActivitySnippet>,
     /// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.
-    #[serde(alias="contentDetails")]
+    #[serde(rename="contentDetails")]
     pub content_details: Option<ActivityContentDetails>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".
     pub kind: Option<String>,
@@ -3871,7 +3871,7 @@ impl ToParts for Activity {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSubscriberSnippet {
     /// The channel ID of the subscriber.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The description of the subscriber.
     pub description: String,
@@ -3957,26 +3957,26 @@ impl ToParts for I18nLanguage {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="actualEndTime")]
+    #[serde(rename="actualEndTime")]
     pub actual_end_time: String,
     /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.
     pub description: String,
     /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.
     pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="scheduledStartTime")]
+    #[serde(rename="scheduledStartTime")]
     pub scheduled_start_time: String,
     /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="actualStartTime")]
+    #[serde(rename="actualStartTime")]
     pub actual_start_time: String,
     /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="scheduledEndTime")]
+    #[serde(rename="scheduledEndTime")]
     pub scheduled_end_time: String,
     /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
@@ -3992,36 +3992,36 @@ impl Part for LiveBroadcastSnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
-    #[serde(alias="startWithSlate")]
+    #[serde(rename="startWithSlate")]
     pub start_with_slate: bool,
     /// This value uniquely identifies the live stream bound to the broadcast.
-    #[serde(alias="boundStreamId")]
+    #[serde(rename="boundStreamId")]
     pub bound_stream_id: String,
     /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
-    #[serde(alias="enableEmbed")]
+    #[serde(rename="enableEmbed")]
     pub enable_embed: bool,
     /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.
-    #[serde(alias="enableClosedCaptions")]
+    #[serde(rename="enableClosedCaptions")]
     pub enable_closed_captions: bool,
     /// This setting indicates whether YouTube should enable content encryption for the broadcast.
-    #[serde(alias="enableContentEncryption")]
+    #[serde(rename="enableContentEncryption")]
     pub enable_content_encryption: bool,
     /// Automatically start recording after the event goes live. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
-    #[serde(alias="recordFromStart")]
+    #[serde(rename="recordFromStart")]
     pub record_from_start: bool,
     /// This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
-    #[serde(alias="enableDvr")]
+    #[serde(rename="enableDvr")]
     pub enable_dvr: bool,
     /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
-    #[serde(alias="monitorStream")]
+    #[serde(rename="monitorStream")]
     pub monitor_stream: MonitorStreamInfo,
 }
 
@@ -4037,7 +4037,7 @@ pub struct VideoConversionPing {
     /// Defines the context of the ping.
     pub context: String,
     /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
-    #[serde(alias="conversionUrl")]
+    #[serde(rename="conversionUrl")]
     pub conversion_url: String,
 }
 
@@ -4053,7 +4053,7 @@ pub struct VideoCategorySnippet {
     /// no description provided
     pub assignable: bool,
     /// The YouTube channel that created the video category.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The video category's title.
     pub title: String,
@@ -4074,28 +4074,28 @@ impl Part for VideoCategorySnippet {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.
-    #[serde(alias="eventId")]
+    #[serde(rename="eventId")]
     pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".
     pub kind: String,
     /// The visitorId identifies the visitor.
-    #[serde(alias="visitorId")]
+    #[serde(rename="visitorId")]
     pub visitor_id: String,
     /// A list of results that match the search criteria.
     pub items: Vec<SearchResult>,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// Etag of this resource.
     pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-    #[serde(alias="prevPageToken")]
+    #[serde(rename="prevPageToken")]
     pub prev_page_token: String,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
 }
 
@@ -4109,19 +4109,19 @@ impl ResponseResult for SearchListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestions {
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
-    #[serde(alias="processingErrors")]
+    #[serde(rename="processingErrors")]
     pub processing_errors: Vec<String>,
     /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
-    #[serde(alias="tagSuggestions")]
+    #[serde(rename="tagSuggestions")]
     pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
     /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
-    #[serde(alias="editorSuggestions")]
+    #[serde(rename="editorSuggestions")]
     pub editor_suggestions: Vec<String>,
     /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
-    #[serde(alias="processingWarnings")]
+    #[serde(rename="processingWarnings")]
     pub processing_warnings: Vec<String>,
     /// A list of suggestions that may improve YouTube's ability to process the video.
-    #[serde(alias="processingHints")]
+    #[serde(rename="processingHints")]
     pub processing_hints: Vec<String>,
 }
 
@@ -4135,7 +4135,7 @@ impl Part for VideoSuggestions {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
-    #[serde(alias="liveBroadcastContent")]
+    #[serde(rename="liveBroadcastContent")]
     pub live_broadcast_content: String,
     /// A description of the search result.
     pub description: String,
@@ -4144,13 +4144,13 @@ pub struct SearchResultSnippet {
     /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
     /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.
-    #[serde(alias="channelId")]
+    #[serde(rename="channelId")]
     pub channel_id: String,
     /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-    #[serde(alias="publishedAt")]
+    #[serde(rename="publishedAt")]
     pub published_at: String,
     /// The title of the channel that published the resource that the search result identifies.
-    #[serde(alias="channelTitle")]
+    #[serde(rename="channelTitle")]
     pub channel_title: String,
 }
 

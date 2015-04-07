@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *translate* crate version *0.1.3+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *translate* crate version *0.1.4+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *translate* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/translate/v2/using_rest).
@@ -278,7 +278,7 @@ impl<'a, C, NC, A> Translate<C, NC, A>
         Translate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -294,7 +294,7 @@ impl<'a, C, NC, A> Translate<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -353,7 +353,7 @@ impl ResponseResult for LanguagesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DetectionsResource {
     /// A boolean to indicate is the language detection result reliable.
-    #[serde(alias="isReliable")]
+    #[serde(rename="isReliable")]
     pub is_reliable: bool,
     /// The confidence of the detection resul of this language.
     pub confidence: f32,
@@ -371,10 +371,10 @@ impl Part for DetectionsResource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TranslationsResource {
     /// Detected source language if source parameter is unspecified.
-    #[serde(alias="detectedSourceLanguage")]
+    #[serde(rename="detectedSourceLanguage")]
     pub detected_source_language: String,
     /// The translation.
-    #[serde(alias="translatedText")]
+    #[serde(rename="translatedText")]
     pub translated_text: String,
 }
 
@@ -403,7 +403,7 @@ impl Part for LanguagesResource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DetectionsResourceNested {
     /// A boolean to indicate is the language detection result reliable.
-    #[serde(alias="isReliable")]
+    #[serde(rename="isReliable")]
     pub is_reliable: bool,
     /// The confidence of the detection resul of this language.
     pub confidence: f32,

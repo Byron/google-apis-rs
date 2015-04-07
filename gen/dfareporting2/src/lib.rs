@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *dfareporting:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *dfareporting* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *dfareporting:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *dfareporting* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/reporting/).
@@ -422,7 +422,7 @@ impl<'a, C, NC, A> Dfareporting<C, NC, A>
         Dfareporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -573,7 +573,7 @@ impl<'a, C, NC, A> Dfareporting<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -601,7 +601,7 @@ pub struct OperatingSystemsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#operatingSystemsListResponse".
     pub kind: String,
     /// Operating system collection.
-    #[serde(alias="operatingSystems")]
+    #[serde(rename="operatingSystems")]
     pub operating_systems: Vec<OperatingSystem>,
 }
 
@@ -615,21 +615,21 @@ impl ResponseResult for OperatingSystemsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectorySiteSettings {
     /// Whether this site accepts interstitial ads.
-    #[serde(alias="interstitialPlacementAccepted")]
+    #[serde(rename="interstitialPlacementAccepted")]
     pub interstitial_placement_accepted: bool,
     /// Whether this directory site has disabled Nielsen OCR reach ratings.
-    #[serde(alias="nielsenOcrOptOut")]
+    #[serde(rename="nielsenOcrOptOut")]
     pub nielsen_ocr_opt_out: bool,
     /// Whether this directory site has disabled active view creatives.
-    #[serde(alias="activeViewOptOut")]
+    #[serde(rename="activeViewOptOut")]
     pub active_view_opt_out: bool,
     /// Whether this directory site has disabled active view for in-stream video creatives.
-    #[serde(alias="videoActiveViewOptOut")]
+    #[serde(rename="videoActiveViewOptOut")]
     pub video_active_view_opt_out: bool,
     /// Directory site DFP settings.
     pub dfp_settings: DfpSettings,
     /// Whether this directory site has disabled generation of Verification ins tags.
-    #[serde(alias="verificationTagOptOut")]
+    #[serde(rename="verificationTagOptOut")]
     pub verification_tag_opt_out: bool,
     /// Whether this site accepts in-stream video ads.
     pub instream_video_placement_accepted: bool,
@@ -652,12 +652,12 @@ pub struct MobileCarrier {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#mobileCarrier".
     pub kind: Option<String>,
     /// DART ID of the country to which this mobile carrier belongs.
-    #[serde(alias="countryDartId")]
+    #[serde(rename="countryDartId")]
     pub country_dart_id: Option<String>,
     /// ID of this mobile carrier.
     pub id: Option<String>,
     /// Country code of the country to which this mobile carrier belongs.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: Option<String>,
     /// Name of this mobile carrier.
     pub name: Option<String>,
@@ -684,10 +684,10 @@ pub struct Subaccount {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#subaccount".
     pub kind: Option<String>,
     /// ID of the account that contains this subaccount. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// IDs of the available user role permissions for this subaccount.
-    #[serde(alias="availablePermissionIds")]
+    #[serde(rename="availablePermissionIds")]
     pub available_permission_ids: Option<Vec<String>>,
     /// ID of this subaccount. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -736,7 +736,7 @@ impl ResponseResult for AccountPermissionGroup {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DimensionValueList {
     /// Continuation token used to page through dimension values. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The dimension values returned in this response.
     pub items: Vec<DimensionValue>,
@@ -761,10 +761,10 @@ impl ResponseResult for DimensionValueList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CampaignCreativeAssociationsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Campaign creative association collection
-    #[serde(alias="campaignCreativeAssociations")]
+    #[serde(rename="campaignCreativeAssociations")]
     pub campaign_creative_associations: Vec<CampaignCreativeAssociation>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#campaignCreativeAssociationsListResponse".
     pub kind: String,
@@ -785,12 +785,12 @@ impl ResponseResult for CampaignCreativeAssociationsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FloodlightActivitiesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivitiesListResponse".
     pub kind: String,
     /// Floodlight activity collection.
-    #[serde(alias="floodlightActivities")]
+    #[serde(rename="floodlightActivities")]
     pub floodlight_activities: Vec<FloodlightActivity>,
 }
 
@@ -809,7 +809,7 @@ impl ResponseResult for FloodlightActivitiesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserRolePermissionGroupsListResponse {
     /// User role permission group collection.
-    #[serde(alias="userRolePermissionGroups")]
+    #[serde(rename="userRolePermissionGroups")]
     pub user_role_permission_groups: Vec<UserRolePermissionGroup>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRolePermissionGroupsListResponse".
     pub kind: String,
@@ -831,7 +831,7 @@ impl ResponseResult for UserRolePermissionGroupsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FileList {
     /// Continuation token used to page through files. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The files returned in this response.
     pub items: Vec<File>,
@@ -853,7 +853,7 @@ pub struct CustomRichMediaEvents {
     /// The kind of resource this is, in this case dfareporting#customRichMediaEvents.
     pub kind: String,
     /// List of custom rich media event IDs. Dimension values must be all of type dfa:richMediaEventTypeIdAndName.
-    #[serde(alias="filteredEventIds")]
+    #[serde(rename="filteredEventIds")]
     pub filtered_event_ids: Vec<DimensionValue>,
 }
 
@@ -887,18 +887,18 @@ impl Part for EventTagOverride {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountActiveAdSummary {
     /// Ads that can be activated for the account.
-    #[serde(alias="availableAds")]
+    #[serde(rename="availableAds")]
     pub available_ads: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountActiveAdSummary".
     pub kind: String,
     /// ID of the account.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// Ads that have been activated for the account
-    #[serde(alias="activeAds")]
+    #[serde(rename="activeAds")]
     pub active_ads: String,
     /// Maximum number of active ads allowed for the account.
-    #[serde(alias="activeAdsLimitTier")]
+    #[serde(rename="activeAdsLimitTier")]
     pub active_ads_limit_tier: String,
 }
 
@@ -912,10 +912,10 @@ impl ResponseResult for AccountActiveAdSummary {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookbackConfiguration {
     /// Lookback window, in days, from the last time a given user clicked on one of your ads. If you enter 0, clicks will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used.
-    #[serde(alias="clickDuration")]
+    #[serde(rename="clickDuration")]
     pub click_duration: i32,
     /// Lookback window, in days, from the last time a given user viewed one of your ads. If you enter 0, impressions will not be considered as triggering events for floodlight tracking. If you leave this field blank, the default value for your account will be used.
-    #[serde(alias="postImpressionActivitiesDuration")]
+    #[serde(rename="postImpressionActivitiesDuration")]
     pub post_impression_activities_duration: i32,
 }
 
@@ -936,7 +936,7 @@ pub struct FloodlightActivitiesGenerateTagResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivitiesGenerateTagResponse".
     pub kind: String,
     /// Generated tag for this floodlight activity.
-    #[serde(alias="floodlightActivityTag")]
+    #[serde(rename="floodlightActivityTag")]
     pub floodlight_activity_tag: String,
 }
 
@@ -950,22 +950,22 @@ impl ResponseResult for FloodlightActivitiesGenerateTagResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteSettings {
     /// Whether brand safe ads are disabled for this site.
-    #[serde(alias="disableBrandSafeAds")]
+    #[serde(rename="disableBrandSafeAds")]
     pub disable_brand_safe_ads: bool,
     /// Site-wide creative settings.
-    #[serde(alias="creativeSettings")]
+    #[serde(rename="creativeSettings")]
     pub creative_settings: CreativeSettings,
     /// Whether active view creatives are disabled for this site.
-    #[serde(alias="activeViewOptOut")]
+    #[serde(rename="activeViewOptOut")]
     pub active_view_opt_out: bool,
     /// Lookback window settings for this site.
-    #[serde(alias="lookbackConfiguration")]
+    #[serde(rename="lookbackConfiguration")]
     pub lookback_configuration: LookbackConfiguration,
     /// Whether new cookies are disabled for this site.
-    #[serde(alias="disableNewCookie")]
+    #[serde(rename="disableNewCookie")]
     pub disable_new_cookie: bool,
     /// Configuration settings for dynamic and image floodlight tags.
-    #[serde(alias="tagSetting")]
+    #[serde(rename="tagSetting")]
     pub tag_setting: TagSetting,
 }
 
@@ -1006,41 +1006,41 @@ pub struct AccountUserProfile {
     /// - "zh-TW" (Chinese Traditional)
     pub locale: Option<String>,
     /// Filter that describes which sites are visible to the user profile.
-    #[serde(alias="siteFilter")]
+    #[serde(rename="siteFilter")]
     pub site_filter: Option<ObjectFilter>,
     /// Filter that describes which campaigns are visible to the user profile.
-    #[serde(alias="campaignFilter")]
+    #[serde(rename="campaignFilter")]
     pub campaign_filter: Option<ObjectFilter>,
     /// User role ID of the user profile. This is a required field.
-    #[serde(alias="userRoleId")]
+    #[serde(rename="userRoleId")]
     pub user_role_id: Option<String>,
     /// User type of the user profile. This is a read-only field that can be left blank.
-    #[serde(alias="userAccessType")]
+    #[serde(rename="userAccessType")]
     pub user_access_type: Option<String>,
     /// Whether this user profile is active. This defaults to false, and must be set true on insert for the user profile to be usable.
     pub active: Option<bool>,
     /// ID of the user profile. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of the user profile. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountUserProfile".
     pub kind: Option<String>,
     /// Subaccount ID of the user profile. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Filter that describes which user roles are visible to the user profile.
-    #[serde(alias="userRoleFilter")]
+    #[serde(rename="userRoleFilter")]
     pub user_role_filter: Option<ObjectFilter>,
     /// Trafficker type of this user profile.
-    #[serde(alias="traffickerType")]
+    #[serde(rename="traffickerType")]
     pub trafficker_type: Option<String>,
     /// Comments for this user profile.
     pub comments: Option<String>,
     /// Name of the user profile. This is a required field. Must be less than 64 characters long, must be globally unique, and cannot contain whitespace or any of the following characters: "&;"#%,".
     pub name: Option<String>,
     /// Filter that describes which advertisers are visible to the user profile.
-    #[serde(alias="advertiserFilter")]
+    #[serde(rename="advertiserFilter")]
     pub advertiser_filter: Option<ObjectFilter>,
     /// Email of the user profile. The email addresss must be linked to a Google Account. This field is required on insertion and is read-only after insertion.
     pub email: Option<String>,
@@ -1058,10 +1058,10 @@ impl ResponseResult for AccountUserProfile {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TagSettings {
     /// Whether dynamic floodlight tags are enabled.
-    #[serde(alias="dynamicTagEnabled")]
+    #[serde(rename="dynamicTagEnabled")]
     pub dynamic_tag_enabled: bool,
     /// Whether image tags are enabled.
-    #[serde(alias="imageTagEnabled")]
+    #[serde(rename="imageTagEnabled")]
     pub image_tag_enabled: bool,
 }
 
@@ -1080,17 +1080,17 @@ impl Part for TagSettings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperatingSystemVersion {
     /// Major version (leftmost number) of this operating system version.
-    #[serde(alias="majorVersion")]
+    #[serde(rename="majorVersion")]
     pub major_version: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#operatingSystemVersion".
     pub kind: Option<String>,
     /// Minor version (number after the first dot) of this operating system version.
-    #[serde(alias="minorVersion")]
+    #[serde(rename="minorVersion")]
     pub minor_version: Option<String>,
     /// Name of this operating system version.
     pub name: Option<String>,
     /// Operating system of this operating system version.
-    #[serde(alias="operatingSystem")]
+    #[serde(rename="operatingSystem")]
     pub operating_system: Option<OperatingSystem>,
     /// ID of this operating system version.
     pub id: Option<String>,
@@ -1106,13 +1106,13 @@ impl Resource for OperatingSystemVersion {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportFloodlightCriteriaReportProperties {
     /// Include conversions that have no associated cookies and no exposures. It’s therefore impossible to know how the user was exposed to your ads during the lookback window prior to a conversion.
-    #[serde(alias="includeUnattributedIPConversions")]
+    #[serde(rename="includeUnattributedIPConversions")]
     pub include_unattributed_ip_conversions: bool,
     /// Include conversions of users with a DoubleClick cookie but without an exposure. That means the user did not click or see an ad from the advertiser within the Floodlight group, or that the interaction happened outside the lookback window.
-    #[serde(alias="includeUnattributedCookieConversions")]
+    #[serde(rename="includeUnattributedCookieConversions")]
     pub include_unattributed_cookie_conversions: bool,
     /// Include conversions that have no cookie, but do have an exposure path.
-    #[serde(alias="includeAttributedIPConversions")]
+    #[serde(rename="includeAttributedIPConversions")]
     pub include_attributed_ip_conversions: bool,
 }
 
@@ -1127,10 +1127,10 @@ impl Part for ReportFloodlightCriteriaReportProperties {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFieldAssignment {
     /// ID of the creative field.
-    #[serde(alias="creativeFieldId")]
+    #[serde(rename="creativeFieldId")]
     pub creative_field_id: String,
     /// ID of the creative field value.
-    #[serde(alias="creativeFieldValueId")]
+    #[serde(rename="creativeFieldValueId")]
     pub creative_field_value_id: String,
 }
 
@@ -1152,10 +1152,10 @@ impl Part for CreativeFieldAssignment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// File size limit in kilobytes of Rich Media teaser creatives. Must be between 1 and 10240.
-    #[serde(alias="teaserSizeLimit")]
+    #[serde(rename="teaserSizeLimit")]
     pub teaser_size_limit: Option<String>,
     /// Whether to serve creatives with Active View tags. If disabled, viewability data will not be available for any impressions.
-    #[serde(alias="activeViewOptOut")]
+    #[serde(rename="activeViewOptOut")]
     pub active_view_opt_out: Option<bool>,
     /// Description of this account.
     pub description: Option<String>,
@@ -1179,36 +1179,36 @@ pub struct Account {
     /// - "zh-TW" (Chinese Traditional)
     pub locale: Option<String>,
     /// Profile for this account. This is a read-only field that can be left blank.
-    #[serde(alias="accountProfile")]
+    #[serde(rename="accountProfile")]
     pub account_profile: Option<String>,
     /// Whether this account is active.
     pub active: Option<bool>,
     /// Whether campaigns created in this account will be enabled for comScore vCE by default.
-    #[serde(alias="comscoreVceEnabled")]
+    #[serde(rename="comscoreVceEnabled")]
     pub comscore_vce_enabled: Option<bool>,
     /// ID of this account. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// User role permissions available to the user roles of this account.
-    #[serde(alias="availablePermissionIds")]
+    #[serde(rename="availablePermissionIds")]
     pub available_permission_ids: Option<Vec<String>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#account".
     pub kind: Option<String>,
     /// ID of the country associated with this account.
-    #[serde(alias="countryId")]
+    #[serde(rename="countryId")]
     pub country_id: Option<String>,
     /// Name of this account. This is a required field, and must be less than 128 characters long and be globally unique.
     pub name: Option<String>,
     /// Maximum image size allowed for this account.
-    #[serde(alias="maximumImageSize")]
+    #[serde(rename="maximumImageSize")]
     pub maximum_image_size: Option<String>,
     /// Whether campaigns created in this account will be enabled for Nielsen OCR reach ratings by default.
-    #[serde(alias="nielsenOcrEnabled")]
+    #[serde(rename="nielsenOcrEnabled")]
     pub nielsen_ocr_enabled: Option<bool>,
     /// Default placement dimensions for this account.
-    #[serde(alias="defaultCreativeSizeId")]
+    #[serde(rename="defaultCreativeSizeId")]
     pub default_creative_size_id: Option<String>,
     /// Account permissions assigned to this account.
-    #[serde(alias="accountPermissionIds")]
+    #[serde(rename="accountPermissionIds")]
     pub account_permission_ids: Option<Vec<String>>,
     /// ID of currency associated with this account. This is a required field.
     /// Acceptable values are: 
@@ -1248,13 +1248,13 @@ pub struct Account {
     /// - "34" for VEF 
     /// - "35" for COP 
     /// - "36" for GTQ
-    #[serde(alias="currencyId")]
+    #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Reporting configuration of this account.
-    #[serde(alias="reportsConfiguration")]
+    #[serde(rename="reportsConfiguration")]
     pub reports_configuration: Option<ReportsConfiguration>,
     /// Maximum number of active ads allowed for this account.
-    #[serde(alias="activeAdsLimitTier")]
+    #[serde(rename="activeAdsLimitTier")]
     pub active_ads_limit_tier: Option<String>,
 }
 
@@ -1279,13 +1279,13 @@ pub struct DayPartTargeting {
     /// - "THURSDAY"
     /// - "FRIDAY"
     /// - "SATURDAY"
-    #[serde(alias="daysOfWeek")]
+    #[serde(rename="daysOfWeek")]
     pub days_of_week: Vec<String>,
     /// Hours of the day when the ad will serve. Must be an integer between 0 and 23 (inclusive), where 0 is midnight to 1 AM, and 23 is 11 PM to midnight. Can be specified with days of week, in which case the ad would serve during these hours on the specified days. For example, if Monday, Wednesday, Friday are the days of week specified and 9-10am, 3-5pm (hours 9, 15, and 16) is specified, the ad would serve Monday, Wednesdays, and Fridays at 9-10am and 3-5pm.
-    #[serde(alias="hoursOfDay")]
+    #[serde(rename="hoursOfDay")]
     pub hours_of_day: Vec<i32>,
     /// Whether or not to use the user's local time. If false, the America/New York time zone applies.
-    #[serde(alias="userLocalTime")]
+    #[serde(rename="userLocalTime")]
     pub user_local_time: bool,
 }
 
@@ -1306,19 +1306,19 @@ pub struct CompatibleFields {
     /// The kind of resource this is, in this case dfareporting#compatibleFields.
     pub kind: String,
     /// Contains items that are compatible to be selected for a report of type "CROSS_DIMENSION_REACH".
-    #[serde(alias="crossDimensionReachReportCompatibleFields")]
+    #[serde(rename="crossDimensionReachReportCompatibleFields")]
     pub cross_dimension_reach_report_compatible_fields: CrossDimensionReachReportCompatibleFields,
     /// Contains items that are compatible to be selected for a report of type "REACH".
-    #[serde(alias="reachReportCompatibleFields")]
+    #[serde(rename="reachReportCompatibleFields")]
     pub reach_report_compatible_fields: ReachReportCompatibleFields,
     /// Contains items that are compatible to be selected for a report of type "PATH_TO_CONVERSION".
-    #[serde(alias="pathToConversionReportCompatibleFields")]
+    #[serde(rename="pathToConversionReportCompatibleFields")]
     pub path_to_conversion_report_compatible_fields: PathToConversionReportCompatibleFields,
     /// Contains items that are compatible to be selected for a report of type "FLOODLIGHT".
-    #[serde(alias="floodlightReportCompatibleFields")]
+    #[serde(rename="floodlightReportCompatibleFields")]
     pub floodlight_report_compatible_fields: FloodlightReportCompatibleFields,
     /// Contains items that are compatible to be selected for a report of type "STANDARD".
-    #[serde(alias="reportCompatibleFields")]
+    #[serde(rename="reportCompatibleFields")]
     pub report_compatible_fields: ReportCompatibleFields,
 }
 
@@ -1337,20 +1337,20 @@ impl ResponseResult for CompatibleFields {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Region {
     /// Region code.
-    #[serde(alias="regionCode")]
+    #[serde(rename="regionCode")]
     pub region_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#region".
     pub kind: Option<String>,
     /// DART ID of the country to which this region belongs.
-    #[serde(alias="countryDartId")]
+    #[serde(rename="countryDartId")]
     pub country_dart_id: Option<String>,
     /// Name of this region.
     pub name: Option<String>,
     /// Country code of the country to which this region belongs.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: Option<String>,
     /// DART ID of this region.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: Option<String>,
 }
 
@@ -1368,17 +1368,17 @@ pub struct ReportCriteria {
     /// The list of standard dimensions the report should include.
     pub dimensions: Vec<SortedDimension>,
     /// The list of names of metrics the report should include.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
     /// The date range for which this report should be run.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// Custom Rich Media Events group.
-    #[serde(alias="customRichMediaEvents")]
+    #[serde(rename="customRichMediaEvents")]
     pub custom_rich_media_events: CustomRichMediaEvents,
     /// The list of filters on which dimensions are filtered.
     /// Filters for different dimensions are ANDed, filters for the same dimension are grouped together and ORed.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<DimensionValue>,
 }
 
@@ -1399,10 +1399,10 @@ pub struct CrossDimensionReachReportCompatibleFields {
     /// The kind of resource this is, in this case dfareporting#crossDimensionReachReportCompatibleFields.
     pub kind: String,
     /// Metrics which are compatible to be selected in the "overlapMetricNames" section of the report.
-    #[serde(alias="overlapMetrics")]
+    #[serde(rename="overlapMetrics")]
     pub overlap_metrics: Vec<Metric>,
     /// Dimensions which are compatible to be selected in the "dimensionFilters" section of the report.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<Dimension>,
 }
 
@@ -1426,20 +1426,20 @@ impl Part for CrossDimensionReachReportCompatibleFields {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRole {
     /// Whether this is a default user role. Default user roles are created by the system for the account/subaccount and cannot be modified or deleted. Each default user role comes with a basic set of preassigned permissions.
-    #[serde(alias="defaultUserRole")]
+    #[serde(rename="defaultUserRole")]
     pub default_user_role: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRole".
     pub kind: Option<String>,
     /// Subaccount ID of this user role. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this user role. This is a required field. Must be less than 256 characters long. If this user role is under a subaccount, the name must be unique among sites of the same subaccount. Otherwise, this user role is a top-level user role, and the name must be unique among top-level user roles of the same account.
     pub name: Option<String>,
     /// ID of the user role that this user role is based on or copied from. This is a required field.
-    #[serde(alias="parentUserRoleId")]
+    #[serde(rename="parentUserRoleId")]
     pub parent_user_role_id: Option<String>,
     /// Account ID of this user role. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// ID of this user role. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -1464,7 +1464,7 @@ impl ResponseResult for UserRole {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventTagsListResponse {
     /// Event tag collection.
-    #[serde(alias="eventTags")]
+    #[serde(rename="eventTags")]
     pub event_tags: Vec<EventTag>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#eventTagsListResponse".
     pub kind: String,
@@ -1492,35 +1492,35 @@ pub struct FloodlightActivityGroup {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivityGroup".
     pub kind: Option<String>,
     /// Subaccount ID of this floodlight activity group. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this floodlight activity group. This is a required field. Must be less than 65 characters long and cannot contain quotes.
     pub name: Option<String>,
     /// Floodlight configuration ID of this floodlight activity group. This is a required field.
-    #[serde(alias="floodlightConfigurationId")]
+    #[serde(rename="floodlightConfigurationId")]
     pub floodlight_configuration_id: Option<String>,
     /// Advertiser ID of this floodlight activity group. If this field is left blank, the value will be copied over either from the floodlight configuration's advertiser or from the existing activity group's advertiser.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Dimension value for the ID of the floodlight configuration. This is a read-only, auto-generated field.
-    #[serde(alias="floodlightConfigurationIdDimensionValue")]
+    #[serde(rename="floodlightConfigurationIdDimensionValue")]
     pub floodlight_configuration_id_dimension_value: Option<DimensionValue>,
     /// Dimension value for the ID of this floodlight activity group. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// Value of the type= parameter in the floodlight tag, which the ad servers use to identify the activity group that the activity belongs to. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activity groups of the same floodlight configuration. This field is read-only after insertion.
-    #[serde(alias="tagString")]
+    #[serde(rename="tagString")]
     pub tag_string: Option<String>,
     /// Type of the floodlight activity group. This is a required field that is read-only after insertion.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// ID of this floodlight activity group. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this floodlight activity group. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -1564,81 +1564,81 @@ pub struct Campaign {
     /// Arbitrary comments about this campaign. Must be less than 256 characters long.
     pub comment: Option<String>,
     /// Date on which the campaign starts running. The start date can be any date. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error. This is a required field.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: Option<String>,
     /// Date on which the campaign will stop running. On insert, the end date must be today or a future date. The end date must be later than or be the same as the start date. If, for example, you set 6/25/2015 as both the start and end dates, the effective campaign run date is just that day only, 6/25/2015. The hours, minutes, and seconds of the end date should not be set, as doing so will result in an error. This is a required field.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: Option<String>,
     /// Click-through URL suffix override properties for this campaign.
-    #[serde(alias="clickThroughUrlSuffixProperties")]
+    #[serde(rename="clickThroughUrlSuffixProperties")]
     pub click_through_url_suffix_properties: Option<ClickThroughUrlSuffixProperties>,
     /// Whether this campaign has been archived.
     pub archived: Option<bool>,
     /// Additional creative optimization configurations for the campaign.
-    #[serde(alias="additionalCreativeOptimizationConfigurations")]
+    #[serde(rename="additionalCreativeOptimizationConfigurations")]
     pub additional_creative_optimization_configurations: Option<Vec<CreativeOptimizationConfiguration>>,
     /// Advertiser ID of this campaign. This is a required field.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Audience segment groups assigned to this campaign. Cannot have more than 300 segment groups.
-    #[serde(alias="audienceSegmentGroups")]
+    #[serde(rename="audienceSegmentGroups")]
     pub audience_segment_groups: Option<Vec<AudienceSegmentGroup>>,
     /// Information about the creation of this campaign. This is a read-only field.
-    #[serde(alias="createInfo")]
+    #[serde(rename="createInfo")]
     pub create_info: Option<LastModifiedInfo>,
     /// Click-through event tag ID override properties for this campaign.
-    #[serde(alias="defaultClickThroughEventTagProperties")]
+    #[serde(rename="defaultClickThroughEventTagProperties")]
     pub default_click_through_event_tag_properties: Option<DefaultClickThroughEventTagProperties>,
     /// Dimension value for the advertiser ID of this campaign. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// Overrides that can be used to activate or deactivate advertiser event tags.
-    #[serde(alias="eventTagOverrides")]
+    #[serde(rename="eventTagOverrides")]
     pub event_tag_overrides: Option<Vec<EventTagOverride>>,
     /// Creative optimization configuration for the campaign.
-    #[serde(alias="creativeOptimizationConfiguration")]
+    #[serde(rename="creativeOptimizationConfiguration")]
     pub creative_optimization_configuration: Option<CreativeOptimizationConfiguration>,
     /// ID of this campaign. This is a read-only auto-generated field.
     pub id: Option<String>,
     /// Account ID of this campaign. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Campaign trafficker contact emails.
-    #[serde(alias="traffickerEmails")]
+    #[serde(rename="traffickerEmails")]
     pub trafficker_emails: Option<Vec<String>>,
     /// List of creative group IDs that are assigned to the campaign.
-    #[serde(alias="creativeGroupIds")]
+    #[serde(rename="creativeGroupIds")]
     pub creative_group_ids: Option<Vec<String>>,
     /// Subaccount ID of this campaign. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this campaign. This is a required field and must be less than 256 characters long and unique among campaigns of the same advertiser.
     pub name: Option<String>,
     /// Lookback window settings for the campaign.
-    #[serde(alias="lookbackConfiguration")]
+    #[serde(rename="lookbackConfiguration")]
     pub lookback_configuration: Option<LookbackConfiguration>,
     /// Whether Nielsen reports are enabled for this campaign.
-    #[serde(alias="nielsenOcrEnabled")]
+    #[serde(rename="nielsenOcrEnabled")]
     pub nielsen_ocr_enabled: Option<bool>,
     /// Information about the most recent modification of this campaign. This is a read-only field.
-    #[serde(alias="lastModifiedInfo")]
+    #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
     /// Whether comScore vCE reports are enabled for this campaign.
-    #[serde(alias="comscoreVceEnabled")]
+    #[serde(rename="comscoreVceEnabled")]
     pub comscore_vce_enabled: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#campaign".
     pub kind: Option<String>,
     /// External ID for this campaign.
-    #[serde(alias="externalId")]
+    #[serde(rename="externalId")]
     pub external_id: Option<String>,
     /// Advertiser group ID of the associated advertiser.
-    #[serde(alias="advertiserGroupId")]
+    #[serde(rename="advertiserGroupId")]
     pub advertiser_group_id: Option<String>,
     /// Dimension value for the ID of this campaign. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Billing invoice code included in the DCM client billing invoices associated with the campaign.
-    #[serde(alias="billingInvoiceCode")]
+    #[serde(rename="billingInvoiceCode")]
     pub billing_invoice_code: Option<String>,
 }
 
@@ -1660,43 +1660,43 @@ impl ResponseResult for Campaign {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChangeLog {
     /// Time when the object was modified.
-    #[serde(alias="changeTime")]
+    #[serde(rename="changeTime")]
     pub change_time: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#changeLog".
     pub kind: String,
     /// Subaccount ID of the modified object.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: String,
     /// Old value of the object field.
-    #[serde(alias="oldValue")]
+    #[serde(rename="oldValue")]
     pub old_value: String,
     /// ID of the object of this change log. The object could be a campaign, placement, ad, or other type.
-    #[serde(alias="objectId")]
+    #[serde(rename="objectId")]
     pub object_id: String,
     /// ID of this change log.
     pub id: String,
     /// User profile name of the user who modified the object.
-    #[serde(alias="userProfileName")]
+    #[serde(rename="userProfileName")]
     pub user_profile_name: String,
     /// Field name of the object which changed.
-    #[serde(alias="fieldName")]
+    #[serde(rename="fieldName")]
     pub field_name: String,
     /// ID of the user who modified the object.
-    #[serde(alias="userProfileId")]
+    #[serde(rename="userProfileId")]
     pub user_profile_id: String,
     /// Action which caused the change.
     pub action: String,
     /// Transaction ID of this change log. When a single API call results in many changes, each change will have a separate ID in the change log but will share the same transactionId.
-    #[serde(alias="transactionId")]
+    #[serde(rename="transactionId")]
     pub transaction_id: String,
     /// Account ID of the modified object.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// New value of the object field.
-    #[serde(alias="newValue")]
+    #[serde(rename="newValue")]
     pub new_value: String,
     /// Object type of the change log.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
 }
 
@@ -1725,20 +1725,20 @@ pub struct File {
     /// The output format of the report. Only available once the file is available.
     pub format: String,
     /// The date range for which the file has report data. The date range will always be the absolute date range for which the report is run.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// The filename of the file.
-    #[serde(alias="fileName")]
+    #[serde(rename="fileName")]
     pub file_name: String,
     /// The eTag of this response for caching purposes.
     pub etag: String,
     /// The ID of the report this file was generated from.
-    #[serde(alias="reportId")]
+    #[serde(rename="reportId")]
     pub report_id: String,
     /// The URLs where the completed report file can be downloaded.
     pub urls: FileUrls,
     /// The timestamp in milliseconds since epoch when this file was last modified.
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: String,
     /// The unique ID of this report file.
     pub id: String,
@@ -1772,16 +1772,16 @@ pub struct ReportCrossDimensionReachCriteria {
     /// Whether the report is pivoted or not. Defaults to true.
     pub pivoted: bool,
     /// The list of names of overlap metrics the report should include.
-    #[serde(alias="overlapMetricNames")]
+    #[serde(rename="overlapMetricNames")]
     pub overlap_metric_names: Vec<String>,
     /// The list of names of metrics the report should include.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
     /// The date range this report should be run for.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// The list of filters on which dimensions are filtered.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<DimensionValue>,
     /// The dimension option.
     pub dimension: String,
@@ -1798,7 +1798,7 @@ impl Part for ReportCrossDimensionReachCriteria {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AudienceSegmentGroup {
     /// Audience segments assigned to this group. The number of segments must be between 2 and 100.
-    #[serde(alias="audienceSegments")]
+    #[serde(rename="audienceSegments")]
     pub audience_segments: Vec<AudienceSegment>,
     /// ID of this audience segment group. This is a read-only, auto-generated field.
     pub id: String,
@@ -1826,7 +1826,7 @@ pub struct PlacementStrategy {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementStrategy".
     pub kind: Option<String>,
     /// Account ID of this placement strategy.This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// ID of this placement strategy. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -1845,10 +1845,10 @@ impl ResponseResult for PlacementStrategy {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlacementTag {
     /// Tags generated for this placement.
-    #[serde(alias="tagDatas")]
+    #[serde(rename="tagDatas")]
     pub tag_datas: Vec<TagData>,
     /// Placement ID
-    #[serde(alias="placementId")]
+    #[serde(rename="placementId")]
     pub placement_id: String,
 }
 
@@ -1882,13 +1882,13 @@ impl ResponseResult for CountriesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClickThroughUrl {
     /// ID of the landing page for the click-through URL. Applicable if the defaultLandingPage field is set to false.
-    #[serde(alias="landingPageId")]
+    #[serde(rename="landingPageId")]
     pub landing_page_id: String,
     /// Custom click-through URL. Applicable if the defaultLandingPage field is set to false and the landingPageId field is left unset.
-    #[serde(alias="customClickThroughUrl")]
+    #[serde(rename="customClickThroughUrl")]
     pub custom_click_through_url: String,
     /// Whether the campaign default landing page is used.
-    #[serde(alias="defaultLandingPage")]
+    #[serde(rename="defaultLandingPage")]
     pub default_landing_page: bool,
 }
 
@@ -1902,10 +1902,10 @@ impl Part for ClickThroughUrl {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompanionClickThroughOverride {
     /// Click-through URL of this companion click-through override.
-    #[serde(alias="clickThroughUrl")]
+    #[serde(rename="clickThroughUrl")]
     pub click_through_url: ClickThroughUrl,
     /// ID of the creative for this companion click-through override.
-    #[serde(alias="creativeId")]
+    #[serde(rename="creativeId")]
     pub creative_id: String,
 }
 
@@ -1940,7 +1940,7 @@ impl Part for FrequencyCap {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CampaignCreativeAssociation {
     /// ID of the creative associated with the campaign. This is a required field.
-    #[serde(alias="creativeId")]
+    #[serde(rename="creativeId")]
     pub creative_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#campaignCreativeAssociation".
     pub kind: Option<String>,
@@ -1965,7 +1965,7 @@ pub struct OperatingSystemVersionsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#operatingSystemVersionsListResponse".
     pub kind: String,
     /// Operating system version collection.
-    #[serde(alias="operatingSystemVersions")]
+    #[serde(rename="operatingSystemVersions")]
     pub operating_system_versions: Vec<OperatingSystemVersion>,
 }
 
@@ -1989,7 +1989,7 @@ pub struct ContentCategory {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#contentCategory".
     pub kind: Option<String>,
     /// Account ID of this content category. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Description of this content category.
     pub description: Option<String>,
@@ -2022,35 +2022,35 @@ pub struct Placement {
     /// Comments for this placement.
     pub comment: Option<String>,
     /// Campaign ID of this placement. This field is a required field on insertion.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: Option<String>,
     /// Payment source for this placement. This is a required field that is read-only after insertion.
-    #[serde(alias="paymentSource")]
+    #[serde(rename="paymentSource")]
     pub payment_source: Option<String>,
     /// Dimension value for the ID of the directory site. This is a read-only, auto-generated field.
-    #[serde(alias="directorySiteIdDimensionValue")]
+    #[serde(rename="directorySiteIdDimensionValue")]
     pub directory_site_id_dimension_value: Option<DimensionValue>,
     /// Advertiser ID of this placement. This field can be left blank.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Key name of this placement. This is a read-only, auto-generated field.
-    #[serde(alias="keyName")]
+    #[serde(rename="keyName")]
     pub key_name: Option<String>,
     /// Directory site ID of this placement. On insert, you must set either this field or the siteId field to specify the site associated with this placement. This is a required field that is read-only after insertion.
-    #[serde(alias="directorySiteId")]
+    #[serde(rename="directorySiteId")]
     pub directory_site_id: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// ID of the content category assigned to this placement.
-    #[serde(alias="contentCategoryId")]
+    #[serde(rename="contentCategoryId")]
     pub content_category_id: Option<String>,
     /// Size associated with this placement. When inserting or updating a placement, only the size ID field is used. This field is required on insertion.
     pub size: Option<Size>,
     /// Whether this placement is archived.
     pub archived: Option<bool>,
     /// Information about the last publisher update. This is a read-only field.
-    #[serde(alias="publisherUpdateInfo")]
+    #[serde(rename="publisherUpdateInfo")]
     pub publisher_update_info: Option<LastModifiedInfo>,
     /// Tag formats to generate for this placement. This field is required on insertion.
     /// Acceptable values are:
@@ -2067,70 +2067,70 @@ pub struct Placement {
     /// - "PLACEMENT_TAG_TRACKING"
     /// - "PLACEMENT_TAG_TRACKING_IFRAME"
     /// - "PLACEMENT_TAG_TRACKING_JAVASCRIPT"
-    #[serde(alias="tagFormats")]
+    #[serde(rename="tagFormats")]
     pub tag_formats: Option<Vec<String>>,
     /// Whether payment was approved for this placement. This is a read-only field relevant only to publisher-paid placements.
-    #[serde(alias="paymentApproved")]
+    #[serde(rename="paymentApproved")]
     pub payment_approved: Option<bool>,
     /// Tag settings for this placement.
-    #[serde(alias="tagSetting")]
+    #[serde(rename="tagSetting")]
     pub tag_setting: Option<TagSetting>,
     /// ID of this placement. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// External ID for this placement.
-    #[serde(alias="externalId")]
+    #[serde(rename="externalId")]
     pub external_id: Option<String>,
     /// Dimension value for the ID of this placement. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Account ID of this placement. This field can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Whether creatives assigned to this placement must be SSL-compliant.
-    #[serde(alias="sslRequired")]
+    #[serde(rename="sslRequired")]
     pub ssl_required: Option<bool>,
     /// Third-party placement status.
     pub status: Option<String>,
     /// Dimension value for the ID of the campaign. This is a read-only, auto-generated field.
-    #[serde(alias="campaignIdDimensionValue")]
+    #[serde(rename="campaignIdDimensionValue")]
     pub campaign_id_dimension_value: Option<DimensionValue>,
     /// Whether this placement is the primary placement of a roadblock (placement group). You cannot change this field from true to false. Setting this field to true will automatically set the primary field on the original primary placement of the roadblock to false, and it will automatically set the roadblock's primaryPlacementId field to the ID of this placement.
     pub primary: Option<bool>,
     /// ID of this placement's group, if applicable.
-    #[serde(alias="placementGroupId")]
+    #[serde(rename="placementGroupId")]
     pub placement_group_id: Option<String>,
     /// Information about the creation of this placement. This is a read-only field.
-    #[serde(alias="createInfo")]
+    #[serde(rename="createInfo")]
     pub create_info: Option<LastModifiedInfo>,
     /// Site ID associated with this placement. On insert, you must set either this field or the directorySiteId field to specify the site associated with this placement. This is a required field that is read-only after insertion.
-    #[serde(alias="siteId")]
+    #[serde(rename="siteId")]
     pub site_id: Option<String>,
     /// Dimension value for the ID of the site. This is a read-only, auto-generated field.
-    #[serde(alias="siteIdDimensionValue")]
+    #[serde(rename="siteIdDimensionValue")]
     pub site_id_dimension_value: Option<DimensionValue>,
     /// Placement compatibility. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps.IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard. This field is required on insertion.
     pub compatibility: Option<String>,
     /// ID of the placement strategy assigned to this placement.
-    #[serde(alias="placementStrategyId")]
+    #[serde(rename="placementStrategyId")]
     pub placement_strategy_id: Option<String>,
     /// Dimension value for the ID of the placement group. This is a read-only, auto-generated field.
-    #[serde(alias="placementGroupIdDimensionValue")]
+    #[serde(rename="placementGroupIdDimensionValue")]
     pub placement_group_id_dimension_value: Option<DimensionValue>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placement".
     pub kind: Option<String>,
     /// Subaccount ID of this placement. This field can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this placement.This is a required field and must be less than 256 characters long.
     pub name: Option<String>,
     /// Lookback window settings for this placement.
-    #[serde(alias="lookbackConfiguration")]
+    #[serde(rename="lookbackConfiguration")]
     pub lookback_configuration: Option<LookbackConfiguration>,
     /// Information about the most recent modification of this placement. This is a read-only field.
-    #[serde(alias="lastModifiedInfo")]
+    #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
     /// Pricing schedule of this placement. This field is required on insertion, specifically subfields startDate, endDate and pricingType.
-    #[serde(alias="pricingSchedule")]
+    #[serde(rename="pricingSchedule")]
     pub pricing_schedule: Option<PricingSchedule>,
 }
 
@@ -2150,7 +2150,7 @@ pub struct FloodlightReportCompatibleFields {
     /// The kind of resource this is, in this case dfareporting#floodlightReportCompatibleFields.
     pub kind: String,
     /// Dimensions which are compatible to be selected in the "dimensionFilters" section of the report.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<Dimension>,
     /// Dimensions which are compatible to be selected in the "dimensions" section of the report.
     pub dimensions: Vec<Dimension>,
@@ -2166,7 +2166,7 @@ impl Part for FloodlightReportCompatibleFields {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeAssetId {
     /// Type of asset to upload. This is a required field. IMAGE is solely used for IMAGE creatives. Other image assets should use HTML_IMAGE.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Name of the creative asset. This is a required field while inserting an asset. After insertion, this assetIdentifier is used to identify the uploaded asset. Characters in the name must be alphanumeric or one of the following: ".-_ ". Spaces are allowed.
     pub name: String,
@@ -2182,7 +2182,7 @@ impl Part for CreativeAssetId {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectorySiteContactAssignment {
     /// ID of this directory site contact. This is a read-only, auto-generated field.
-    #[serde(alias="contactId")]
+    #[serde(rename="contactId")]
     pub contact_id: String,
     /// Visibility of this directory site contact assignment. When set to PUBLIC this contact assignment is visible to all account and agency users; when set to PRIVATE it is visible only to the site.
     pub visibility: String,
@@ -2202,7 +2202,7 @@ pub struct CreativeAssignment {
     /// Sequence number of the creative assignment, applicable when the rotation type is CREATIVE_ROTATION_TYPE_SEQUENTIAL.
     pub sequence: i32,
     /// Click-through URL of the creative assignment.
-    #[serde(alias="clickThroughUrl")]
+    #[serde(rename="clickThroughUrl")]
     pub click_through_url: ClickThroughUrl,
     /// Rich media exit overrides for this creative assignment.
     /// Applicable when the creative type is any of the following: 
@@ -2217,33 +2217,33 @@ pub struct CreativeAssignment {
     /// - ADVANCED_BANNER
     /// - VPAID_LINEAR
     /// - VPAID_NON_LINEAR
-    #[serde(alias="richMediaExitOverrides")]
+    #[serde(rename="richMediaExitOverrides")]
     pub rich_media_exit_overrides: Vec<RichMediaExitOverride>,
     /// Whether applicable event tags should fire when this creative assignment is rendered. If this value is unset when the ad is inserted or updated, it will default to true for all creative types EXCEPT for INTERNAL_REDIRECT, INTERSTITIAL_INTERNAL_REDIRECT, and INSTREAM_VIDEO.
-    #[serde(alias="applyEventTags")]
+    #[serde(rename="applyEventTags")]
     pub apply_event_tags: bool,
     /// Creative group assignments for this creative assignment. Only one assignment per creative group number is allowed for a maximum of two assignments.
-    #[serde(alias="creativeGroupAssignments")]
+    #[serde(rename="creativeGroupAssignments")]
     pub creative_group_assignments: Vec<CreativeGroupAssignment>,
     /// Companion creative overrides for this creative assignment. Applicable to video ads.
-    #[serde(alias="companionCreativeOverrides")]
+    #[serde(rename="companionCreativeOverrides")]
     pub companion_creative_overrides: Vec<CompanionClickThroughOverride>,
     /// Date and time that the assigned creative should start serving.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// Whether the creative to be assigned is SSL-compliant. This is a read-only field that is auto-generated when the ad is inserted or updated.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: bool,
     /// Whether this creative assignment is active. When true, the creative will be included in the ad's rotation.
     pub active: bool,
     /// ID of the creative to be assigned. This is a required field.
-    #[serde(alias="creativeId")]
+    #[serde(rename="creativeId")]
     pub creative_id: String,
     /// Date and time that the assigned creative should stop serving. Must be later than the start time.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// Dimension value for the ID of the creative. This is a read-only, auto-generated field.
-    #[serde(alias="creativeIdDimensionValue")]
+    #[serde(rename="creativeIdDimensionValue")]
     pub creative_id_dimension_value: DimensionValue,
 }
 
@@ -2262,15 +2262,15 @@ impl Part for CreativeAssignment {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DimensionValueRequest {
     /// The name of the dimension for which values should be requested.
-    #[serde(alias="dimensionName")]
+    #[serde(rename="dimensionName")]
     pub dimension_name: Option<String>,
     /// The start date of the date range for which to retrieve dimension values. A string of the format "yyyy-MM-dd".
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: Option<String>,
     /// The kind of request this is, in this case dfareporting#dimensionValueRequest.
     pub kind: Option<String>,
     /// The end date of the date range for which to retrieve dimension values. A string of the format "yyyy-MM-dd".
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: Option<String>,
     /// The list of filters by which to filter values. The filters are ANDed.
     pub filters: Option<Vec<DimensionFilter>>,
@@ -2286,10 +2286,10 @@ impl RequestValue for DimensionValueRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DefaultClickThroughEventTagProperties {
     /// Whether this entity should override the inherited default click-through event tag with its own defined value.
-    #[serde(alias="overrideInheritedEventTag")]
+    #[serde(rename="overrideInheritedEventTag")]
     pub override_inherited_event_tag: bool,
     /// ID of the click-through event tag to apply to all ads in this entity's scope.
-    #[serde(alias="defaultClickThroughEventTagId")]
+    #[serde(rename="defaultClickThroughEventTagId")]
     pub default_click_through_event_tag_id: String,
 }
 
@@ -2330,7 +2330,7 @@ impl ResponseResult for UserProfileList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubaccountsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#subaccountsListResponse".
     pub kind: String,
@@ -2362,35 +2362,35 @@ impl ResponseResult for SubaccountsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
     /// The user profile id of the owner of this report.
-    #[serde(alias="ownerProfileId")]
+    #[serde(rename="ownerProfileId")]
     pub owner_profile_id: Option<String>,
     /// The subaccount ID to which this report belongs if applicable.
-    #[serde(alias="subAccountId")]
+    #[serde(rename="subAccountId")]
     pub sub_account_id: Option<String>,
     /// The report's schedule. Can only be set if the report's 'dateRange' is a relative date range and the relative date range is not "TODAY".
     pub schedule: Option<ReportSchedule>,
     /// The report criteria for a report of type "PATH_TO_CONVERSION".
-    #[serde(alias="pathToConversionCriteria")]
+    #[serde(rename="pathToConversionCriteria")]
     pub path_to_conversion_criteria: Option<ReportPathToConversionCriteria>,
     /// The report criteria for a report of type "REACH".
-    #[serde(alias="reachCriteria")]
+    #[serde(rename="reachCriteria")]
     pub reach_criteria: Option<ReportReachCriteria>,
     /// The report criteria for a report of type "FLOODLIGHT".
-    #[serde(alias="floodlightCriteria")]
+    #[serde(rename="floodlightCriteria")]
     pub floodlight_criteria: Option<ReportFloodlightCriteria>,
     /// The filename used when generating report files for this report.
-    #[serde(alias="fileName")]
+    #[serde(rename="fileName")]
     pub file_name: Option<String>,
     /// The report's email delivery settings.
     pub delivery: Option<ReportDelivery>,
     /// The timestamp (in milliseconds since epoch) of when this report was last modified.
-    #[serde(alias="lastModifiedTime")]
+    #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
     /// The report criteria for a report of type "CROSS_DIMENSION_REACH".
-    #[serde(alias="crossDimensionReachCriteria")]
+    #[serde(rename="crossDimensionReachCriteria")]
     pub cross_dimension_reach_criteria: Option<ReportCrossDimensionReachCriteria>,
     /// The account ID to which this report belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// The kind of resource this is, in this case dfareporting#report.
     pub kind: Option<String>,
@@ -2405,7 +2405,7 @@ pub struct Report {
     /// The report criteria for a report of type "STANDARD".
     pub criteria: Option<ReportCriteria>,
     /// The type of the report.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
@@ -2448,7 +2448,7 @@ impl Resource for PlatformType {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdvertisersListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Advertiser collection.
     pub advertisers: Vec<Advertiser>,
@@ -2471,32 +2471,32 @@ impl ResponseResult for AdvertisersListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeAsset {
     /// Detected MIME type for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// Artwork type of rich media creative. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="artworkType")]
+    #[serde(rename="artworkType")]
     pub artwork_type: Option<String>,
     /// Offset left unit for an asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="positionLeftUnit")]
+    #[serde(rename="positionLeftUnit")]
     pub position_left_unit: Option<String>,
     /// Size of an asset when collapsed. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA and all VPAID. Additionally, applicable to assets whose displayType is ASSET_DISPLAY_TYPE_EXPANDING or ASSET_DISPLAY_TYPE_PEEL_DOWN.
-    #[serde(alias="collapsedSize")]
+    #[serde(rename="collapsedSize")]
     pub collapsed_size: Option<Size>,
     /// Flash version of the asset. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, ENHANCED_BANNER, all RICH_MEDIA, and all VPAID.
-    #[serde(alias="flashVersion")]
+    #[serde(rename="flashVersion")]
     pub flash_version: Option<i32>,
     /// Whether the asset pushes down other content. Applicable to the following creative types: all RICH_MEDIA. Additionally, only applicable when the asset offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height.
     pub pushdown: Option<bool>,
     /// Whether to hide Flash objects flag for an asset. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="hideFlashObjects")]
+    #[serde(rename="hideFlashObjects")]
     pub hide_flash_objects: Option<bool>,
     /// List of feature dependencies for the creative asset that are detected by DCM. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field. Applicable to the following creative types: ENHANCED_BANNER and HTML5_BANNER.
-    #[serde(alias="detectedFeatures")]
+    #[serde(rename="detectedFeatures")]
     pub detected_features: Option<Vec<String>>,
     /// Duration in seconds for which an asset will be displayed. Applicable to the following creative types: INSTREAM_VIDEO and VPAID_LINEAR.
     pub duration: Option<i32>,
     /// Offset top unit for an asset. This is a read-only field if the asset displayType is ASSET_DISPLAY_TYPE_OVERLAY. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="positionTopUnit")]
+    #[serde(rename="positionTopUnit")]
     pub position_top_unit: Option<String>,
     /// Numeric ID of this creative asset. This is a required field and should not be modified. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
     pub id: Option<String>,
@@ -2505,19 +2505,19 @@ pub struct CreativeAsset {
     /// Size associated with this creative asset. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, if left blank, this field will be automatically set using the actual size of the associated image asset. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA.
     pub size: Option<Size>,
     /// Whether the asset is horizontally locked. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="horizontallyLocked")]
+    #[serde(rename="horizontallyLocked")]
     pub horizontally_locked: Option<bool>,
     /// Initial wait time type before making the asset visible. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="startTimeType")]
+    #[serde(rename="startTimeType")]
     pub start_time_type: Option<String>,
     /// Type of rich media asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="displayType")]
+    #[serde(rename="displayType")]
     pub display_type: Option<String>,
     /// Detected expanded dimension for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="expandedDimension")]
+    #[serde(rename="expandedDimension")]
     pub expanded_dimension: Option<Size>,
     /// Whether the asset is vertically locked. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="verticallyLocked")]
+    #[serde(rename="verticallyLocked")]
     pub vertically_locked: Option<bool>,
     /// Role of the asset in relation to creative. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT. This is a required field.
     /// PRIMARY applies to ENHANCED_BANNER, FLASH_INPAGE, HTML5_BANNER, IMAGE, IMAGE_GALLERY, all RICH_MEDIA (which may contain multiple primary assets), and all VPAID creatives.
@@ -2530,69 +2530,69 @@ pub struct CreativeAsset {
     /// For VPAID_LINEAR creatives, PARENT_VIDEO, TRANSCODED_VIDEO and ALTERNATE_VIDEO assets that are marked active serve as backup in case the VPAID creative cannot be served. Only PARENT_VIDEO assets can be added or removed for an INSTREAM_VIDEO or VPAID_LINEAR creative.
     pub role: Option<String>,
     /// Size of zip file. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
-    #[serde(alias="zipFilesize")]
+    #[serde(rename="zipFilesize")]
     pub zip_filesize: Option<String>,
     /// Detected bit-rate for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="bitRate")]
+    #[serde(rename="bitRate")]
     pub bit_rate: Option<i32>,
     /// Window mode options for flash assets. Applicable to the following creative types: FLASH_INPAGE, RICH_MEDIA_EXPANDING, RICH_MEDIA_IM_EXPAND, RICH_MEDIA_INPAGE, and RICH_MEDIA_INPAGE_FLOATING.
-    #[serde(alias="windowMode")]
+    #[serde(rename="windowMode")]
     pub window_mode: Option<String>,
     /// Progressive URL for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="progressiveServingUrl")]
+    #[serde(rename="progressiveServingUrl")]
     pub progressive_serving_url: Option<String>,
     /// Duration type for which an asset will be displayed. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="durationType")]
+    #[serde(rename="durationType")]
     pub duration_type: Option<String>,
     /// Detected video duration for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="videoDuration")]
+    #[serde(rename="videoDuration")]
     pub video_duration: Option<f32>,
     /// File size associated with this creative asset. This is a read-only field. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: Option<String>,
     /// Offset position for an asset in collapsed mode. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA and all VPAID. Additionally, only applicable to assets whose displayType is ASSET_DISPLAY_TYPE_EXPANDING or ASSET_DISPLAY_TYPE_PEEL_DOWN.
     pub offset: Option<OffsetPosition>,
     /// Whether the video asset is active. This is a read-only field for VPAID_NON_LINEAR assets. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
     pub active: Option<bool>,
     /// Whether the backup asset is original or changed by the user in DCM. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="originalBackup")]
+    #[serde(rename="originalBackup")]
     pub original_backup: Option<bool>,
     /// Whether to hide selection boxes flag for an asset. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="hideSelectionBoxes")]
+    #[serde(rename="hideSelectionBoxes")]
     pub hide_selection_boxes: Option<bool>,
     /// Streaming URL for video asset. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="streamingServingUrl")]
+    #[serde(rename="streamingServingUrl")]
     pub streaming_serving_url: Option<String>,
     /// zIndex value of an asset. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable to assets whose displayType is NOT one of the following types: ASSET_DISPLAY_TYPE_INPAGE or ASSET_DISPLAY_TYPE_OVERLAY.
-    #[serde(alias="zIndex")]
+    #[serde(rename="zIndex")]
     pub z_index: Option<i32>,
     /// Rich media child asset type. This is a read-only field. Applicable to the following creative types: all VPAID.
-    #[serde(alias="childAssetType")]
+    #[serde(rename="childAssetType")]
     pub child_asset_type: Option<String>,
     /// Exit event configured for the backup image. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="backupImageExit")]
+    #[serde(rename="backupImageExit")]
     pub backup_image_exit: Option<CreativeCustomEvent>,
     /// Whether ActionScript3 is enabled for the flash asset. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE and ENHANCED_BANNER.
-    #[serde(alias="actionScript3")]
+    #[serde(rename="actionScript3")]
     pub action_script3: Option<bool>,
     /// Pushdown duration in seconds for an asset. Must be between 0 and 9.99. Applicable to the following creative types: all RICH_MEDIA.Additionally, only applicable when the asset pushdown field is true, the offsets are 0, the collapsedSize.width matches size.width, and the collapsedSize.height is less than size.height.
-    #[serde(alias="pushdownDuration")]
+    #[serde(rename="pushdownDuration")]
     pub pushdown_duration: Option<f32>,
     /// Identifier of this asset. This is the same identifier returned during creative asset insert operation. This is a required field. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
-    #[serde(alias="assetIdentifier")]
+    #[serde(rename="assetIdentifier")]
     pub asset_identifier: Option<CreativeAssetId>,
     /// Whether the asset is transparent. Applicable to the following creative types: all RICH_MEDIA. Additionally, only applicable to HTML5 assets.
     pub transparency: Option<bool>,
     /// Whether the asset is SSL-compliant. This is a read-only field. Applicable to all but the following creative types: all REDIRECT and TRACKING_TEXT.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// Offset position for an asset. Applicable to the following creative types: all RICH_MEDIA.
     pub position: Option<OffsetPosition>,
     /// Custom start time in seconds for making the asset visible. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="customStartTimeValue")]
+    #[serde(rename="customStartTimeValue")]
     pub custom_start_time_value: Option<i32>,
     /// File name of zip file. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
-    #[serde(alias="zipFilename")]
+    #[serde(rename="zipFilename")]
     pub zip_filename: Option<String>,
 }
 
@@ -2611,12 +2611,12 @@ impl Resource for CreativeAsset {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectorySitesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySitesListResponse".
     pub kind: String,
     /// Directory site collection.
-    #[serde(alias="directorySites")]
+    #[serde(rename="directorySites")]
     pub directory_sites: Vec<DirectorySite>,
 }
 
@@ -2687,7 +2687,7 @@ impl ResponseResult for UserRolePermissionGroup {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClickTag {
     /// Advertiser event name associated with the click tag. This field is used by ENHANCED_BANNER, ENHANCED_IMAGE, and HTML5_BANNER creatives.
-    #[serde(alias="eventName")]
+    #[serde(rename="eventName")]
     pub event_name: String,
     /// Parameter name for the specified click tag. For ENHANCED_IMAGE creative assets, this field must match the value of the creative asset's creativeAssetId.name field.
     pub name: String,
@@ -2747,7 +2747,7 @@ impl ResponseResult for BrowsersListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectFilter {
     /// Applicable when status is ASSIGNED. The user has access to objects with these object IDs.
-    #[serde(alias="objectIds")]
+    #[serde(rename="objectIds")]
     pub object_ids: Vec<String>,
     /// Status of the filter. NONE means the user has access to none of the objects. ALL means the user has access to all objects. ASSIGNED means the user has access to the objects with IDs in the objectIds list.
     pub status: String,
@@ -2765,10 +2765,10 @@ impl Part for ObjectFilter {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeSettings {
     /// Header text for iFrames for this site. Must be less than or equal to 2000 characters long.
-    #[serde(alias="iFrameHeader")]
+    #[serde(rename="iFrameHeader")]
     pub i_frame_header: String,
     /// Header text for iFrames for this site. Must be less than or equal to 2000 characters long.
-    #[serde(alias="iFrameFooter")]
+    #[serde(rename="iFrameFooter")]
     pub i_frame_footer: String,
 }
 
@@ -2807,22 +2807,22 @@ impl Part for Dimension {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeField {
     /// Advertiser ID of this creative field. This is a required field on insertion.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeField".
     pub kind: Option<String>,
     /// Subaccount ID of this creative field. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this creative field. This is a required field and must be less than 256 characters long and unique among creative fields of the same advertiser.
     pub name: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// ID of this creative field. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this creative field. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -2846,7 +2846,7 @@ pub struct DirectorySite {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySite".
     pub kind: String,
     /// Country ID of this directory site.
-    #[serde(alias="countryId")]
+    #[serde(rename="countryId")]
     pub country_id: String,
     /// Description of this directory site.
     pub description: String,
@@ -2890,7 +2890,7 @@ pub struct DirectorySite {
     /// - "34" for VEF 
     /// - "35" for COP 
     /// - "36" for GTQ
-    #[serde(alias="currencyId")]
+    #[serde(rename="currencyId")]
     pub currency_id: String,
     /// Tag types for regular placements.
     /// 
@@ -2899,15 +2899,15 @@ pub struct DirectorySite {
     /// - "IFRAME_JAVASCRIPT_INPAGE"
     /// - "INTERNAL_REDIRECT_INPAGE"
     /// - "JAVASCRIPT_INPAGE"
-    #[serde(alias="inpageTagFormats")]
+    #[serde(rename="inpageTagFormats")]
     pub inpage_tag_formats: Vec<String>,
     /// URL of this directory site.
     pub url: String,
     /// Directory site contacts.
-    #[serde(alias="contactAssignments")]
+    #[serde(rename="contactAssignments")]
     pub contact_assignments: Vec<DirectorySiteContactAssignment>,
     /// Parent directory site ID.
-    #[serde(alias="parentId")]
+    #[serde(rename="parentId")]
     pub parent_id: String,
     /// Tag types for interstitial placements.
     /// 
@@ -2915,10 +2915,10 @@ pub struct DirectorySite {
     /// - "IFRAME_JAVASCRIPT_INTERSTITIAL"
     /// - "INTERNAL_REDIRECT_INTERSTITIAL"
     /// - "JAVASCRIPT_INTERSTITIAL"
-    #[serde(alias="interstitialTagFormats")]
+    #[serde(rename="interstitialTagFormats")]
     pub interstitial_tag_formats: Vec<String>,
     /// Dimension value for the ID of this directory site. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: DimensionValue,
     /// Whether this directory site is active.
     pub active: bool,
@@ -2970,7 +2970,7 @@ pub struct CreativeGroup {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeGroup".
     pub kind: Option<String>,
     /// Subaccount ID of this creative group. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this creative group. This is a required field and must be less than 256 characters long and unique among creative groups of the same advertiser.
     pub name: Option<String>,
@@ -2978,18 +2978,18 @@ pub struct CreativeGroup {
     /// Acceptable values are: 
     /// - 1
     /// - 2
-    #[serde(alias="groupNumber")]
+    #[serde(rename="groupNumber")]
     pub group_number: Option<i32>,
     /// Advertiser ID of this creative group. This is a required field on insertion.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// ID of this creative group. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this creative group. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -3020,13 +3020,13 @@ impl Part for Metric {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RichMediaExitOverride {
     /// Click-through URL to override the default exit URL. Applicable if the useCustomExitUrl field is set to true.
-    #[serde(alias="customExitUrl")]
+    #[serde(rename="customExitUrl")]
     pub custom_exit_url: String,
     /// Whether to use the custom exit URL.
-    #[serde(alias="useCustomExitUrl")]
+    #[serde(rename="useCustomExitUrl")]
     pub use_custom_exit_url: bool,
     /// ID for the override to refer to a specific exit in the creative.
-    #[serde(alias="exitId")]
+    #[serde(rename="exitId")]
     pub exit_id: String,
 }
 
@@ -3045,7 +3045,7 @@ impl Part for RichMediaExitOverride {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountPermissionsListResponse {
     /// Account permission collection.
-    #[serde(alias="accountPermissions")]
+    #[serde(rename="accountPermissions")]
     pub account_permissions: Vec<AccountPermission>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountPermissionsListResponse".
     pub kind: String,
@@ -3068,7 +3068,7 @@ pub struct PlacementsGenerateTagsResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementsGenerateTagsResponse".
     pub kind: String,
     /// Set of generated tags for the specified placements.
-    #[serde(alias="placementTags")]
+    #[serde(rename="placementTags")]
     pub placement_tags: Vec<PlacementTag>,
 }
 
@@ -3116,12 +3116,12 @@ impl ResponseResult for CreativeFieldValue {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FloodlightActivityGroupsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivityGroupsListResponse".
     pub kind: String,
     /// Floodlight activity group collection.
-    #[serde(alias="floodlightActivityGroups")]
+    #[serde(rename="floodlightActivityGroups")]
     pub floodlight_activity_groups: Vec<FloodlightActivityGroup>,
 }
 
@@ -3140,10 +3140,10 @@ impl ResponseResult for FloodlightActivityGroupsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectorySiteContactsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Directory site contact collection
-    #[serde(alias="directorySiteContacts")]
+    #[serde(rename="directorySiteContacts")]
     pub directory_site_contacts: Vec<DirectorySiteContact>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#directorySiteContactsListResponse".
     pub kind: String,
@@ -3159,32 +3159,32 @@ impl ResponseResult for DirectorySiteContactsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeCustomEvent {
     /// Target type used by the event.
-    #[serde(alias="targetType")]
+    #[serde(rename="targetType")]
     pub target_type: String,
     /// Artwork type used by the creative.This is a read-only field.
-    #[serde(alias="artworkType")]
+    #[serde(rename="artworkType")]
     pub artwork_type: String,
     /// Reporting ID, used to differentiate multiple videos in a single creative.
-    #[serde(alias="videoReportingId")]
+    #[serde(rename="videoReportingId")]
     pub video_reporting_id: String,
     /// Properties for rich media popup windows. This field is used only for exit events.
-    #[serde(alias="popupWindowProperties")]
+    #[serde(rename="popupWindowProperties")]
     pub popup_window_properties: PopupWindowProperties,
     /// Artwork label column, used to link events in DCM back to events in Studio. This is a required field and should not be modified after insertion.
-    #[serde(alias="artworkLabel")]
+    #[serde(rename="artworkLabel")]
     pub artwork_label: String,
     /// Whether the event is active.
     pub active: bool,
     /// Type of the event. This is a read-only field.
-    #[serde(alias="advertiserCustomEventType")]
+    #[serde(rename="advertiserCustomEventType")]
     pub advertiser_custom_event_type: String,
     /// Exit URL of the event. This field is used only for exit events.
-    #[serde(alias="exitUrl")]
+    #[serde(rename="exitUrl")]
     pub exit_url: String,
     /// ID of this event. This is a required field and should not be modified after insertion.
     pub id: String,
     /// User-entered name for the event.
-    #[serde(alias="advertiserCustomEventName")]
+    #[serde(rename="advertiserCustomEventName")]
     pub advertiser_custom_event_name: String,
 }
 
@@ -3203,7 +3203,7 @@ impl Part for CreativeCustomEvent {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativesListResponse".
     pub kind: String,
@@ -3221,10 +3221,10 @@ impl ResponseResult for CreativesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OmnitureSettings {
     /// Whether placement cost data will be sent to Omniture. This property can be enabled only if omnitureIntegrationEnabled is true.
-    #[serde(alias="omnitureCostDataEnabled")]
+    #[serde(rename="omnitureCostDataEnabled")]
     pub omniture_cost_data_enabled: bool,
     /// Whether Omniture integration is enabled. This property can be enabled only when the "Advanced Ad Serving" account setting is enabled.
-    #[serde(alias="omnitureIntegrationEnabled")]
+    #[serde(rename="omnitureIntegrationEnabled")]
     pub omniture_integration_enabled: bool,
 }
 
@@ -3240,15 +3240,15 @@ pub struct PathToConversionReportCompatibleFields {
     /// Metrics which are compatible to be selected in the "metricNames" section of the report.
     pub metrics: Vec<Metric>,
     /// Per-interaction dimensions which are compatible to be selected in the "perInteractionDimensions" section of the report.
-    #[serde(alias="perInteractionDimensions")]
+    #[serde(rename="perInteractionDimensions")]
     pub per_interaction_dimensions: Vec<Dimension>,
     /// The kind of resource this is, in this case dfareporting#pathToConversionReportCompatibleFields.
     pub kind: String,
     /// Conversion dimensions which are compatible to be selected in the "conversionDimensions" section of the report.
-    #[serde(alias="conversionDimensions")]
+    #[serde(rename="conversionDimensions")]
     pub conversion_dimensions: Vec<Dimension>,
     /// Custom floodlight variables which are compatible to be selected in the "customFloodlightVariables" section of the report.
-    #[serde(alias="customFloodlightVariables")]
+    #[serde(rename="customFloodlightVariables")]
     pub custom_floodlight_variables: Vec<Dimension>,
 }
 
@@ -3269,7 +3269,7 @@ pub struct MobileCarriersListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#mobileCarriersListResponse".
     pub kind: String,
     /// Mobile carrier collection.
-    #[serde(alias="mobileCarriers")]
+    #[serde(rename="mobileCarriers")]
     pub mobile_carriers: Vec<MobileCarrier>,
 }
 
@@ -3309,112 +3309,112 @@ impl Part for FloodlightActivityDynamicTag {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Creative {
     /// Type of artwork used for the creative. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="artworkType")]
+    #[serde(rename="artworkType")]
     pub artwork_type: Option<String>,
     /// Latest Studio trafficked creative ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="latestTraffickedCreativeId")]
+    #[serde(rename="latestTraffickedCreativeId")]
     pub latest_trafficked_creative_id: Option<String>,
     /// List of counter events configured for the creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="counterCustomEvents")]
+    #[serde(rename="counterCustomEvents")]
     pub counter_custom_events: Option<Vec<CreativeCustomEvent>>,
     /// Advertiser ID of this creative. This is a required field. Applicable to all creative types.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Whether the creative is active. Applicable to all creative types.
     pub active: Option<bool>,
     /// List of timer events configured for the creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="timerCustomEvents")]
+    #[serde(rename="timerCustomEvents")]
     pub timer_custom_events: Option<Vec<CreativeCustomEvent>>,
     /// Dimension value for the rendering ID of this creative. This is a read-only field. Applicable to all creative types.
-    #[serde(alias="renderingIdDimensionValue")]
+    #[serde(rename="renderingIdDimensionValue")]
     pub rendering_id_dimension_value: Option<DimensionValue>,
     /// OpenWindow FSCommand of this creative. This lets the SWF file communicate with either Flash Player or the program hosting Flash Player, such as a web browser. This is only triggered if allowScriptAccess field is true. Applicable to the following creative types: FLASH_INPAGE.
-    #[serde(alias="fsCommand")]
+    #[serde(rename="fsCommand")]
     pub fs_command: Option<FsCommand>,
     /// ID of this creative. This is a read-only, auto-generated field. Applicable to all creative types.
     pub id: Option<String>,
     /// Account ID of this creative. This field, if left unset, will be auto-generated for both insert and update operations. Applicable to all creative types.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Studio trafficked creative ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="studioTraffickedCreativeId")]
+    #[serde(rename="studioTraffickedCreativeId")]
     pub studio_trafficked_creative_id: Option<String>,
     /// Whether the creative is archived. Applicable to all creative types.
     pub archived: Option<bool>,
     /// Override CSS value for rich media creatives. Applicable to the following creative types: all RICH_MEDIA.
-    #[serde(alias="overrideCss")]
+    #[serde(rename="overrideCss")]
     pub override_css: Option<String>,
     /// Whether script access is allowed for this creative. This is a read-only and deprecated field which will automatically be set to true on update. Applicable to the following creative types: FLASH_INPAGE.
-    #[serde(alias="allowScriptAccess")]
+    #[serde(rename="allowScriptAccess")]
     pub allow_script_access: Option<bool>,
     /// The internal Flash version for this creative as calculated by DoubleClick Studio. This is a read-only field. Applicable to the following creative types: FLASH_INPAGE, ENHANCED_BANNER, all RICH_MEDIA, and all VPAID.
-    #[serde(alias="requiredFlashVersion")]
+    #[serde(rename="requiredFlashVersion")]
     pub required_flash_version: Option<i32>,
     /// List of exit events configured for the creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="exitCustomEvents")]
+    #[serde(rename="exitCustomEvents")]
     pub exit_custom_events: Option<Vec<CreativeCustomEvent>>,
     /// ID of current rendering version. This is a read-only field. Applicable to all creative types.
-    #[serde(alias="renderingId")]
+    #[serde(rename="renderingId")]
     pub rendering_id: Option<String>,
     /// Description of the video ad. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="videoDescription")]
+    #[serde(rename="videoDescription")]
     pub video_description: Option<String>,
     /// Third-party URL used to record backup image impressions. Applicable to the following creative types: all RICH_MEDIA
-    #[serde(alias="thirdPartyBackupImageImpressionsUrl")]
+    #[serde(rename="thirdPartyBackupImageImpressionsUrl")]
     pub third_party_backup_image_impressions_url: Option<String>,
     /// The version number helps you keep track of multiple versions of your creative in your reports. The version number will always be auto-generated during insert operations to start at 1. For tracking creatives the version cannot be incremented and will always remain at 1. For all other creative types the version can be incremented only by 1 during update operations. In addition, the version will be automatically incremented by 1 when undergoing Rich Media creative merging. Applicable to all creative types.
     pub version: Option<i32>,
     /// Creative field assignments for this creative. Applicable to all creative types.
-    #[serde(alias="creativeFieldAssignments")]
+    #[serde(rename="creativeFieldAssignments")]
     pub creative_field_assignments: Option<Vec<CreativeFieldAssignment>>,
     /// The 6-character HTML color code, beginning with #, for the background of the window area where the Flash file is displayed. Default is white. Applicable to the following creative types: FLASH_INPAGE.
-    #[serde(alias="backgroundColor")]
+    #[serde(rename="backgroundColor")]
     pub background_color: Option<String>,
     /// Custom key-values for a Rich Media creative. Key-values let you customize the creative settings of a Rich Media ad running on your site without having to contact the advertiser. You can use key-values to dynamically change the look or functionality of a creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="customKeyValues")]
+    #[serde(rename="customKeyValues")]
     pub custom_key_values: Option<Vec<String>>,
     /// Dimension value for the ID of this creative. This is a read-only field. Applicable to all creative types.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Whether images are automatically advanced for enhanced image creatives. Applicable to the following creative types: ENHANCED_IMAGE.
     pub auto_advance_images: Option<bool>,
     /// Size associated with this creative. When inserting or updating a creative either the size ID field or size width and height fields can be used. This is a required field when applicable; however for IMAGE and FLASH_INPAGE creatives, if left blank, this field will be automatically set using the actual size of the associated image assets. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER, IMAGE, and all RICH_MEDIA.
     pub size: Option<Size>,
     /// Type of this creative.This is a required field. Applicable to all creative types.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Combined size of all creative assets. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="totalFileSize")]
+    #[serde(rename="totalFileSize")]
     pub total_file_size: Option<String>,
     /// Third-party URL used to record rich media impressions. Applicable to the following creative types: all RICH_MEDIA
-    #[serde(alias="thirdPartyRichMediaImpressionsUrl")]
+    #[serde(rename="thirdPartyRichMediaImpressionsUrl")]
     pub third_party_rich_media_impressions_url: Option<String>,
     /// Studio advertiser ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="studioAdvertiserId")]
+    #[serde(rename="studioAdvertiserId")]
     pub studio_advertiser_id: Option<String>,
     /// Assets associated with a creative. Applicable to all but the following creative types: INTERNAL_REDIRECT, INTERSTITIAL_INTERNAL_REDIRECT, and REDIRECT
-    #[serde(alias="creativeAssets")]
+    #[serde(rename="creativeAssets")]
     pub creative_assets: Option<Vec<CreativeAsset>>,
     /// List of feature dependencies that will cause a backup image to be served if the browser that serves the ad does not support them. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative asset correctly. This field is initially auto-generated to contain all features detected by DCM for all the assets of this creative and can then be modified by the client. To reset this field, copy over all the creativeAssets' detected features. Applicable to the following creative types: ENHANCED_BANNER and HTML5_BANNER.
-    #[serde(alias="backupImageFeatures")]
+    #[serde(rename="backupImageFeatures")]
     pub backup_image_features: Option<Vec<String>>,
     /// Whether HTML code is DCM-generated or manually entered. Set to true to ignore changes to htmlCode. Applicable to the following creative types: FLASH_INPAGE and HTML5_BANNER.
-    #[serde(alias="htmlCodeLocked")]
+    #[serde(rename="htmlCodeLocked")]
     pub html_code_locked: Option<bool>,
     /// URL of hosted image or another ad tag. This is a required field when applicable. Applicable to the following creative types: INTERNAL_REDIRECT, INTERSTITIAL_INTERNAL_REDIRECT, and REDIRECT
-    #[serde(alias="redirectUrl")]
+    #[serde(rename="redirectUrl")]
     pub redirect_url: Option<String>,
     /// Click tags of the creative. For ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER creatives, this is a subset of detected click tags for the assets associated with this creative. After creating a flash asset, detected click tags will be returned in the creativeAssetMetadata. When inserting the creative, populate the creative clickTags field using the creativeAssetMetadata.clickTags field. For ENHANCED_IMAGE creatives, there should be exactly one entry in this list for each image creative asset. A click tag is matched with a corresponding creative asset by matching the clickTag.name field with the creativeAsset.assetIdentifier.name field. Applicable to the following creative types: ENHANCED_BANNER, ENHANCED_IMAGE, FLASH_INPAGE, HTML5_BANNER.
-    #[serde(alias="clickTags")]
+    #[serde(rename="clickTags")]
     pub click_tags: Option<Vec<ClickTag>>,
     /// Target window for backup image. Applicable to the following creative types: ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER.
-    #[serde(alias="backupImageTargetWindow")]
+    #[serde(rename="backupImageTargetWindow")]
     pub backup_image_target_window: Option<TargetWindow>,
     /// The minimum required Flash plugin version for this creative. For example, 11.2.202.235. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="requiredFlashPluginVersion")]
+    #[serde(rename="requiredFlashPluginVersion")]
     pub required_flash_plugin_version: Option<String>,
     /// Reporting label used for HTML5 banner backup image. Applicable to the following creative types: ENHANCED_BANNER.
-    #[serde(alias="backupImageReportingLabel")]
+    #[serde(rename="backupImageReportingLabel")]
     pub backup_image_reporting_label: Option<String>,
     /// Compatibilities associated with this creative. This is a read-only field. WEB and WEB_INTERSTITIAL refer to rendering either on desktop or on mobile devices for regular or interstitial ads, respectively. APP and APP_INTERSTITIAL are for rendering in mobile apps. IN_STREAM_VIDEO refers to rendering in in-stream video ads developed with the VAST standard. Applicable to all creative types.
     /// 
@@ -3426,47 +3426,47 @@ pub struct Creative {
     /// - "WEB_INTERSTITIAL"
     pub compatibility: Option<Vec<String>>,
     /// Ad parameters user for VPAID creative. This is a read-only field. Applicable to the following creative types: all VPAID.
-    #[serde(alias="adParameters")]
+    #[serde(rename="adParameters")]
     pub ad_parameters: Option<String>,
     /// Keywords for a Rich Media creative. Keywords let you customize the creative settings of a Rich Media ad running on your site without having to contact the advertiser. You can use keywords to dynamically change the look or functionality of a creative. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="adTagKeys")]
+    #[serde(rename="adTagKeys")]
     pub ad_tag_keys: Option<Vec<String>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creative".
     pub kind: Option<String>,
     /// Subaccount ID of this creative. This field, if left unset, will be auto-generated for both insert and update operations. Applicable to all creative types.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of the creative. This is a required field and must be less than 256 characters long. Applicable to all creative types.
     pub name: Option<String>,
     /// Creative video duration in seconds. This is a read-only field. Applicable to the following creative types: INSTREAM_VIDEO, all RICH_MEDIA, and all VPAID.
-    #[serde(alias="videoDuration")]
+    #[serde(rename="videoDuration")]
     pub video_duration: Option<f32>,
     /// Creative last modification information. This is a read-only field. Applicable to all creative types.
-    #[serde(alias="lastModifiedInfo")]
+    #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
     /// Click-through URL for backup image. Applicable to the following creative types: ENHANCED_BANNER, FLASH_INPAGE, and HTML5_BANNER.
-    #[serde(alias="backupImageClickThroughUrl")]
+    #[serde(rename="backupImageClickThroughUrl")]
     pub backup_image_click_through_url: Option<String>,
     /// Studio creative ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
-    #[serde(alias="studioCreativeId")]
+    #[serde(rename="studioCreativeId")]
     pub studio_creative_id: Option<String>,
     /// Authoring tool for HTML5 banner creatives. This is a read-only field. Applicable to the following creative types: HTML5_BANNER.
-    #[serde(alias="authoringTool")]
+    #[serde(rename="authoringTool")]
     pub authoring_tool: Option<String>,
     /// Third-party URLs for tracking in-stream video creative events. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="thirdPartyUrls")]
+    #[serde(rename="thirdPartyUrls")]
     pub third_party_urls: Option<Vec<ThirdPartyTrackingUrl>>,
     /// List of companion creatives assigned to an in-Stream videocreative. Acceptable values include IDs of existing flash and image creatives. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="companionCreatives")]
+    #[serde(rename="companionCreatives")]
     pub companion_creatives: Option<Vec<String>>,
     /// HTML code for the creative. This is a required field when applicable. This field is ignored if htmlCodeLocked is false. Applicable to the following creative types: all CUSTOM, FLASH_INPAGE, and HTML5_BANNER, and all RICH_MEDIA.
-    #[serde(alias="htmlCode")]
+    #[serde(rename="htmlCode")]
     pub html_code: Option<String>,
     /// Whether the creative is SSL-compliant. This is a read-only field. Applicable to all creative types.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// Industry standard ID assigned to creative for reach and frequency. Applicable to the following creative types: INSTREAM_VIDEO and all VPAID.
-    #[serde(alias="commercialId")]
+    #[serde(rename="commercialId")]
     pub commercial_id: Option<String>,
     /// Whether the user can choose to skip the creative. Applicable to the following creative types: INSTREAM_VIDEO.
     pub skippable: Option<bool>,
@@ -3484,7 +3484,7 @@ impl ResponseResult for Creative {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportsConfiguration {
     /// Whether the exposure to conversion report is enabled. This report shows detailed pathway information on up to 10 of the most recent ad exposures seen by a user before converting.
-    #[serde(alias="exposureToConversionEnabled")]
+    #[serde(rename="exposureToConversionEnabled")]
     pub exposure_to_conversion_enabled: bool,
     /// Report generation time zone ID of this account. This is a required field that can only be changed by a superuser.
     /// Acceptable values are:
@@ -3502,10 +3502,10 @@ pub struct ReportsConfiguration {
     /// - "11" for "America/Los_Angeles" 
     /// - "12" for "Pacific/Auckland" 
     /// - "13" for "America/Sao_Paulo"
-    #[serde(alias="reportGenerationTimeZoneId")]
+    #[serde(rename="reportGenerationTimeZoneId")]
     pub report_generation_time_zone_id: String,
     /// Default lookback windows for new advertisers in this account.
-    #[serde(alias="lookbackConfiguration")]
+    #[serde(rename="lookbackConfiguration")]
     pub lookback_configuration: LookbackConfiguration,
 }
 
@@ -3526,7 +3526,7 @@ pub struct CampaignsListResponse {
     /// Campaign collection.
     pub campaigns: Vec<Campaign>,
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#campaignsListResponse".
     pub kind: String,
@@ -3547,7 +3547,7 @@ impl ResponseResult for CampaignsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserRolePermissionsListResponse {
     /// User role permission collection.
-    #[serde(alias="userRolePermissions")]
+    #[serde(rename="userRolePermissions")]
     pub user_role_permissions: Vec<UserRolePermission>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRolePermissionsListResponse".
     pub kind: String,
@@ -3569,26 +3569,26 @@ impl ResponseResult for UserRolePermissionsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserProfile {
     /// The user name.
-    #[serde(alias="userName")]
+    #[serde(rename="userName")]
     pub user_name: String,
     /// The kind of resource this is, in this case dfareporting#userProfile.
     pub kind: String,
     /// The sub account ID this profile belongs to if applicable.
-    #[serde(alias="subAccountId")]
+    #[serde(rename="subAccountId")]
     pub sub_account_id: String,
     /// The account name this profile belongs to.
-    #[serde(alias="accountName")]
+    #[serde(rename="accountName")]
     pub account_name: String,
     /// The eTag of this response for caching purposes.
     pub etag: String,
     /// The sub account name this profile belongs to if applicable.
-    #[serde(alias="subAccountName")]
+    #[serde(rename="subAccountName")]
     pub sub_account_name: String,
     /// The unique ID of the user profile.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// The account ID to which this profile belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -3603,10 +3603,10 @@ impl ResponseResult for UserProfile {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeGroupAssignment {
     /// ID of the creative group to be assigned.
-    #[serde(alias="creativeGroupId")]
+    #[serde(rename="creativeGroupId")]
     pub creative_group_id: String,
     /// Creative group number of the creative group assignment.
-    #[serde(alias="creativeGroupNumber")]
+    #[serde(rename="creativeGroupNumber")]
     pub creative_group_number: String,
 }
 
@@ -3620,31 +3620,31 @@ impl Part for CreativeGroupAssignment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportPathToConversionCriteria {
     /// The list of conversion dimensions the report should include.
-    #[serde(alias="conversionDimensions")]
+    #[serde(rename="conversionDimensions")]
     pub conversion_dimensions: Vec<SortedDimension>,
     /// The list of names of metrics the report should include.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
     /// The date range this report should be run for.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// The list of custom floodlight variables the report should include.
-    #[serde(alias="customFloodlightVariables")]
+    #[serde(rename="customFloodlightVariables")]
     pub custom_floodlight_variables: Vec<SortedDimension>,
     /// The list of 'dfa:activity' values to filter on.
-    #[serde(alias="activityFilters")]
+    #[serde(rename="activityFilters")]
     pub activity_filters: Vec<DimensionValue>,
     /// The list of custom rich media events to include.
-    #[serde(alias="customRichMediaEvents")]
+    #[serde(rename="customRichMediaEvents")]
     pub custom_rich_media_events: Vec<DimensionValue>,
     /// The list of per interaction dimensions the report should include.
-    #[serde(alias="perInteractionDimensions")]
+    #[serde(rename="perInteractionDimensions")]
     pub per_interaction_dimensions: Vec<SortedDimension>,
     /// The properties of the report.
-    #[serde(alias="reportProperties")]
+    #[serde(rename="reportProperties")]
     pub report_properties: ReportPathToConversionCriteriaReportProperties,
     /// The floodlight ID for which to show data in this report. All advertisers associated with that ID will automatically be added. The dimension of the value needs to be 'dfa:floodlightConfigId'.
-    #[serde(alias="floodlightConfigId")]
+    #[serde(rename="floodlightConfigId")]
     pub floodlight_config_id: DimensionValue,
 }
 
@@ -3664,10 +3664,10 @@ impl Part for ReportPathToConversionCriteria {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativeFieldsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Creative field collection.
-    #[serde(alias="creativeFields")]
+    #[serde(rename="creativeFields")]
     pub creative_fields: Vec<CreativeField>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeFieldsListResponse".
     pub kind: String,
@@ -3685,12 +3685,12 @@ pub struct ReportDelivery {
     /// The message to be sent with each email.
     pub message: String,
     /// The type of delivery for the owner to receive, if enabled.
-    #[serde(alias="emailOwnerDeliveryType")]
+    #[serde(rename="emailOwnerDeliveryType")]
     pub email_owner_delivery_type: String,
     /// The list of recipients to which to email the report.
     pub recipients: Vec<Recipient>,
     /// Whether the report should be emailed to the report owner.
-    #[serde(alias="emailOwner")]
+    #[serde(rename="emailOwner")]
     pub email_owner: bool,
 }
 
@@ -3713,10 +3713,10 @@ pub struct GeoTargeting {
     /// Cities to be targeted. For each city only dartId is required. The other fields are populated automatically when the ad is inserted or updated. If targeting a city, do not target or exclude the country of the city, and do not target the metro or region of the city.
     pub cities: Vec<City>,
     /// Whether or not to exclude the countries in the countries field from targeting. If false, the countries field refers to countries which will be targeted by the ad.
-    #[serde(alias="excludeCountries")]
+    #[serde(rename="excludeCountries")]
     pub exclude_countries: bool,
     /// Postal codes to be targeted. For each postal code only id is required. The other fields are populated automatically when the ad is inserted or updated. If targeting a postal code, do not target or exclude the country of the postal code.
-    #[serde(alias="postalCodes")]
+    #[serde(rename="postalCodes")]
     pub postal_codes: Vec<PostalCode>,
 }
 
@@ -3732,13 +3732,13 @@ pub struct DeliverySchedule {
     /// Serving priority of an ad, with respect to other ads. The lower the priority number, the greater the priority with which it is served.
     pub priority: String,
     /// Whether or not hard cutoff is enabled. If true, the ad will not serve after the end date and time. Otherwise the ad will continue to be served until it has reached its delivery goals.
-    #[serde(alias="hardCutoff")]
+    #[serde(rename="hardCutoff")]
     pub hard_cutoff: bool,
     /// Limit on the number of times an individual user can be served the ad within a specified period of time.
-    #[serde(alias="frequencyCap")]
+    #[serde(rename="frequencyCap")]
     pub frequency_cap: FrequencyCap,
     /// Impression ratio for this ad. This ratio determines how often each ad is served relative to the others. For example, if ad A has an impression ratio of 1 and ad B has an impression ratio of 3, then DCM will serve ad B three times as often as ad A. Must be between 1 and 10.
-    #[serde(alias="impressionRatio")]
+    #[serde(rename="impressionRatio")]
     pub impression_ratio: String,
 }
 
@@ -3752,14 +3752,14 @@ impl Part for DeliverySchedule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportSchedule {
     /// Start date of date range for which scheduled reports should be run.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// Enum to define for "MONTHLY" scheduled reports whether reports should be repeated on the same day of the month as "startDate" or the same day of the week of the month.
     /// Example: If 'startDate' is Monday, April 2nd 2012 (2012-04-02), "DAY_OF_MONTH" would run subsequent reports on the 2nd of every Month, and "WEEK_OF_MONTH" would run subsequent reports on the first Monday of the month.
-    #[serde(alias="runsOnDayOfMonth")]
+    #[serde(rename="runsOnDayOfMonth")]
     pub runs_on_day_of_month: String,
     /// The expiration date when the scheduled report stops running.
-    #[serde(alias="expirationDate")]
+    #[serde(rename="expirationDate")]
     pub expiration_date: String,
     /// Whether the schedule is active or not. Must be set to either true or false.
     pub active: bool,
@@ -3771,7 +3771,7 @@ pub struct ReportSchedule {
     /// - "MONTHLY" also requires fields "every" and "runsOnDayOfMonth" to be set.
     pub repeats: String,
     /// List of week days "WEEKLY" on which scheduled reports should run.
-    #[serde(alias="repeatsOnWeekDays")]
+    #[serde(rename="repeatsOnWeekDays")]
     pub repeats_on_week_days: Vec<String>,
 }
 
@@ -3788,7 +3788,7 @@ pub struct Recipient {
     /// The kind of resource this is, in this case dfareporting#recipient.
     pub kind: String,
     /// The delivery type for the recipient.
-    #[serde(alias="deliveryType")]
+    #[serde(rename="deliveryType")]
     pub delivery_type: String,
     /// The email address of the recipient.
     pub email: String,
@@ -3808,12 +3808,12 @@ pub struct ReportCompatibleFields {
     /// The kind of resource this is, in this case dfareporting#reportCompatibleFields.
     pub kind: String,
     /// Metrics which are compatible to be selected as activity metrics to pivot on in the "activities" section of the report.
-    #[serde(alias="pivotedActivityMetrics")]
+    #[serde(rename="pivotedActivityMetrics")]
     pub pivoted_activity_metrics: Vec<Metric>,
     /// Dimensions which are compatible to be selected in the "dimensions" section of the report.
     pub dimensions: Vec<Dimension>,
     /// Dimensions which are compatible to be selected in the "dimensionFilters" section of the report.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<Dimension>,
 }
 
@@ -3832,12 +3832,12 @@ impl Part for ReportCompatibleFields {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdvertiserGroupsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#advertiserGroupsListResponse".
     pub kind: String,
     /// Advertiser group collection.
-    #[serde(alias="advertiserGroups")]
+    #[serde(rename="advertiserGroups")]
     pub advertiser_groups: Vec<AdvertiserGroup>,
 }
 
@@ -3856,12 +3856,12 @@ impl ResponseResult for AdvertiserGroupsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlacementGroupsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementGroupsListResponse".
     pub kind: String,
     /// Placement group collection.
-    #[serde(alias="placementGroups")]
+    #[serde(rename="placementGroups")]
     pub placement_groups: Vec<PlacementGroup>,
 }
 
@@ -3875,31 +3875,31 @@ impl ResponseResult for PlacementGroupsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportPathToConversionCriteriaReportProperties {
     /// DFA checks to see if a click interaction occurred within the specified period of time before a conversion. By default the value is pulled from Floodlight or you can manually enter a custom value. Valid values: 1-90.
-    #[serde(alias="clicksLookbackWindow")]
+    #[serde(rename="clicksLookbackWindow")]
     pub clicks_lookback_window: i32,
     /// Enable pivoting on interaction path.
-    #[serde(alias="pivotOnInteractionPath")]
+    #[serde(rename="pivotOnInteractionPath")]
     pub pivot_on_interaction_path: bool,
     /// DFA checks to see if an impression interaction occurred within the specified period of time before a conversion. By default the value is pulled from Floodlight or you can manually enter a custom value. Valid values: 1-90.
-    #[serde(alias="impressionsLookbackWindow")]
+    #[serde(rename="impressionsLookbackWindow")]
     pub impressions_lookback_window: i32,
     /// Include conversions that have no associated cookies and no exposures. It’s therefore impossible to know how the user was exposed to your ads during the lookback window prior to a conversion.
-    #[serde(alias="includeUnattributedIPConversions")]
+    #[serde(rename="includeUnattributedIPConversions")]
     pub include_unattributed_ip_conversions: bool,
     /// Include conversions of users with a DoubleClick cookie but without an exposure. That means the user did not click or see an ad from the advertiser within the Floodlight group, or that the interaction happened outside the lookback window.
-    #[serde(alias="includeUnattributedCookieConversions")]
+    #[serde(rename="includeUnattributedCookieConversions")]
     pub include_unattributed_cookie_conversions: bool,
     /// The maximum amount of time that can take place between interactions (clicks or impressions) by the same user. Valid values: 1-90.
-    #[serde(alias="maximumInteractionGap")]
+    #[serde(rename="maximumInteractionGap")]
     pub maximum_interaction_gap: i32,
     /// Deprecated: has no effect.
-    #[serde(alias="includeAttributedIPConversions")]
+    #[serde(rename="includeAttributedIPConversions")]
     pub include_attributed_ip_conversions: bool,
     /// The maximum number of click interactions to include in the report. Advertisers currently paying for E2C reports get up to 200 (100 clicks, 100 impressions). If another advertiser in your network is paying for E2C, you can have up to 5 total exposures per report.
-    #[serde(alias="maximumClickInteractions")]
+    #[serde(rename="maximumClickInteractions")]
     pub maximum_click_interactions: i32,
     /// The maximum number of click interactions to include in the report. Advertisers currently paying for E2C reports get up to 200 (100 clicks, 100 impressions). If another advertiser in your network is paying for E2C, you can have up to 5 total exposures per report.
-    #[serde(alias="maximumImpressionInteractions")]
+    #[serde(rename="maximumImpressionInteractions")]
     pub maximum_impression_interactions: i32,
 }
 
@@ -3916,19 +3916,19 @@ pub struct TechnologyTargeting {
     /// Browsers that this ad targets. For each browser either set browserVersionId or dartId along with the version numbers. If both are specified, only browserVersionId will be used.The other fields are populated automatically when the ad is inserted or updated.
     pub browsers: Vec<Browser>,
     /// Operating systems that this ad targets. To target specific versions, use operatingSystemVersions. For each operating system only dartId is required. The other fields are populated automatically when the ad is inserted or updated. If targeting an operating system, do not set targeting for operating system versions for the same operating system.
-    #[serde(alias="operatingSystems")]
+    #[serde(rename="operatingSystems")]
     pub operating_systems: Vec<OperatingSystem>,
     /// Mobile carriers that this ad targets. For each mobile carrier only id is required, and the other fields are populated automatically when the ad is inserted or updated. If targeting a mobile carrier, do not set targeting for any zip codes.
-    #[serde(alias="mobileCarriers")]
+    #[serde(rename="mobileCarriers")]
     pub mobile_carriers: Vec<MobileCarrier>,
     /// Connection types that this ad targets. For each connection type only id is required.The other fields are populated automatically when the ad is inserted or updated.
-    #[serde(alias="connectionTypes")]
+    #[serde(rename="connectionTypes")]
     pub connection_types: Vec<ConnectionType>,
     /// Platform types that this ad targets. For example, desktop, mobile, or tablet. For each platform type, only id is required, and the other fields are populated automatically when the ad is inserted or updated.
-    #[serde(alias="platformTypes")]
+    #[serde(rename="platformTypes")]
     pub platform_types: Vec<PlatformType>,
     /// Operating system versions that this ad targets. To target all versions, use operatingSystems. For each operating system version, only id is required. The other fields are populated automatically when the ad is inserted or updated. If targeting an operating system version, do not set targeting for the corresponding operating system in operatingSystems.
-    #[serde(alias="operatingSystemVersions")]
+    #[serde(rename="operatingSystemVersions")]
     pub operating_system_versions: Vec<OperatingSystemVersion>,
 }
 
@@ -3942,10 +3942,10 @@ impl Part for TechnologyTargeting {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OptimizationActivity {
     /// Floodlight activity ID of this optimization activity. This is a required field.
-    #[serde(alias="floodlightActivityId")]
+    #[serde(rename="floodlightActivityId")]
     pub floodlight_activity_id: String,
     /// Dimension value for the ID of the floodlight activity. This is a read-only, auto-generated field.
-    #[serde(alias="floodlightActivityIdDimensionValue")]
+    #[serde(rename="floodlightActivityIdDimensionValue")]
     pub floodlight_activity_id_dimension_value: DimensionValue,
     /// Weight associated with this optimization. Must be greater than 1. The weight assigned will be understood in proportion to the weights assigned to the other optimization activities.
     pub weight: i32,
@@ -4002,16 +4002,16 @@ pub struct CreativeAssetMetadata {
     /// - "ASSET_FORMAT_UNSUPPORTED_DCM"
     /// - "COMPONENT_UNSUPPORTED_DCM"
     /// - "HTML5_FEATURE_UNSUPPORTED' "
-    #[serde(alias="warnedValidationRules")]
+    #[serde(rename="warnedValidationRules")]
     pub warned_validation_rules: Option<Vec<String>>,
     /// List of feature dependencies for the creative asset that are detected by DCM. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field.
-    #[serde(alias="detectedFeatures")]
+    #[serde(rename="detectedFeatures")]
     pub detected_features: Option<Vec<String>>,
     /// List of detected click tags for assets. This is a read-only auto-generated field.
-    #[serde(alias="clickTags")]
+    #[serde(rename="clickTags")]
     pub click_tags: Option<Vec<ClickTag>>,
     /// ID of the creative asset. This is a required field.
-    #[serde(alias="assetIdentifier")]
+    #[serde(rename="assetIdentifier")]
     pub asset_identifier: Option<CreativeAssetId>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeAssetMetadata".
     pub kind: Option<String>,
@@ -4028,16 +4028,16 @@ impl ResponseResult for CreativeAssetMetadata {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TagData {
     /// Tag string to record a click.
-    #[serde(alias="clickTag")]
+    #[serde(rename="clickTag")]
     pub click_tag: String,
     /// Tag string for serving an ad.
-    #[serde(alias="impressionTag")]
+    #[serde(rename="impressionTag")]
     pub impression_tag: String,
     /// Creative associated with this placement tag.
-    #[serde(alias="creativeId")]
+    #[serde(rename="creativeId")]
     pub creative_id: String,
     /// Ad associated with this placement tag.
-    #[serde(alias="adId")]
+    #[serde(rename="adId")]
     pub ad_id: String,
     /// TagData tag format of this tag.
     pub format: String,
@@ -4053,25 +4053,25 @@ impl Part for TagData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportFloodlightCriteria {
     /// The floodlight ID for which to show data in this report. All advertisers associated with that ID will automatically be added. The dimension of the value needs to be 'dfa:floodlightConfigId'.
-    #[serde(alias="floodlightConfigId")]
+    #[serde(rename="floodlightConfigId")]
     pub floodlight_config_id: DimensionValue,
     /// The list of dimensions the report should include.
     pub dimensions: Vec<SortedDimension>,
     /// The list of names of metrics the report should include.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
     /// The date range this report should be run for.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// The list of custom rich media events to include.
-    #[serde(alias="customRichMediaEvents")]
+    #[serde(rename="customRichMediaEvents")]
     pub custom_rich_media_events: Vec<DimensionValue>,
     /// The list of filters on which dimensions are filtered.
     /// Filters for different dimensions are ANDed, filters for the same dimension are grouped together and ORed.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<DimensionValue>,
     /// The properties of the report.
-    #[serde(alias="reportProperties")]
+    #[serde(rename="reportProperties")]
     pub report_properties: ReportFloodlightCriteriaReportProperties,
 }
 
@@ -4093,7 +4093,7 @@ pub struct LandingPagesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#landingPagesListResponse".
     pub kind: String,
     /// Landing page collection
-    #[serde(alias="landingPages")]
+    #[serde(rename="landingPages")]
     pub landing_pages: Vec<LandingPage>,
 }
 
@@ -4112,7 +4112,7 @@ impl ResponseResult for LandingPagesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SitesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#sitesListResponse".
     pub kind: String,
@@ -4130,7 +4130,7 @@ impl ResponseResult for SitesListResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DimensionFilter {
     /// The name of the dimension to filter.
-    #[serde(alias="dimensionName")]
+    #[serde(rename="dimensionName")]
     pub dimension_name: String,
     /// The kind of resource this is, in this case dfareporting#dimensionFilter.
     pub kind: String,
@@ -4155,12 +4155,12 @@ pub struct PostalCode {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#postalCode".
     pub kind: Option<String>,
     /// DART ID of the country to which this postal code belongs.
-    #[serde(alias="countryDartId")]
+    #[serde(rename="countryDartId")]
     pub country_dart_id: Option<String>,
     /// ID of this postal code.
     pub id: Option<String>,
     /// Country code of the country to which this postal code belongs.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: Option<String>,
 }
 
@@ -4184,25 +4184,25 @@ pub struct FloodlightActivity {
     /// Whether this tag should use SSL.
     pub secure: Option<bool>,
     /// Dimension value for the ID of this floodlight activity. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Name of the associated floodlight activity group. This is a read-only field.
-    #[serde(alias="floodlightActivityGroupName")]
+    #[serde(rename="floodlightActivityGroupName")]
     pub floodlight_activity_group_name: Option<String>,
     /// Whether the image tag is enabled for this activity.
-    #[serde(alias="imageTagEnabled")]
+    #[serde(rename="imageTagEnabled")]
     pub image_tag_enabled: Option<bool>,
     /// Advertiser ID of this floodlight activity. If this field is left blank, the value will be copied over either from the activity group's advertiser or the existing activity's advertiser.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Code type used for cache busting in the generated tag.
-    #[serde(alias="cacheBustingType")]
+    #[serde(rename="cacheBustingType")]
     pub cache_busting_type: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// Floodlight activity group ID of this floodlight activity. This is a required field.
-    #[serde(alias="floodlightActivityGroupId")]
+    #[serde(rename="floodlightActivityGroupId")]
     pub floodlight_activity_group_id: Option<String>,
     /// List of the user-defined variables used by this conversion tag. These map to the "u[1-20]=" in the tags. Each of these can have a user defined type.
     /// Acceptable values are:
@@ -4226,59 +4226,59 @@ pub struct FloodlightActivity {
     /// - "U18"
     /// - "U19"
     /// - "U20"
-    #[serde(alias="userDefinedVariableTypes")]
+    #[serde(rename="userDefinedVariableTypes")]
     pub user_defined_variable_types: Option<Vec<String>>,
     /// Value of the cat= paramter in the floodlight tag, which the ad servers use to identify the activity. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activities of the same activity group. This field is read-only after insertion.
-    #[serde(alias="tagString")]
+    #[serde(rename="tagString")]
     pub tag_string: Option<String>,
     /// Tag string of the associated floodlight activity group. This is a read-only field.
-    #[serde(alias="floodlightActivityGroupTagString")]
+    #[serde(rename="floodlightActivityGroupTagString")]
     pub floodlight_activity_group_tag_string: Option<String>,
     /// URL where this tag will be deployed. If specified, must be less than 256 characters long.
-    #[serde(alias="expectedUrl")]
+    #[serde(rename="expectedUrl")]
     pub expected_url: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivity".
     pub kind: Option<String>,
     /// Subaccount ID of this floodlight activity. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this floodlight activity. This is a required field. Must be less than 129 characters long and cannot contain quotes.
     pub name: Option<String>,
     /// Publisher dynamic floodlight tags.
-    #[serde(alias="publisherTags")]
+    #[serde(rename="publisherTags")]
     pub publisher_tags: Option<Vec<FloodlightActivityPublisherDynamicTag>>,
     /// Whether the floodlight activity is SSL-compliant. This is a read-only field, its value detected by the system from the floodlight tags.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// General notes or implementation instructions for the tag.
     pub notes: Option<String>,
     /// Floodlight configuration ID of this floodlight activity. If this field is left blank, the value will be copied over either from the activity group's floodlight configuration or from the existing activity's floodlight configuration.
-    #[serde(alias="floodlightConfigurationId")]
+    #[serde(rename="floodlightConfigurationId")]
     pub floodlight_configuration_id: Option<String>,
     /// ID of this floodlight activity. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Counting method for conversions for this floodlight activity. This is a required field.
-    #[serde(alias="countingMethod")]
+    #[serde(rename="countingMethod")]
     pub counting_method: Option<String>,
     /// Dynamic floodlight tags.
-    #[serde(alias="defaultTags")]
+    #[serde(rename="defaultTags")]
     pub default_tags: Option<Vec<FloodlightActivityDynamicTag>>,
     /// Dimension value for the ID of the floodlight configuration. This is a read-only, auto-generated field.
-    #[serde(alias="floodlightConfigurationIdDimensionValue")]
+    #[serde(rename="floodlightConfigurationIdDimensionValue")]
     pub floodlight_configuration_id_dimension_value: Option<DimensionValue>,
     /// Tag format type for the floodlight activity. If left blank, the tag format will default to HTML.
-    #[serde(alias="tagFormat")]
+    #[serde(rename="tagFormat")]
     pub tag_format: Option<String>,
     /// Whether this activity is archived.
     pub hidden: Option<bool>,
     /// Account ID of this floodlight activity. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Whether this floodlight activity must be SSL-compliant.
-    #[serde(alias="sslRequired")]
+    #[serde(rename="sslRequired")]
     pub ssl_required: Option<bool>,
     /// Type of the associated floodlight activity group. This is a read-only field.
-    #[serde(alias="floodlightActivityGroupType")]
+    #[serde(rename="floodlightActivityGroupType")]
     pub floodlight_activity_group_type: Option<String>,
 }
 
@@ -4298,20 +4298,20 @@ impl ResponseResult for FloodlightActivity {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Browser {
     /// Major version number (leftmost number) of this browser. For example, for Chrome 5.0.376.86 beta, this field should be set to 5. An asterisk (*) may be used to target any version number, and a question mark (?) may be used to target cases where the version number cannot be identified. For example, Chrome *.* targets any version of Chrome: 1.2, 2.5, 3.5, and so on. Chrome 3.* targets Chrome 3.1, 3.5, but not 4.0. Firefox ?.? targets cases where the ad server knows the browser is Firefox but can't tell which version it is.
-    #[serde(alias="majorVersion")]
+    #[serde(rename="majorVersion")]
     pub major_version: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#browser".
     pub kind: Option<String>,
     /// ID referring to this grouping of browser and version numbers. This is the ID used for targeting.
-    #[serde(alias="browserVersionId")]
+    #[serde(rename="browserVersionId")]
     pub browser_version_id: Option<String>,
     /// Name of this browser.
     pub name: Option<String>,
     /// DART ID of this browser. This is the ID used when generating reports.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: Option<String>,
     /// Minor version number (number after first dot on left) of this browser. For example, for Chrome 5.0.375.86 beta, this field should be set to 0. An asterisk (*) may be used to target any version number, and a question mark (?) may be used to target cases where the version number cannot be identified. For example, Chrome *.* targets any version of Chrome: 1.2, 2.5, 3.5, and so on. Chrome 3.* targets Chrome 3.1, 3.5, but not 4.0. Firefox ?.? targets cases where the ad server knows the browser is Firefox but can't tell which version it is.
-    #[serde(alias="minorVersion")]
+    #[serde(rename="minorVersion")]
     pub minor_version: Option<String>,
 }
 
@@ -4330,10 +4330,10 @@ impl Resource for Browser {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountUserProfilesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Account user profile collection.
-    #[serde(alias="accountUserProfiles")]
+    #[serde(rename="accountUserProfiles")]
     pub account_user_profiles: Vec<AccountUserProfile>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountUserProfilesListResponse".
     pub kind: String,
@@ -4362,37 +4362,37 @@ pub struct Advertiser {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#advertiser".
     pub kind: Option<String>,
     /// Subaccount ID of this advertiser.This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this advertiser. This is a required field and must be less than 256 characters long and unique among advertisers of the same account.
     pub name: Option<String>,
     /// ID of the click-through event tag to apply by default to the landing pages of this advertiser's campaigns.
-    #[serde(alias="defaultClickThroughEventTagId")]
+    #[serde(rename="defaultClickThroughEventTagId")]
     pub default_click_through_event_tag_id: Option<String>,
     /// Suffix added to click-through URL of ad creative associations under this advertiser. Must be less than 129 characters long.
-    #[serde(alias="clickThroughUrlSuffix")]
+    #[serde(rename="clickThroughUrlSuffix")]
     pub click_through_url_suffix: Option<String>,
     /// Floodlight configuration ID of this advertiser. The floodlight configuration ID will be created automatically, so on insert this field should be left blank. This field can be set to another advertiser's floodlight configuration ID in order to share that advertiser's floodlight configuration with this advertiser, so long as: 
     /// - This advertiser's original floodlight configuration is not already associated with floodlight activities or floodlight activity groups. 
     /// - This advertiser's original floodlight configuration is not already shared with another advertiser.
-    #[serde(alias="floodlightConfigurationId")]
+    #[serde(rename="floodlightConfigurationId")]
     pub floodlight_configuration_id: Option<String>,
     /// Dimension value for the ID of the floodlight configuration. This is a read-only, auto-generated field.
-    #[serde(alias="floodlightConfigurationIdDimensionValue")]
+    #[serde(rename="floodlightConfigurationIdDimensionValue")]
     pub floodlight_configuration_id_dimension_value: Option<DimensionValue>,
     /// ID of the advertiser group this advertiser belongs to. You can group advertisers for reporting purposes, allowing you to see aggregated information for all advertisers in each group.
-    #[serde(alias="advertiserGroupId")]
+    #[serde(rename="advertiserGroupId")]
     pub advertiser_group_id: Option<String>,
     /// Dimension value for the ID of this advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Default email address used in sender field for tag emails.
-    #[serde(alias="defaultEmail")]
+    #[serde(rename="defaultEmail")]
     pub default_email: Option<String>,
     /// ID of this advertiser. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this advertiser.This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -4415,7 +4415,7 @@ pub struct PlatformTypesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#platformTypesListResponse".
     pub kind: String,
     /// Platform type collection.
-    #[serde(alias="platformTypes")]
+    #[serde(rename="platformTypes")]
     pub platform_types: Vec<PlatformType>,
 }
 
@@ -4434,12 +4434,12 @@ impl ResponseResult for PlatformTypesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChangeLogsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#changeLogsListResponse".
     pub kind: String,
     /// Change log collection.
-    #[serde(alias="changeLogs")]
+    #[serde(rename="changeLogs")]
     pub change_logs: Vec<ChangeLog>,
 }
 
@@ -4458,7 +4458,7 @@ impl ResponseResult for ChangeLogsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlacementsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementsListResponse".
     pub kind: String,
@@ -4481,7 +4481,7 @@ impl ResponseResult for PlacementsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#adsListResponse".
     pub kind: String,
@@ -4503,23 +4503,23 @@ pub struct ReportReachCriteria {
     /// The list of dimensions the report should include.
     pub dimensions: Vec<SortedDimension>,
     /// The list of names of metrics the report should include.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
     /// The date range this report should be run for.
-    #[serde(alias="dateRange")]
+    #[serde(rename="dateRange")]
     pub date_range: DateRange,
     /// The list of filters on which dimensions are filtered.
     /// Filters for different dimensions are ANDed, filters for the same dimension are grouped together and ORed.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<DimensionValue>,
     /// The list of names of  Reach By Frequency metrics the report should include.
-    #[serde(alias="reachByFrequencyMetricNames")]
+    #[serde(rename="reachByFrequencyMetricNames")]
     pub reach_by_frequency_metric_names: Vec<String>,
     /// Custom Rich Media Events group.
-    #[serde(alias="customRichMediaEvents")]
+    #[serde(rename="customRichMediaEvents")]
     pub custom_rich_media_events: CustomRichMediaEvents,
     /// Whether to enable all reach dimension combinations in the report. Defaults to false. If enabled, the date range of the report should be within the last three months.
-    #[serde(alias="enableAllDimensionCombinations")]
+    #[serde(rename="enableAllDimensionCombinations")]
     pub enable_all_dimension_combinations: bool,
 }
 
@@ -4534,10 +4534,10 @@ impl Part for ReportReachCriteria {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FileUrls {
     /// The URL for downloading the report data through a browser.
-    #[serde(alias="browserUrl")]
+    #[serde(rename="browserUrl")]
     pub browser_url: String,
     /// The URL for downloading the report data through the API.
-    #[serde(alias="apiUrl")]
+    #[serde(rename="apiUrl")]
     pub api_url: String,
 }
 
@@ -4552,13 +4552,13 @@ impl Part for FileUrls {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserDefinedVariableConfiguration {
     /// Data type for the variable. This is a required field.
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: String,
     /// User-friendly name for the variable which will appear in reports. This is a required field, must be less than 64 characters long, and cannot contain the following characters: ""<>".
-    #[serde(alias="reportName")]
+    #[serde(rename="reportName")]
     pub report_name: String,
     /// Variable name in the tag. This is a required field.
-    #[serde(alias="variableType")]
+    #[serde(rename="variableType")]
     pub variable_type: String,
 }
 
@@ -4572,22 +4572,22 @@ impl Part for UserDefinedVariableConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightActivityPublisherDynamicTag {
     /// Whether this tag is applicable only for view-throughs.
-    #[serde(alias="viewThrough")]
+    #[serde(rename="viewThrough")]
     pub view_through: bool,
     /// Site ID of this dynamic tag.
-    #[serde(alias="siteId")]
+    #[serde(rename="siteId")]
     pub site_id: String,
     /// Whether this tag is applicable only for click-throughs.
-    #[serde(alias="clickThrough")]
+    #[serde(rename="clickThrough")]
     pub click_through: bool,
     /// Directory site ID of this dynamic tag. This is a write-only field that can be used as an alternative to the siteId field. When this resource is retrieved, only the siteId field will be populated.
-    #[serde(alias="directorySiteId")]
+    #[serde(rename="directorySiteId")]
     pub directory_site_id: String,
     /// Dimension value for the ID of the site. This is a read-only, auto-generated field.
-    #[serde(alias="siteIdDimensionValue")]
+    #[serde(rename="siteIdDimensionValue")]
     pub site_id_dimension_value: DimensionValue,
     /// Dynamic floodlight tag.
-    #[serde(alias="dynamicTag")]
+    #[serde(rename="dynamicTag")]
     pub dynamic_tag: FloodlightActivityDynamicTag,
 }
 
@@ -4666,27 +4666,27 @@ pub struct City {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#city".
     pub kind: String,
     /// DART ID of the country to which this city belongs.
-    #[serde(alias="countryDartId")]
+    #[serde(rename="countryDartId")]
     pub country_dart_id: String,
     /// Name of this city.
     pub name: String,
     /// Country code of the country to which this city belongs.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: String,
     /// Metro region code of the metro region (DMA) to which this city belongs.
-    #[serde(alias="metroCode")]
+    #[serde(rename="metroCode")]
     pub metro_code: String,
     /// Region code of the region to which this city belongs.
-    #[serde(alias="regionCode")]
+    #[serde(rename="regionCode")]
     pub region_code: String,
     /// ID of the metro region (DMA) to which this city belongs.
-    #[serde(alias="metroDmaId")]
+    #[serde(rename="metroDmaId")]
     pub metro_dma_id: String,
     /// DART ID of this city. This is the ID used for targeting and generating reports.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: String,
     /// DART ID of the region to which this city belongs.
-    #[serde(alias="regionDartId")]
+    #[serde(rename="regionDartId")]
     pub region_dart_id: String,
 }
 
@@ -4700,10 +4700,10 @@ impl Part for City {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClickThroughUrlSuffixProperties {
     /// Click-through URL suffix to apply to all ads in this entity's scope. Must be less than 128 characters long.
-    #[serde(alias="clickThroughUrlSuffix")]
+    #[serde(rename="clickThroughUrlSuffix")]
     pub click_through_url_suffix: String,
     /// Whether this entity should override the inherited click-through URL suffix with its own defined value.
-    #[serde(alias="overrideInheritedSuffix")]
+    #[serde(rename="overrideInheritedSuffix")]
     pub override_inherited_suffix: bool,
 }
 
@@ -4728,78 +4728,78 @@ pub struct PlacementGroup {
     /// Comments for this placement group.
     pub comment: Option<String>,
     /// ID of the primary placement, used to calculate the media cost of a roadblock (placement group). Modifying this field will automatically modify the primary field on all affected roadblock child placements.
-    #[serde(alias="primaryPlacementId")]
+    #[serde(rename="primaryPlacementId")]
     pub primary_placement_id: Option<String>,
     /// Campaign ID of this placement group. This field is required on insertion.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: Option<String>,
     /// Dimension value for the ID of the primary placement. This is a read-only, auto-generated field.
-    #[serde(alias="primaryPlacementIdDimensionValue")]
+    #[serde(rename="primaryPlacementIdDimensionValue")]
     pub primary_placement_id_dimension_value: Option<DimensionValue>,
     /// Dimension value for the ID of the directory site. This is a read-only, auto-generated field.
-    #[serde(alias="directorySiteIdDimensionValue")]
+    #[serde(rename="directorySiteIdDimensionValue")]
     pub directory_site_id_dimension_value: Option<DimensionValue>,
     /// Advertiser ID of this placement group. This is a required field on insertion.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Directory site ID associated with this placement group. On insert, you must set either this field or the site_id field to specify the site associated with this placement group. This is a required field that is read-only after insertion.
-    #[serde(alias="directorySiteId")]
+    #[serde(rename="directorySiteId")]
     pub directory_site_id: Option<String>,
     /// Information about the creation of this placement group. This is a read-only field.
-    #[serde(alias="createInfo")]
+    #[serde(rename="createInfo")]
     pub create_info: Option<LastModifiedInfo>,
     /// Site ID associated with this placement group. On insert, you must set either this field or the directorySiteId field to specify the site associated with this placement group. This is a required field that is read-only after insertion.
-    #[serde(alias="siteId")]
+    #[serde(rename="siteId")]
     pub site_id: Option<String>,
     /// Pricing schedule of this placement group. This field is required on insertion.
-    #[serde(alias="pricingSchedule")]
+    #[serde(rename="pricingSchedule")]
     pub pricing_schedule: Option<PricingSchedule>,
     /// Dimension value for the ID of the site. This is a read-only, auto-generated field.
-    #[serde(alias="siteIdDimensionValue")]
+    #[serde(rename="siteIdDimensionValue")]
     pub site_id_dimension_value: Option<DimensionValue>,
     /// Type of this placement group. A package is a simple group of placements that acts as a single pricing point for a group of tags. A roadblock is a group of placements that not only acts as a single pricing point, but also assumes that all the tags in it will be served at the same time. A roadblock requires one of its assigned placements to be marked as primary for reporting. This field is required on insertion.
-    #[serde(alias="placementGroupType")]
+    #[serde(rename="placementGroupType")]
     pub placement_group_type: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// Whether this placement group is archived.
     pub archived: Option<bool>,
     /// ID of this placement group. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// ID of the placement strategy assigned to this placement group.
-    #[serde(alias="placementStrategyId")]
+    #[serde(rename="placementStrategyId")]
     pub placement_strategy_id: Option<String>,
     /// Account ID of this placement group. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Settings for a programmatic placement.
-    #[serde(alias="programmaticSetting")]
+    #[serde(rename="programmaticSetting")]
     pub programmatic_setting: Option<ProgrammaticSetting>,
     /// Dimension value for the ID of the campaign. This is a read-only, auto-generated field.
-    #[serde(alias="campaignIdDimensionValue")]
+    #[serde(rename="campaignIdDimensionValue")]
     pub campaign_id_dimension_value: Option<DimensionValue>,
     /// Subaccount ID of this placement group. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this placement group. This is a required field and must be less than 256 characters long.
     pub name: Option<String>,
     /// IDs of placements which are assigned to this placement group. This is a read-only, auto-generated field.
-    #[serde(alias="childPlacementIds")]
+    #[serde(rename="childPlacementIds")]
     pub child_placement_ids: Option<Vec<String>>,
     /// Information about the most recent modification of this placement group. This is a read-only field.
-    #[serde(alias="lastModifiedInfo")]
+    #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementGroup".
     pub kind: Option<String>,
     /// ID of the content category assigned to this placement group.
-    #[serde(alias="contentCategoryId")]
+    #[serde(rename="contentCategoryId")]
     pub content_category_id: Option<String>,
     /// External ID for this placement.
-    #[serde(alias="externalId")]
+    #[serde(rename="externalId")]
     pub external_id: Option<String>,
     /// Dimension value for the ID of this placement group. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
 }
 
@@ -4817,7 +4817,7 @@ pub struct ThirdPartyTrackingUrl {
     /// URL for the specified third-party URL type.
     pub url: String,
     /// Third-party URL type for in-stream video creatives.
-    #[serde(alias="thirdPartyUrlType")]
+    #[serde(rename="thirdPartyUrlType")]
     pub third_party_url_type: String,
 }
 
@@ -4837,7 +4837,7 @@ impl Part for ThirdPartyTrackingUrl {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRolePermission {
     /// ID of the permission group that this user role permission belongs to.
-    #[serde(alias="permissionGroupId")]
+    #[serde(rename="permissionGroupId")]
     pub permission_group_id: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRolePermission".
     pub kind: String,
@@ -4880,30 +4880,30 @@ impl ResponseResult for MetrosListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PricingSchedule {
     /// Placement start date. This date must be later than, or the same day as, the campaign start date. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error. This field is required on insertion.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// Placement end date. This date must be later than, or the same day as, the placement start date, but not later than the campaign end date. If, for example, you set 6/25/2015 as both the start and end dates, the effective placement date is just that day only, 6/25/2015. The hours, minutes, and seconds of the end date should not be set, as doing so will result in an error. This field is required on insertion.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// Whether this placement is flighted. If true, pricing periods will be computed automatically.
     pub flighted: bool,
     /// Whether cap costs are ignored by ad serving.
-    #[serde(alias="disregardOverdelivery")]
+    #[serde(rename="disregardOverdelivery")]
     pub disregard_overdelivery: bool,
     /// Placement cap cost option.
-    #[serde(alias="capCostOption")]
+    #[serde(rename="capCostOption")]
     pub cap_cost_option: String,
     /// Pricing periods for this placement.
-    #[serde(alias="pricingPeriods")]
+    #[serde(rename="pricingPeriods")]
     pub pricing_periods: Vec<PricingSchedulePricingPeriod>,
     /// Placement pricing type. This field is required on insertion.
-    #[serde(alias="pricingType")]
+    #[serde(rename="pricingType")]
     pub pricing_type: String,
     /// Testing start date of this placement. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error.
-    #[serde(alias="testingStartDate")]
+    #[serde(rename="testingStartDate")]
     pub testing_start_date: String,
     /// Floodlight activity ID associated with this placement. This field should be set when placement pricing type is set to PRICING_TYPE_CPA.
-    #[serde(alias="floodlightActivityId")]
+    #[serde(rename="floodlightActivityId")]
     pub floodlight_activity_id: String,
 }
 
@@ -4922,7 +4922,7 @@ impl Part for PricingSchedule {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountsListResponse".
     pub kind: String,
@@ -4947,7 +4947,7 @@ pub struct OperatingSystem {
     /// Whether this operating system is for mobile.
     pub mobile: Option<bool>,
     /// DART ID of this operating system. This is the ID used for targeting.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: Option<String>,
     /// Whether this operating system is for desktop.
     pub desktop: Option<bool>,
@@ -4971,7 +4971,7 @@ pub struct Activities {
     /// List of activity filters. The dimension values need to be all either of type "dfa:activity" or "dfa:activityGroup".
     pub filters: Vec<DimensionValue>,
     /// List of names of floodlight activity metrics.
-    #[serde(alias="metricNames")]
+    #[serde(rename="metricNames")]
     pub metric_names: Vec<String>,
 }
 
@@ -4989,7 +4989,7 @@ pub struct SortedDimension {
     /// The name of the dimension.
     pub name: String,
     /// An optional sort order for the dimension column.
-    #[serde(alias="sortOrder")]
+    #[serde(rename="sortOrder")]
     pub sort_order: String,
 }
 
@@ -5008,12 +5008,12 @@ impl Part for SortedDimension {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlacementStrategiesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#placementStrategiesListResponse".
     pub kind: String,
     /// Placement strategy collection.
-    #[serde(alias="placementStrategies")]
+    #[serde(rename="placementStrategies")]
     pub placement_strategies: Vec<PlacementStrategy>,
 }
 
@@ -5032,7 +5032,7 @@ impl ResponseResult for PlacementStrategiesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportList {
     /// Continuation token used to page through reports. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The reports returned in this response.
     pub items: Vec<Report>,
@@ -5064,7 +5064,7 @@ pub struct AdvertiserGroup {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#advertiserGroup".
     pub kind: Option<String>,
     /// Account ID of this advertiser group. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// ID of this advertiser group. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -5084,15 +5084,15 @@ impl ResponseResult for AdvertiserGroup {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FsCommand {
     /// Height of the window.
-    #[serde(alias="windowHeight")]
+    #[serde(rename="windowHeight")]
     pub window_height: i32,
     /// Distance from the top of the browser. Applicable when positionOption is DISTANCE_FROM_TOP_LEFT_CORNER.
     pub top: i32,
     /// Width of the window.
-    #[serde(alias="windowWidth")]
+    #[serde(rename="windowWidth")]
     pub window_width: i32,
     /// Position in the browser where the window will open.
-    #[serde(alias="positionOption")]
+    #[serde(rename="positionOption")]
     pub position_option: String,
     /// Distance from the left of the browser.Applicable when positionOption is DISTANCE_FROM_TOP_LEFT_CORNER.
     pub left: i32,
@@ -5108,14 +5108,14 @@ impl Part for FsCommand {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeOptimizationConfiguration {
     /// List of optimization activities associated with this configuration.
-    #[serde(alias="optimizationActivitys")]
+    #[serde(rename="optimizationActivitys")]
     pub optimization_activitys: Vec<OptimizationActivity>,
     /// ID of this creative optimization config. This field is auto-generated when the campaign is inserted or updated. It can be null for existing campaigns.
     pub id: String,
     /// Name of this creative optimization config. This is a required field and must be less than 129 characters long.
     pub name: String,
     /// Optimization model for this configuration.
-    #[serde(alias="optimizationModel")]
+    #[serde(rename="optimizationModel")]
     pub optimization_model: String,
 }
 
@@ -5134,10 +5134,10 @@ impl Part for CreativeOptimizationConfiguration {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativeGroupsListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Creative group collection.
-    #[serde(alias="creativeGroups")]
+    #[serde(rename="creativeGroups")]
     pub creative_groups: Vec<CreativeGroup>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeGroupsListResponse".
     pub kind: String,
@@ -5168,10 +5168,10 @@ impl Part for OffsetPosition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetWindow {
     /// User-entered value.
-    #[serde(alias="customHtml")]
+    #[serde(rename="customHtml")]
     pub custom_html: String,
     /// Type of browser window for which the backup image of the flash creative can be displayed.
-    #[serde(alias="targetWindowOption")]
+    #[serde(rename="targetWindowOption")]
     pub target_window_option: String,
 }
 
@@ -5185,21 +5185,21 @@ impl Part for TargetWindow {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProgrammaticSetting {
     /// Trafficker emails assigned to the placement.
-    #[serde(alias="traffickerEmails")]
+    #[serde(rename="traffickerEmails")]
     pub trafficker_emails: Vec<String>,
     /// Whether programmatic is enabled.
     pub programmatic: bool,
     /// Media cost for the programmatic placement.
-    #[serde(alias="mediaCostNanos")]
+    #[serde(rename="mediaCostNanos")]
     pub media_cost_nanos: String,
     /// Adx deal IDs assigned to the placement.
-    #[serde(alias="adxDealIds")]
+    #[serde(rename="adxDealIds")]
     pub adx_deal_ids: Vec<String>,
     /// Insertion order ID.
-    #[serde(alias="insertionOrderId")]
+    #[serde(rename="insertionOrderId")]
     pub insertion_order_id: String,
     /// Whether insertion order ID has been placed in DFP. This is a read-only field.
-    #[serde(alias="insertionOrderIdStatus")]
+    #[serde(rename="insertionOrderIdStatus")]
     pub insertion_order_id_status: bool,
 }
 
@@ -5213,15 +5213,15 @@ impl Part for ProgrammaticSetting {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteContact {
     /// Last name of this site contact.
-    #[serde(alias="lastName")]
+    #[serde(rename="lastName")]
     pub last_name: String,
     /// Site contact type.
-    #[serde(alias="contactType")]
+    #[serde(rename="contactType")]
     pub contact_type: String,
     /// Email address of this site contact. This is a required field.
     pub email: String,
     /// First name of this site contact.
-    #[serde(alias="firstName")]
+    #[serde(rename="firstName")]
     pub first_name: String,
     /// ID of this site contact. This is a read-only, auto-generated field.
     pub id: String,
@@ -5237,16 +5237,16 @@ impl Part for SiteContact {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeRotation {
     /// Creative assignments in this creative rotation.
-    #[serde(alias="creativeAssignments")]
+    #[serde(rename="creativeAssignments")]
     pub creative_assignments: Vec<CreativeAssignment>,
     /// Strategy for calculating weights. Used with CREATIVE_ROTATION_TYPE_RANDOM.
-    #[serde(alias="weightCalculationStrategy")]
+    #[serde(rename="weightCalculationStrategy")]
     pub weight_calculation_strategy: String,
     /// Creative optimization configuration that is used by this ad. It should refer to one of the existing optimization configurations in the ad's campaign. If it is unset or set to 0, then the campaign's default optimization configuration will be used for this ad.
-    #[serde(alias="creativeOptimizationConfigurationId")]
+    #[serde(rename="creativeOptimizationConfigurationId")]
     pub creative_optimization_configuration_id: String,
     /// Type of creative rotation. Can be used to specify whether to use sequential or random rotation.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -5267,21 +5267,21 @@ pub struct Metro {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#metro".
     pub kind: Option<String>,
     /// DART ID of the country to which this metro region belongs.
-    #[serde(alias="countryDartId")]
+    #[serde(rename="countryDartId")]
     pub country_dart_id: Option<String>,
     /// Name of this metro region.
     pub name: Option<String>,
     /// Country code of the country to which this metro region belongs.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: Option<String>,
     /// Metro code of this metro region. This is equivalent to dma_id.
-    #[serde(alias="metroCode")]
+    #[serde(rename="metroCode")]
     pub metro_code: Option<String>,
     /// DART ID of this metro region.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: Option<String>,
     /// DMA ID of this metro region. This is the ID used for targeting and generating reports, and is equivalent to metro_code.
-    #[serde(alias="dmaId")]
+    #[serde(rename="dmaId")]
     pub dma_id: Option<String>,
 }
 
@@ -5300,15 +5300,15 @@ impl Resource for Metro {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Country {
     /// DART ID of this country. This is the ID used for targeting and generating reports.
-    #[serde(alias="dartId")]
+    #[serde(rename="dartId")]
     pub dart_id: String,
     /// Whether ad serving supports secure servers in this country.
-    #[serde(alias="sslEnabled")]
+    #[serde(rename="sslEnabled")]
     pub ssl_enabled: bool,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#country".
     pub kind: String,
     /// Country code.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: String,
     /// Name of this country.
     pub name: String,
@@ -5331,7 +5331,7 @@ pub struct PostalCodesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#postalCodesListResponse".
     pub kind: String,
     /// Postal code collection.
-    #[serde(alias="postalCodes")]
+    #[serde(rename="postalCodes")]
     pub postal_codes: Vec<PostalCode>,
 }
 
@@ -5345,16 +5345,16 @@ impl ResponseResult for PostalCodesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TagSetting {
     /// Whether static landing page URLs should be included in the tags. This setting applies only to placements.
-    #[serde(alias="includeClickThroughUrls")]
+    #[serde(rename="includeClickThroughUrls")]
     pub include_click_through_urls: bool,
     /// Whether click-tracking string should be included in the tags.
-    #[serde(alias="includeClickTracking")]
+    #[serde(rename="includeClickTracking")]
     pub include_click_tracking: bool,
     /// Additional key-values to be included in tags. Each key-value pair must be of the form key=value, and pairs must be separated by a semicolon (;). Keys and values must not contain commas. For example, id=2;color=red is a valid value for this field.
-    #[serde(alias="additionalKeyValues")]
+    #[serde(rename="additionalKeyValues")]
     pub additional_key_values: String,
     /// Option specifying how keywords are embedded in ad tags. This setting can be used to specify whether keyword placeholders are inserted in placement tags for this site. Publishers can then add keywords to those placeholders.
-    #[serde(alias="keywordOption")]
+    #[serde(rename="keywordOption")]
     pub keyword_option: String,
 }
 
@@ -5380,48 +5380,48 @@ pub struct EventTag {
     /// Status of this event tag. Must be ENABLED for this event tag to fire. This is a required field.
     pub status: Option<String>,
     /// Filter list of site IDs associated with this event tag. The siteFilterType determines whether this is a whitelist or blacklist filter.
-    #[serde(alias="siteIds")]
+    #[serde(rename="siteIds")]
     pub site_ids: Option<Vec<String>>,
     /// Campaign ID of this event tag. This field or the advertiserId field is required on insertion.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: Option<String>,
     /// Dimension value for the ID of the campaign. This is a read-only, auto-generated field.
-    #[serde(alias="campaignIdDimensionValue")]
+    #[serde(rename="campaignIdDimensionValue")]
     pub campaign_id_dimension_value: Option<DimensionValue>,
     /// Whether this event tag should be automatically enabled for all of the advertiser's campaigns and ads.
-    #[serde(alias="enabledByDefault")]
+    #[serde(rename="enabledByDefault")]
     pub enabled_by_default: Option<bool>,
     /// Advertiser ID of this event tag. This field or the campaignId field is required on insertion.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Site filter type for this event tag. If no type is specified then the event tag will be applied to all sites.
-    #[serde(alias="siteFilterType")]
+    #[serde(rename="siteFilterType")]
     pub site_filter_type: Option<String>,
     /// Event tag type. Can be used to specify whether to use a third-party pixel, a third-party JavaScript URL, or a third-party click-through URL for either impression or click tracking. This is a required field.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// ID of this event tag. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this event tag. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#eventTag".
     pub kind: Option<String>,
     /// Subaccount ID of this event tag. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this event tag. This is a required field and must be less than 256 characters long.
     pub name: Option<String>,
     /// Payload URL for this event tag. The URL on a click-through event tag should have a landing page URL appended to the end of it. This field is required on insertion.
     pub url: Option<String>,
     /// Whether this tag is SSL-compliant or not.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// Number of times the landing page URL should be URL-escaped before being appended to the click-through event tag URL. Only applies to click-through event tags as specified by the event tag type.
-    #[serde(alias="urlEscapeLevels")]
+    #[serde(rename="urlEscapeLevels")]
     pub url_escape_levels: Option<i32>,
 }
 
@@ -5442,12 +5442,12 @@ impl ResponseResult for EventTag {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativeFieldValuesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeFieldValuesListResponse".
     pub kind: String,
     /// Creative field value collection.
-    #[serde(alias="creativeFieldValues")]
+    #[serde(rename="creativeFieldValues")]
     pub creative_field_values: Vec<CreativeFieldValue>,
 }
 
@@ -5471,13 +5471,13 @@ pub struct DirectorySiteContact {
     /// Directory site contact role.
     pub role: String,
     /// First name of this directory site contact.
-    #[serde(alias="firstName")]
+    #[serde(rename="firstName")]
     pub first_name: String,
     /// Last name of this directory site contact.
-    #[serde(alias="lastName")]
+    #[serde(rename="lastName")]
     pub last_name: String,
     /// Directory site contact type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Email address of this directory site contact.
     pub email: String,
@@ -5501,14 +5501,14 @@ impl ResponseResult for DirectorySiteContact {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DimensionValue {
     /// The name of the dimension.
-    #[serde(alias="dimensionName")]
+    #[serde(rename="dimensionName")]
     pub dimension_name: Option<String>,
     /// The kind of resource this is, in this case dfareporting#dimensionValue.
     pub kind: Option<String>,
     /// The eTag of this response for caching purposes.
     pub etag: Option<String>,
     /// Determines how the 'value' field is matched when filtering. If not specified, defaults to EXACT. If set to WILDCARD_EXPRESSION, '*' is allowed as a placeholder for variable length character sequences, and it can be escaped with a backslash. Note, only paid search dimensions ('dfa:paidSearch*') allow a matchType other than EXACT.
-    #[serde(alias="matchType")]
+    #[serde(rename="matchType")]
     pub match_type: Option<String>,
     /// The ID associated with the value if available.
     pub id: Option<String>,
@@ -5531,12 +5531,12 @@ impl Resource for DimensionValue {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ContentCategoriesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#contentCategoriesListResponse".
     pub kind: String,
     /// Content category collection.
-    #[serde(alias="contentCategories")]
+    #[serde(rename="contentCategories")]
     pub content_categories: Vec<ContentCategory>,
 }
 
@@ -5555,7 +5555,7 @@ impl ResponseResult for ContentCategoriesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FloodlightConfigurationsListResponse {
     /// Floodlight configuration collection.
-    #[serde(alias="floodlightConfigurations")]
+    #[serde(rename="floodlightConfigurations")]
     pub floodlight_configurations: Vec<FloodlightConfiguration>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightConfigurationsListResponse".
     pub kind: String,
@@ -5571,26 +5571,26 @@ impl ResponseResult for FloodlightConfigurationsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PopupWindowProperties {
     /// Whether to display the browser status bar.
-    #[serde(alias="showStatusBar")]
+    #[serde(rename="showStatusBar")]
     pub show_status_bar: bool,
     /// Whether to display the browser scroll bar.
-    #[serde(alias="showScrollBar")]
+    #[serde(rename="showScrollBar")]
     pub show_scroll_bar: bool,
     /// Whether to display the browser address bar.
-    #[serde(alias="showAddressBar")]
+    #[serde(rename="showAddressBar")]
     pub show_address_bar: bool,
     /// Whether to display the browser menu bar.
-    #[serde(alias="showMenuBar")]
+    #[serde(rename="showMenuBar")]
     pub show_menu_bar: bool,
     /// Title of popup window.
     pub title: String,
     /// Upper-left corner coordinates of the popup window. Applicable if positionType is COORDINATES.
     pub offset: OffsetPosition,
     /// Popup window position either centered or at specific coordinate.
-    #[serde(alias="positionType")]
+    #[serde(rename="positionType")]
     pub position_type: String,
     /// Whether to display the browser tool bar.
-    #[serde(alias="showToolBar")]
+    #[serde(rename="showToolBar")]
     pub show_tool_bar: bool,
     /// Popup dimension for a creative. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA and all VPAID
     pub dimension: Size,
@@ -5612,7 +5612,7 @@ impl Part for PopupWindowProperties {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountPermission {
     /// Permission group of this account permission.
-    #[serde(alias="permissionGroupId")]
+    #[serde(rename="permissionGroupId")]
     pub permission_group_id: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountPermission".
     pub kind: String,
@@ -5625,7 +5625,7 @@ pub struct AccountPermission {
     /// Possible values are:
     /// - "ACCOUNT_PROFILE_BASIC"
     /// - "ACCOUNT_PROFILE_STANDARD"
-    #[serde(alias="accountProfiles")]
+    #[serde(rename="accountProfiles")]
     pub account_profiles: Vec<String>,
     /// ID of this account permission.
     pub id: String,
@@ -5651,27 +5651,27 @@ impl ResponseResult for AccountPermission {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Ad {
     /// Click-through URL suffix properties for this ad. Applies to the URL in the ad or (if overriding ad properties) the URL in the creative.
-    #[serde(alias="clickThroughUrlSuffixProperties")]
+    #[serde(rename="clickThroughUrlSuffixProperties")]
     pub click_through_url_suffix_properties: Option<ClickThroughUrlSuffixProperties>,
     /// Campaign ID of this ad. This is a required field on insertion.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: Option<String>,
     /// Advertiser ID of this ad. This is a required field on insertion.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Geographical targeting information for this ad.Applicable when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="geoTargeting")]
+    #[serde(rename="geoTargeting")]
     pub geo_targeting: Option<GeoTargeting>,
     /// Comments for this ad.
     pub comments: Option<String>,
     /// Delivery schedule information for this ad. Applicable when type is AD_SERVING_STANDARD_AD or AD_SERVING_TRACKING. This field along with subfields priority and impressionRatio are required on insertion when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="deliverySchedule")]
+    #[serde(rename="deliverySchedule")]
     pub delivery_schedule: Option<DeliverySchedule>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// Event tag overrides for this ad.
-    #[serde(alias="eventTagOverrides")]
+    #[serde(rename="eventTagOverrides")]
     pub event_tag_overrides: Option<Vec<EventTagOverride>>,
     /// ID of this ad. This is a read-only, auto-generated field.
     pub id: Option<String>,
@@ -5682,46 +5682,46 @@ pub struct Ad {
     /// Whether this ad is archived.
     pub archived: Option<bool>,
     /// Technology platform targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="technologyTargeting")]
+    #[serde(rename="technologyTargeting")]
     pub technology_targeting: Option<TechnologyTargeting>,
     /// Creative rotation for this ad. Applicable when type is AD_SERVING_DEFAULT_AD, AD_SERVING_STANDARD_AD, or AD_SERVING_TRACKING. When type is AD_SERVING_DEFAULT_AD, this field should have exactly one creativeAssignment.
-    #[serde(alias="creativeRotation")]
+    #[serde(rename="creativeRotation")]
     pub creative_rotation: Option<CreativeRotation>,
     /// Click-through URL for this ad. This is a required field on insertion. Applicable when type is AD_SERVING_CLICK_TRACKER.
-    #[serde(alias="clickThroughUrl")]
+    #[serde(rename="clickThroughUrl")]
     pub click_through_url: Option<ClickThroughUrl>,
     /// Creative group assignments for this ad. Applicable when type is AD_SERVING_CLICK_TRACKER. Only one assignment per creative group number is allowed for a maximum of two assignments.
-    #[serde(alias="creativeGroupAssignments")]
+    #[serde(rename="creativeGroupAssignments")]
     pub creative_group_assignments: Option<Vec<CreativeGroupAssignment>>,
     /// Dimension value for the ID of this ad. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Account ID of this ad. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Type of ad. This is a required field on insertion. Note that default ads (AD_SERVING_DEFAULT_AD) cannot be created directly (see Creative resource).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Whether this ad requires ssl. This is a read-only field that is auto-generated when the ad is inserted or updated.
-    #[serde(alias="sslRequired")]
+    #[serde(rename="sslRequired")]
     pub ssl_required: Option<bool>,
     /// Audience segment ID that is being targeted for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="audienceSegmentId")]
+    #[serde(rename="audienceSegmentId")]
     pub audience_segment_id: Option<String>,
     /// Key-value targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="keyValueTargetingExpression")]
+    #[serde(rename="keyValueTargetingExpression")]
     pub key_value_targeting_expression: Option<KeyValueTargetingExpression>,
     /// Dimension value for the ID of the campaign. This is a read-only, auto-generated field.
-    #[serde(alias="campaignIdDimensionValue")]
+    #[serde(rename="campaignIdDimensionValue")]
     pub campaign_id_dimension_value: Option<DimensionValue>,
     /// Default click-through event tag properties for this ad.
-    #[serde(alias="defaultClickThroughEventTagProperties")]
+    #[serde(rename="defaultClickThroughEventTagProperties")]
     pub default_click_through_event_tag_properties: Option<DefaultClickThroughEventTagProperties>,
     /// Information about the creation of this ad.This is a read-only field.
-    #[serde(alias="createInfo")]
+    #[serde(rename="createInfo")]
     pub create_info: Option<LastModifiedInfo>,
     /// Date and time that this ad should start serving. If creating an ad, this field must be a time in the future. This is a required field on insertion.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// Whether this ad is active.
     pub active: Option<bool>,
@@ -5730,27 +5730,27 @@ pub struct Ad {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#ad".
     pub kind: Option<String>,
     /// Subaccount ID of this ad. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this ad. This is a required field and must be less than 256 characters long.
     pub name: Option<String>,
     /// Time and day targeting information for this ad. Applicable when type is AD_SERVING_STANDARD_AD.
-    #[serde(alias="dayPartTargeting")]
+    #[serde(rename="dayPartTargeting")]
     pub day_part_targeting: Option<DayPartTargeting>,
     /// Information about the most recent modification of this ad. This is a read-only field.
-    #[serde(alias="lastModifiedInfo")]
+    #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
     /// Whether this ad is ssl compliant. This is a read-only field that is auto-generated when the ad is inserted or updated.
-    #[serde(alias="sslCompliant")]
+    #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// Date and time that this ad should stop serving. Must be later than the start time. This is a required field on insertion.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// Whether this ad is a dynamic click tracker. Applicable when type is AD_SERVING_CLICK_TRACKER. This is a required field on insert, and is read-only after insert.
-    #[serde(alias="dynamicClickTracker")]
+    #[serde(rename="dynamicClickTracker")]
     pub dynamic_click_tracker: Option<bool>,
     /// Placement assignments for this ad.
-    #[serde(alias="placementAssignments")]
+    #[serde(rename="placementAssignments")]
     pub placement_assignments: Option<Vec<PlacementAssignment>>,
 }
 
@@ -5768,16 +5768,16 @@ pub struct PricingSchedulePricingPeriod {
     /// Units of this pricing period.
     pub units: String,
     /// Pricing period start date. This date must be later than, or the same day as, the placement start date. The hours, minutes, and seconds of the start date should not be set, as doing so will result in an error.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// Rate or cost of this pricing period.
-    #[serde(alias="rateOrCostNanos")]
+    #[serde(rename="rateOrCostNanos")]
     pub rate_or_cost_nanos: String,
     /// Pricing period end date. This date must be later than, or the same day as, the pricing period start date, but not later than the placement end date. The period end date can be the same date as the period start date. If, for example, you set 6/25/2015 as both the start and end dates, the effective pricing period date is just that day only, 6/25/2015. The hours, minutes, and seconds of the end date should not be set, as doing so will result in an error.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// Comments for this pricing period.
-    #[serde(alias="pricingComment")]
+    #[serde(rename="pricingComment")]
     pub pricing_comment: String,
 }
 
@@ -5793,13 +5793,13 @@ pub struct PlacementAssignment {
     /// Whether this placement assignment is active. When true, the placement will be included in the ad's rotation.
     pub active: bool,
     /// Dimension value for the ID of the placement. This is a read-only, auto-generated field.
-    #[serde(alias="placementIdDimensionValue")]
+    #[serde(rename="placementIdDimensionValue")]
     pub placement_id_dimension_value: DimensionValue,
     /// ID of the placement to be assigned. This is a required field.
-    #[serde(alias="placementId")]
+    #[serde(rename="placementId")]
     pub placement_id: String,
     /// Whether the placement to be assigned requires SSL. This is a read-only field that is auto-generated when the ad is inserted or updated.
-    #[serde(alias="sslRequired")]
+    #[serde(rename="sslRequired")]
     pub ssl_required: bool,
 }
 
@@ -5819,13 +5819,13 @@ pub struct ReachReportCompatibleFields {
     /// Dimensions which are compatible to be selected in the "dimensions" section of the report.
     pub dimensions: Vec<Dimension>,
     /// Metrics which are compatible to be selected in the "reachByFrequencyMetricNames" section of the report.
-    #[serde(alias="reachByFrequencyMetrics")]
+    #[serde(rename="reachByFrequencyMetrics")]
     pub reach_by_frequency_metrics: Vec<Metric>,
     /// Dimensions which are compatible to be selected in the "dimensionFilters" section of the report.
-    #[serde(alias="dimensionFilters")]
+    #[serde(rename="dimensionFilters")]
     pub dimension_filters: Vec<Dimension>,
     /// Metrics which are compatible to be selected as activity metrics to pivot on in the "activities" section of the report.
-    #[serde(alias="pivotedActivityMetrics")]
+    #[serde(rename="pivotedActivityMetrics")]
     pub pivoted_activity_metrics: Vec<Metric>,
 }
 
@@ -5850,34 +5850,34 @@ pub struct Site {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#site".
     pub kind: Option<String>,
     /// Subaccount ID of this site. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Name of this site.This is a required field. Must be less than 128 characters long. If this site is under a subaccount, the name must be unique among sites of the same subaccount. Otherwise, this site is a top-level site, and the name must be unique among top-level sites of the same account.
     pub name: Option<String>,
     /// Dimension value for the ID of the directory site. This is a read-only, auto-generated field.
-    #[serde(alias="directorySiteIdDimensionValue")]
+    #[serde(rename="directorySiteIdDimensionValue")]
     pub directory_site_id_dimension_value: Option<DimensionValue>,
     /// Site-wide settings.
-    #[serde(alias="siteSettings")]
+    #[serde(rename="siteSettings")]
     pub site_settings: Option<SiteSettings>,
     /// ID of this site. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Directory site associated with this site. This is a required field that is read-only after insertion.
-    #[serde(alias="directorySiteId")]
+    #[serde(rename="directorySiteId")]
     pub directory_site_id: Option<String>,
     /// Site contacts.
-    #[serde(alias="siteContacts")]
+    #[serde(rename="siteContacts")]
     pub site_contacts: Option<Vec<SiteContact>>,
     /// Key name of this site. This is a read-only, auto-generated field.
-    #[serde(alias="keyName")]
+    #[serde(rename="keyName")]
     pub key_name: Option<String>,
     /// Dimension value for the ID of this site. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Whether this site is approved.
     pub approved: Option<bool>,
     /// Account ID of this site. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -5897,13 +5897,13 @@ pub struct DfpSettings {
     /// DFP network code for this directory site.
     pub dfp_network_code: String,
     /// Whether this directory site is available only via DoubleClick Publisher Portal.
-    #[serde(alias="publisherPortalOnly")]
+    #[serde(rename="publisherPortalOnly")]
     pub publisher_portal_only: bool,
     /// Whether this directory site accepts programmatic placements.
-    #[serde(alias="programmaticPlacementAccepted")]
+    #[serde(rename="programmaticPlacementAccepted")]
     pub programmatic_placement_accepted: bool,
     /// Whether this directory site accepts publisher-paid tags.
-    #[serde(alias="pubPaidPlacementAccepted")]
+    #[serde(rename="pubPaidPlacementAccepted")]
     pub pub_paid_placement_accepted: bool,
 }
 
@@ -5924,7 +5924,7 @@ pub struct ConnectionTypesListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#connectionTypesListResponse".
     pub kind: String,
     /// Collection of connection types such as broadband and mobile.
-    #[serde(alias="connectionTypes")]
+    #[serde(rename="connectionTypes")]
     pub connection_types: Vec<ConnectionType>,
 }
 
@@ -5946,57 +5946,57 @@ impl ResponseResult for ConnectionTypesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FloodlightConfiguration {
     /// List of user defined variables enabled for this configuration.
-    #[serde(alias="userDefinedVariableConfigurations")]
+    #[serde(rename="userDefinedVariableConfigurations")]
     pub user_defined_variable_configurations: Option<Vec<UserDefinedVariableConfiguration>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightConfiguration".
     pub kind: Option<String>,
     /// Advertiser ID of the parent advertiser of this floodlight configuration.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Configuration settings for dynamic and image floodlight tags.
-    #[serde(alias="tagSettings")]
+    #[serde(rename="tagSettings")]
     pub tag_settings: Option<TagSettings>,
     /// Dimension value for the ID of the advertiser. This is a read-only, auto-generated field.
-    #[serde(alias="advertiserIdDimensionValue")]
+    #[serde(rename="advertiserIdDimensionValue")]
     pub advertiser_id_dimension_value: Option<DimensionValue>,
     /// ID of this floodlight configuration. This is a read-only, auto-generated field.
     pub id: Option<String>,
     /// Account ID of this floodlight configuration. This is a read-only field that can be left blank.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Types of attribution options for natural search conversions.
-    #[serde(alias="naturalSearchConversionAttributionOption")]
+    #[serde(rename="naturalSearchConversionAttributionOption")]
     pub natural_search_conversion_attribution_option: Option<String>,
     /// Settings for DCM Omniture integration.
-    #[serde(alias="omnitureSettings")]
+    #[serde(rename="omnitureSettings")]
     pub omniture_settings: Option<OmnitureSettings>,
     /// Whether the exposure-to-conversion report is enabled. This report shows detailed pathway information on up to 10 of the most recent ad exposures seen by a user before converting.
-    #[serde(alias="exposureToConversionEnabled")]
+    #[serde(rename="exposureToConversionEnabled")]
     pub exposure_to_conversion_enabled: Option<bool>,
     /// Lookback window settings for this floodlight configuration.
-    #[serde(alias="lookbackConfiguration")]
+    #[serde(rename="lookbackConfiguration")]
     pub lookback_configuration: Option<LookbackConfiguration>,
     /// Day that will be counted as the first day of the week in reports. This is a required field.
-    #[serde(alias="firstDayOfWeek")]
+    #[serde(rename="firstDayOfWeek")]
     pub first_day_of_week: Option<String>,
     /// List of standard variables enabled for this configuration.
     /// 
     /// Acceptable values are:
     /// - "ORD"
     /// - "NUM"
-    #[serde(alias="standardVariableTypes")]
+    #[serde(rename="standardVariableTypes")]
     pub standard_variable_types: Option<Vec<String>>,
     /// Subaccount ID of this floodlight configuration. This is a read-only field that can be left blank.
-    #[serde(alias="subaccountId")]
+    #[serde(rename="subaccountId")]
     pub subaccount_id: Option<String>,
     /// Whether advertiser data is shared with Google Analytics.
-    #[serde(alias="analyticsDataSharingEnabled")]
+    #[serde(rename="analyticsDataSharingEnabled")]
     pub analytics_data_sharing_enabled: Option<bool>,
     /// Dimension value for the ID of this floodlight configuration. This is a read-only, auto-generated field.
-    #[serde(alias="idDimensionValue")]
+    #[serde(rename="idDimensionValue")]
     pub id_dimension_value: Option<DimensionValue>,
     /// Whether floodlight activities owned by this configuration are required to be SSL-compliant.
-    #[serde(alias="sslRequired")]
+    #[serde(rename="sslRequired")]
     pub ssl_required: Option<bool>,
 }
 
@@ -6012,15 +6012,15 @@ impl ResponseResult for FloodlightConfiguration {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DateRange {
     /// The start date of the date range, inclusive. A string of the format: "yyyy-MM-dd".
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// The kind of resource this is, in this case dfareporting#dateRange.
     pub kind: String,
     /// The end date of the date range, inclusive. A string of the format: "yyyy-MM-dd".
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// The date range relative to the date of when the report is run.
-    #[serde(alias="relativeDateRange")]
+    #[serde(rename="relativeDateRange")]
     pub relative_date_range: String,
 }
 
@@ -6041,7 +6041,7 @@ pub struct AccountPermissionGroupsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#accountPermissionGroupsListResponse".
     pub kind: String,
     /// Account permission group collection.
-    #[serde(alias="accountPermissionGroups")]
+    #[serde(rename="accountPermissionGroups")]
     pub account_permission_groups: Vec<AccountPermissionGroup>,
 }
 
@@ -6080,12 +6080,12 @@ impl ResponseResult for SizesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserRolesListResponse {
     /// Pagination token to be used for the next list operation.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userRolesListResponse".
     pub kind: String,
     /// User role collection.
-    #[serde(alias="userRoles")]
+    #[serde(rename="userRoles")]
     pub user_roles: Vec<UserRole>,
 }
 

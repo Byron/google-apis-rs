@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *manager* crate version *0.1.3+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *manager* crate version *0.1.4+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *manager* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -325,7 +325,7 @@ impl<'a, C, NC, A> Manager<C, NC, A>
         Manager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -338,7 +338,7 @@ impl<'a, C, NC, A> Manager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -359,24 +359,24 @@ impl<'a, C, NC, A> Manager<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingModule {
     /// no description provided
-    #[serde(alias="maxNumReplicas")]
+    #[serde(rename="maxNumReplicas")]
     pub max_num_replicas: i32,
     /// no description provided
     pub description: String,
     /// no description provided
-    #[serde(alias="targetModule")]
+    #[serde(rename="targetModule")]
     pub target_module: String,
     /// target_utilization should be in range [0,1].
-    #[serde(alias="targetUtilization")]
+    #[serde(rename="targetUtilization")]
     pub target_utilization: f64,
     /// no description provided
-    #[serde(alias="signalType")]
+    #[serde(rename="signalType")]
     pub signal_type: String,
     /// no description provided
-    #[serde(alias="minNumReplicas")]
+    #[serde(rename="minNumReplicas")]
     pub min_num_replicas: i32,
     /// no description provided
-    #[serde(alias="coolDownPeriodSec")]
+    #[serde(rename="coolDownPeriodSec")]
     pub cool_down_period_sec: i32,
 }
 
@@ -392,15 +392,15 @@ pub struct FirewallModule {
     /// The description of the firewall (optional)
     pub description: String,
     /// Target Tags to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(alias="targetTags")]
+    #[serde(rename="targetTags")]
     pub target_tags: Vec<String>,
     /// The allowed ports or port ranges.
     pub allowed: Vec<AllowedRule>,
     /// Source Tags to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(alias="sourceTags")]
+    #[serde(rename="sourceTags")]
     pub source_tags: Vec<String>,
     /// Source IP ranges to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(alias="sourceRanges")]
+    #[serde(rename="sourceRanges")]
     pub source_ranges: Vec<String>,
     /// The NetworkModule to which this firewall should apply. If not specified, or if specified as 'default', this firewall will be applied to the 'default' network.
     pub network: String,
@@ -416,12 +416,12 @@ impl Part for FirewallModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessConfig {
     /// Type of this access configuration file. (Currently only ONE_TO_ONE_NAT is legal.)
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Name of this access configuration.
     pub name: String,
     /// An external IP address associated with this instance.
-    #[serde(alias="natIp")]
+    #[serde(rename="natIp")]
     pub nat_ip: String,
 }
 
@@ -435,25 +435,25 @@ impl Part for AccessConfig {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Module {
     /// no description provided
-    #[serde(alias="lbModule")]
+    #[serde(rename="lbModule")]
     pub lb_module: LbModule,
     /// no description provided
-    #[serde(alias="replicaPoolModule")]
+    #[serde(rename="replicaPoolModule")]
     pub replica_pool_module: ReplicaPoolModule,
     /// no description provided
-    #[serde(alias="firewallModule")]
+    #[serde(rename="firewallModule")]
     pub firewall_module: FirewallModule,
     /// no description provided
-    #[serde(alias="healthCheckModule")]
+    #[serde(rename="healthCheckModule")]
     pub health_check_module: HealthCheckModule,
     /// no description provided
-    #[serde(alias="autoscalingModule")]
+    #[serde(rename="autoscalingModule")]
     pub autoscaling_module: AutoscalingModule,
     /// no description provided
-    #[serde(alias="networkModule")]
+    #[serde(rename="networkModule")]
     pub network_module: NetworkModule,
     /// The type of this module. Valid values ("AUTOSCALING", "FIREWALL", "HEALTH_CHECK", "LOAD_BALANCING", "NETWORK", "REPLICA_POOL")
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -518,7 +518,7 @@ impl Part for DeployState {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallModuleStatus {
     /// [Output Only] The URL of the corresponding Firewall resource.
-    #[serde(alias="firewallUrl")]
+    #[serde(rename="firewallUrl")]
     pub firewall_url: String,
 }
 
@@ -534,7 +534,7 @@ pub struct Metadata {
     /// A list of metadata items.
     pub items: Vec<MetadataItem>,
     /// The fingerprint of the metadata.
-    #[serde(alias="fingerPrint")]
+    #[serde(rename="fingerPrint")]
     pub finger_print: String,
 }
 
@@ -548,27 +548,27 @@ impl Part for Metadata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModuleStatus {
     /// [Output Only] The status of the HealthCheckModule, set for type HEALTH_CHECK.
-    #[serde(alias="healthCheckModuleStatus")]
+    #[serde(rename="healthCheckModuleStatus")]
     pub health_check_module_status: HealthCheckModuleStatus,
     /// [Output Only] The status of the NetworkModule, set for type NETWORK.
-    #[serde(alias="networkModuleStatus")]
+    #[serde(rename="networkModuleStatus")]
     pub network_module_status: NetworkModuleStatus,
     /// [Output Only] The status of the ReplicaPoolModule, set for type VM.
-    #[serde(alias="replicaPoolModuleStatus")]
+    #[serde(rename="replicaPoolModuleStatus")]
     pub replica_pool_module_status: ReplicaPoolModuleStatus,
     /// [Output Only] The current state of the module.
     pub state: DeployState,
     /// [Output Only] The status of the AutoscalingModule, set for type AUTOSCALING.
-    #[serde(alias="autoscalingModuleStatus")]
+    #[serde(rename="autoscalingModuleStatus")]
     pub autoscaling_module_status: AutoscalingModuleStatus,
     /// [Output Only] The status of the FirewallModule, set for type FIREWALL.
-    #[serde(alias="firewallModuleStatus")]
+    #[serde(rename="firewallModuleStatus")]
     pub firewall_module_status: FirewallModuleStatus,
     /// [Output Only] The type of the module.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// [Output Only] The status of the LbModule, set for type LOAD_BALANCING.
-    #[serde(alias="lbModuleStatus")]
+    #[serde(rename="lbModuleStatus")]
     pub lb_module_status: LbModuleStatus,
 }
 
@@ -582,7 +582,7 @@ impl Part for ModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkModuleStatus {
     /// [Output Only] The URL of the corresponding Network resource.
-    #[serde(alias="networkUrl")]
+    #[serde(rename="networkUrl")]
     pub network_url: String,
 }
 
@@ -644,7 +644,7 @@ impl Part for ReplicaPoolParams {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TemplatesListResponse {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub resources: Vec<Template>,
@@ -665,7 +665,7 @@ impl ResponseResult for TemplatesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeploymentsListResponse {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub resources: Vec<Deployment>,
@@ -693,12 +693,12 @@ pub struct Deployment {
     /// A user-supplied description of this Deployment.
     pub description: Option<String>,
     /// The name of the Template on which this deployment is based.
-    #[serde(alias="templateName")]
+    #[serde(rename="templateName")]
     pub template_name: Option<String>,
     /// The set of parameter overrides to apply to the corresponding Template before deploying.
     pub overrides: Option<Vec<ParamOverride>>,
     /// [Output Only] The time when this deployment was created.
-    #[serde(alias="creationDate")]
+    #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// [Output Only] List of status for the modules in this deployment.
     pub modules: Option<HashMap<String, ModuleStatus>>,
@@ -718,13 +718,13 @@ impl ResponseResult for Deployment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewDiskInitializeParams {
     /// The size of the created disk in gigabytes.
-    #[serde(alias="diskSizeGb")]
+    #[serde(rename="diskSizeGb")]
     pub disk_size_gb: String,
     /// The fully-qualified URL of a source image to use to create this disk.
-    #[serde(alias="sourceImage")]
+    #[serde(rename="sourceImage")]
     pub source_image: String,
     /// Name of the disk type resource describing which disk type to use to create the disk. For example 'pd-ssd' or 'pd-standard'. Default is 'pd-standard'
-    #[serde(alias="diskType")]
+    #[serde(rename="diskType")]
     pub disk_type: String,
 }
 
@@ -738,10 +738,10 @@ impl Part for NewDiskInitializeParams {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkModule {
     /// Required; The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16.
-    #[serde(alias="IPv4Range")]
+    #[serde(rename="IPv4Range")]
     pub i_pv4_range: String,
     /// An optional address that is used for default routing to other networks. This must be within the range specified by IPv4Range, and is typicall the first usable address in that range. If not specified, the default value is the first usable address in IPv4Range.
-    #[serde(alias="gatewayIPv4")]
+    #[serde(rename="gatewayIPv4")]
     pub gateway_i_pv4: String,
     /// The description of the network.
     pub description: String,
@@ -757,13 +757,13 @@ impl Part for NetworkModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolParamsV1Beta1 {
     /// A list of Disk resources to create and attach to each Replica in the Pool. Currently, you can only define one disk and it must be a root persistent disk. Note that Replica Pool will create a root persistent disk for each replica.
-    #[serde(alias="disksToCreate")]
+    #[serde(rename="disksToCreate")]
     pub disks_to_create: Vec<NewDisk>,
     /// Whether these replicas should be restarted if they experience a failure. The default value is true.
-    #[serde(alias="autoRestart")]
+    #[serde(rename="autoRestart")]
     pub auto_restart: bool,
     /// Enables IP Forwarding
-    #[serde(alias="canIpForward")]
+    #[serde(rename="canIpForward")]
     pub can_ip_forward: bool,
     /// An optional textual description of the resource.
     pub description: String,
@@ -772,27 +772,27 @@ pub struct ReplicaPoolParamsV1Beta1 {
     /// A list of tags to apply to the Google Compute Engine instance to identify resources.
     pub tags: Tag,
     /// no description provided
-    #[serde(alias="onHostMaintenance")]
+    #[serde(rename="onHostMaintenance")]
     pub on_host_maintenance: String,
     /// A list of existing Persistent Disk resources to attach to each replica in the pool. Each disk will be attached in read-only mode to every replica.
-    #[serde(alias="disksToAttach")]
+    #[serde(rename="disksToAttach")]
     pub disks_to_attach: Vec<ExistingDisk>,
     /// The machine type for this instance. Either a complete URL, or the resource name (e.g. n1-standard-1).
-    #[serde(alias="machineType")]
+    #[serde(rename="machineType")]
     pub machine_type: String,
     /// The base name for instances within this ReplicaPool.
-    #[serde(alias="baseInstanceName")]
+    #[serde(rename="baseInstanceName")]
     pub base_instance_name: String,
     /// Name of the Action to be run during initialization of a ReplicaPoolModule.
-    #[serde(alias="initAction")]
+    #[serde(rename="initAction")]
     pub init_action: String,
     /// The metadata key/value pairs assigned to this instance.
     pub metadata: Metadata,
     /// A list of Service Accounts to enable for this instance.
-    #[serde(alias="serviceAccounts")]
+    #[serde(rename="serviceAccounts")]
     pub service_accounts: Vec<ServiceAccount>,
     /// A list of network interfaces for the instance. Currently only one interface is supported by Google Compute Engine.
-    #[serde(alias="networkInterfaces")]
+    #[serde(rename="networkInterfaces")]
     pub network_interfaces: Vec<NetworkInterface>,
 }
 
@@ -821,10 +821,10 @@ impl Part for ParamOverride {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolModuleStatus {
     /// [Output Only] The URL of the Resource Group associated with this ReplicaPool.
-    #[serde(alias="resourceViewUrl")]
+    #[serde(rename="resourceViewUrl")]
     pub resource_view_url: String,
     /// [Output Only] The URL of the associated ReplicaPool resource.
-    #[serde(alias="replicaPoolUrl")]
+    #[serde(rename="replicaPoolUrl")]
     pub replica_pool_url: String,
 }
 
@@ -853,10 +853,10 @@ impl Part for ServiceAccount {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkInterface {
     /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services
-    #[serde(alias="accessConfigs")]
+    #[serde(rename="accessConfigs")]
     pub access_configs: Vec<AccessConfig>,
     /// An optional IPV4 internal network address to assign to the instance for this network interface.
-    #[serde(alias="networkIp")]
+    #[serde(rename="networkIp")]
     pub network_ip: String,
     /// Name of the interface.
     pub name: String,
@@ -874,7 +874,7 @@ impl Part for NetworkInterface {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Action {
     /// The timeout in milliseconds for this action to run.
-    #[serde(alias="timeoutMs")]
+    #[serde(rename="timeoutMs")]
     pub timeout_ms: i32,
     /// A list of commands to run sequentially for this action.
     pub commands: Vec<String>,
@@ -890,7 +890,7 @@ impl Part for Action {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingModuleStatus {
     /// [Output Only] The URL of the corresponding Autoscaling configuration.
-    #[serde(alias="autoscalingConfigUrl")]
+    #[serde(rename="autoscalingConfigUrl")]
     pub autoscaling_config_url: String,
 }
 
@@ -904,10 +904,10 @@ impl Part for AutoscalingModuleStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LbModuleStatus {
     /// [Output Only] The URL of the corresponding ForwardingRule in GCE.
-    #[serde(alias="forwardingRuleUrl")]
+    #[serde(rename="forwardingRuleUrl")]
     pub forwarding_rule_url: String,
     /// [Output Only] The URL of the corresponding TargetPool resource in GCE.
-    #[serde(alias="targetPoolUrl")]
+    #[serde(rename="targetPoolUrl")]
     pub target_pool_url: String,
 }
 
@@ -923,22 +923,22 @@ pub struct LbModule {
     /// no description provided
     pub description: String,
     /// no description provided
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Vec<String>,
     /// no description provided
-    #[serde(alias="portRange")]
+    #[serde(rename="portRange")]
     pub port_range: String,
     /// no description provided
-    #[serde(alias="targetModules")]
+    #[serde(rename="targetModules")]
     pub target_modules: Vec<String>,
     /// no description provided
-    #[serde(alias="ipAddress")]
+    #[serde(rename="ipAddress")]
     pub ip_address: String,
     /// no description provided
-    #[serde(alias="ipProtocol")]
+    #[serde(rename="ipProtocol")]
     pub ip_protocol: String,
     /// no description provided
-    #[serde(alias="sessionAffinity")]
+    #[serde(rename="sessionAffinity")]
     pub session_affinity: String,
 }
 
@@ -952,7 +952,7 @@ impl Part for LbModule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HealthCheckModuleStatus {
     /// [Output Only] The HealthCheck URL.
-    #[serde(alias="healthCheckUrl")]
+    #[serde(rename="healthCheckUrl")]
     pub health_check_url: String,
 }
 
@@ -968,16 +968,16 @@ pub struct HealthCheckModule {
     /// no description provided
     pub description: String,
     /// no description provided
-    #[serde(alias="timeoutSec")]
+    #[serde(rename="timeoutSec")]
     pub timeout_sec: i32,
     /// no description provided
-    #[serde(alias="checkIntervalSec")]
+    #[serde(rename="checkIntervalSec")]
     pub check_interval_sec: i32,
     /// no description provided
-    #[serde(alias="unhealthyThreshold")]
+    #[serde(rename="unhealthyThreshold")]
     pub unhealthy_threshold: i32,
     /// no description provided
-    #[serde(alias="healthyThreshold")]
+    #[serde(rename="healthyThreshold")]
     pub healthy_threshold: i32,
     /// no description provided
     pub host: String,
@@ -999,12 +999,12 @@ pub struct NewDisk {
     /// If true, indicates that this is the root persistent disk.
     pub boot: bool,
     /// Create the new disk using these parameters. The name of the disk will be <instance_name>-<five_random_charactersgt;.
-    #[serde(alias="initializeParams")]
+    #[serde(rename="initializeParams")]
     pub initialize_params: NewDiskInitializeParams,
     /// How the disk will be attached to the Replica.
     pub attachment: DiskAttachment,
     /// If true, then this disk will be deleted when the instance is deleted.
-    #[serde(alias="autoDelete")]
+    #[serde(rename="autoDelete")]
     pub auto_delete: bool,
 }
 
@@ -1018,7 +1018,7 @@ impl Part for NewDisk {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllowedRule {
     /// ?tcp?, ?udp? or ?icmp?
-    #[serde(alias="IPProtocol")]
+    #[serde(rename="IPProtocol")]
     pub ip_protocol: String,
     /// List of ports or port ranges (Example inputs include: ["22"], [?33?, "12345-12349"].
     pub ports: Vec<String>,
@@ -1036,7 +1036,7 @@ pub struct Tag {
     /// Items contained in this tag.
     pub items: Vec<String>,
     /// The fingerprint of the tag.
-    #[serde(alias="fingerPrint")]
+    #[serde(rename="fingerPrint")]
     pub finger_print: String,
 }
 
@@ -1050,19 +1050,19 @@ impl Part for Tag {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolModule {
     /// The Health Checks to configure for the ReplicaPoolModule
-    #[serde(alias="healthChecks")]
+    #[serde(rename="healthChecks")]
     pub health_checks: Vec<String>,
     /// Information for a ReplicaPoolModule.
-    #[serde(alias="replicaPoolParams")]
+    #[serde(rename="replicaPoolParams")]
     pub replica_pool_params: ReplicaPoolParams,
     /// [Output Only] The name of the Resource View associated with a ReplicaPoolModule. This field will be generated by the service.
-    #[serde(alias="resourceView")]
+    #[serde(rename="resourceView")]
     pub resource_view: String,
     /// Number of replicas in this module.
-    #[serde(alias="numReplicas")]
+    #[serde(rename="numReplicas")]
     pub num_replicas: i32,
     /// A list of environment variables.
-    #[serde(alias="envVariables")]
+    #[serde(rename="envVariables")]
     pub env_variables: HashMap<String, EnvVariable>,
 }
 
@@ -1091,7 +1091,7 @@ impl Part for MetadataItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskAttachment {
     /// The device name of this disk.
-    #[serde(alias="deviceName")]
+    #[serde(rename="deviceName")]
     pub device_name: String,
     /// A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, this is assigned by the server.
     pub index: u32,

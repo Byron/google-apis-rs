@@ -16,7 +16,7 @@ ${struct} {
 % for pn, p in properties.iteritems():
     ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
     % if pn != mangle_ident(pn):
-    #[serde(alias="${pn}")]
+    #[serde(rename="${pn}")]
     % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor
@@ -32,7 +32,7 @@ pub enum ${et} {
 % for p in s.variant.map:
     ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
     % if variant_type(p) != p.type_value:
-    #[serde(alias="${p.type_value}")]
+    #[serde(rename="${p.type_value}")]
     % endif
     ${variant_type(p)}(${to_rust_type(schemas, s.id, None, p, allow_optionals=allow_optionals)}),
 % endfor

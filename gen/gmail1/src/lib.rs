@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gmail* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *gmail* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -354,7 +354,7 @@ impl<'a, C, NC, A> Gmail<C, NC, A>
         Gmail {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -364,7 +364,7 @@ impl<'a, C, NC, A> Gmail<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,7 +405,7 @@ impl Part for MessagePartHeader {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MessagePartBody {
     /// When present, contains the ID of an external attachment that can be retrieved in a separate messages.attachments.get request. When not present, the entire content of the message part body is contained in the data field.
-    #[serde(alias="attachmentId")]
+    #[serde(rename="attachmentId")]
     pub attachment_id: String,
     /// The body data of a MIME message part. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.
     pub data: String,
@@ -437,7 +437,7 @@ pub struct Thread {
     /// The unique ID of the thread.
     pub id: String,
     /// The ID of the last history record that modified this thread.
-    #[serde(alias="historyId")]
+    #[serde(rename="historyId")]
     pub history_id: String,
 }
 
@@ -474,27 +474,27 @@ pub struct Label {
     /// The display name of the label.
     pub name: Option<String>,
     /// The total number of messages with the label.
-    #[serde(alias="messagesTotal")]
+    #[serde(rename="messagesTotal")]
     pub messages_total: Option<i32>,
     /// The visibility of the label in the message list in the Gmail web interface.
-    #[serde(alias="messageListVisibility")]
+    #[serde(rename="messageListVisibility")]
     pub message_list_visibility: Option<String>,
     /// The total number of threads with the label.
-    #[serde(alias="threadsTotal")]
+    #[serde(rename="threadsTotal")]
     pub threads_total: Option<i32>,
     /// The visibility of the label in the label list in the Gmail web interface.
-    #[serde(alias="labelListVisibility")]
+    #[serde(rename="labelListVisibility")]
     pub label_list_visibility: Option<String>,
     /// The number of unread threads with the label.
-    #[serde(alias="threadsUnread")]
+    #[serde(rename="threadsUnread")]
     pub threads_unread: Option<i32>,
     /// The owner type for the label. User labels are created by the user and can be modified and deleted by the user and can be applied to any message or thread. System labels are internally created and cannot be added, modified, or deleted. System labels may be able to be applied to or removed from messages and threads under some circumstances but this is not guaranteed. For example, users can apply and remove the INBOX and UNREAD labels from messages and threads, but cannot apply or remove the DRAFTS or SENT labels from messages or threads.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The immutable ID of the label.
     pub id: Option<String>,
     /// The number of unread messages with the label.
-    #[serde(alias="messagesUnread")]
+    #[serde(rename="messagesUnread")]
     pub messages_unread: Option<i32>,
 }
 
@@ -514,10 +514,10 @@ impl ResponseResult for Label {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListHistoryResponse {
     /// Page token to retrieve the next page of results in the list.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The ID of the mailbox's current history record.
-    #[serde(alias="historyId")]
+    #[serde(rename="historyId")]
     pub history_id: String,
     /// List of history records. Any messages contained in the response will typically only have id and threadId fields populated.
     pub history: Vec<History>,
@@ -559,12 +559,12 @@ pub struct MessagePart {
     /// The message part body for this part, which may be empty for container MIME message parts.
     pub body: MessagePartBody,
     /// The MIME type of the message part.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: String,
     /// The child MIME message parts of this part. This only applies to container MIME message parts, for example multipart/*. For non- container MIME message part types, such as text/plain, this field is empty. For more information, see RFC 1521.
     pub parts: Vec<MessagePart>,
     /// The immutable ID of the message part.
-    #[serde(alias="partId")]
+    #[serde(rename="partId")]
     pub part_id: String,
     /// List of headers on this message part. For the top-level message part, representing the entire message payload, it will contain the standard RFC 2822 email headers such as To, From, and Subject.
     pub headers: Vec<MessagePartHeader>,
@@ -587,10 +587,10 @@ impl Part for MessagePart {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyMessageRequest {
     /// A list of IDs of labels to add to this message.
-    #[serde(alias="addLabelIds")]
+    #[serde(rename="addLabelIds")]
     pub add_label_ids: Option<Vec<String>>,
     /// A list IDs of labels to remove from this message.
-    #[serde(alias="removeLabelIds")]
+    #[serde(rename="removeLabelIds")]
     pub remove_label_ids: Option<Vec<String>>,
 }
 
@@ -609,10 +609,10 @@ impl RequestValue for ModifyMessageRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDraftsResponse {
     /// Token to retrieve the next page of results in the list.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Estimated total number of results.
-    #[serde(alias="resultSizeEstimate")]
+    #[serde(rename="resultSizeEstimate")]
     pub result_size_estimate: u32,
     /// List of drafts.
     pub drafts: Vec<Draft>,
@@ -641,20 +641,20 @@ impl Part for HistoryMessageDeleted {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct History {
     /// Labels removed from messages in this history record.
-    #[serde(alias="labelsRemoved")]
+    #[serde(rename="labelsRemoved")]
     pub labels_removed: Vec<HistoryLabelRemoved>,
     /// Messages deleted (not Trashed) from the mailbox in this history record.
-    #[serde(alias="messagesDeleted")]
+    #[serde(rename="messagesDeleted")]
     pub messages_deleted: Vec<HistoryMessageDeleted>,
     /// Labels added to messages in this history record.
-    #[serde(alias="labelsAdded")]
+    #[serde(rename="labelsAdded")]
     pub labels_added: Vec<HistoryLabelAdded>,
     /// List of messages changed in this history record. The fields for specific change types, such as messagesAdded may duplicate messages in this field. We recommend using the specific change-type fields instead of this.
     pub messages: Vec<Message>,
     /// The mailbox sequence ID.
     pub id: String,
     /// Messages added to the mailbox in this history record.
-    #[serde(alias="messagesAdded")]
+    #[serde(rename="messagesAdded")]
     pub messages_added: Vec<HistoryMessageAdded>,
 }
 
@@ -673,16 +673,16 @@ impl Part for History {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Profile {
     /// The total number of messages in the mailbox.
-    #[serde(alias="messagesTotal")]
+    #[serde(rename="messagesTotal")]
     pub messages_total: i32,
     /// The user's email address.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: String,
     /// The ID of the mailbox's current history record.
-    #[serde(alias="historyId")]
+    #[serde(rename="historyId")]
     pub history_id: String,
     /// The total number of threads in the mailbox.
-    #[serde(alias="threadsTotal")]
+    #[serde(rename="threadsTotal")]
     pub threads_total: i32,
 }
 
@@ -696,7 +696,7 @@ impl ResponseResult for Profile {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryLabelAdded {
     /// Label IDs added to the message.
-    #[serde(alias="labelIds")]
+    #[serde(rename="labelIds")]
     pub label_ids: Vec<String>,
     /// no description provided
     pub message: Message,
@@ -717,10 +717,10 @@ impl Part for HistoryLabelAdded {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListThreadsResponse {
     /// Page token to retrieve the next page of results in the list.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Estimated total number of results.
-    #[serde(alias="resultSizeEstimate")]
+    #[serde(rename="resultSizeEstimate")]
     pub result_size_estimate: u32,
     /// List of threads.
     pub threads: Vec<Thread>,
@@ -741,10 +741,10 @@ impl ResponseResult for ListThreadsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyThreadRequest {
     /// A list of IDs of labels to add to this thread.
-    #[serde(alias="addLabelIds")]
+    #[serde(rename="addLabelIds")]
     pub add_label_ids: Option<Vec<String>>,
     /// A list of IDs of labels to remove from this thread.
-    #[serde(alias="removeLabelIds")]
+    #[serde(rename="removeLabelIds")]
     pub remove_label_ids: Option<Vec<String>>,
 }
 
@@ -763,10 +763,10 @@ impl RequestValue for ModifyThreadRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListMessagesResponse {
     /// Token to retrieve the next page of results in the list.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Estimated total number of results.
-    #[serde(alias="resultSizeEstimate")]
+    #[serde(rename="resultSizeEstimate")]
     pub result_size_estimate: u32,
     /// List of messages.
     pub messages: Vec<Message>,
@@ -812,7 +812,7 @@ impl ResponseResult for ListLabelsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Message {
     /// The ID of the last history record that modified this message.
-    #[serde(alias="historyId")]
+    #[serde(rename="historyId")]
     pub history_id: Option<String>,
     /// The immutable ID of the message.
     pub id: Option<String>,
@@ -821,16 +821,16 @@ pub struct Message {
     /// The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in messages.get and drafts.get responses when the format=RAW parameter is supplied.
     pub raw: Option<String>,
     /// Estimated size in bytes of the message.
-    #[serde(alias="sizeEstimate")]
+    #[serde(rename="sizeEstimate")]
     pub size_estimate: Option<i32>,
     /// The ID of the thread the message belongs to. To add a message or draft to a thread, the following criteria must be met: 
     /// - The requested threadId must be specified on the Message or Draft.Message you supply with your request. 
     /// - The References and In-Reply-To headers must be set in compliance with the RFC 2822 standard. 
     /// - The Subject headers must match.
-    #[serde(alias="threadId")]
+    #[serde(rename="threadId")]
     pub thread_id: Option<String>,
     /// List of IDs of labels applied to this message.
-    #[serde(alias="labelIds")]
+    #[serde(rename="labelIds")]
     pub label_ids: Option<Vec<String>>,
     /// The parsed email structure in the message parts.
     pub payload: Option<MessagePart>,
@@ -847,7 +847,7 @@ impl ResponseResult for Message {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryLabelRemoved {
     /// Label IDs removed from the message.
-    #[serde(alias="labelIds")]
+    #[serde(rename="labelIds")]
     pub label_ids: Vec<String>,
     /// no description provided
     pub message: Message,

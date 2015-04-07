@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).
@@ -279,7 +279,7 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
         DoubleClickBidManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -295,7 +295,7 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -321,10 +321,10 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DownloadLineItemsRequest {
     /// Filter type used to filter line items to fetch.
-    #[serde(alias="filterType")]
+    #[serde(rename="filterType")]
     pub filter_type: Option<String>,
     /// Ids of the specified filter type used to filter line items to fetch. If omitted, all the line items will be returned.
-    #[serde(alias="filterIds")]
+    #[serde(rename="filterIds")]
     pub filter_ids: Option<Vec<String>>,
     /// Format in which the line items will be returned. Default to CSV.
     pub format: Option<String>,
@@ -340,7 +340,7 @@ impl RequestValue for DownloadLineItemsRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportFailure {
     /// Error code that shows why the report was not created.
-    #[serde(alias="errorCode")]
+    #[serde(rename="errorCode")]
     pub error_code: String,
 }
 
@@ -358,13 +358,13 @@ pub struct Parameters {
     /// Filters used to match traffic data in your report.
     pub filters: Vec<FilterPair>,
     /// Report type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Data is grouped by the filters listed in this field.
-    #[serde(alias="groupBys")]
+    #[serde(rename="groupBys")]
     pub group_bys: Vec<String>,
     /// Whether to include data from Invite Media.
-    #[serde(alias="includeInviteData")]
+    #[serde(rename="includeInviteData")]
     pub include_invite_data: bool,
 }
 
@@ -378,10 +378,10 @@ impl Part for Parameters {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportKey {
     /// Query ID.
-    #[serde(alias="queryId")]
+    #[serde(rename="queryId")]
     pub query_id: String,
     /// Report ID.
-    #[serde(alias="reportId")]
+    #[serde(rename="reportId")]
     pub report_id: String,
 }
 
@@ -400,10 +400,10 @@ impl Part for ReportKey {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UploadLineItemsRequest {
     /// Line items in CSV to upload. Refer to  Entity Write File Format for more information on file format.
-    #[serde(alias="lineItems")]
+    #[serde(rename="lineItems")]
     pub line_items: Option<String>,
     /// Set to true to get upload status without actually persisting the line items.
-    #[serde(alias="dryRun")]
+    #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
     /// Format the line items are in. Default to CSV.
     pub format: Option<String>,
@@ -441,13 +441,13 @@ pub struct ReportMetadata {
     /// Report status.
     pub status: ReportStatus,
     /// The ending time for the data that is shown in the report.
-    #[serde(alias="reportDataEndTimeMs")]
+    #[serde(rename="reportDataEndTimeMs")]
     pub report_data_end_time_ms: String,
     /// The path to the location in Google Cloud Storage where the report is stored.
-    #[serde(alias="googleCloudStoragePath")]
+    #[serde(rename="googleCloudStoragePath")]
     pub google_cloud_storage_path: String,
     /// The starting time for the data that is shown in the report.
-    #[serde(alias="reportDataStartTimeMs")]
+    #[serde(rename="reportDataStartTimeMs")]
     pub report_data_start_time_ms: String,
 }
 
@@ -461,15 +461,15 @@ impl Part for ReportMetadata {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuerySchedule {
     /// Datetime to periodically run the query until.
-    #[serde(alias="endTimeMs")]
+    #[serde(rename="endTimeMs")]
     pub end_time_ms: String,
     /// How often the query is run.
     pub frequency: String,
     /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.
-    #[serde(alias="nextRunMinuteOfDay")]
+    #[serde(rename="nextRunMinuteOfDay")]
     pub next_run_minute_of_day: i32,
     /// Canonical timezone code for report generation time. Defaults to America/New_York.
-    #[serde(alias="nextRunTimezoneCode")]
+    #[serde(rename="nextRunTimezoneCode")]
     pub next_run_timezone_code: String,
 }
 
@@ -488,16 +488,16 @@ impl Part for QuerySchedule {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RunQueryRequest {
     /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
-    #[serde(alias="reportDataEndTimeMs")]
+    #[serde(rename="reportDataEndTimeMs")]
     pub report_data_end_time_ms: Option<String>,
     /// Canonical timezone code for report data time. Defaults to America/New_York.
-    #[serde(alias="timezoneCode")]
+    #[serde(rename="timezoneCode")]
     pub timezone_code: Option<String>,
     /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
-    #[serde(alias="reportDataStartTimeMs")]
+    #[serde(rename="reportDataStartTimeMs")]
     pub report_data_start_time_ms: Option<String>,
     /// Report data range used to generate the report.
-    #[serde(alias="dataRange")]
+    #[serde(rename="dataRange")]
     pub data_range: Option<String>,
 }
 
@@ -516,7 +516,7 @@ impl RequestValue for RunQueryRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UploadLineItemsResponse {
     /// Status of upload.
-    #[serde(alias="uploadStatus")]
+    #[serde(rename="uploadStatus")]
     pub upload_status: UploadStatus,
 }
 
@@ -530,33 +530,33 @@ impl ResponseResult for UploadLineItemsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryMetadata {
     /// The path to the location in Google Cloud Storage where the latest report is stored.
-    #[serde(alias="googleCloudStoragePathForLatestReport")]
+    #[serde(rename="googleCloudStoragePathForLatestReport")]
     pub google_cloud_storage_path_for_latest_report: String,
     /// Range of report data.
-    #[serde(alias="dataRange")]
+    #[serde(rename="dataRange")]
     pub data_range: String,
     /// Whether to send an email notification when a report is ready. Default to false.
-    #[serde(alias="sendNotification")]
+    #[serde(rename="sendNotification")]
     pub send_notification: bool,
     /// Locale of the generated reports. Valid values are cs CZECH de GERMAN en ENGLISH es SPANISH fr FRENCH it ITALIAN ja JAPANESE ko KOREAN pl POLISH pt-BR BRAZILIAN_PORTUGUESE ru RUSSIAN tr TURKISH uk UKRAINIAN zh-CN CHINA_CHINESE zh-TW TAIWAN_CHINESE
     /// 
     /// An locale string not in the list above will generate reports in English.
     pub locale: String,
     /// The path in Google Drive for the latest report.
-    #[serde(alias="googleDrivePathForLatestReport")]
+    #[serde(rename="googleDrivePathForLatestReport")]
     pub google_drive_path_for_latest_report: String,
     /// Format of the generated report.
     pub format: String,
     /// List of email addresses which are sent email notifications when the report is finished. Separate from sendNotification.
-    #[serde(alias="shareEmailAddress")]
+    #[serde(rename="shareEmailAddress")]
     pub share_email_address: Vec<String>,
     /// Number of reports that have been generated for the query.
-    #[serde(alias="reportCount")]
+    #[serde(rename="reportCount")]
     pub report_count: i32,
     /// Whether the latest report is currently running.
     pub running: bool,
     /// The time when the latest report started to run.
-    #[serde(alias="latestReportRunTimeMs")]
+    #[serde(rename="latestReportRunTimeMs")]
     pub latest_report_run_time_ms: String,
     /// Query title. It is used to name the reports generated from this query.
     pub title: String,
@@ -576,7 +576,7 @@ pub struct ReportStatus {
     /// The state of the report.
     pub state: String,
     /// The time when this report either completed successfully or failed.
-    #[serde(alias="finishTimeMs")]
+    #[serde(rename="finishTimeMs")]
     pub finish_time_ms: String,
     /// The file type of the report.
     pub format: String,
@@ -616,15 +616,15 @@ pub struct RowStatus {
     /// Reasons why the entity can't be uploaded.
     pub errors: Vec<String>,
     /// Entity name.
-    #[serde(alias="entityName")]
+    #[serde(rename="entityName")]
     pub entity_name: String,
     /// Whether the stored entity is changed as a result of upload.
     pub changed: bool,
     /// Entity Id.
-    #[serde(alias="entityId")]
+    #[serde(rename="entityId")]
     pub entity_id: String,
     /// Row number.
-    #[serde(alias="rowNumber")]
+    #[serde(rename="rowNumber")]
     pub row_number: i32,
 }
 
@@ -670,18 +670,18 @@ pub struct Query {
     /// Information on how often and when to run a query.
     pub schedule: Option<QuerySchedule>,
     /// Canonical timezone code for report data time. Defaults to America/New_York.
-    #[serde(alias="timezoneCode")]
+    #[serde(rename="timezoneCode")]
     pub timezone_code: Option<String>,
     /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.
-    #[serde(alias="reportDataEndTimeMs")]
+    #[serde(rename="reportDataEndTimeMs")]
     pub report_data_end_time_ms: Option<String>,
     /// Query ID.
-    #[serde(alias="queryId")]
+    #[serde(rename="queryId")]
     pub query_id: Option<String>,
     /// Query parameters.
     pub params: Option<Parameters>,
     /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.
-    #[serde(alias="reportDataStartTimeMs")]
+    #[serde(rename="reportDataStartTimeMs")]
     pub report_data_start_time_ms: Option<String>,
     /// Query metadata.
     pub metadata: Option<QueryMetadata>,
@@ -703,7 +703,7 @@ impl ResponseResult for Query {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadLineItemsResponse {
     /// Retrieved line items in CSV format. Refer to  Entity Write File Format for more information on file format.
-    #[serde(alias="lineItems")]
+    #[serde(rename="lineItems")]
     pub line_items: String,
 }
 
@@ -717,7 +717,7 @@ impl ResponseResult for DownloadLineItemsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterPair {
     /// Filter type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Filter value.
     pub value: String,
@@ -735,7 +735,7 @@ pub struct UploadStatus {
     /// Reasons why upload can't be completed.
     pub errors: Vec<String>,
     /// Per-row upload status.
-    #[serde(alias="rowStatus")]
+    #[serde(rename="rowStatus")]
     pub row_status: Vec<RowStatus>,
 }
 

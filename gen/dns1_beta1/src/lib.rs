@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *0.1.3+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *dns* crate version *0.1.4+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *dns* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -317,7 +317,7 @@ impl<'a, C, NC, A> Dns<C, NC, A>
         Dns {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -336,7 +336,7 @@ impl<'a, C, NC, A> Dns<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -369,18 +369,18 @@ pub struct ManagedZone {
     /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
     pub description: Option<String>,
     /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
-    #[serde(alias="nameServers")]
+    #[serde(rename="nameServers")]
     pub name_servers: Option<Vec<String>>,
     /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// Unique identifier for the resource; defined by the server (output only)
     pub id: Option<String>,
     /// The DNS name of this managed zone, for instance "example.com.".
-    #[serde(alias="dnsName")]
+    #[serde(rename="dnsName")]
     pub dns_name: Option<String>,
     /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
-    #[serde(alias="nameServerSet")]
+    #[serde(rename="nameServerSet")]
     pub name_server_set: Option<String>,
     /// User assigned name for this resource. Must be unique within the project. The name must be 1-32 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
     pub name: Option<String>,
@@ -407,7 +407,7 @@ pub struct ResourceRecordSet {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
     pub kind: Option<String>,
     /// One of A, AAAA, SOA, MX, NS, TXT
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// For example, www.example.com.
     pub name: Option<String>,
@@ -425,24 +425,24 @@ impl Resource for ResourceRecordSet {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Quota {
     /// Maximum allowed number of ResourceRecordSets per zone in the project.
-    #[serde(alias="rrsetsPerManagedZone")]
+    #[serde(rename="rrsetsPerManagedZone")]
     pub rrsets_per_managed_zone: i32,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
     pub kind: String,
     /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
-    #[serde(alias="rrsetAdditionsPerChange")]
+    #[serde(rename="rrsetAdditionsPerChange")]
     pub rrset_additions_per_change: i32,
     /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
-    #[serde(alias="totalRrdataSizePerChange")]
+    #[serde(rename="totalRrdataSizePerChange")]
     pub total_rrdata_size_per_change: i32,
     /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
-    #[serde(alias="resourceRecordsPerRrset")]
+    #[serde(rename="resourceRecordsPerRrset")]
     pub resource_records_per_rrset: i32,
     /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
-    #[serde(alias="rrsetDeletionsPerChange")]
+    #[serde(rename="rrsetDeletionsPerChange")]
     pub rrset_deletions_per_change: i32,
     /// Maximum allowed number of managed zones in the project.
-    #[serde(alias="managedZones")]
+    #[serde(rename="managedZones")]
     pub managed_zones: i32,
 }
 
@@ -488,7 +488,7 @@ pub struct ChangesListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
     /// 
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Type of resource.
     pub kind: String,
@@ -513,12 +513,12 @@ pub struct ManagedZonesListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
     /// 
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Type of resource.
     pub kind: String,
     /// The managed zone resources.
-    #[serde(alias="managedZones")]
+    #[serde(rename="managedZones")]
     pub managed_zones: Vec<ManagedZone>,
 }
 
@@ -545,7 +545,7 @@ pub struct Change {
     /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
     pub kind: Option<String>,
     /// The time that this operation was started by the server. This is in RFC3339 text format.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// Which ResourceRecordSets to add?
     pub additions: Option<Vec<ResourceRecordSet>>,
@@ -572,7 +572,7 @@ pub struct ResourceRecordSetsListResponse {
     /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
     /// 
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The resource record set resources.
     pub rrsets: Vec<ResourceRecordSet>,

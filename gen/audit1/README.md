@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-audit1` library allows access to all features of the *Google audit* service.
 
-This documentation was generated from *audit* crate version *0.1.3+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+This documentation was generated from *audit* crate version *0.1.4+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 
 Everything else about the *audit* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/admin-audit/get_started).

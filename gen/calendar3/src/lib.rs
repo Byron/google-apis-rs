@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *calendar* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -382,7 +382,7 @@ impl<'a, C, NC, A> CalendarHub<C, NC, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -413,7 +413,7 @@ impl<'a, C, NC, A> CalendarHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -444,14 +444,14 @@ pub struct EventGadget {
     /// The gadget's URL.
     pub link: String,
     /// The gadget's type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The gadget's display mode. Optional. Possible values are:  
     /// - "icon" - The gadget displays next to the event's title in the calendar view. 
     /// - "chip" - The gadget displays when the event is clicked.
     pub display: String,
     /// The gadget's icon URL.
-    #[serde(alias="iconLink")]
+    #[serde(rename="iconLink")]
     pub icon_link: String,
 }
 
@@ -485,7 +485,7 @@ pub struct AclRuleScope {
     /// - "user" - Limits the scope to a single user. 
     /// - "group" - Limits the scope to a group. 
     /// - "domain" - Limits the scope to a domain.  Note: The permissions granted to the "default", or public, scope apply to any user, authenticated or not.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type "default".
     pub value: String,
@@ -507,7 +507,7 @@ impl Part for AclRuleScope {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Settings {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of user settings.
     pub items: Vec<Setting>,
@@ -516,7 +516,7 @@ pub struct Settings {
     /// Etag of the collection.
     pub etag: String,
     /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(alias="nextSyncToken")]
+    #[serde(rename="nextSyncToken")]
     pub next_sync_token: String,
 }
 
@@ -548,7 +548,7 @@ pub struct Calendar {
     /// Identifier of the calendar.
     pub id: Option<String>,
     /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
     /// Geographic location of the calendar as free-form text. Optional.
     pub location: Option<String>,
@@ -576,7 +576,7 @@ impl ResponseResult for Calendar {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarListEntry {
     /// The notifications that the authenticated user is receiving for this calendar.
-    #[serde(alias="notificationSettings")]
+    #[serde(rename="notificationSettings")]
     pub notification_settings: Option<CalendarListEntryNotificationSettings>,
     /// Description of the calendar. Optional. Read-only.
     pub description: Option<String>,
@@ -589,20 +589,20 @@ pub struct CalendarListEntry {
     /// - "reader" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. 
     /// - "writer" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. 
     /// - "owner" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
-    #[serde(alias="accessRole")]
+    #[serde(rename="accessRole")]
     pub access_role: Option<String>,
     /// Identifier of the calendar.
     pub id: Option<String>,
     /// Type of the resource ("calendar#calendarListEntry").
     pub kind: Option<String>,
     /// The foreground color of the calendar in the hexadecimal format "#ffffff". This property supersedes the index-based colorId property. Optional.
-    #[serde(alias="foregroundColor")]
+    #[serde(rename="foregroundColor")]
     pub foreground_color: Option<String>,
     /// The default reminders that the authenticated user has for this calendar.
-    #[serde(alias="defaultReminders")]
+    #[serde(rename="defaultReminders")]
     pub default_reminders: Option<Vec<EventReminder>>,
     /// The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). Optional.
-    #[serde(alias="colorId")]
+    #[serde(rename="colorId")]
     pub color_id: Option<String>,
     /// Whether the calendar content shows up in the calendar UI. Optional. The default is False.
     pub selected: Option<bool>,
@@ -613,13 +613,13 @@ pub struct CalendarListEntry {
     /// Geographic location of the calendar as free-form text. Optional. Read-only.
     pub location: Option<String>,
     /// The main color of the calendar in the hexadecimal format "#0088aa". This property supersedes the index-based colorId property. Optional.
-    #[serde(alias="backgroundColor")]
+    #[serde(rename="backgroundColor")]
     pub background_color: Option<String>,
     /// The summary that the authenticated user has set for this calendar. Optional.
-    #[serde(alias="summaryOverride")]
+    #[serde(rename="summaryOverride")]
     pub summary_override: Option<String>,
     /// The time zone of the calendar. Optional. Read-only.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
     /// Whether the calendar has been hidden from the list. Optional. The default is False.
     pub hidden: Option<bool>,
@@ -667,10 +667,10 @@ pub struct EventDateTime {
     /// The date, in the format "yyyy-mm-dd", if this is an all-day event.
     pub date: String,
     /// The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: String,
     /// The time, as a combined date-time value (formatted according to RFC 3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.
-    #[serde(alias="dateTime")]
+    #[serde(rename="dateTime")]
     pub date_time: String,
 }
 
@@ -711,10 +711,10 @@ impl ResponseResult for Setting {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventCreator {
     /// Whether the creator corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
-    #[serde(alias="self")]
+    #[serde(rename="self")]
     pub self_: bool,
     /// The creator's name, if available.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The creator's email address, if available.
     pub email: String,
@@ -792,7 +792,7 @@ impl ResponseResult for AclRule {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Acl {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of rules on the access control list.
     pub items: Vec<AclRule>,
@@ -801,7 +801,7 @@ pub struct Acl {
     /// ETag of the collection.
     pub etag: String,
     /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(alias="nextSyncToken")]
+    #[serde(rename="nextSyncToken")]
     pub next_sync_token: String,
 }
 
@@ -821,12 +821,12 @@ impl ResponseResult for Acl {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Events {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Type of the collection ("calendar#events").
     pub kind: String,
     /// The default reminders on the calendar for the authenticated user. These reminders apply to all events on this calendar that do not explicitly override them (i.e. do not have reminders.useDefault set to True).
-    #[serde(alias="defaultReminders")]
+    #[serde(rename="defaultReminders")]
     pub default_reminders: Vec<EventReminder>,
     /// Description of the calendar. Read-only.
     pub description: String,
@@ -839,10 +839,10 @@ pub struct Events {
     /// ETag of the collection.
     pub etag: String,
     /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(alias="nextSyncToken")]
+    #[serde(rename="nextSyncToken")]
     pub next_sync_token: String,
     /// The time zone of the calendar. Read-only.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: String,
     /// The user's access role for this calendar. Read-only. Possible values are:  
     /// - "none" - The user has no access. 
@@ -850,7 +850,7 @@ pub struct Events {
     /// - "reader" - The user has read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. 
     /// - "writer" - The user has read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. 
     /// - "owner" - The user has ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
-    #[serde(alias="accessRole")]
+    #[serde(rename="accessRole")]
     pub access_role: String,
 }
 
@@ -873,12 +873,12 @@ impl ResponseResult for Events {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// A version-specific identifier for the watched resource.
-    #[serde(alias="resourceUri")]
+    #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
@@ -891,7 +891,7 @@ pub struct Channel {
     /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
     /// The type of delivery mechanism used for this channel.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
@@ -911,17 +911,17 @@ pub struct EventAttendee {
     /// The attendee's response comment. Optional.
     pub comment: String,
     /// The attendee's name, if available. Optional.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// Whether this entry represents the calendar on which this copy of the event appears. Read-only. The default is False.
-    #[serde(alias="self")]
+    #[serde(rename="self")]
     pub self_: bool,
     /// The attendee's email address, if available. This field must be present when adding an attendee.
     pub email: String,
     /// The attendee's Profile ID, if available.
     pub id: String,
     /// Number of additional guests. Optional. The default is 0.
-    #[serde(alias="additionalGuests")]
+    #[serde(rename="additionalGuests")]
     pub additional_guests: i32,
     /// Whether the attendee is a resource. Read-only. The default is False.
     pub resource: bool,
@@ -934,7 +934,7 @@ pub struct EventAttendee {
     /// - "declined" - The attendee has declined the invitation. 
     /// - "tentative" - The attendee has tentatively accepted the invitation. 
     /// - "accepted" - The attendee has accepted the invitation.
-    #[serde(alias="responseStatus")]
+    #[serde(rename="responseStatus")]
     pub response_status: String,
 }
 
@@ -965,7 +965,7 @@ pub struct EventReminders {
     /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event.
     pub overrides: Vec<EventReminder>,
     /// Whether the default reminders of the calendar apply to the event.
-    #[serde(alias="useDefault")]
+    #[serde(rename="useDefault")]
     pub use_default: bool,
 }
 
@@ -985,7 +985,7 @@ impl Part for EventReminders {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CalendarList {
     /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Calendars that are present on the user's calendar list.
     pub items: Vec<CalendarListEntry>,
@@ -994,7 +994,7 @@ pub struct CalendarList {
     /// ETag of the collection.
     pub etag: String,
     /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(alias="nextSyncToken")]
+    #[serde(rename="nextSyncToken")]
     pub next_sync_token: String,
 }
 
@@ -1042,7 +1042,7 @@ impl Part for FreeBusyRequestItem {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBusyResponse {
     /// The end of the interval.
-    #[serde(alias="timeMax")]
+    #[serde(rename="timeMax")]
     pub time_max: String,
     /// Type of the resource ("calendar#freeBusy").
     pub kind: String,
@@ -1051,7 +1051,7 @@ pub struct FreeBusyResponse {
     /// Expansion of groups.
     pub groups: HashMap<String, FreeBusyGroup>,
     /// The start of the interval.
-    #[serde(alias="timeMin")]
+    #[serde(rename="timeMin")]
     pub time_min: String,
 }
 
@@ -1094,21 +1094,21 @@ impl ResponseResult for Colors {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FreeBusyRequest {
     /// Maximal number of calendars for which FreeBusy information is to be provided. Optional.
-    #[serde(alias="calendarExpansionMax")]
+    #[serde(rename="calendarExpansionMax")]
     pub calendar_expansion_max: Option<i32>,
     /// The start of the interval for the query.
-    #[serde(alias="timeMin")]
+    #[serde(rename="timeMin")]
     pub time_min: Option<String>,
     /// Maximal number of calendar identifiers to be provided for a single group. Optional. An error will be returned for a group with more members than this value.
-    #[serde(alias="groupExpansionMax")]
+    #[serde(rename="groupExpansionMax")]
     pub group_expansion_max: Option<i32>,
     /// The end of the interval for the query.
-    #[serde(alias="timeMax")]
+    #[serde(rename="timeMax")]
     pub time_max: Option<String>,
     /// List of calendars and/or groups to query.
     pub items: Option<Vec<FreeBusyRequestItem>>,
     /// Time zone used in the response. Optional. The default is UTC.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
 }
 
@@ -1138,10 +1138,10 @@ impl Part for EventSource {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventOrganizer {
     /// Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
-    #[serde(alias="self")]
+    #[serde(rename="self")]
     pub self_: bool,
     /// The organizer's name, if available.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The organizer's email address, if available.
     pub email: String,
@@ -1198,7 +1198,7 @@ pub struct CalendarNotification {
     /// - "eventCancellation" - Notification sent when an event is cancelled. 
     /// - "eventResponse" - Notification sent when an event is changed. 
     /// - "agenda" - An agenda with the events of the day (sent out in the morning).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The method used to deliver the notification. Possible values are:  
     /// - "email" - Reminders are sent via email. 
@@ -1240,17 +1240,17 @@ pub struct Event {
     /// - the ID must be unique per calendar  Due to the globally distributed nature of the system, we cannot guarantee that ID collisions will be detected at event creation time. To minimize the risk of collisions we recommend using an established UUID algorithm such as one described in RFC4122.
     pub id: Option<String>,
     /// An absolute link to the Google+ hangout associated with this event. Read-only.
-    #[serde(alias="hangoutLink")]
+    #[serde(rename="hangoutLink")]
     pub hangout_link: Option<String>,
     /// Whether attendees other than the organizer can invite others to the event. Optional. The default is True.
-    #[serde(alias="guestsCanInviteOthers")]
+    #[serde(rename="guestsCanInviteOthers")]
     pub guests_can_invite_others: Option<bool>,
     /// The attendees of the event.
     pub attendees: Option<Vec<EventAttendee>>,
     /// The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.
     pub start: Option<EventDateTime>,
     /// An absolute link to this event in the Google Calendar Web UI. Read-only.
-    #[serde(alias="htmlLink")]
+    #[serde(rename="htmlLink")]
     pub html_link: Option<String>,
     /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event. This field is omitted for single events or instances of recurring events.
     pub recurrence: Option<Vec<String>>,
@@ -1261,10 +1261,10 @@ pub struct Event {
     /// Geographic location of the event as free-form text. Optional.
     pub location: Option<String>,
     /// For an instance of a recurring event, this is the event ID of the recurring event itself. Immutable.
-    #[serde(alias="recurringEventId")]
+    #[serde(rename="recurringEventId")]
     pub recurring_event_id: Option<String>,
     /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. Immutable.
-    #[serde(alias="originalStartTime")]
+    #[serde(rename="originalStartTime")]
     pub original_start_time: Option<EventDateTime>,
     /// Status of the event. Optional. Possible values are:  
     /// - "confirmed" - The event is confirmed. This is the default status. 
@@ -1276,12 +1276,12 @@ pub struct Event {
     /// Description of the event. Optional.
     pub description: Option<String>,
     /// Event ID in the iCalendar format.
-    #[serde(alias="iCalUID")]
+    #[serde(rename="iCalUID")]
     pub i_cal_uid: Option<String>,
     /// A gadget that extends this event.
     pub gadget: Option<EventGadget>,
     /// Whether the end time is actually unspecified. An end time is still provided for compatibility reasons, even if this attribute is set to True. The default is False.
-    #[serde(alias="endTimeUnspecified")]
+    #[serde(rename="endTimeUnspecified")]
     pub end_time_unspecified: Option<bool>,
     /// Sequence number as per iCalendar.
     pub sequence: Option<i32>,
@@ -1292,12 +1292,12 @@ pub struct Event {
     /// - "confidential" - The event is private. This value is provided for compatibility reasons.
     pub visibility: Option<String>,
     /// Whether attendees other than the organizer can modify the event. Optional. The default is False.
-    #[serde(alias="guestsCanModify")]
+    #[serde(rename="guestsCanModify")]
     pub guests_can_modify: Option<bool>,
     /// The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.
     pub end: Option<EventDateTime>,
     /// Whether attendees may have been omitted from the event's representation. When retrieving an event, this may be due to a restriction specified by the maxAttendee query parameter. When updating an event, this can be used to only update the participant's response. Optional. The default is False.
-    #[serde(alias="attendeesOmitted")]
+    #[serde(rename="attendeesOmitted")]
     pub attendees_omitted: Option<bool>,
     /// Type of the resource ("calendar#event").
     pub kind: Option<String>,
@@ -1306,27 +1306,27 @@ pub struct Event {
     /// Creation time of the event (as a RFC 3339 timestamp). Read-only.
     pub created: Option<String>,
     /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
-    #[serde(alias="colorId")]
+    #[serde(rename="colorId")]
     pub color_id: Option<String>,
     /// Whether anyone can invite themselves to the event. Optional. The default is False.
-    #[serde(alias="anyoneCanAddSelf")]
+    #[serde(rename="anyoneCanAddSelf")]
     pub anyone_can_add_self: Option<bool>,
     /// Information about the event's reminders for the authenticated user.
     pub reminders: Option<EventReminders>,
     /// Whether attendees other than the organizer can see who the event's attendees are. Optional. The default is True.
-    #[serde(alias="guestsCanSeeOtherGuests")]
+    #[serde(rename="guestsCanSeeOtherGuests")]
     pub guests_can_see_other_guests: Option<bool>,
     /// Title of the event.
     pub summary: Option<String>,
     /// Extended properties of the event.
-    #[serde(alias="extendedProperties")]
+    #[serde(rename="extendedProperties")]
     pub extended_properties: Option<EventExtendedProperties>,
     /// Whether the event blocks time on the calendar. Optional. Possible values are:  
     /// - "opaque" - The event blocks time on the calendar. This is the default value. 
     /// - "transparent" - The event does not block time on the calendar.
     pub transparency: Option<String>,
     /// Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.
-    #[serde(alias="privateCopy")]
+    #[serde(rename="privateCopy")]
     pub private_copy: Option<bool>,
 }
 

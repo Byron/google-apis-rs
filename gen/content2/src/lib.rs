@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.3+20150317*, where *20150317* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.4+20150317*, where *20150317* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> ShoppingContent<C, NC, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -365,7 +365,7 @@ impl<'a, C, NC, A> ShoppingContent<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,10 +405,10 @@ pub struct ProductAspect {
     /// Whether the aspect is required, excluded or should be validated.
     pub intention: String,
     /// The name of the aspect.
-    #[serde(alias="aspectName")]
+    #[serde(rename="aspectName")]
     pub aspect_name: String,
     /// The name of the destination. Leave out to apply to all destinations.
-    #[serde(alias="destinationName")]
+    #[serde(rename="destinationName")]
     pub destination_name: String,
 }
 
@@ -422,7 +422,7 @@ impl Part for ProductAspect {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponseEntry".
     pub kind: String,
@@ -504,7 +504,7 @@ pub struct AccountUser {
     /// Whether user is an admin.
     pub admin: bool,
     /// User's email address.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: String,
 }
 
@@ -571,19 +571,19 @@ impl ResponseResult for DatafeedsCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingLocationGroup {
     /// A postal code range representing a city or a set of cities.
-    #[serde(alias="postalCodeRanges")]
+    #[serde(rename="postalCodeRanges")]
     pub postal_code_ranges: Vec<AccountShippingPostalCodeRange>,
     /// The country in which this location group is, represented as ISO 3166-1 Alpha-2 code.
     pub country: String,
     /// A location ID (also called criteria ID) representing administrative areas, smaller country subdivisions (counties), or cities.
-    #[serde(alias="locationIds")]
+    #[serde(rename="locationIds")]
     pub location_ids: Vec<String>,
     /// The name of the location group.
     pub name: String,
     /// A postal code representing a city or a set of cities.  
     /// - A single postal code (e.g., 12345)
     /// - A postal code prefix followed by a star (e.g., 1234*)
-    #[serde(alias="postalCodes")]
+    #[serde(rename="postalCodes")]
     pub postal_codes: Vec<String>,
 }
 
@@ -620,28 +620,28 @@ impl ResponseResult for InventorySetResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatus {
     /// Date on which the item expires in Google Shopping, in ISO 8601 format.
-    #[serde(alias="googleExpirationDate")]
+    #[serde(rename="googleExpirationDate")]
     pub google_expiration_date: String,
     /// The intended destinations for the product.
-    #[serde(alias="destinationStatuses")]
+    #[serde(rename="destinationStatuses")]
     pub destination_statuses: Vec<ProductStatusDestinationStatus>,
     /// The title of the product.
     pub title: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".
     pub kind: String,
     /// Date on which the item has been last updated, in ISO 8601 format.
-    #[serde(alias="lastUpdateDate")]
+    #[serde(rename="lastUpdateDate")]
     pub last_update_date: String,
     /// The link to the product.
     pub link: String,
     /// Date on which the item has been created, in ISO 8601 format.
-    #[serde(alias="creationDate")]
+    #[serde(rename="creationDate")]
     pub creation_date: String,
     /// A list of data quality issues associated with the product.
-    #[serde(alias="dataQualityIssues")]
+    #[serde(rename="dataQualityIssues")]
     pub data_quality_issues: Vec<ProductStatusDataQualityIssue>,
     /// The id of the product for which status is reported.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -663,13 +663,13 @@ pub struct DatafeedFetchSchedule {
     /// The hour of the day the feed file should be fetched (0-24).
     pub hour: u32,
     /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: String,
     /// The URL where the feed file can be fetched. Google Merchant Center will support automatic scheduled uploads using the HTTP, HTTPS, FTP, or SFTP protocols, so the value will need to be a valid link using one of those four protocols.
-    #[serde(alias="fetchUrl")]
+    #[serde(rename="fetchUrl")]
     pub fetch_url: String,
     /// The day of the month the feed file should be fetched (1-31).
-    #[serde(alias="dayOfMonth")]
+    #[serde(rename="dayOfMonth")]
     pub day_of_month: u32,
 }
 
@@ -688,20 +688,20 @@ impl Part for DatafeedFetchSchedule {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedStatus {
     /// The number of items in the feed that were valid.
-    #[serde(alias="itemsValid")]
+    #[serde(rename="itemsValid")]
     pub items_valid: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedStatus".
     pub kind: String,
     /// The list of errors occurring in the feed.
     pub errors: Vec<DatafeedStatusError>,
     /// The processing status of the feed.
-    #[serde(alias="processingStatus")]
+    #[serde(rename="processingStatus")]
     pub processing_status: String,
     /// The number of items in the feed that were processed.
-    #[serde(alias="itemsTotal")]
+    #[serde(rename="itemsTotal")]
     pub items_total: String,
     /// The ID of the feed for which the status is reported.
-    #[serde(alias="datafeedId")]
+    #[serde(rename="datafeedId")]
     pub datafeed_id: String,
     /// The list of errors occurring in the feed.
     pub warnings: Vec<DatafeedStatusError>,
@@ -717,13 +717,13 @@ impl ResponseResult for DatafeedStatus {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The ID of the data feed to get or delete.
-    #[serde(alias="datafeedId")]
+    #[serde(rename="datafeedId")]
     pub datafeed_id: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
@@ -739,10 +739,10 @@ impl Part for DatafeedstatusesCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccounttaxCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The retrieved or updated account tax settings.
-    #[serde(alias="accountTax")]
+    #[serde(rename="accountTax")]
     pub account_tax: AccountTax,
     /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
@@ -782,7 +782,7 @@ impl RequestValue for AccountstatusesCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingServiceCostRule {
     /// Final calculation method to be used only in leaf nodes.
-    #[serde(alias="calculationMethod")]
+    #[serde(rename="calculationMethod")]
     pub calculation_method: AccountShippingShippingServiceCalculationMethod,
     /// Condition for this rule to be applicable. If no condition is specified, the rule acts as a catch-all.
     pub condition: AccountShippingCondition,
@@ -812,23 +812,23 @@ impl Part for AccountShippingShippingServiceCostRule {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// URL for individual seller reviews, i.e., reviews for each child account.
-    #[serde(alias="reviewsUrl")]
+    #[serde(rename="reviewsUrl")]
     pub reviews_url: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#account".
     pub kind: Option<String>,
     /// Display name for the account.
     pub name: Option<String>,
     /// Indicates whether the merchant sells adult content.
-    #[serde(alias="adultContent")]
+    #[serde(rename="adultContent")]
     pub adult_content: Option<bool>,
     /// List of linked AdWords accounts.
-    #[serde(alias="adwordsLinks")]
+    #[serde(rename="adwordsLinks")]
     pub adwords_links: Option<Vec<AccountAdwordsLink>>,
     /// The merchant's website.
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: Option<String>,
     /// Client-specific, locally-unique, internal ID for the child account.
-    #[serde(alias="sellerId")]
+    #[serde(rename="sellerId")]
     pub seller_id: Option<String>,
     /// Merchant Center account ID.
     pub id: Option<String>,
@@ -848,10 +848,10 @@ impl ResponseResult for Account {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountIdentifier {
     /// The aggregator ID, set for aggregators and subaccounts (in that case, it represents the aggregator of the subaccount).
-    #[serde(alias="aggregatorId")]
+    #[serde(rename="aggregatorId")]
     pub aggregator_id: String,
     /// The merchant account ID, set for individual accounts and subaccounts.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
 }
 
@@ -865,7 +865,7 @@ impl Part for AccountIdentifier {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InventoryCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponseEntry".
     pub kind: String,
@@ -917,12 +917,12 @@ impl Part for ProductShippingDimension {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
     /// The requested account status. Defined if and only if the request was successful.
-    #[serde(alias="accountStatus")]
+    #[serde(rename="accountStatus")]
     pub account_status: AccountStatus,
 }
 
@@ -936,13 +936,13 @@ impl Part for AccountstatusesCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The ID of the (sub-)account whose status to get.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// The method (get).
     pub method: String,
@@ -963,7 +963,7 @@ impl Part for AccountstatusesCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccounttaxListResponse {
     /// The token for the retrieval of the next page of account tax settings.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxListResponse".
     pub kind: String,
@@ -1016,7 +1016,7 @@ impl Part for ErrorType {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
@@ -1034,18 +1034,18 @@ impl Part for DatafeedsCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountshippingCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The ID of the account for which to get/update account shipping settings.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// The account shipping settings to update. Only defined if the method is update.
-    #[serde(alias="accountShipping")]
+    #[serde(rename="accountShipping")]
     pub account_shipping: AccountShipping,
     /// no description provided
     pub method: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
 }
 
@@ -1064,7 +1064,7 @@ impl Part for AccountshippingCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedsListResponse {
     /// The token for the retrieval of the next page of datafeeds.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsListResponse".
     pub kind: String,
@@ -1082,12 +1082,12 @@ impl ResponseResult for DatafeedsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShipping {
     /// The numeric id of a location that the shipping rate applies to as defined in the AdWords API.
-    #[serde(alias="locationId")]
+    #[serde(rename="locationId")]
     pub location_id: String,
     /// A free-form description of the service class or delivery speed.
     pub service: String,
     /// The postal code range that the shipping rate applies to, represented by a postal code, a postal code prefix followed by a * wildcard, a range between two postal codes or two postal code prefixes of equal length.
-    #[serde(alias="postalCode")]
+    #[serde(rename="postalCode")]
     pub postal_code: String,
     /// The two-letter ISO 3166 country code for the country to which an item will ship.
     pub country: String,
@@ -1096,7 +1096,7 @@ pub struct ProductShipping {
     /// The geographic region to which a shipping rate applies (e.g. zip code).
     pub region: String,
     /// The location where the shipping is applicable, represented by a location group name.
-    #[serde(alias="locationGroupName")]
+    #[serde(rename="locationGroupName")]
     pub location_group_name: String,
 }
 
@@ -1121,7 +1121,7 @@ pub struct AccountTax {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountTax".
     pub kind: Option<String>,
     /// The ID of the account to which these account tax settings belong.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -1136,17 +1136,17 @@ impl ResponseResult for AccountTax {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The product to insert. Only required if the method is insert.
     pub product: Product,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
     /// The ID of the product to get or delete. Only defined if the method is get or delete.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -1160,7 +1160,7 @@ impl Part for ProductsCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The retrieved, created, or updated account. Not defined if the method was delete.
     pub account: Account,
@@ -1218,23 +1218,23 @@ impl ResponseResult for ProductstatusesCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingCarrierRate {
     /// Shipping origin represented as a postal code.
-    #[serde(alias="shippingOrigin")]
+    #[serde(rename="shippingOrigin")]
     pub shipping_origin: String,
     /// The carrier that is responsible for the shipping, such as "UPS", "FedEx", or "USPS".
     pub carrier: String,
     /// The name of the carrier rate.
     pub name: String,
     /// Sale country for which this carrier rate is valid, represented as an ISO 3166-1 Alpha-2 code.
-    #[serde(alias="saleCountry")]
+    #[serde(rename="saleCountry")]
     pub sale_country: i64,
     /// The carrier service, such as "Ground" or "2Day".
-    #[serde(alias="carrierService")]
+    #[serde(rename="carrierService")]
     pub carrier_service: String,
     /// Additive shipping rate modifier.
-    #[serde(alias="modifierFlatRate")]
+    #[serde(rename="modifierFlatRate")]
     pub modifier_flat_rate: Price,
     /// Multiplicative shipping rate modifier in percent. Represented as a floating point number without the percentage character.
-    #[serde(alias="modifierPercent")]
+    #[serde(rename="modifierPercent")]
     pub modifier_percent: String,
 }
 
@@ -1261,31 +1261,31 @@ pub struct Datafeed {
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeed".
     pub kind: Option<String>,
     /// The type of data feed.
-    #[serde(alias="contentType")]
+    #[serde(rename="contentType")]
     pub content_type: Option<String>,
     /// A descriptive name of the data feed.
     pub name: Option<String>,
     /// The two-letter ISO 639-1 language of the items in the feed.
-    #[serde(alias="contentLanguage")]
+    #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Format of the feed file.
     pub format: Option<DatafeedFormat>,
     /// Fetch schedule for the feed file.
-    #[serde(alias="fetchSchedule")]
+    #[serde(rename="fetchSchedule")]
     pub fetch_schedule: Option<DatafeedFetchSchedule>,
     /// The two-letter ISO 3166 country where the items in the feed will be included in the search index.
-    #[serde(alias="targetCountry")]
+    #[serde(rename="targetCountry")]
     pub target_country: Option<i64>,
     /// The filename of the feed. All feeds must have a unique file name.
-    #[serde(alias="fileName")]
+    #[serde(rename="fileName")]
     pub file_name: Option<String>,
     /// The ID of the data feed.
     pub id: Option<String>,
     /// The list of intended destinations (corresponds to checked check boxes in Merchant Center).
-    #[serde(alias="intendedDestinations")]
+    #[serde(rename="intendedDestinations")]
     pub intended_destinations: Option<Vec<String>>,
     /// The two-letter ISO 639-1 language in which the attributes are defined in the data feed.
-    #[serde(alias="attributeLanguage")]
+    #[serde(rename="attributeLanguage")]
     pub attribute_language: Option<String>,
 }
 
@@ -1301,18 +1301,18 @@ impl ResponseResult for Datafeed {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingServiceCalculationMethod {
     /// Percentage of the price, represented as a floating point number without the percentage character.
-    #[serde(alias="percentageRate")]
+    #[serde(rename="percentageRate")]
     pub percentage_rate: String,
     /// Name of the carrier rate to use for the calculation.
-    #[serde(alias="carrierRate")]
+    #[serde(rename="carrierRate")]
     pub carrier_rate: String,
     /// Name of the rate table to use for the calculation.
-    #[serde(alias="rateTable")]
+    #[serde(rename="rateTable")]
     pub rate_table: String,
     /// Delivery is excluded. Valid only within cost rules tree.
     pub excluded: bool,
     /// Fixed price shipping, represented as a floating point number associated with a currency.
-    #[serde(alias="flatRate")]
+    #[serde(rename="flatRate")]
     pub flat_rate: Price,
 }
 
@@ -1328,17 +1328,17 @@ pub struct ProductTax {
     /// The percentage of tax rate that applies to the item price.
     pub rate: f64,
     /// The numeric id of a location that the tax rate applies to as defined in the AdWords API.
-    #[serde(alias="locationId")]
+    #[serde(rename="locationId")]
     pub location_id: String,
     /// The postal code range that the tax rate applies to, represented by a ZIP code, a ZIP code prefix using * wildcard, a range between two ZIP codes or two ZIP code prefixes of equal length. Examples: 94114, 94*, 94002-95460, 94*-95*.
-    #[serde(alias="postalCode")]
+    #[serde(rename="postalCode")]
     pub postal_code: String,
     /// The country within which the item is taxed, specified with a two-letter ISO 3166 country code.
     pub country: String,
     /// The geographic region to which the tax rate applies.
     pub region: String,
     /// Set to true if tax is charged on shipping.
-    #[serde(alias="taxShip")]
+    #[serde(rename="taxShip")]
     pub tax_ship: bool,
 }
 
@@ -1372,15 +1372,15 @@ impl ResponseResult for DatafeedstatusesCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The account to create or update. Only defined if the method is insert or update.
     pub account: Account,
     /// The ID of the account to get or delete. Only defined if the method is get or delete.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
@@ -1406,7 +1406,7 @@ pub struct AccountsAuthInfoResponse {
     /// - For an individual account: only the merchant ID is defined
     /// - For an aggregator: only the aggregator ID is defined
     /// - For a subaccount of an MCA: both the merchant ID and the aggregator ID are defined.
-    #[serde(alias="accountIdentifiers")]
+    #[serde(rename="accountIdentifiers")]
     pub account_identifiers: Vec<AccountIdentifier>,
 }
 
@@ -1443,7 +1443,7 @@ impl RequestValue for ProductsCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedstatusesListResponse {
     /// The token for the retrieval of the next page of datafeed statuses.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesListResponse".
     pub kind: String,
@@ -1503,10 +1503,10 @@ pub struct AccountStatus {
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
     pub kind: String,
     /// A list of data quality issues.
-    #[serde(alias="dataQualityIssues")]
+    #[serde(rename="dataQualityIssues")]
     pub data_quality_issues: Vec<AccountStatusDataQualityIssue>,
     /// The ID of the account for which the status is reported.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -1535,12 +1535,12 @@ impl Part for ProductInstallment {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
     /// The requested data feed status. Defined if and only if the request was successful.
-    #[serde(alias="datafeedStatus")]
+    #[serde(rename="datafeedStatus")]
     pub datafeed_status: DatafeedStatus,
 }
 
@@ -1556,10 +1556,10 @@ pub struct Inventory {
     /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
     pub kind: String,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
-    #[serde(alias="salePrice")]
+    #[serde(rename="salePrice")]
     pub sale_price: Price,
     /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
-    #[serde(alias="salePriceEffectiveDate")]
+    #[serde(rename="salePriceEffectiveDate")]
     pub sale_price_effective_date: String,
     /// The price of the product.
     pub price: Price,
@@ -1581,7 +1581,7 @@ pub struct AccountShippingRateTable {
     /// One-dimensional table cells define one condition along the same dimension. Bi-dimensional table cells use two dimensions with respectively M and N distinct values and must contain exactly M * N cells with distinct conditions (for each possible value pairs).
     pub content: Vec<AccountShippingRateTableCell>,
     /// Sale country for which this table is valid, represented as an ISO 3166-1 Alpha-2 code.
-    #[serde(alias="saleCountry")]
+    #[serde(rename="saleCountry")]
     pub sale_country: i64,
     /// The name of the rate table.
     pub name: String,
@@ -1597,7 +1597,7 @@ impl Part for AccountShippingRateTable {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatusDestinationStatus {
     /// The destination's approval status.
-    #[serde(alias="approvalStatus")]
+    #[serde(rename="approvalStatus")]
     pub approval_status: String,
     /// The name of the destination
     pub destination: String,
@@ -1633,18 +1633,18 @@ impl RequestValue for AccounttaxCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InventoryCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
-    #[serde(alias="storeCode")]
+    #[serde(rename="storeCode")]
     pub store_code: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// Price and availability of the product.
     pub inventory: Inventory,
     /// The ID of the product for which to update price and availability.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -1683,7 +1683,7 @@ impl ResponseResult for ProductsCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountshippingListResponse {
     /// The token for the retrieval of the next page of account shipping settings.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingListResponse".
     pub kind: String,
@@ -1701,15 +1701,15 @@ impl ResponseResult for AccountshippingListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountStatusExampleItem {
     /// Unique item ID as specified in the uploaded product data.
-    #[serde(alias="itemId")]
+    #[serde(rename="itemId")]
     pub item_id: String,
     /// The item value that was submitted.
-    #[serde(alias="submittedValue")]
+    #[serde(rename="submittedValue")]
     pub submitted_value: String,
     /// Landing page of the item.
     pub link: String,
     /// The actual value on the landing page.
-    #[serde(alias="valueOnLandingPage")]
+    #[serde(rename="valueOnLandingPage")]
     pub value_on_landing_page: String,
     /// Title of the item.
     pub title: String,
@@ -1725,15 +1725,15 @@ impl Part for AccountStatusExampleItem {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductstatusesCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
     /// The ID of the product whose status to get.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -1781,12 +1781,12 @@ impl Part for DatafeedStatusError {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedStatusExample {
     /// The ID of the example item.
-    #[serde(alias="itemId")]
+    #[serde(rename="itemId")]
     pub item_id: String,
     /// The problematic value.
     pub value: String,
     /// Line number in the data feed where the example is found.
-    #[serde(alias="lineNumber")]
+    #[serde(rename="lineNumber")]
     pub line_number: String,
 }
 
@@ -1815,16 +1815,16 @@ impl Part for ProductShippingWeight {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccounttaxCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The account tax settings to update. Only defined if the method is update.
-    #[serde(alias="accountTax")]
+    #[serde(rename="accountTax")]
     pub account_tax: AccountTax,
     /// The ID of the account for which to get/update account tax settings.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
@@ -1847,20 +1847,20 @@ impl Part for AccounttaxCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShipping {
     /// Carrier-based shipping calculations.
-    #[serde(alias="carrierRates")]
+    #[serde(rename="carrierRates")]
     pub carrier_rates: Option<Vec<AccountShippingCarrierRate>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountShipping".
     pub kind: Option<String>,
     /// Location groups for shipping.
-    #[serde(alias="locationGroups")]
+    #[serde(rename="locationGroups")]
     pub location_groups: Option<Vec<AccountShippingLocationGroup>>,
     /// Shipping services describing shipping fees calculation.
     pub services: Option<Vec<AccountShippingShippingService>>,
     /// The ID of the account to which these account shipping settings belong.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Rate tables definitions.
-    #[serde(alias="rateTables")]
+    #[serde(rename="rateTables")]
     pub rate_tables: Option<Vec<AccountShippingRateTable>>,
 }
 
@@ -1892,16 +1892,16 @@ pub struct AccountTaxTaxRule {
     /// Country code in which tax is applicable.
     pub country: String,
     /// Explicit tax rate in percent, represented as a floating point number without the percentage character. Must not be negative.
-    #[serde(alias="ratePercent")]
+    #[serde(rename="ratePercent")]
     pub rate_percent: String,
     /// If true, shipping charges are also taxed.
-    #[serde(alias="shippingTaxed")]
+    #[serde(rename="shippingTaxed")]
     pub shipping_taxed: bool,
     /// State (or province) is which the tax is applicable, described by its location id (also called criteria id).
-    #[serde(alias="locationId")]
+    #[serde(rename="locationId")]
     pub location_id: String,
     /// Whether the tax rate is taken from a global tax table or specified explicitly.
-    #[serde(alias="useGlobalRate")]
+    #[serde(rename="useGlobalRate")]
     pub use_global_rate: bool,
 }
 
@@ -1917,7 +1917,7 @@ pub struct ProductCustomAttribute {
     /// Free-form unit of the attribute. Unit can only be used for values of type INT or FLOAT.
     pub unit: String,
     /// The type of the attribute.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
     pub name: String,
@@ -1940,7 +1940,7 @@ impl Part for ProductCustomAttribute {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountstatusesListResponse {
     /// The token for the retrieval of the next page of account statuses.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesListResponse".
     pub kind: String,
@@ -1958,25 +1958,25 @@ impl ResponseResult for AccountstatusesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingCondition {
     /// Maximum shipping weight. Forms an interval between the maximum of smaller weight (exclusive) and this weight (inclusive).
-    #[serde(alias="weightMax")]
+    #[serde(rename="weightMax")]
     pub weight_max: Weight,
     /// Delivery location in terms of a location ID. Can be used to represent administrative areas, smaller country subdivisions, or cities.
-    #[serde(alias="deliveryLocationId")]
+    #[serde(rename="deliveryLocationId")]
     pub delivery_location_id: String,
     /// Shipping label of the product. The products with the label are matched.
-    #[serde(alias="shippingLabel")]
+    #[serde(rename="shippingLabel")]
     pub shipping_label: String,
     /// Delivery location in terms of a location group name. A location group with this name must be specified among location groups.
-    #[serde(alias="deliveryLocationGroup")]
+    #[serde(rename="deliveryLocationGroup")]
     pub delivery_location_group: String,
     /// Delivery location in terms of a postal code.
-    #[serde(alias="deliveryPostalCode")]
+    #[serde(rename="deliveryPostalCode")]
     pub delivery_postal_code: String,
     /// Maximum shipping price. Forms an interval between the maximum of smaller prices (exclusive) and this price (inclusive).
-    #[serde(alias="priceMax")]
+    #[serde(rename="priceMax")]
     pub price_max: Price,
     /// Delivery location in terms of a postal code range.
-    #[serde(alias="deliveryPostalCodeRange")]
+    #[serde(rename="deliveryPostalCodeRange")]
     pub delivery_postal_code_range: AccountShippingPostalCodeRange,
 }
 
@@ -2021,47 +2021,47 @@ pub struct Product {
     /// Color of the item.
     pub color: Option<String>,
     /// Similar to adwords_grouping, but only works on CPC.
-    #[serde(alias="adwordsLabels")]
+    #[serde(rename="adwordsLabels")]
     pub adwords_labels: Option<Vec<String>>,
     /// Shared identifier for all variants of the same product.
-    #[serde(alias="itemGroupId")]
+    #[serde(rename="itemGroupId")]
     pub item_group_id: Option<String>,
     /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.
-    #[serde(alias="expirationDate")]
+    #[serde(rename="expirationDate")]
     pub expiration_date: Option<String>,
     /// Availability status of the item.
     pub availability: Option<String>,
     /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
-    #[serde(alias="adwordsGrouping")]
+    #[serde(rename="adwordsGrouping")]
     pub adwords_grouping: Option<String>,
     /// Specifies the intended destinations for the product.
     pub destinations: Option<Vec<ProductDestination>>,
     /// The two-letter ISO 3166 country code for the item.
-    #[serde(alias="targetCountry")]
+    #[serde(rename="targetCountry")]
     pub target_country: Option<i64>,
     /// Custom label 4 for custom grouping of items in a Shopping campaign.
-    #[serde(alias="customLabel4")]
+    #[serde(rename="customLabel4")]
     pub custom_label4: Option<String>,
     /// Title of the item.
     pub title: Option<String>,
     /// Whether an item is available for purchase only online.
-    #[serde(alias="onlineOnly")]
+    #[serde(rename="onlineOnly")]
     pub online_only: Option<bool>,
     /// Link to a mobile-optimized version of the landing page.
-    #[serde(alias="mobileLink")]
+    #[serde(rename="mobileLink")]
     pub mobile_link: Option<String>,
     /// Specifies the intended aspects for the product.
     pub aspects: Option<Vec<ProductAspect>>,
     /// Height of the item for shipping.
-    #[serde(alias="shippingHeight")]
+    #[serde(rename="shippingHeight")]
     pub shipping_height: Option<ProductShippingDimension>,
     /// The two-letter ISO 639-1 language code for the item.
-    #[serde(alias="contentLanguage")]
+    #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Manufacturer Part Number (MPN) of the item.
     pub mpn: Option<String>,
     /// Date range during which the item is on sale (see product feed specifications).
-    #[serde(alias="salePriceEffectiveDate")]
+    #[serde(rename="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
     /// Brand of the item.
     pub brand: Option<String>,
@@ -2070,27 +2070,27 @@ pub struct Product {
     /// URL directly linking to your item's page on your website.
     pub link: Option<String>,
     /// Allows advertisers to override the item URL when the product is shown within the context of Product Ads.
-    #[serde(alias="adwordsRedirect")]
+    #[serde(rename="adwordsRedirect")]
     pub adwords_redirect: Option<String>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
-    #[serde(alias="energyEfficiencyClass")]
+    #[serde(rename="energyEfficiencyClass")]
     pub energy_efficiency_class: Option<String>,
     /// System in which the size is specified. Recommended for apparel items.
-    #[serde(alias="sizeSystem")]
+    #[serde(rename="sizeSystem")]
     pub size_system: Option<String>,
     /// The cut of the item. Recommended for apparel items.
-    #[serde(alias="sizeType")]
+    #[serde(rename="sizeType")]
     pub size_type: Option<String>,
     /// Custom label 3 for custom grouping of items in a Shopping campaign.
-    #[serde(alias="customLabel3")]
+    #[serde(rename="customLabel3")]
     pub custom_label3: Option<String>,
     /// Custom label 2 for custom grouping of items in a Shopping campaign.
-    #[serde(alias="customLabel2")]
+    #[serde(rename="customLabel2")]
     pub custom_label2: Option<String>,
     /// Condition or state of the item.
     pub condition: Option<String>,
     /// Custom label 0 for custom grouping of items in a Shopping campaign.
-    #[serde(alias="customLabel0")]
+    #[serde(rename="customLabel0")]
     pub custom_label0: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#product".
     pub kind: Option<String>,
@@ -2103,63 +2103,63 @@ pub struct Product {
     /// Tax information.
     pub taxes: Option<Vec<ProductTax>>,
     /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
-    #[serde(alias="identifierExists")]
+    #[serde(rename="identifierExists")]
     pub identifier_exists: Option<bool>,
     /// Advertised sale price of the item.
-    #[serde(alias="salePrice")]
+    #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
     /// Your category of the item (formatted as in product feeds specification).
-    #[serde(alias="productType")]
+    #[serde(rename="productType")]
     pub product_type: Option<String>,
     /// Advertiser-specified recommendations.
-    #[serde(alias="displayAdsSimilarIds")]
+    #[serde(rename="displayAdsSimilarIds")]
     pub display_ads_similar_ids: Option<Vec<String>>,
     /// Custom label 1 for custom grouping of items in a Shopping campaign.
-    #[serde(alias="customLabel1")]
+    #[serde(rename="customLabel1")]
     pub custom_label1: Option<String>,
     /// Target age group of the item.
-    #[serde(alias="ageGroup")]
+    #[serde(rename="ageGroup")]
     pub age_group: Option<String>,
     /// Additional URLs of images of the item.
-    #[serde(alias="additionalImageLinks")]
+    #[serde(rename="additionalImageLinks")]
     pub additional_image_links: Option<Vec<String>>,
     /// An identifier of the item.
-    #[serde(alias="offerId")]
+    #[serde(rename="offerId")]
     pub offer_id: Option<String>,
     /// Global Trade Item Number (GTIN) of the item.
     pub gtin: Option<String>,
     /// The shipping label of the product, used to group product in account-level shipping rules.
-    #[serde(alias="shippingLabel")]
+    #[serde(rename="shippingLabel")]
     pub shipping_label: Option<String>,
     /// Google's category of the item (see Google product taxonomy).
-    #[serde(alias="googleProductCategory")]
+    #[serde(rename="googleProductCategory")]
     pub google_product_category: Option<String>,
     /// The number of identical products in a merchant-defined multipack.
     pub multipack: Option<String>,
     /// An identifier for an item for dynamic remarketing campaigns.
-    #[serde(alias="displayAdsId")]
+    #[serde(rename="displayAdsId")]
     pub display_ads_id: Option<String>,
     /// Offer margin for dynamic remarketing campaigns.
-    #[serde(alias="displayAdsValue")]
+    #[serde(rename="displayAdsValue")]
     pub display_ads_value: Option<f64>,
     /// The REST id of the product.
     pub id: Option<String>,
     /// Width of the item for shipping.
-    #[serde(alias="shippingWidth")]
+    #[serde(rename="shippingWidth")]
     pub shipping_width: Option<ProductShippingDimension>,
     /// The item's pattern (e.g. polka dots).
     pub pattern: Option<String>,
     /// The measure and dimension of an item.
-    #[serde(alias="unitPricingMeasure")]
+    #[serde(rename="unitPricingMeasure")]
     pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
     /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
-    #[serde(alias="customAttributes")]
+    #[serde(rename="customAttributes")]
     pub custom_attributes: Option<Vec<ProductCustomAttribute>>,
     /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
-    #[serde(alias="availabilityDate")]
+    #[serde(rename="availabilityDate")]
     pub availability_date: Option<String>,
     /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.
-    #[serde(alias="isBundle")]
+    #[serde(rename="isBundle")]
     pub is_bundle: Option<bool>,
     /// The item's channel (online or local).
     pub channel: Option<String>,
@@ -2170,33 +2170,33 @@ pub struct Product {
     /// Price of the item.
     pub price: Option<Price>,
     /// Length of the item for shipping.
-    #[serde(alias="shippingLength")]
+    #[serde(rename="shippingLength")]
     pub shipping_length: Option<ProductShippingDimension>,
     /// URL directly to your item's landing page for dynamic remarketing campaigns.
-    #[serde(alias="displayAdsLink")]
+    #[serde(rename="displayAdsLink")]
     pub display_ads_link: Option<String>,
     /// The read-only list of intended destinations which passed validation.
-    #[serde(alias="validatedDestinations")]
+    #[serde(rename="validatedDestinations")]
     pub validated_destinations: Option<Vec<String>>,
     /// A list of custom (merchant-provided) custom attribute groups.
-    #[serde(alias="customGroups")]
+    #[serde(rename="customGroups")]
     pub custom_groups: Option<Vec<ProductCustomGroup>>,
     /// Loyalty points that users receive after purchasing the item. Japan only.
-    #[serde(alias="loyaltyPoints")]
+    #[serde(rename="loyaltyPoints")]
     pub loyalty_points: Option<LoyaltyPoints>,
     /// The preference of the denominator of the unit price.
-    #[serde(alias="unitPricingBaseMeasure")]
+    #[serde(rename="unitPricingBaseMeasure")]
     pub unit_pricing_base_measure: Option<ProductUnitPricingBaseMeasure>,
     /// Shipping rules.
     pub shipping: Option<Vec<ProductShipping>>,
     /// Weight of the item for shipping.
-    #[serde(alias="shippingWeight")]
+    #[serde(rename="shippingWeight")]
     pub shipping_weight: Option<ProductShippingWeight>,
     /// URL of an image of the item.
-    #[serde(alias="imageLink")]
+    #[serde(rename="imageLink")]
     pub image_link: Option<String>,
     /// Title of an item for dynamic remarketing campaigns.
-    #[serde(alias="displayAdsTitle")]
+    #[serde(rename="displayAdsTitle")]
     pub display_ads_title: Option<String>,
 }
 
@@ -2212,7 +2212,7 @@ impl ResponseResult for Product {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatusDataQualityIssue {
     /// The value the attribute had at time of evaluation.
-    #[serde(alias="valueProvided")]
+    #[serde(rename="valueProvided")]
     pub value_provided: String,
     /// The severity of the data quality issue.
     pub severity: String,
@@ -2223,12 +2223,12 @@ pub struct ProductStatusDataQualityIssue {
     /// The attribute name that is relevant for the issue.
     pub location: String,
     /// The value of that attribute that was found on the landing page
-    #[serde(alias="valueOnLandingPage")]
+    #[serde(rename="valueOnLandingPage")]
     pub value_on_landing_page: String,
     /// The id of the data quality issue.
     pub id: String,
     /// The fetch status for landing_page_errors.
-    #[serde(alias="fetchStatus")]
+    #[serde(rename="fetchStatus")]
     pub fetch_status: String,
 }
 
@@ -2247,7 +2247,7 @@ impl Part for ProductStatusDataQualityIssue {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductsListResponse {
     /// The token for the retrieval of the next page of products.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productsListResponse".
     pub kind: String,
@@ -2267,13 +2267,13 @@ pub struct AccountShippingShippingService {
     /// Whether the shipping service is available.
     pub active: bool,
     /// Decision tree for "complicated" shipping cost calculation.
-    #[serde(alias="costRuleTree")]
+    #[serde(rename="costRuleTree")]
     pub cost_rule_tree: AccountShippingShippingServiceCostRule,
     /// Sale country for which this service can be used, represented as an ISO 3166-1 Alpha-2 code.
-    #[serde(alias="saleCountry")]
+    #[serde(rename="saleCountry")]
     pub sale_country: i64,
     /// Calculation method for the "simple" case that needs no rules.
-    #[serde(alias="calculationMethod")]
+    #[serde(rename="calculationMethod")]
     pub calculation_method: AccountShippingShippingServiceCalculationMethod,
     /// The name of this shipping service.
     pub name: String,
@@ -2289,14 +2289,14 @@ impl Part for AccountShippingShippingService {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountshippingCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponseEntry".
     pub kind: String,
     /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
     /// The retrieved or updated account shipping settings.
-    #[serde(alias="accountShipping")]
+    #[serde(rename="accountShipping")]
     pub account_shipping: AccountShipping,
 }
 
@@ -2315,7 +2315,7 @@ impl Part for AccountshippingCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InventorySetRequest {
     /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
-    #[serde(alias="salePriceEffectiveDate")]
+    #[serde(rename="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
     /// The price of the product.
     pub price: Option<Price>,
@@ -2324,7 +2324,7 @@ pub struct InventorySetRequest {
     /// The availability of the product.
     pub availability: Option<String>,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
-    #[serde(alias="salePrice")]
+    #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
 }
 
@@ -2340,7 +2340,7 @@ pub struct ProductDestination {
     /// Whether the destination is required, excluded or should be validated.
     pub intention: String,
     /// The name of the destination.
-    #[serde(alias="destinationName")]
+    #[serde(rename="destinationName")]
     pub destination_name: String,
 }
 
@@ -2374,15 +2374,15 @@ impl ResponseResult for AccountsCustomBatchResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// The ID of the data feed to get or delete.
-    #[serde(alias="datafeedId")]
+    #[serde(rename="datafeedId")]
     pub datafeed_id: String,
     /// The data feed to insert.
     pub datafeed: Datafeed,
     /// The ID of the managing account.
-    #[serde(alias="merchantId")]
+    #[serde(rename="merchantId")]
     pub merchant_id: String,
     /// no description provided
     pub method: String,
@@ -2403,7 +2403,7 @@ impl Part for DatafeedsCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductstatusesListResponse {
     /// The token for the retrieval of the next page of products statuses.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesListResponse".
     pub kind: String,
@@ -2436,23 +2436,23 @@ impl Part for Weight {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountStatusDataQualityIssue {
     /// Actual value displayed on the landing page.
-    #[serde(alias="displayedValue")]
+    #[serde(rename="displayedValue")]
     pub displayed_value: String,
     /// Severity of the problem.
     pub severity: String,
     /// Last time the account was checked for this issue.
-    #[serde(alias="lastChecked")]
+    #[serde(rename="lastChecked")]
     pub last_checked: String,
     /// Country for which this issue is reported.
     pub country: String,
     /// Example items featuring the issue.
-    #[serde(alias="exampleItems")]
+    #[serde(rename="exampleItems")]
     pub example_items: Vec<AccountStatusExampleItem>,
     /// Submitted value that causes the issue.
-    #[serde(alias="submittedValue")]
+    #[serde(rename="submittedValue")]
     pub submitted_value: String,
     /// Number of items in the account found to have the said issue.
-    #[serde(alias="numItems")]
+    #[serde(rename="numItems")]
     pub num_items: u32,
     /// Issue identifier.
     pub id: String,
@@ -2473,7 +2473,7 @@ impl Part for AccountStatusDataQualityIssue {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsListResponse {
     /// The token for the retrieval of the next page of accounts.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsListResponse".
     pub kind: String,
@@ -2491,14 +2491,14 @@ impl ResponseResult for AccountsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductstatusesCustomBatchResponseEntry {
     /// The ID of the request entry this entry responds to.
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponseEntry".
     pub kind: String,
     /// A list of errors, if the request failed.
     pub errors: Errors,
     /// The requested product status. Only defined if the request was successful.
-    #[serde(alias="productStatus")]
+    #[serde(rename="productStatus")]
     pub product_status: ProductStatus,
 }
 
@@ -2534,7 +2534,7 @@ pub struct LoyaltyPoints {
     /// Name of loyalty points program. It is recommended to limit the name to 12 full-width characters or 24 Roman characters.
     pub name: String,
     /// The retailer's loyalty points in absolute value.
-    #[serde(alias="pointsValue")]
+    #[serde(rename="pointsValue")]
     pub points_value: String,
 }
 
@@ -2566,13 +2566,13 @@ impl RequestValue for DatafeedsCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedFormat {
     /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.
-    #[serde(alias="fileEncoding")]
+    #[serde(rename="fileEncoding")]
     pub file_encoding: String,
     /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.
-    #[serde(alias="quotingMode")]
+    #[serde(rename="quotingMode")]
     pub quoting_mode: String,
     /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.
-    #[serde(alias="columnDelimiter")]
+    #[serde(rename="columnDelimiter")]
     pub column_delimiter: String,
 }
 
@@ -2588,7 +2588,7 @@ pub struct AccountAdwordsLink {
     /// Status of the link between this Merchant Center account and the AdWords account.
     pub status: String,
     /// Customer ID of the AdWords account.
-    #[serde(alias="adwordsId")]
+    #[serde(rename="adwordsId")]
     pub adwords_id: String,
 }
 

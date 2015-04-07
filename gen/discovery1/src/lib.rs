@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *discovery* crate version *0.1.3+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *discovery* crate version *0.1.4+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *discovery* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/discovery/).
@@ -274,7 +274,7 @@ impl<'a, C, NC, A> Discovery<C, NC, A>
         Discovery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -284,7 +284,7 @@ impl<'a, C, NC, A> Discovery<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -319,7 +319,7 @@ impl Part for RestDescriptionAuthOauth2 {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RestMethodResponse {
     /// Schema ID for the response schema.
-    #[serde(alias="$ref")]
+    #[serde(rename="$ref")]
     pub ref_: String,
 }
 
@@ -398,7 +398,7 @@ pub struct JsonSchemaVariantMap {
     /// no description provided
     pub type_value: String,
     /// no description provided
-    #[serde(alias="$ref")]
+    #[serde(rename="$ref")]
     pub ref_: String,
 }
 
@@ -435,27 +435,27 @@ pub struct RestMethod {
     /// Details for all parameters in this method.
     pub parameters: HashMap<String, JsonSchema>,
     /// Whether this method supports media uploads.
-    #[serde(alias="supportsMediaUpload")]
+    #[serde(rename="supportsMediaUpload")]
     pub supports_media_upload: bool,
     /// Whether this method requires an ETag to be specified. The ETag is sent as an HTTP If-Match or If-None-Match header.
-    #[serde(alias="etagRequired")]
+    #[serde(rename="etagRequired")]
     pub etag_required: bool,
     /// Media upload parameters.
-    #[serde(alias="mediaUpload")]
+    #[serde(rename="mediaUpload")]
     pub media_upload: RestMethodMediaUpload,
     /// The schema for the request.
     pub request: RestMethodRequest,
     /// Indicates that downloads from this method should use the download service URL (i.e. "/download"). Only applies if the method supports media download.
-    #[serde(alias="useMediaDownloadService")]
+    #[serde(rename="useMediaDownloadService")]
     pub use_media_download_service: bool,
     /// HTTP method used by this method.
-    #[serde(alias="httpMethod")]
+    #[serde(rename="httpMethod")]
     pub http_method: String,
     /// Whether this method supports subscriptions.
-    #[serde(alias="supportsSubscription")]
+    #[serde(rename="supportsSubscription")]
     pub supports_subscription: bool,
     /// Ordered list of required parameters, serves as a hint to clients on how to structure their method signatures. The array is ordered such that the "most-significant" parameter appears first.
-    #[serde(alias="parameterOrder")]
+    #[serde(rename="parameterOrder")]
     pub parameter_order: Vec<String>,
     /// A unique ID for this method. This property can be used to match methods between different versions of Discovery.
     pub id: String,
@@ -464,7 +464,7 @@ pub struct RestMethod {
     /// The schema for the response.
     pub response: RestMethodResponse,
     /// Whether this method supports media downloads.
-    #[serde(alias="supportsMediaDownload")]
+    #[serde(rename="supportsMediaDownload")]
     pub supports_media_download: bool,
 }
 
@@ -491,31 +491,31 @@ pub struct RestDescription {
     /// The kind for this response.
     pub kind: String,
     /// Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names.
-    #[serde(alias="canonicalName")]
+    #[serde(rename="canonicalName")]
     pub canonical_name: String,
     /// The name of the owner of this API. See ownerDomain.
-    #[serde(alias="ownerName")]
+    #[serde(rename="ownerName")]
     pub owner_name: String,
     /// A link to human readable documentation for the API.
-    #[serde(alias="documentationLink")]
+    #[serde(rename="documentationLink")]
     pub documentation_link: String,
     /// Authentication information.
     pub auth: RestDescriptionAuth,
     /// The package of the owner of this API. See ownerDomain.
-    #[serde(alias="packagePath")]
+    #[serde(rename="packagePath")]
     pub package_path: String,
     /// The path for REST batch requests.
-    #[serde(alias="batchPath")]
+    #[serde(rename="batchPath")]
     pub batch_path: String,
     /// The ID of this API.
     pub id: String,
     /// A list of supported features for this API.
     pub features: Vec<String>,
     /// The domain of the owner of this API. Together with the ownerName and a packagePath values, this can be used to generate a library for this API which would have a unique fully qualified name.
-    #[serde(alias="ownerDomain")]
+    #[serde(rename="ownerDomain")]
     pub owner_domain: String,
     /// The root URL under which all API services live.
-    #[serde(alias="rootUrl")]
+    #[serde(rename="rootUrl")]
     pub root_url: String,
     /// The name of this API.
     pub name: String,
@@ -528,22 +528,22 @@ pub struct RestDescription {
     /// The title of this API.
     pub title: String,
     /// [DEPRECATED] The base URL for REST requests.
-    #[serde(alias="baseUrl")]
+    #[serde(rename="baseUrl")]
     pub base_url: String,
     /// The ETag for this response.
     pub etag: String,
     /// The version of this API.
     pub version: String,
     /// The base path for all REST requests.
-    #[serde(alias="servicePath")]
+    #[serde(rename="servicePath")]
     pub service_path: String,
     /// Indicate the version of the Discovery API used to generate this doc.
-    #[serde(alias="discoveryVersion")]
+    #[serde(rename="discoveryVersion")]
     pub discovery_version: String,
     /// The schemas for this API.
     pub schemas: HashMap<String, JsonSchema>,
     /// [DEPRECATED] The base path for REST requests.
-    #[serde(alias="basePath")]
+    #[serde(rename="basePath")]
     pub base_path: String,
     /// The resources in this API.
     pub resources: HashMap<String, RestResource>,
@@ -561,7 +561,7 @@ impl ResponseResult for RestDescription {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RestMethodMediaUpload {
     /// Maximum size of a media upload, such as "1MB", "2GB" or "3TB".
-    #[serde(alias="maxSize")]
+    #[serde(rename="maxSize")]
     pub max_size: String,
     /// MIME Media Ranges for acceptable media uploads to this method.
     pub accept: Vec<String>,
@@ -587,7 +587,7 @@ pub struct DirectoryList {
     /// The individual directory entries. One entry per api/version pair.
     pub items: Vec<DirectoryListItems>,
     /// Indicate the version of the Discovery API used to generate this doc.
-    #[serde(alias="discoveryVersion")]
+    #[serde(rename="discoveryVersion")]
     pub discovery_version: String,
     /// The kind for this response.
     pub kind: String,
@@ -607,15 +607,15 @@ pub struct JsonSchema {
     /// An additional regular expression or key that helps constrain the value. For more details see: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.23
     pub format: String,
     /// Values this parameter may take (if it is an enum).
-    #[serde(alias="enum")]
+    #[serde(rename="enum")]
     pub enum_: Vec<String>,
     /// In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names.
     pub variant: JsonSchemaVariant,
     /// The descriptions for the enums. Each position maps to the corresponding value in the "enum" array.
-    #[serde(alias="enumDescriptions")]
+    #[serde(rename="enumDescriptions")]
     pub enum_descriptions: Vec<String>,
     /// The value is read-only, generated by the service. The value cannot be modified by the client. If the value is included in a POST, PUT, or PATCH request, it is ignored by the service.
-    #[serde(alias="readOnly")]
+    #[serde(rename="readOnly")]
     pub read_only: bool,
     /// The minimum value of this parameter.
     pub minimum: String,
@@ -624,7 +624,7 @@ pub struct JsonSchema {
     /// Unique identifier for this schema.
     pub id: String,
     /// A reference to another schema. The value of this property is the "id" of another schema.
-    #[serde(alias="$ref")]
+    #[serde(rename="$ref")]
     pub ref_: String,
     /// The default value of this property (if one exists).
     pub default: String,
@@ -641,10 +641,10 @@ pub struct JsonSchema {
     /// The regular expression this parameter must conform to. Uses Java 6 regex format: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
     pub pattern: String,
     /// If this is a schema for an object, this property is the schema for any additional properties with dynamic keys on this object.
-    #[serde(alias="additionalProperties")]
+    #[serde(rename="additionalProperties")]
     pub additional_properties: Option<Box<JsonSchema>>,
     /// The value type for this schema. A list of values can be found here: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Additional information about this property.
     pub annotations: JsonSchemaAnnotations,
@@ -662,7 +662,7 @@ pub struct DirectoryListItems {
     /// The kind for this response.
     pub kind: String,
     /// The URL for the discovery REST document.
-    #[serde(alias="discoveryRestUrl")]
+    #[serde(rename="discoveryRestUrl")]
     pub discovery_rest_url: String,
     /// The description of this API.
     pub description: String,
@@ -673,14 +673,14 @@ pub struct DirectoryListItems {
     /// True if this version is the preferred version to use.
     pub preferred: bool,
     /// A link to the discovery document.
-    #[serde(alias="discoveryLink")]
+    #[serde(rename="discoveryLink")]
     pub discovery_link: String,
     /// The version of the API.
     pub version: String,
     /// The title of this API.
     pub title: String,
     /// A link to human readable documentation for the API.
-    #[serde(alias="documentationLink")]
+    #[serde(rename="documentationLink")]
     pub documentation_link: String,
     /// The id of this API.
     pub id: String,
@@ -743,10 +743,10 @@ impl Part for DirectoryListItemsIcons {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RestMethodRequest {
     /// parameter name.
-    #[serde(alias="parameterName")]
+    #[serde(rename="parameterName")]
     pub parameter_name: String,
     /// Schema ID for the request schema.
-    #[serde(alias="$ref")]
+    #[serde(rename="$ref")]
     pub ref_: String,
 }
 

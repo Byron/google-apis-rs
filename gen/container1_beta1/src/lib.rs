@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.3+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *container* crate version *0.1.4+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *container* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -298,7 +298,7 @@ impl<'a, C, NC, A> Container<C, NC, A>
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -308,7 +308,7 @@ impl<'a, C, NC, A> Container<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,21 +405,21 @@ pub struct Cluster {
     /// [Output only] The current status of this cluster.
     pub status: String,
     /// [Output only] The IP addresses of the container pods in this cluster, in  CIDR notation (e.g. 1.2.3.4/29).
-    #[serde(alias="containerIpv4Cidr")]
+    #[serde(rename="containerIpv4Cidr")]
     pub container_ipv4_cidr: String,
     /// An optional description of this cluster.
     pub description: String,
     /// [Output only] The size of the address space on each node for hosting containers.
-    #[serde(alias="nodeRoutingPrefixSize")]
+    #[serde(rename="nodeRoutingPrefixSize")]
     pub node_routing_prefix_size: i32,
     /// The HTTP basic authentication information for accessing the master. Because the master endpoint is open to the internet, you should create a strong password.
-    #[serde(alias="masterAuth")]
+    #[serde(rename="masterAuth")]
     pub master_auth: MasterAuth,
     /// The API version of the Kubernetes master and kubelets running in this cluster. Leave blank to pick up the latest stable release, or specify a version of the form "x.y.z". The Google Container Engine release notes lists the currently supported versions. If an incorrect version is specified, the server returns an error listing the currently supported versions.
-    #[serde(alias="clusterApiVersion")]
+    #[serde(rename="clusterApiVersion")]
     pub cluster_api_version: String,
     /// [Output only] The time the cluster was created, in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// The name of this cluster. The name must be unique within this project and zone, and can be up to 40 characters with the following restrictions:  
     /// - Lowercase letters, numbers, and hyphens only.
@@ -435,22 +435,22 @@ pub struct Cluster {
     /// [Output only] The name of the Google Compute Engine zone in which the cluster resides.
     pub zone: String,
     /// The number of nodes to create in this cluster. You must ensure that your Compute Engine resource quota is sufficient for this number of instances plus one (to include the master). You must also have available firewall and routes quota.
-    #[serde(alias="numNodes")]
+    #[serde(rename="numNodes")]
     pub num_nodes: i32,
     /// The machine type and image to use for all nodes in this cluster. See the descriptions of the child properties of nodeConfig.
-    #[serde(alias="nodeConfig")]
+    #[serde(rename="nodeConfig")]
     pub node_config: NodeConfig,
     /// [Output only] Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Whether logs from the cluster should be made available via the Google Cloud Logging service. This includes both logs from your applications running in the cluster as well as logs from the Kubernetes components themselves.
-    #[serde(alias="enableCloudLogging")]
+    #[serde(rename="enableCloudLogging")]
     pub enable_cloud_logging: bool,
     /// [Output only] Additional information about the current status of this cluster, if available.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// [Output only] The IP addresses of the Kubernetes services in this cluster, in  CIDR notation (e.g. 1.2.3.4/29). Service addresses are always in the 10.0.0.0/16 range.
-    #[serde(alias="servicesIpv4Cidr")]
+    #[serde(rename="servicesIpv4Cidr")]
     pub services_ipv4_cidr: String,
 }
 
@@ -466,17 +466,17 @@ pub struct NodeConfig {
     /// The optional list of ServiceAccounts, each with their specified scopes, to be made available on all of the node VMs. In addition to the service accounts and scopes specified, the "default" account will always be created with the following scopes to ensure the correct functioning of the cluster:  
     /// - https://www.googleapis.com/auth/compute,
     /// - https://www.googleapis.com/auth/devstorage.read_only
-    #[serde(alias="serviceAccounts")]
+    #[serde(rename="serviceAccounts")]
     pub service_accounts: Vec<ServiceAccount>,
     /// The name of a Google Compute Engine machine type (e.g. n1-standard-1).
     /// 
     /// If unspecified, the default machine type is n1-standard-1.
-    #[serde(alias="machineType")]
+    #[serde(rename="machineType")]
     pub machine_type: String,
     /// The fully-specified name of a Google Compute Engine image. For example: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-vYYYYMMDD (where YYYMMDD is the version date).
     /// 
     /// If specifying an image, you are responsible for ensuring its compatibility with the Debian 7 backports image. We recommend leaving this field blank to accept the default backports-debian-7-wheezy value.
-    #[serde(alias="sourceImage")]
+    #[serde(rename="sourceImage")]
     pub source_image: String,
 }
 
@@ -518,16 +518,16 @@ pub struct Operation {
     /// The name of the Google Compute Engine zone in which the operation is taking place.
     pub zone: String,
     /// If an error has occurred, a textual description of the error.
-    #[serde(alias="errorMessage")]
+    #[serde(rename="errorMessage")]
     pub error_message: String,
     /// Server-defined URL for the target of the operation.
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// The operation type.
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// Server-defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Optional] The URL of the cluster resource that this operation is associated with.
     pub target: String,

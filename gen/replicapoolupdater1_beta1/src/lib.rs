@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapoolupdater* crate version *0.1.3+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *replicapoolupdater* crate version *0.1.4+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
@@ -321,7 +321,7 @@ impl<'a, C, NC, A> Replicapoolupdater<C, NC, A>
         Replicapoolupdater {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -334,7 +334,7 @@ impl<'a, C, NC, A> Replicapoolupdater<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -384,14 +384,14 @@ impl Part for InstanceUpdate {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceUpdateList {
     /// A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Collection of requested instance updates.
     pub items: Vec<InstanceUpdate>,
     /// [Output Only] Type of the resource.
     pub kind: String,
     /// [Output Only] The fully qualified URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -457,27 +457,27 @@ pub struct RollingUpdate {
     /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
     /// Fully-qualified URL of an instance group being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
-    #[serde(alias="instanceGroup")]
+    #[serde(rename="instanceGroup")]
     pub instance_group: Option<String>,
     /// List of fully-qualified URLs of instances to be updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
     pub instances: Option<Vec<String>>,
     /// Fully-qualified URL of an instance template to apply.
-    #[serde(alias="instanceTemplate")]
+    #[serde(rename="instanceTemplate")]
     pub instance_template: Option<String>,
     /// Specifies the action to take for each instance within the instance group. This can be RECREATE which will recreate each instance and is only available for managed instance groups. It can also be REBOOT which performs a soft reboot for each instance and is only available for regular (non-managed) instance groups and explicit lists of instances.
-    #[serde(alias="actionType")]
+    #[serde(rename="actionType")]
     pub action_type: Option<String>,
     /// [Output Only] User who requested the update, for example: user@example.com.
     pub user: Option<String>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] Type of the resource.
     pub kind: Option<String>,
     /// [Output Only] The fully qualified URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Output Only] Errors that occurred during rolling update.
     pub error: Option<RollingUpdateError>,
@@ -486,10 +486,10 @@ pub struct RollingUpdate {
     /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the update will be complete. This number should be monotonically increasing as the update progresses.
     pub progress: Option<i32>,
     /// [Output Only] An optional textual description of the current status of the update.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
     /// Fully-qualified URL of an instance group manager being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
-    #[serde(alias="instanceGroupManager")]
+    #[serde(rename="instanceGroupManager")]
     pub instance_group_manager: Option<String>,
 }
 
@@ -523,22 +523,22 @@ impl Part for RollingUpdateErrorErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdatePolicy {
     /// Time period after the instance has been restarted but before marking the update of this instance as done. This field is deprecated and ignored by Rolling Updater.
-    #[serde(alias="sleepAfterInstanceRestartSec")]
+    #[serde(rename="sleepAfterInstanceRestartSec")]
     pub sleep_after_instance_restart_sec: i32,
     /// Maximum amount of time we will wait after finishing all steps until we receive HEALTHY state for instance. If this deadline is exceeded instance update is considered as failed.
-    #[serde(alias="instanceStartupTimeoutSec")]
+    #[serde(rename="instanceStartupTimeoutSec")]
     pub instance_startup_timeout_sec: i32,
     /// Maximum number of instances that can be updated simultaneously (concurrently). An update of an instance starts when the instance is about to be restarted and finishes after the instance has been restarted and the sleep period (defined by sleepAfterInstanceRestartSec) has passed.
-    #[serde(alias="maxNumConcurrentInstances")]
+    #[serde(rename="maxNumConcurrentInstances")]
     pub max_num_concurrent_instances: i32,
     /// Specifies minimum amount of time we will spend on updating single instance, measuring at the start of the first update action (e.g. Recreate call on Instance Group Manager or Stop call on Instance resource). If actual instance update takes less time we will simply sleep before proceeding with next instance.
-    #[serde(alias="minInstanceUpdateTimeSec")]
+    #[serde(rename="minInstanceUpdateTimeSec")]
     pub min_instance_update_time_sec: i32,
     /// Number of instances updated before the update gets automatically paused.
-    #[serde(alias="autoPauseAfterInstances")]
+    #[serde(rename="autoPauseAfterInstances")]
     pub auto_pause_after_instances: i32,
     /// Maximum number of instance updates that can fail without failing the group update. Instance update is considered failed if any of it's update actions (e.g. Stop call on Instance resource in Rolling Reboot) failed with permanent failure, or if after finishing all update actions this instance is in UNHEALTHY state.
-    #[serde(alias="maxNumFailedInstances")]
+    #[serde(rename="maxNumFailedInstances")]
     pub max_num_failed_instances: i32,
 }
 
@@ -633,26 +633,26 @@ pub struct Operation {
     /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".
     pub status: String,
     /// [Output Only] The time that this operation was requested. This is in RFC 3339 format.
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// no description provided
     pub warnings: Vec<OperationWarnings>,
     /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationError,
     /// [Output Only] Unique target id which identifies a particular incarnation of the target.
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// [Output Only] URL of the resource the operation is mutating (output only).
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// [Output Only] The time that this operation was started by the server. This is in RFC 3339 format.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// no description provided
-    #[serde(alias="clientOperationId")]
+    #[serde(rename="clientOperationId")]
     pub client_operation_id: String,
     /// [Output Only] Creation timestamp in RFC3339 text format (output only).
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
@@ -665,24 +665,24 @@ pub struct Operation {
     /// [Output Only] URL of the region where the operation resides (output only).
     pub region: String,
     /// [Output Only] Server defined URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// no description provided
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// no description provided
-    #[serde(alias="httpErrorMessage")]
+    #[serde(rename="httpErrorMessage")]
     pub http_error_message: String,
     /// no description provided
     pub progress: i32,
     /// no description provided
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// no description provided
-    #[serde(alias="httpErrorStatusCode")]
+    #[serde(rename="httpErrorStatusCode")]
     pub http_error_status_code: i32,
     /// [Output Only] An optional textual description of the current status of the operation.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// no description provided
     pub user: String,
@@ -717,14 +717,14 @@ impl Part for RollingUpdateError {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RollingUpdateList {
     /// A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Collection of requested updates.
     pub items: Vec<RollingUpdate>,
     /// [Output Only] Type of the resource.
     pub kind: String,
     /// [Output Only] The fully qualified URL for the resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 

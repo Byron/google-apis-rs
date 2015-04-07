@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense Host* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *AdSense Host* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *AdSense Host* *v4d1* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/host/).
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
         AdSenseHost {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -356,7 +356,7 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -382,7 +382,7 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlChannels {
     /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The URL channels returned in this list response.
     pub items: Vec<UrlChannel>,
@@ -404,7 +404,7 @@ pub struct ReportHeaders {
     /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
     pub currency: String,
     /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The name of the header.
     pub name: String,
@@ -462,7 +462,7 @@ impl ResponseResult for Account {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdUnits {
     /// Continuation token used to page through ad units. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The ad units returned in this list response.
     pub items: Vec<AdUnit>,
@@ -488,7 +488,7 @@ impl ResponseResult for AdUnits {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClients {
     /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The ad clients returned in this list response.
     pub items: Vec<AdClient>,
@@ -549,13 +549,13 @@ impl Part for AdStyleColors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdUnitMobileContentAdsSettings {
     /// The scripting language to use for this ad unit.
-    #[serde(alias="scriptingLanguage")]
+    #[serde(rename="scriptingLanguage")]
     pub scripting_language: String,
     /// The markup language to use for this ad unit.
-    #[serde(alias="markupLanguage")]
+    #[serde(rename="markupLanguage")]
     pub markup_language: String,
     /// Type of this ad unit.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Size of this ad unit.
     pub size: String,
@@ -577,7 +577,7 @@ impl Part for AdUnitMobileContentAdsSettings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdCode {
     /// The ad code snippet.
-    #[serde(alias="adCode")]
+    #[serde(rename="adCode")]
     pub ad_code: String,
     /// Kind this is, in this case adsensehost#adCode.
     pub kind: String,
@@ -615,15 +615,15 @@ pub struct AdUnit {
     /// Name of this ad unit.
     pub name: Option<String>,
     /// Settings specific to content ads (AFC) and highend mobile content ads (AFMC).
-    #[serde(alias="contentAdsSettings")]
+    #[serde(rename="contentAdsSettings")]
     pub content_ads_settings: Option<AdUnitContentAdsSettings>,
     /// Unique identifier of this ad unit. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
     /// Settings specific to WAP mobile content ads (AFMC).
-    #[serde(alias="mobileContentAdsSettings")]
+    #[serde(rename="mobileContentAdsSettings")]
     pub mobile_content_ads_settings: Option<AdUnitMobileContentAdsSettings>,
     /// Custom style information specific to this ad unit.
-    #[serde(alias="customStyle")]
+    #[serde(rename="customStyle")]
     pub custom_style: Option<AdStyle>,
 }
 
@@ -648,7 +648,7 @@ pub struct UrlChannel {
     /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
     /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home
-    #[serde(alias="urlPattern")]
+    #[serde(rename="urlPattern")]
     pub url_pattern: Option<String>,
 }
 
@@ -670,17 +670,17 @@ impl ResponseResult for UrlChannel {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClient {
     /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
-    #[serde(alias="productCode")]
+    #[serde(rename="productCode")]
     pub product_code: String,
     /// Kind of resource this is, in this case adsensehost#adClient.
     pub kind: String,
     /// Unique identifier of this ad client.
     pub id: String,
     /// Whether this ad client is opted in to ARC.
-    #[serde(alias="arcOptIn")]
+    #[serde(rename="arcOptIn")]
     pub arc_opt_in: bool,
     /// Whether this ad client supports being reported on.
-    #[serde(alias="supportsReporting")]
+    #[serde(rename="supportsReporting")]
     pub supports_reporting: bool,
 }
 
@@ -699,7 +699,7 @@ pub struct AdUnitContentAdsSettingsBackupOption {
     /// URL to use when type is set to URL.
     pub url: String,
     /// Type of the backup option. Possible values are BLANK, COLOR and URL.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -722,26 +722,26 @@ pub struct AssociationSession {
     /// Status of the completed association, available once the association callback token has been verified. One of ACCEPTED, REJECTED, or ERROR.
     pub status: String,
     /// The products to associate with the user. Options: AFC, AFF, AFS, AFMC
-    #[serde(alias="productCodes")]
+    #[serde(rename="productCodes")]
     pub product_codes: Vec<String>,
     /// Kind of resource this is, in this case adsensehost#associationSession.
     pub kind: String,
     /// The preferred locale of the user themselves when going through the AdSense association flow.
-    #[serde(alias="userLocale")]
+    #[serde(rename="userLocale")]
     pub user_locale: String,
     /// The locale of the user's hosted website.
-    #[serde(alias="websiteLocale")]
+    #[serde(rename="websiteLocale")]
     pub website_locale: String,
     /// Redirect URL of this association session. Used to redirect users into the AdSense association flow.
-    #[serde(alias="redirectUrl")]
+    #[serde(rename="redirectUrl")]
     pub redirect_url: String,
     /// The URL of the user's hosted website.
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: String,
     /// Unique identifier of this association session.
     pub id: String,
     /// Hosted account id of the associated publisher after association. Present if status is ACCEPTED.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -778,10 +778,10 @@ impl ResponseResult for Accounts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdUnitContentAdsSettings {
     /// Type of this ad unit. Possible values are TEXT, TEXT_IMAGE, IMAGE and LINK.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The backup option to be used in instances where no ad is available.
-    #[serde(alias="backupOption")]
+    #[serde(rename="backupOption")]
     pub backup_option: AdUnitContentAdsSettingsBackupOption,
     /// Size of this ad unit. Size values are in the form SIZE_{width}_{height}.
     pub size: String,
@@ -826,7 +826,7 @@ pub struct Report {
     /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.
     pub rows: Vec<Vec<String>>,
     /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.
-    #[serde(alias="totalMatchedRows")]
+    #[serde(rename="totalMatchedRows")]
     pub total_matched_rows: String,
     /// Any warnings associated with generation of the report.
     pub warnings: Vec<String>,
@@ -882,7 +882,7 @@ impl ResponseResult for CustomChannel {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannels {
     /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The custom channels returned in this list response.
     pub items: Vec<CustomChannel>,

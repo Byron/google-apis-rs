@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapool* crate version *0.1.3+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *replicapool* crate version *0.1.4+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *replicapool* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
@@ -321,7 +321,7 @@ impl<'a, C, NC, A> Replicapool<C, NC, A>
         Replicapool {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -334,7 +334,7 @@ impl<'a, C, NC, A> Replicapool<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -413,7 +413,7 @@ impl Part for OperationWarnings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The operation resources.
     pub items: Vec<Operation>,
@@ -422,7 +422,7 @@ pub struct OperationList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -441,7 +441,7 @@ impl ResponseResult for OperationList {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstanceGroupManagersSetInstanceTemplateRequest {
     /// The full URL to an Instance Template from which all new instances will be created.
-    #[serde(alias="instanceTemplate")]
+    #[serde(rename="instanceTemplate")]
     pub instance_template: Option<String>,
 }
 
@@ -478,7 +478,7 @@ impl Part for OperationErrorErrors {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceGroupManagerList {
     /// A token used to continue a truncated list request (output only).
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of instance resources.
     pub items: Vec<InstanceGroupManager>,
@@ -487,7 +487,7 @@ pub struct InstanceGroupManagerList {
     /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -529,7 +529,7 @@ impl Part for OperationError {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceGroupManager {
     /// [Output only] The number of instances that the manager is attempting to maintain. Deleting or abandoning instances affects this number, as does resizing the group.
-    #[serde(alias="targetSize")]
+    #[serde(rename="targetSize")]
     pub target_size: Option<i32>,
     /// [Output only] The full URL of the instance group created by the manager. This group contains all of the instances being managed, and cannot contain non-managed instances.
     pub group: Option<String>,
@@ -540,24 +540,24 @@ pub struct InstanceGroupManager {
     /// [Output only] The resource type. Always replicapool#instanceGroupManager.
     pub kind: Option<String>,
     /// The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name.
-    #[serde(alias="baseInstanceName")]
+    #[serde(rename="baseInstanceName")]
     pub base_instance_name: Option<String>,
     /// The full URL of all target pools to which new instances in the group are added. Updating the target pool values does not affect existing instances.
-    #[serde(alias="targetPools")]
+    #[serde(rename="targetPools")]
     pub target_pools: Option<Vec<String>>,
     /// The full URL to an instance template from which all new instances will be created.
-    #[serde(alias="instanceTemplate")]
+    #[serde(rename="instanceTemplate")]
     pub instance_template: Option<String>,
     /// [Output only] The number of instances that currently exist and are a part of this group. This includes instances that are starting but are not yet RUNNING, and instances that are in the process of being deleted or abandoned.
-    #[serde(alias="currentSize")]
+    #[serde(rename="currentSize")]
     pub current_size: Option<i32>,
     /// [Output only] The time the instance group manager was created, in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output only] A server-assigned unique identifier for the resource.
     pub id: Option<String>,
     /// [Output only] The fully qualified URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// The name of the instance group manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens.
     pub name: Option<String>,
@@ -582,7 +582,7 @@ pub struct InstanceGroupManagersSetTargetPoolsRequest {
     /// The current fingerprint of the Instance Group Manager resource. If this does not match the server-side fingerprint of the resource, then the request will be rejected.
     pub fingerprint: Option<String>,
     /// A list of fully-qualified URLs to existing Target Pool resources. New instances in the Instance Group Manager will be added to the specified target pools; existing instances are not affected.
-    #[serde(alias="targetPools")]
+    #[serde(rename="targetPools")]
     pub target_pools: Option<Vec<String>>,
 }
 
@@ -650,26 +650,26 @@ pub struct Operation {
     /// [Output Only] Status of the operation.
     pub status: String,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// [Output Only] If there are issues with this operation, a warning is returned.
     pub warnings: Vec<OperationWarnings>,
     /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationError,
     /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// [Output only] URL of the resource the operation is mutating.
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.
-    #[serde(alias="clientOperationId")]
+    #[serde(rename="clientOperationId")]
     pub client_operation_id: String,
     /// [Output Only] The time that this operation was requested, in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// [Output Only] Unique identifier for the resource, generated by the server.
     pub id: String,
@@ -682,24 +682,24 @@ pub struct Operation {
     /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.
     pub region: String,
     /// [Output Only] Server-defined fully-qualified URL for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// [Output only] Type of the operation. Operations include insert, update, and delete.
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// [Output only] If operation fails, the HTTP error message returned.
-    #[serde(alias="httpErrorMessage")]
+    #[serde(rename="httpErrorMessage")]
     pub http_error_message: String,
     /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
     pub progress: i32,
     /// [Output Only] The time that this operation was completed, in RFC3339 text format.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// [Output only] If operation fails, the HTTP error status code returned.
-    #[serde(alias="httpErrorStatusCode")]
+    #[serde(rename="httpErrorStatusCode")]
     pub http_error_status_code: i32,
     /// [Output Only] An optional textual description of the current status of the operation.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// [Output Only] User who requested the operation, for example: user@example.com.
     pub user: String,

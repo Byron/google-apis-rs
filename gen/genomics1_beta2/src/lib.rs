@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *genomics* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *genomics* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/genomics/v1beta2/reference).
@@ -350,7 +350,7 @@ impl<'a, C, NC, A> Genomics<C, NC, A>
         Genomics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -396,7 +396,7 @@ impl<'a, C, NC, A> Genomics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -440,13 +440,13 @@ impl ResponseResult for BatchAnnotationsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchVariantSetsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Exactly one dataset ID must be provided here. Only variant sets which belong to this dataset will be returned.
-    #[serde(alias="datasetIds")]
+    #[serde(rename="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
     /// The maximum number of variant sets to return in a request.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
 
@@ -478,7 +478,7 @@ impl Part for Int32Value {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchJobsResponse {
     /// The continuation token which is used to page through large result sets. Provide this value is a subsequent request to return the next page of results. This field will be empty if there are no more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of jobs results, ordered newest to oldest.
     pub jobs: Vec<Job>,
@@ -494,23 +494,23 @@ impl ResponseResult for SearchJobsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VariantAnnotation {
     /// Google annotation IDs of the transcripts affected by this variant. These should be provided when the variant is created.
-    #[serde(alias="transcriptIds")]
+    #[serde(rename="transcriptIds")]
     pub transcript_ids: Vec<String>,
     /// The alternate allele for this variant. If multiple alternate alleles exist at this location, create a separate variant for each one, as they may represent distinct conditions.
-    #[serde(alias="alternateBases")]
+    #[serde(rename="alternateBases")]
     pub alternate_bases: String,
     /// Describes the clinical significance of a variant. It is adapted from the ClinVar controlled vocabulary for clinical significance described at: http://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/
-    #[serde(alias="clinicalSignificance")]
+    #[serde(rename="clinicalSignificance")]
     pub clinical_significance: String,
     /// The set of conditions associated with this variant. A condition describes the way a variant influences human health.
     pub conditions: Vec<VariantAnnotationCondition>,
     /// Type has been adapted from ClinVar's list of variant types.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Effect of the variant on the coding sequence.
     pub effect: String,
     /// Google annotation ID of the gene affected by this variant. This should be provided when the variant is created.
-    #[serde(alias="geneId")]
+    #[serde(rename="geneId")]
     pub gene_id: String,
 }
 
@@ -524,13 +524,13 @@ impl Part for VariantAnnotation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VariantAnnotationCondition {
     /// The MedGen concept id associated with this gene. Search for these IDs at http://www.ncbi.nlm.nih.gov/medgen/
-    #[serde(alias="conceptId")]
+    #[serde(rename="conceptId")]
     pub concept_id: String,
     /// The OMIM id for this condition. Search for these IDs at http://omim.org/
-    #[serde(alias="omimId")]
+    #[serde(rename="omimId")]
     pub omim_id: String,
     /// The set of external IDs for this condition.
-    #[serde(alias="externalIds")]
+    #[serde(rename="externalIds")]
     pub external_ids: Vec<ExternalId>,
     /// A set of names for the condition.
     pub names: Vec<String>,
@@ -551,7 +551,7 @@ impl Part for VariantAnnotationCondition {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ImportVariantsRequest {
     /// A list of URIs pointing at VCF files in Google Cloud Storage. See the VCF Specification for more details on the input format.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
     /// The format of the variant data being imported.
     pub format: Option<String>,
@@ -573,7 +573,7 @@ pub struct Metadata {
     /// The top-level key.
     pub key: String,
     /// The type of data. Possible types include: Integer, Float, Flag, Character, and String.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The number of values that can be included in a field described by this metadata.
     pub number: String,
@@ -598,13 +598,13 @@ impl Part for Metadata {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListCoverageBucketsResponse {
     /// The coverage buckets. The list of buckets is sparse; a bucket with 0 overlapping reads is not returned. A bucket never crosses more than one reference sequence. Each bucket has width bucketWidth, unless its end is the end of the reference sequence.
-    #[serde(alias="coverageBuckets")]
+    #[serde(rename="coverageBuckets")]
     pub coverage_buckets: Vec<CoverageBucket>,
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The length of each coverage bucket in base pairs. Note that buckets at the end of a reference sequence may be shorter. This value is omitted if the bucket width is infinity (the default behaviour, with no range or targetBucketWidth).
-    #[serde(alias="bucketWidth")]
+    #[serde(rename="bucketWidth")]
     pub bucket_width: String,
 }
 
@@ -618,19 +618,19 @@ impl ResponseResult for ListCoverageBucketsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FastqMetadata {
     /// Optionally specifies the platform unit for alignment from FASTQ. For example: flowcell-barcode.lane for Illumina or slide for SOLID.
-    #[serde(alias="platformUnit")]
+    #[serde(rename="platformUnit")]
     pub platform_unit: String,
     /// Optionally specifies the read group name for alignment from FASTQ.
-    #[serde(alias="readGroupName")]
+    #[serde(rename="readGroupName")]
     pub read_group_name: String,
     /// Optionally specifies the library name for alignment from FASTQ.
-    #[serde(alias="libraryName")]
+    #[serde(rename="libraryName")]
     pub library_name: String,
     /// Optionally specifies the platform name for alignment from FASTQ. For example: CAPILLARY, LS454, ILLUMINA, SOLID, HELICOS, IONTORRENT, PACBIO.
-    #[serde(alias="platformName")]
+    #[serde(rename="platformName")]
     pub platform_name: String,
     /// Optionally specifies the sample name for alignment from FASTQ.
-    #[serde(alias="sampleName")]
+    #[serde(rename="sampleName")]
     pub sample_name: String,
 }
 
@@ -649,7 +649,7 @@ impl Part for FastqMetadata {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExportVariantSetResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -668,7 +668,7 @@ impl ResponseResult for ExportVariantSetResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchAnnotationsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matching annotations.
     pub annotations: Vec<Annotation>,
@@ -684,7 +684,7 @@ impl ResponseResult for SearchAnnotationsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroupProgram {
     /// The command line used to run this program.
-    #[serde(alias="commandLine")]
+    #[serde(rename="commandLine")]
     pub command_line: String,
     /// The version of the program run.
     pub version: String,
@@ -693,7 +693,7 @@ pub struct ReadGroupProgram {
     /// The name of the program.
     pub name: String,
     /// The ID of the program run before this one.
-    #[serde(alias="prevProgramId")]
+    #[serde(rename="prevProgramId")]
     pub prev_program_id: String,
 }
 
@@ -712,19 +712,19 @@ impl Part for ReadGroupProgram {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AlignReadGroupSetsRequest {
     /// The interleaved FASTQ source files for alignment, where both members of each pair of reads are found on consecutive records within the same FASTQ file. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
-    #[serde(alias="interleavedFastqSource")]
+    #[serde(rename="interleavedFastqSource")]
     pub interleaved_fastq_source: Option<InterleavedFastqSource>,
     /// The BAM source files for alignment. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided. The caller must have READ permissions for these files.
-    #[serde(alias="bamSourceUris")]
+    #[serde(rename="bamSourceUris")]
     pub bam_source_uris: Option<Vec<String>>,
     /// The paired end FASTQ source files for alignment, where each member of a pair of reads are found in separate files. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
-    #[serde(alias="pairedFastqSource")]
+    #[serde(rename="pairedFastqSource")]
     pub paired_fastq_source: Option<PairedFastqSource>,
     /// Required. The ID of the dataset the newly aligned read group sets will belong to. The caller must have WRITE permissions to this dataset.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
     /// The ID of the read group set which will be aligned. A new read group set will be generated to hold the aligned data, the originals will not be modified. The caller must have READ permissions for this read group set. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
-    #[serde(alias="readGroupSetId")]
+    #[serde(rename="readGroupSetId")]
     pub read_group_set_id: Option<String>,
 }
 
@@ -740,7 +740,7 @@ pub struct Transcript {
     /// The range of the coding sequence for this transcript, if any. To determine the exact ranges of coding sequence, intersect this range with those of the exons, if any. If there are any exons, the codingSequence must start and end within them.
     /// 
     /// Note that in some cases, the reference genome will not exactly match the observed mRNA transcript e.g. due to variance in the source genome from reference. In these cases, exon.frame will not necessarily match the expected reference reading frame and coding exon reference bases cannot necessarily be concatenated to produce the original transcript mRNA.
-    #[serde(alias="codingSequence")]
+    #[serde(rename="codingSequence")]
     pub coding_sequence: TranscriptCodingSequence,
     /// The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.
     /// 
@@ -754,7 +754,7 @@ pub struct Transcript {
     /// Exons are ordered by start position and may not overlap.
     pub exons: Vec<TranscriptExon>,
     /// The annotation ID of the gene from which this transcript is transcribed.
-    #[serde(alias="geneId")]
+    #[serde(rename="geneId")]
     pub gene_id: String,
 }
 
@@ -787,12 +787,12 @@ pub struct Annotation {
     /// A variant annotation, which describes the effect of a variant on the genome, the coding sequence, and/or higher level consequences at the organism level e.g. pathogenicity. This field is only set for annotations of type VARIANT.
     pub variant: Option<VariantAnnotation>,
     /// The ID of the containing annotation set.
-    #[serde(alias="annotationSetId")]
+    #[serde(rename="annotationSetId")]
     pub annotation_set_id: Option<String>,
     /// The position of this annotation on the reference sequence.
     pub position: Option<RangePosition>,
     /// The data type for this annotation. Must match the containing annotation set's type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The generated unique ID for this annotation.
     pub id: Option<String>,
@@ -814,7 +814,7 @@ pub struct JobRequest {
     /// The data destination of the request, for example, a Google BigQuery Table or Dataset ID.
     pub destination: Vec<String>,
     /// The original request type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -833,7 +833,7 @@ impl Part for JobRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchVariantsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of matching Variants.
     pub variants: Vec<Variant>,
@@ -856,19 +856,19 @@ pub struct SearchJobsRequest {
     /// Only return jobs which have a matching status.
     pub status: Option<Vec<String>>,
     /// The continuation token which is used to page through large result sets. To get the next page of results, set this parameter to the value of the nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// If specified, only jobs created on or after this date, given in milliseconds since Unix epoch, will be returned.
-    #[serde(alias="createdAfter")]
+    #[serde(rename="createdAfter")]
     pub created_after: Option<String>,
     /// If specified, only jobs created prior to this date, given in milliseconds since Unix epoch, will be returned.
-    #[serde(alias="createdBefore")]
+    #[serde(rename="createdBefore")]
     pub created_before: Option<String>,
     /// Specifies the number of results to return in a single page. Defaults to 128. The maximum value is 256.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// Required. Only return jobs which belong to this Google Developers Console project.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
 }
 
@@ -884,15 +884,15 @@ pub struct RangePosition {
     /// The start position of the range on the reference, 0-based inclusive.
     pub start: String,
     /// The ID of the Google Genomics reference associated with this range.
-    #[serde(alias="referenceId")]
+    #[serde(rename="referenceId")]
     pub reference_id: String,
     /// The end position of the range on the reference, 0-based exclusive.
     pub end: String,
     /// Whether this range refers to the reverse strand, as opposed to the forward strand. Note that regardless of this field, the start/end position of the range always refer to the forward strand.
-    #[serde(alias="reverseStrand")]
+    #[serde(rename="reverseStrand")]
     pub reverse_strand: bool,
     /// The display name corresponding to the reference specified by referenceId, for example chr1, 1, or chrX.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: String,
 }
 
@@ -906,7 +906,7 @@ impl Part for RangePosition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalId {
     /// The name of the source of this data.
-    #[serde(alias="sourceName")]
+    #[serde(rename="sourceName")]
     pub source_name: String,
     /// The id used by the source of this data.
     pub id: String,
@@ -932,14 +932,14 @@ pub struct CallSet {
     /// A map of additional call set information.
     pub info: Option<HashMap<String, Vec<String>>>,
     /// The IDs of the variant sets this call set belongs to.
-    #[serde(alias="variantSetIds")]
+    #[serde(rename="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
     /// The call set name.
     pub name: Option<String>,
     /// The date this call set was created in milliseconds from the epoch.
     pub created: Option<String>,
     /// The sample ID this call set corresponds to.
-    #[serde(alias="sampleId")]
+    #[serde(rename="sampleId")]
     pub sample_id: Option<String>,
     /// The Google generated ID of the call set, immutable.
     pub id: Option<String>,
@@ -959,10 +959,10 @@ pub struct Position {
     /// The 0-based offset from the start of the forward strand for that reference.
     pub position: String,
     /// Whether this position is on the reverse strand, as opposed to the forward strand.
-    #[serde(alias="reverseStrand")]
+    #[serde(rename="reverseStrand")]
     pub reverse_strand: bool,
     /// The name of the reference in whatever reference set is being used.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: String,
 }
 
@@ -981,7 +981,7 @@ impl Part for Position {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImportVariantsResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -995,16 +995,16 @@ impl ResponseResult for ImportVariantsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroupExperiment {
     /// The sequencing center used as part of this experiment.
-    #[serde(alias="sequencingCenter")]
+    #[serde(rename="sequencingCenter")]
     pub sequencing_center: String,
     /// The library used as part of this experiment. Note: This is not an actual ID within this repository, but rather an identifier for a library which may be meaningful to some external system.
-    #[serde(alias="libraryId")]
+    #[serde(rename="libraryId")]
     pub library_id: String,
     /// The instrument model used as part of this experiment. This maps to sequencing technology in BAM.
-    #[serde(alias="instrumentModel")]
+    #[serde(rename="instrumentModel")]
     pub instrument_model: String,
     /// The platform unit used as part of this experiment e.g. flowcell-barcode.lane for Illumina or slide for SOLiD. Corresponds to the
-    #[serde(alias="platformUnit")]
+    #[serde(rename="platformUnit")]
     pub platform_unit: String,
 }
 
@@ -1023,15 +1023,15 @@ impl Part for ReadGroupExperiment {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchCallSetsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Restrict the query to call sets within the given variant sets. At least one ID must be provided.
-    #[serde(alias="variantSetIds")]
+    #[serde(rename="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
     /// Only return call sets for which a substring of the name matches this string.
     pub name: Option<String>,
     /// The maximum number of call sets to return.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
 
@@ -1050,7 +1050,7 @@ impl RequestValue for SearchCallSetsRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDatasetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of matching Datasets.
     pub datasets: Vec<Dataset>,
@@ -1071,16 +1071,16 @@ impl ResponseResult for ListDatasetsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ImportReadGroupSetsRequest {
     /// A list of URIs pointing at BAM files in Google Cloud Storage.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
     /// The reference set to which the imported read group sets are aligned to, if any. The reference names of this reference set must be a superset of those found in the imported file headers. If no reference set id is provided, a best effort is made to associate with a matching reference set.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: Option<String>,
     /// The partition strategy describes how read groups are partitioned into read group sets.
-    #[serde(alias="partitionStrategy")]
+    #[serde(rename="partitionStrategy")]
     pub partition_strategy: Option<String>,
     /// Required. The ID of the dataset these read group sets will belong to. The caller must have WRITE permissions to this dataset.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
 }
 
@@ -1099,7 +1099,7 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CallReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -1124,13 +1124,13 @@ pub struct Reference {
     /// The name of this reference, for example 22.
     pub name: String,
     /// The URI from which the sequence was obtained. Specifies a FASTA format file/string with one name, sequence pair.
-    #[serde(alias="sourceURI")]
+    #[serde(rename="sourceURI")]
     pub source_uri: String,
     /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) if not specified by the containing reference set.
-    #[serde(alias="ncbiTaxonId")]
+    #[serde(rename="ncbiTaxonId")]
     pub ncbi_taxon_id: i32,
     /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example GCF_000001405.26.
-    #[serde(alias="sourceAccessions")]
+    #[serde(rename="sourceAccessions")]
     pub source_accessions: Vec<String>,
     /// The Google generated immutable ID of the reference.
     pub id: String,
@@ -1154,16 +1154,16 @@ impl ResponseResult for Reference {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExportVariantSetRequest {
     /// The BigQuery dataset to export data to. Note that this is distinct from the Genomics concept of "dataset".
-    #[serde(alias="bigqueryDataset")]
+    #[serde(rename="bigqueryDataset")]
     pub bigquery_dataset: Option<String>,
     /// The BigQuery table to export data to. If the table doesn't exist, it will be created. If it already exists, it will be overwritten.
-    #[serde(alias="bigqueryTable")]
+    #[serde(rename="bigqueryTable")]
     pub bigquery_table: Option<String>,
     /// If provided, only variant call information from the specified call sets will be exported. By default all variant calls are exported.
-    #[serde(alias="callSetIds")]
+    #[serde(rename="callSetIds")]
     pub call_set_ids: Option<Vec<String>>,
     /// The Google Cloud project number that owns the destination BigQuery dataset. The caller must have WRITE access to this project. This project will also own the resulting export job.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
     /// The format for the exported data.
     pub format: Option<String>,
@@ -1186,15 +1186,15 @@ pub struct SearchReferencesRequest {
     /// If present, return references for which the md5checksum matches. See Reference.md5checksum for construction details.
     pub md5checksums: Option<Vec<String>>,
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// If present, return only references which belong to this reference set.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: Option<String>,
     /// If present, return references for which the accession matches this string. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.
     pub accessions: Option<Vec<String>>,
     /// Specifies the maximum number of results to return in a single page.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
 
@@ -1210,24 +1210,24 @@ pub struct ReadGroup {
     /// A map of additional read group information.
     pub info: HashMap<String, Vec<String>>,
     /// The predicted insert size of this read group. The insert size is the length the sequenced DNA fragment from end-to-end, not including the adapters.
-    #[serde(alias="predictedInsertSize")]
+    #[serde(rename="predictedInsertSize")]
     pub predicted_insert_size: i32,
     /// The read group name. This corresponds to the @RG ID field in the SAM spec.
     pub name: String,
     /// The programs used to generate this read group. Programs are always identical for all read groups within a read group set. For this reason, only the first read group in a returned set will have this field populated.
     pub programs: Vec<ReadGroupProgram>,
     /// The sample this read group's data was generated from. Note: This is not an actual ID within this repository, but rather an identifier for a sample which may be meaningful to some external system.
-    #[serde(alias="sampleId")]
+    #[serde(rename="sampleId")]
     pub sample_id: String,
     /// The experiment used to generate this read group.
     pub experiment: ReadGroupExperiment,
     /// The reference set the reads in this read group are aligned to. Required if there are any read alignments.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: String,
     /// The generated unique read group ID. Note: This is different than the @RG ID field in the SAM spec. For that value, see the name field.
     pub id: String,
     /// The ID of the dataset this read group belongs to.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: String,
     /// A free-form text description of this read group.
     pub description: String,
@@ -1248,10 +1248,10 @@ impl Part for ReadGroup {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReadGroupSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of matching read group sets.
-    #[serde(alias="readGroupSets")]
+    #[serde(rename="readGroupSets")]
     pub read_group_sets: Vec<ReadGroupSet>,
 }
 
@@ -1270,7 +1270,7 @@ impl ResponseResult for SearchReadGroupSetsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -1289,7 +1289,7 @@ impl ResponseResult for ImportReadGroupSetsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExportReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -1308,15 +1308,15 @@ impl ResponseResult for ExportReadGroupSetsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReadGroupSetsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Restricts this query to read group sets within the given datasets. At least one ID must be provided.
-    #[serde(alias="datasetIds")]
+    #[serde(rename="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
     /// Only return read group sets for which a substring of the name matches this string.
     pub name: Option<String>,
     /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 1024.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
 
@@ -1365,7 +1365,7 @@ impl Part for BatchAnnotationsResponseEntryStatus {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListBasesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The offset position (0-based) of the given sequence from the start of this Reference. This value will differ for each page in a paginated request.
     pub offset: String,
@@ -1383,10 +1383,10 @@ impl ResponseResult for ListBasesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReferenceBound {
     /// An upper bound (inclusive) on the starting coordinate of any variant in the reference sequence.
-    #[serde(alias="upperBound")]
+    #[serde(rename="upperBound")]
     pub upper_bound: String,
     /// The reference the bound is associate with.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: String,
 }
 
@@ -1404,15 +1404,15 @@ pub struct Call {
     /// The genotype of this variant call. Each value represents either the value of the referenceBases field or a 1-based index into alternateBases. If a variant had a referenceBases value of T and an alternateBases value of ["A", "C"], and the genotype was [2, 1], that would mean the call represented the heterozygous value CA for this variant. If the genotype was instead [0, 1], the represented value would be TA. Ordering of the genotype values is important if the phaseset is present. If a genotype is not called (that is, a . is present in the GT string) -1 is returned.
     pub genotype: Vec<i32>,
     /// The ID of the call set this variant call belongs to.
-    #[serde(alias="callSetId")]
+    #[serde(rename="callSetId")]
     pub call_set_id: String,
     /// If this field is present, this variant call's genotype ordering implies the phase of the bases and is consistent with any other variant calls in the same reference sequence which have the same phaseset value. When importing data from VCF, if the genotype data was phased but no phase set was specified this field will be set to *.
     pub phaseset: String,
     /// The genotype likelihoods for this variant call. Each array entry represents how likely a specific genotype is for this call. The value ordering is defined by the GL tag in the VCF spec. If Phred-scaled genotype likelihood scores (PL) are available and log10(P) genotype likelihood scores (GL) are not, PL scores are converted to GL scores. If both are available, PL scores are stored in info.
-    #[serde(alias="genotypeLikelihood")]
+    #[serde(rename="genotypeLikelihood")]
     pub genotype_likelihood: Vec<f64>,
     /// The name of the call set this variant call belongs to.
-    #[serde(alias="callSetName")]
+    #[serde(rename="callSetName")]
     pub call_set_name: String,
 }
 
@@ -1431,7 +1431,7 @@ impl Part for Call {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExperimentalCreateJobResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -1452,27 +1452,27 @@ pub struct SearchVariantsRequest {
     /// Required. The end of the window (0-based, exclusive) for which overlapping variants should be returned.
     pub end: Option<String>,
     /// The maximum number of variants to return.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// The maximum number of calls to return. However, at least one variant will always be returned, even if it has more calls than this limit.
-    #[serde(alias="maxCalls")]
+    #[serde(rename="maxCalls")]
     pub max_calls: Option<i32>,
     /// Required. The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.
     pub start: Option<String>,
     /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.
-    #[serde(alias="callSetIds")]
+    #[serde(rename="callSetIds")]
     pub call_set_ids: Option<Vec<String>>,
     /// Only return variants which have exactly this name.
-    #[serde(alias="variantName")]
+    #[serde(rename="variantName")]
     pub variant_name: Option<String>,
     /// Required. Only return variants in this reference sequence.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
     /// Exactly one variant set ID must be provided. Only variants from this variant set will be returned.
-    #[serde(alias="variantSetIds")]
+    #[serde(rename="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
 }
 
@@ -1497,14 +1497,14 @@ impl RequestValue for SearchVariantsRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
     /// Flag indicating whether or not a dataset is publicly viewable. If a dataset is not public, it inherits viewing permissions from its project.
-    #[serde(alias="isPublic")]
+    #[serde(rename="isPublic")]
     pub is_public: Option<bool>,
     /// The Google generated ID of the dataset, immutable.
     pub id: Option<String>,
     /// The dataset name.
     pub name: Option<String>,
     /// The Google Developers Console project number that this dataset belongs to.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
 }
 
@@ -1528,22 +1528,22 @@ impl ResponseResult for Dataset {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Read {
     /// The ID of the read group set this read belongs to. (Every read must belong to exactly one read group set.)
-    #[serde(alias="readGroupSetId")]
+    #[serde(rename="readGroupSetId")]
     pub read_group_set_id: Option<String>,
     /// SAM flag 0x200
-    #[serde(alias="failedVendorQualityChecks")]
+    #[serde(rename="failedVendorQualityChecks")]
     pub failed_vendor_quality_checks: Option<bool>,
     /// The fragment name. Equivalent to QNAME (query template name) in SAM.
-    #[serde(alias="fragmentName")]
+    #[serde(rename="fragmentName")]
     pub fragment_name: Option<String>,
     /// The mapping of the primary alignment of the (readNumber+1)%numberReads read in the fragment. It replaces mate position and mate strand in SAM.
-    #[serde(alias="nextMatePosition")]
+    #[serde(rename="nextMatePosition")]
     pub next_mate_position: Option<Position>,
     /// Whether this alignment is supplementary. Equivalent to SAM flag 0x800. Supplementary alignments are used in the representation of a chimeric alignment. In a chimeric alignment, a read is split into multiple linear alignments that map to different reference contigs. The first linear alignment in the read will be designated as the representative alignment; the remaining linear alignments will be designated as supplementary alignments. These alignments may have different mapping quality scores. In each linear alignment in a chimeric alignment, the read will be hard clipped. The alignedSequence and alignedQuality fields in the alignment record will only represent the bases for its respective linear alignment.
-    #[serde(alias="supplementaryAlignment")]
+    #[serde(rename="supplementaryAlignment")]
     pub supplementary_alignment: Option<bool>,
     /// The observed length of the fragment, equivalent to TLEN in SAM.
-    #[serde(alias="fragmentLength")]
+    #[serde(rename="fragmentLength")]
     pub fragment_length: Option<i32>,
     /// The unique ID for this read. This is a generated unique ID, not to be confused with fragmentName.
     pub id: Option<String>,
@@ -1552,28 +1552,28 @@ pub struct Read {
     /// A map of additional read alignment information.
     pub info: Option<HashMap<String, Vec<String>>>,
     /// The fragment is a PCR or optical duplicate (SAM flag 0x400)
-    #[serde(alias="duplicateFragment")]
+    #[serde(rename="duplicateFragment")]
     pub duplicate_fragment: Option<bool>,
     /// The quality of the read sequence contained in this alignment record. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.
-    #[serde(alias="alignedQuality")]
+    #[serde(rename="alignedQuality")]
     pub aligned_quality: Option<Vec<i32>>,
     /// The read number in sequencing. 0-based and less than numberReads. This field replaces SAM flag 0x40 and 0x80.
-    #[serde(alias="readNumber")]
+    #[serde(rename="readNumber")]
     pub read_number: Option<i32>,
     /// The orientation and the distance between reads from the fragment are consistent with the sequencing protocol (SAM flag 0x2)
-    #[serde(alias="properPlacement")]
+    #[serde(rename="properPlacement")]
     pub proper_placement: Option<bool>,
     /// The ID of the read group this read belongs to. (Every read must belong to exactly one read group.)
-    #[serde(alias="readGroupId")]
+    #[serde(rename="readGroupId")]
     pub read_group_id: Option<String>,
     /// The number of reads in the fragment (extension to SAM flag 0x1).
-    #[serde(alias="numberReads")]
+    #[serde(rename="numberReads")]
     pub number_reads: Option<i32>,
     /// The bases of the read sequence contained in this alignment record, without CIGAR operations applied. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.
-    #[serde(alias="alignedSequence")]
+    #[serde(rename="alignedSequence")]
     pub aligned_sequence: Option<String>,
     /// Whether this alignment is secondary. Equivalent to SAM flag 0x100. A secondary alignment represents an alternative to the primary alignment for this read. Aligners may return secondary alignments if a read can map ambiguously to multiple coordinates in the genome. By convention, each read has one and only one alignment where both secondaryAlignment and supplementaryAlignment are false.
-    #[serde(alias="secondaryAlignment")]
+    #[serde(rename="secondaryAlignment")]
     pub secondary_alignment: Option<bool>,
 }
 
@@ -1592,21 +1592,21 @@ impl Resource for Read {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExperimentalCreateJobRequest {
     /// A list of Google Cloud Storage URIs of paired end .fastq files to operate upon. If specified, this represents the second file of each paired .fastq file. The first file of each pair should be specified in sourceUris.
-    #[serde(alias="pairedSourceUris")]
+    #[serde(rename="pairedSourceUris")]
     pub paired_source_uris: Option<Vec<String>>,
     /// A list of Google Cloud Storage URIs of data files to operate upon. These can be .bam, interleaved .fastq, or paired .fastq. If specifying paired .fastq files, the first of each pair of files should be listed here, and the second of each pair should be listed in pairedSourceUris.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
     /// Specifies whether or not to run the alignment pipeline. Either align or callVariants must be set.
     pub align: Option<bool>,
     /// Specifies where to copy the results of certain pipelines. This should be in the form of gs://bucket/path.
-    #[serde(alias="gcsOutputPath")]
+    #[serde(rename="gcsOutputPath")]
     pub gcs_output_path: Option<String>,
     /// Specifies whether or not to run the variant calling pipeline. Either align or callVariants must be set.
-    #[serde(alias="callVariants")]
+    #[serde(rename="callVariants")]
     pub call_variants: Option<bool>,
     /// Required. The Google Cloud Project ID with which to associate the request.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
 }
 
@@ -1632,7 +1632,7 @@ pub struct Variant {
     /// A map of additional variant information.
     pub info: Option<HashMap<String, Vec<String>>>,
     /// The ID of the variant set this variant belongs to.
-    #[serde(alias="variantSetId")]
+    #[serde(rename="variantSetId")]
     pub variant_set_id: Option<String>,
     /// The end position (0-based) of this variant. This corresponds to the first base after the last base in the reference allele. So, the length of the reference allele is (end - start). This is useful for variants that don't explicitly give alternate bases, for example large deletions.
     pub end: Option<String>,
@@ -1649,15 +1649,15 @@ pub struct Variant {
     /// Names for the variant, for example a RefSNP ID.
     pub names: Option<Vec<String>>,
     /// The bases that appear instead of the reference bases.
-    #[serde(alias="alternateBases")]
+    #[serde(rename="alternateBases")]
     pub alternate_bases: Option<Vec<String>>,
     /// The reference on which this variant occurs. (such as chr20 or X)
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
     /// A measure of how likely this variant is to be real. A higher value is better.
     pub quality: Option<f64>,
     /// The reference bases for this variant. They start at the given position.
-    #[serde(alias="referenceBases")]
+    #[serde(rename="referenceBases")]
     pub reference_bases: Option<String>,
 }
 
@@ -1678,10 +1678,10 @@ impl ResponseResult for Variant {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchAnnotationSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matching annotation sets.
-    #[serde(alias="annotationSets")]
+    #[serde(rename="annotationSets")]
     pub annotation_sets: Vec<AnnotationSet>,
 }
 
@@ -1702,7 +1702,7 @@ impl ResponseResult for SearchAnnotationSetsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Job {
     /// A more detailed description of this job's current status.
-    #[serde(alias="detailedStatus")]
+    #[serde(rename="detailedStatus")]
     pub detailed_status: String,
     /// The status of this job.
     pub status: String,
@@ -1717,10 +1717,10 @@ pub struct Job {
     /// The job ID.
     pub id: String,
     /// If this Job represents an import, this field will contain the IDs of the objects that were successfully imported.
-    #[serde(alias="importedIds")]
+    #[serde(rename="importedIds")]
     pub imported_ids: Vec<String>,
     /// The Google Developers Console project number to which this job belongs.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: String,
 }
 
@@ -1740,13 +1740,13 @@ impl ResponseResult for Job {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CallReadGroupSetsRequest {
     /// A list of URIs pointing at BAM files in Google Cloud Storage which will be called. FASTQ files are not allowed. The caller must have READ permissions for these files. One of readGroupSetId or sourceUris must be provided.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
     /// Required. The ID of the dataset the called variants will belong to. The caller must have WRITE permissions to this dataset.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
     /// The IDs of the read group sets which will be called. The caller must have READ permissions for these read group sets. One of readGroupSetId or sourceUris must be provided.
-    #[serde(alias="readGroupSetId")]
+    #[serde(rename="readGroupSetId")]
     pub read_group_set_id: Option<String>,
 }
 
@@ -1801,16 +1801,16 @@ impl RequestValue for BatchCreateAnnotationsRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExportReadGroupSetsRequest {
     /// A Google Cloud Storage URI for the exported BAM file. The currently authenticated user must have write access to the new file. An error will be returned if the URI already contains data.
-    #[serde(alias="exportUri")]
+    #[serde(rename="exportUri")]
     pub export_uri: Option<String>,
     /// The reference names to export. If this is not specified, all reference sequences, including unmapped reads, are exported. Use * to export only unmapped reads.
-    #[serde(alias="referenceNames")]
+    #[serde(rename="referenceNames")]
     pub reference_names: Option<Vec<String>>,
     /// The IDs of the read group sets to export.
-    #[serde(alias="readGroupSetIds")]
+    #[serde(rename="readGroupSetIds")]
     pub read_group_set_ids: Option<Vec<String>>,
     /// The Google Developers Console project number that owns this export.
-    #[serde(alias="projectNumber")]
+    #[serde(rename="projectNumber")]
     pub project_number: Option<String>,
 }
 
@@ -1829,10 +1829,10 @@ impl RequestValue for ExportReadGroupSetsRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReferenceSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matching references sets.
-    #[serde(alias="referenceSets")]
+    #[serde(rename="referenceSets")]
     pub reference_sets: Vec<ReferenceSet>,
 }
 
@@ -1853,19 +1853,19 @@ pub struct ReferenceSet {
     /// Free text description of this reference set.
     pub description: String,
     /// The URI from which the references were obtained.
-    #[serde(alias="sourceURI")]
+    #[serde(rename="sourceURI")]
     pub source_uri: String,
     /// The IDs of the reference objects that are part of this set. Reference.md5checksum must be unique within this set.
-    #[serde(alias="referenceIds")]
+    #[serde(rename="referenceIds")]
     pub reference_ids: Vec<String>,
     /// Public id of this reference set, such as GRCh37.
-    #[serde(alias="assemblyId")]
+    #[serde(rename="assemblyId")]
     pub assembly_id: String,
     /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example NC_000001.11.
-    #[serde(alias="sourceAccessions")]
+    #[serde(rename="sourceAccessions")]
     pub source_accessions: Vec<String>,
     /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) indicating the species which this assembly is intended to model. Note that contained references may specify a different ncbiTaxonId, as assemblies may contain reference sequences which do not belong to the modeled species, e.g. EBV in a human reference genome.
-    #[serde(alias="ncbiTaxonId")]
+    #[serde(rename="ncbiTaxonId")]
     pub ncbi_taxon_id: i32,
     /// The Google generated immutable ID of the reference set.
     pub id: String,
@@ -1895,10 +1895,10 @@ pub struct VariantSet {
     /// The Google-generated ID of the variant set. Immutable.
     pub id: Option<String>,
     /// The dataset to which this variant set belongs. Immutable.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
     /// A list of all references used by the variants in a variant set with associated coordinate upper bounds for each one.
-    #[serde(alias="referenceBounds")]
+    #[serde(rename="referenceBounds")]
     pub reference_bounds: Option<Vec<ReferenceBound>>,
 }
 
@@ -1919,7 +1919,7 @@ impl ResponseResult for VariantSet {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AlignReadGroupSetsResponse {
     /// A job ID that can be used to get status information.
-    #[serde(alias="jobId")]
+    #[serde(rename="jobId")]
     pub job_id: String,
 }
 
@@ -1938,15 +1938,15 @@ impl ResponseResult for AlignReadGroupSetsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchAnnotationsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// If specified, this query matches only annotations that overlap this range.
     pub range: Option<QueryRange>,
     /// The annotation sets to search within. The caller must have READ access to these annotation sets. Required. All queried annotation sets must have the same type.
-    #[serde(alias="annotationSetIds")]
+    #[serde(rename="annotationSetIds")]
     pub annotation_set_ids: Option<Vec<String>>,
     /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
 }
 
@@ -1960,10 +1960,10 @@ impl RequestValue for SearchAnnotationsRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PairedFastqSource {
     /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The second of each paired file should be specified here, in an order that matches the first of each paired file specified in firstSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
-    #[serde(alias="secondSourceUris")]
+    #[serde(rename="secondSourceUris")]
     pub second_source_uris: Vec<String>,
     /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The first of each paired file should be specified here, in an order that matches the second of each paired file specified in secondSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
-    #[serde(alias="firstSourceUris")]
+    #[serde(rename="firstSourceUris")]
     pub first_source_uris: Vec<String>,
     /// Optionally specifies the metadata to be associated with the final aligned read group set.
     pub metadata: FastqMetadata,
@@ -1984,23 +1984,23 @@ impl Part for PairedFastqSource {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReadsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
     pub end: Option<String>,
     /// The IDs of the read groups within which to search for reads. All specified read groups must belong to the same read group sets. Must specify one of readGroupSetIds or readGroupIds.
-    #[serde(alias="readGroupIds")]
+    #[serde(rename="readGroupIds")]
     pub read_group_ids: Option<Vec<String>>,
     /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
     pub start: Option<String>,
     /// The IDs of the read groups sets within which to search for reads. All specified read group sets must be aligned against a common set of reference sequences; this defines the genomic coordinates for the query. Must specify one of readGroupSetIds or readGroupIds.
-    #[serde(alias="readGroupSetIds")]
+    #[serde(rename="readGroupSetIds")]
     pub read_group_set_ids: Option<Vec<String>>,
     /// The reference sequence name, for example chr1, 1, or chrX. If set to *, only unmapped reads are returned.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
 }
 
@@ -2018,7 +2018,7 @@ pub struct Range {
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
     pub end: String,
     /// The reference sequence name, for example chr1, 1, or chrX.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: String,
 }
 
@@ -2037,18 +2037,18 @@ impl Part for Range {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchAnnotationSetsRequest {
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
     /// Only return annotations sets for which a substring of the name matches this string (case insensitive).
     pub name: Option<String>,
     /// Specifies number of results to return in a single page. If unspecified, it will default to 128. The maximum value is 1024.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// The dataset IDs to search within. Caller must have READ access to these datasets.
-    #[serde(alias="datasetIds")]
+    #[serde(rename="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
     /// If specified, only annotation sets associated with the given reference set are returned.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: Option<String>,
     /// If specified, only annotation sets that have any of these types are returned.
     pub types: Option<Vec<String>>,
@@ -2069,7 +2069,7 @@ impl RequestValue for SearchAnnotationSetsRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReadsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of matching alignments sorted by mapped genomic coordinate, if any, ascending in position within the same reference. Unmapped reads, which have no position, are returned last and are further sorted in ascending lexicographic order by fragment name.
     pub alignments: Vec<Read>,
@@ -2085,7 +2085,7 @@ impl ResponseResult for SearchReadsResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InterleavedFastqSource {
     /// A list of URIs pointing at interleaved FASTQ files in Google Cloud Storage which will be aligned. The caller must have READ permissions for these files.
-    #[serde(alias="sourceUris")]
+    #[serde(rename="sourceUris")]
     pub source_uris: Vec<String>,
     /// Optionally specifies the metadata to be associated with the final aligned read group set.
     pub metadata: FastqMetadata,
@@ -2106,7 +2106,7 @@ impl Part for InterleavedFastqSource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReferencesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The matching references.
     pub references: Vec<Reference>,
@@ -2129,13 +2129,13 @@ pub struct StreamVariantsRequest {
     /// The end of the window (0-based, exclusive) for which overlapping variants should be returned.
     pub end: Option<String>,
     /// Exactly one variant set ID must be provided. Only variants from this variant set will be returned.
-    #[serde(alias="variantSetIds")]
+    #[serde(rename="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
     /// Required. Only return variants in this reference sequence.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
     /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls.
-    #[serde(alias="callSetIds")]
+    #[serde(rename="callSetIds")]
     pub call_set_ids: Option<Vec<String>>,
     /// The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.
     pub start: Option<String>,
@@ -2163,17 +2163,17 @@ pub struct ReadGroupSet {
     /// A map of additional read group set information.
     pub info: Option<HashMap<String, Vec<String>>>,
     /// The dataset ID.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
     /// The read group set name. By default this will be initialized to the sample name of the sequenced data contained in this set.
     pub name: Option<String>,
     /// The reference set the reads in this read group set are aligned to.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: Option<String>,
     /// The read group set ID.
     pub id: Option<String>,
     /// The read groups in this set. There are typically 1-10 read groups in a read group set.
-    #[serde(alias="readGroups")]
+    #[serde(rename="readGroups")]
     pub read_groups: Option<Vec<ReadGroup>>,
     /// The filename of the original source file for this read group set, if any.
     pub filename: Option<String>,
@@ -2193,12 +2193,12 @@ pub struct QueryRange {
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceId or referenceName must also be specified. Defaults to 0.
     pub start: String,
     /// The ID of the reference to query. At most one of referenceId and referenceName should be specified.
-    #[serde(alias="referenceId")]
+    #[serde(rename="referenceId")]
     pub reference_id: String,
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceId or referenceName must also be specified. If unset or 0, defaults to the length of the reference.
     pub end: String,
     /// The name of the reference to query, within the reference set associated with this query. At most one of referenceId and referenceName pshould be specified.
-    #[serde(alias="referenceName")]
+    #[serde(rename="referenceName")]
     pub reference_name: String,
 }
 
@@ -2216,7 +2216,7 @@ pub struct LinearAlignment {
     /// Represents the local alignment of this sequence (alignment matches, indels, etc) against the reference.
     pub cigar: Vec<CigarUnit>,
     /// The mapping quality of this alignment. Represents how likely the read maps to this position as opposed to other locations.
-    #[serde(alias="mappingQuality")]
+    #[serde(rename="mappingQuality")]
     pub mapping_quality: i32,
 }
 
@@ -2244,18 +2244,18 @@ pub struct AnnotationSet {
     /// The display name for this annotation set.
     pub name: Option<String>,
     /// The source URI describing the file from which this annotation set was generated, if any.
-    #[serde(alias="sourceUri")]
+    #[serde(rename="sourceUri")]
     pub source_uri: Option<String>,
     /// The type of annotations contained within this set.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The ID of the reference set that defines the coordinate space for this set's annotations.
-    #[serde(alias="referenceSetId")]
+    #[serde(rename="referenceSetId")]
     pub reference_set_id: Option<String>,
     /// The generated unique ID for this annotation set.
     pub id: Option<String>,
     /// The ID of the containing dataset.
-    #[serde(alias="datasetId")]
+    #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
 }
 
@@ -2271,12 +2271,12 @@ impl ResponseResult for AnnotationSet {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CigarUnit {
     /// referenceSequence is only used at mismatches (SEQUENCE_MISMATCH) and deletions (DELETE). Filling this field replaces SAM's MD tag. If the relevant information is not available, this field is unset.
-    #[serde(alias="referenceSequence")]
+    #[serde(rename="referenceSequence")]
     pub reference_sequence: String,
     /// no description provided
     pub operation: String,
     /// The number of bases that the operation runs for. Required.
-    #[serde(alias="operationLength")]
+    #[serde(rename="operationLength")]
     pub operation_length: String,
 }
 
@@ -2329,10 +2329,10 @@ impl Part for TranscriptExon {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchVariantSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The variant sets belonging to the requested dataset.
-    #[serde(alias="variantSets")]
+    #[serde(rename="variantSets")]
     pub variant_sets: Vec<VariantSet>,
 }
 
@@ -2346,7 +2346,7 @@ impl ResponseResult for SearchVariantSetsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CoverageBucket {
     /// The average number of reads which are aligned to each individual reference base in this bucket.
-    #[serde(alias="meanCoverage")]
+    #[serde(rename="meanCoverage")]
     pub mean_coverage: f32,
     /// The genomic coordinate range spanned by this bucket.
     pub range: Range,
@@ -2367,10 +2367,10 @@ impl Part for CoverageBucket {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchCallSetsResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of matching call sets.
-    #[serde(alias="callSets")]
+    #[serde(rename="callSets")]
     pub call_sets: Vec<CallSet>,
 }
 
@@ -2391,15 +2391,15 @@ pub struct SearchReferenceSetsRequest {
     /// If present, return references for which the md5checksum matches. See ReferenceSet.md5checksum for details.
     pub md5checksums: Option<Vec<String>>,
     /// If present, return reference sets for which a substring of their assemblyId matches this string (case insensitive).
-    #[serde(alias="assemblyId")]
+    #[serde(rename="assemblyId")]
     pub assembly_id: Option<String>,
     /// If present, return references for which the accession matches any of these strings. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.
     pub accessions: Option<Vec<String>>,
     /// Specifies the maximum number of results to return in a single page.
-    #[serde(alias="pageSize")]
+    #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    #[serde(alias="pageToken")]
+    #[serde(rename="pageToken")]
     pub page_token: Option<String>,
 }
 

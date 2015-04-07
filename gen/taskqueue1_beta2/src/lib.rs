@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *taskqueue* crate version *0.1.3+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *taskqueue* crate version *0.1.4+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *taskqueue* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).
@@ -312,7 +312,7 @@ impl<'a, C, NC, A> Taskqueue<C, NC, A>
         Taskqueue {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +325,7 @@ impl<'a, C, NC, A> Taskqueue<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -359,22 +359,22 @@ pub struct Task {
     /// The kind of object returned, in this case set to task.
     pub kind: Option<String>,
     /// Time (in seconds since the epoch) at which the task lease will expire. This value is 0 if the task isnt currently leased out to a worker.
-    #[serde(alias="leaseTimestamp")]
+    #[serde(rename="leaseTimestamp")]
     pub lease_timestamp: Option<String>,
     /// Name of the queue that the task is in.
-    #[serde(alias="queueName")]
+    #[serde(rename="queueName")]
     pub queue_name: Option<String>,
     /// The number of leases applied to this task.
     pub retry_count: Option<i32>,
     /// Tag for the task, could be used later to lease tasks grouped by a specific tag.
     pub tag: Option<String>,
     /// A bag of bytes which is the task payload. The payload on the JSON side is always Base64 encoded.
-    #[serde(alias="payloadBase64")]
+    #[serde(rename="payloadBase64")]
     pub payload_base64: Option<String>,
     /// Name of the task.
     pub id: Option<String>,
     /// Time (in seconds since the epoch) at which the task was enqueued.
-    #[serde(alias="enqueueTimestamp")]
+    #[serde(rename="enqueueTimestamp")]
     pub enqueue_timestamp: Option<String>,
 }
 
@@ -410,16 +410,16 @@ impl ResponseResult for Tasks2 {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskQueueStats {
     /// The timestamp (in seconds since the epoch) of the oldest unfinished task.
-    #[serde(alias="oldestTask")]
+    #[serde(rename="oldestTask")]
     pub oldest_task: String,
     /// Number of tasks leased in the last minute.
-    #[serde(alias="leasedLastMinute")]
+    #[serde(rename="leasedLastMinute")]
     pub leased_last_minute: String,
     /// Number of tasks leased in the last hour.
-    #[serde(alias="leasedLastHour")]
+    #[serde(rename="leasedLastHour")]
     pub leased_last_hour: String,
     /// Number of tasks in the queue.
-    #[serde(alias="totalTasks")]
+    #[serde(rename="totalTasks")]
     pub total_tasks: i32,
 }
 
@@ -434,13 +434,13 @@ impl Part for TaskQueueStats {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskQueueAcl {
     /// Email addresses of users who can "consume" tasks from the TaskQueue. This means they can Dequeue and Delete tasks from the queue.
-    #[serde(alias="consumerEmails")]
+    #[serde(rename="consumerEmails")]
     pub consumer_emails: Vec<String>,
     /// Email addresses of users who can "produce" tasks into the TaskQueue. This means they can Insert tasks into the queue.
-    #[serde(alias="producerEmails")]
+    #[serde(rename="producerEmails")]
     pub producer_emails: Vec<String>,
     /// Email addresses of users who are "admins" of the TaskQueue. This means they can control the queue, eg set ACLs for the queue.
-    #[serde(alias="adminEmails")]
+    #[serde(rename="adminEmails")]
     pub admin_emails: Vec<String>,
 }
 
@@ -466,7 +466,7 @@ pub struct TaskQueue {
     /// Name of the taskqueue.
     pub id: String,
     /// The number of times we should lease out tasks before giving up on them. If unset we lease them out forever until a worker deletes the task.
-    #[serde(alias="maxLeases")]
+    #[serde(rename="maxLeases")]
     pub max_leases: i32,
     /// ACLs that are applicable to this TaskQueue object.
     pub acl: TaskQueueAcl,

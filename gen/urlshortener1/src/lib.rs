@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *urlshortener* crate version *0.1.3+20150319*, where *20150319* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *urlshortener* crate version *0.1.4+20150319*, where *20150319* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *urlshortener* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
@@ -299,7 +299,7 @@ impl<'a, C, NC, A> Urlshortener<C, NC, A>
         Urlshortener {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -309,7 +309,7 @@ impl<'a, C, NC, A> Urlshortener<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -332,10 +332,10 @@ pub struct AnalyticsSummary {
     /// Click analytics over the last week.
     pub week: AnalyticsSnapshot,
     /// Click analytics over all time.
-    #[serde(alias="allTime")]
+    #[serde(rename="allTime")]
     pub all_time: AnalyticsSnapshot,
     /// Click analytics over the last two hours.
-    #[serde(alias="twoHours")]
+    #[serde(rename="twoHours")]
     pub two_hours: AnalyticsSnapshot,
     /// Click analytics over the last day.
     pub day: AnalyticsSnapshot,
@@ -367,7 +367,7 @@ pub struct Url {
     /// Time the short URL was created; ISO 8601 representation using the yyyy-MM-dd'T'HH:mm:ss.SSSZZ format, e.g. "2010-10-14T19:01:24.944+00:00".
     pub created: Option<String>,
     /// Long URL, e.g. "http://www.google.com/". Might not be present if the status is "REMOVED".
-    #[serde(alias="longUrl")]
+    #[serde(rename="longUrl")]
     pub long_url: Option<String>,
     /// Short URL, e.g. "http://goo.gl/l6MS".
     pub id: Option<String>,
@@ -389,17 +389,17 @@ impl ResponseResult for Url {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlHistory {
     /// A token to provide to get the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of URL resources.
     pub items: Vec<Url>,
     /// The fixed string "urlshortener#urlHistory".
     pub kind: String,
     /// Number of items returned with each full "page" of results. Note that the last page could have fewer items than the "itemsPerPage" value.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Total number of short URLs associated with this user (may be approximate).
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -413,7 +413,7 @@ impl ResponseResult for UrlHistory {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyticsSnapshot {
     /// Number of clicks on this short URL.
-    #[serde(alias="shortUrlClicks")]
+    #[serde(rename="shortUrlClicks")]
     pub short_url_clicks: String,
     /// Top platforms or OSes, e.g. "Windows"; sorted by (descending) click counts. Only present if this data is available.
     pub platforms: Vec<StringCount>,
@@ -424,7 +424,7 @@ pub struct AnalyticsSnapshot {
     /// Top referring hosts, e.g. "www.google.com"; sorted by (descending) click counts. Only present if this data is available.
     pub referrers: Vec<StringCount>,
     /// Number of clicks on all goo.gl short URLs pointing to this long URL.
-    #[serde(alias="longUrlClicks")]
+    #[serde(rename="longUrlClicks")]
     pub long_url_clicks: String,
 }
 

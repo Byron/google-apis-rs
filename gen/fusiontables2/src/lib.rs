@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fusiontables* crate version *0.1.3+20150226*, where *20150226* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *fusiontables* crate version *0.1.4+20150226*, where *20150226* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *fusiontables* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/fusiontables).
@@ -332,7 +332,7 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
         Fusiontables {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -357,7 +357,7 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -390,10 +390,10 @@ pub struct Task {
     /// Type of the resource. This is always "fusiontables#task".
     pub kind: String,
     /// Type of background task.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Identifier for the task.
-    #[serde(alias="taskId")]
+    #[serde(rename="taskId")]
     pub task_id: String,
 }
 
@@ -417,36 +417,36 @@ pub struct Column {
     /// Column graph predicate.
     /// Used to map table to graph data model (subject,predicate,object)
     /// See W3C Graph-based Data Model.
-    #[serde(alias="graphPredicate")]
+    #[serde(rename="graphPredicate")]
     pub graph_predicate: Option<String>,
     /// The kind of item this is. For a column, this is always fusiontables#column.
     pub kind: Option<String>,
     /// List of valid values used to validate data and supply a drop-down list of values in the web application.
-    #[serde(alias="validValues")]
+    #[serde(rename="validValues")]
     pub valid_values: Option<Vec<String>>,
     /// Column description.
     pub description: Option<String>,
     /// Identifier of the base column. If present, this column is derived from the specified base column.
-    #[serde(alias="baseColumn")]
+    #[serde(rename="baseColumn")]
     pub base_column: Option<ColumnBaseColumn>,
     /// Identifier for the column.
-    #[serde(alias="columnId")]
+    #[serde(rename="columnId")]
     pub column_id: Option<i32>,
     /// JSON object containing custom column properties.
-    #[serde(alias="columnPropertiesJson")]
+    #[serde(rename="columnPropertiesJson")]
     pub column_properties_json: Option<String>,
     /// Format pattern.
     /// Acceptable values are DT_DATE_MEDIUMe.g Dec 24, 2008 DT_DATE_SHORTfor example 12/24/08 DT_DATE_TIME_MEDIUMfor example Dec 24, 2008 8:30:45 PM DT_DATE_TIME_SHORTfor example 12/24/08 8:30 PM DT_DAY_MONTH_2_DIGIT_YEARfor example 24/12/08 DT_DAY_MONTH_2_DIGIT_YEAR_TIMEfor example 24/12/08 20:30 DT_DAY_MONTH_2_DIGIT_YEAR_TIME_MERIDIANfor example 24/12/08 8:30 PM DT_DAY_MONTH_4_DIGIT_YEARfor example 24/12/2008 DT_DAY_MONTH_4_DIGIT_YEAR_TIMEfor example 24/12/2008 20:30 DT_DAY_MONTH_4_DIGIT_YEAR_TIME_MERIDIANfor example 24/12/2008 8:30 PM DT_ISO_YEAR_MONTH_DAYfor example 2008-12-24 DT_ISO_YEAR_MONTH_DAY_TIMEfor example 2008-12-24 20:30:45 DT_MONTH_DAY_4_DIGIT_YEARfor example 12/24/2008 DT_TIME_LONGfor example 8:30:45 PM UTC-6 DT_TIME_MEDIUMfor example 8:30:45 PM DT_TIME_SHORTfor example 8:30 PM DT_YEAR_ONLYfor example 2008 HIGHLIGHT_UNTYPED_CELLSHighlight cell data that does not match the data type NONENo formatting (default) NUMBER_CURRENCYfor example $1234.56 NUMBER_DEFAULTfor example 1,234.56 NUMBER_INTEGERfor example 1235 NUMBER_NO_SEPARATORfor example 1234.56 NUMBER_PERCENTfor example 123,456% NUMBER_SCIENTIFICfor example 1E3 STRING_EIGHT_LINE_IMAGEDisplays thumbnail images as tall as eight lines of text STRING_FOUR_LINE_IMAGEDisplays thumbnail images as tall as four lines of text STRING_JSON_TEXTAllows JSON editing of text in UI STRING_LINKTreats cell as a link (must start with http:// or https://) STRING_ONE_LINE_IMAGEDisplays thumbnail images as tall as one line of text STRING_VIDEO_OR_MAPDisplay a video or map thumbnail
-    #[serde(alias="formatPattern")]
+    #[serde(rename="formatPattern")]
     pub format_pattern: Option<String>,
     /// JSON schema for interpreting JSON in this column.
-    #[serde(alias="columnJsonSchema")]
+    #[serde(rename="columnJsonSchema")]
     pub column_json_schema: Option<String>,
     /// Type of the column.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// If true, data entered via the web application is validated.
-    #[serde(alias="validateData")]
+    #[serde(rename="validateData")]
     pub validate_data: Option<bool>,
     /// Name of the column.
     pub name: Option<String>,
@@ -488,7 +488,7 @@ pub struct StyleFunction {
     /// Gradient function that interpolates a range of colors based on column value.
     pub gradient: StyleFunctionGradient,
     /// Name of the column whose value is used in the style.
-    #[serde(alias="columnName")]
+    #[serde(rename="columnName")]
     pub column_name: String,
     /// Bucket function that assigns a style based on the range a column value falls into.
     pub buckets: Vec<Bucket>,
@@ -511,14 +511,14 @@ impl Part for StyleFunction {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskList {
     /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of all requested tasks.
     pub items: Vec<Task>,
     /// Type of the resource. This is always "fusiontables#taskList".
     pub kind: String,
     /// Total number of tasks for the table.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -562,15 +562,15 @@ pub struct Template {
     /// The kind of item this is. For a template, this is always fusiontables#template.
     pub kind: Option<String>,
     /// Identifier for the table for which the template is defined.
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: Option<String>,
     /// Optional name assigned to a template.
     pub name: Option<String>,
     /// Identifier for the template, unique within the context of a particular table.
-    #[serde(alias="templateId")]
+    #[serde(rename="templateId")]
     pub template_id: Option<i32>,
     /// List of columns from which the template is to be automatically constructed. Only one of body or automaticColumns can be specified.
-    #[serde(alias="automaticColumnNames")]
+    #[serde(rename="automaticColumnNames")]
     pub automatic_column_names: Option<Vec<String>>,
 }
 
@@ -585,10 +585,10 @@ impl ResponseResult for Template {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ColumnBaseColumn {
     /// Offset to the entry in the list of base tables in the table definition.
-    #[serde(alias="tableIndex")]
+    #[serde(rename="tableIndex")]
     pub table_index: i32,
     /// The id of the column in the base table from which this column is derived.
-    #[serde(alias="columnId")]
+    #[serde(rename="columnId")]
     pub column_id: i32,
 }
 
@@ -608,14 +608,14 @@ impl Part for ColumnBaseColumn {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ColumnList {
     /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of all requested columns.
     pub items: Vec<Column>,
     /// The kind of item this is. For a column list, this is always fusiontables#columnList.
     pub kind: String,
     /// Total number of columns for the table.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -634,7 +634,7 @@ impl ResponseResult for ColumnList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Import {
     /// The number of rows received from the import request.
-    #[serde(alias="numRowsReceived")]
+    #[serde(rename="numRowsReceived")]
     pub num_rows_received: String,
     /// The kind of item this is. For an import, this is always fusiontables#import.
     pub kind: String,
@@ -650,19 +650,19 @@ impl ResponseResult for Import {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LineStyle {
     /// Width of the line in pixels.
-    #[serde(alias="strokeWeight")]
+    #[serde(rename="strokeWeight")]
     pub stroke_weight: i32,
     /// Column-value or bucket styler that is used to determine the width of the line.
-    #[serde(alias="strokeWeightStyler")]
+    #[serde(rename="strokeWeightStyler")]
     pub stroke_weight_styler: StyleFunction,
     /// Color of the line in #RRGGBB format.
-    #[serde(alias="strokeColor")]
+    #[serde(rename="strokeColor")]
     pub stroke_color: String,
     /// Opacity of the line : 0.0 (transparent) to 1.0 (opaque).
-    #[serde(alias="strokeOpacity")]
+    #[serde(rename="strokeOpacity")]
     pub stroke_opacity: f64,
     /// Column-value, gradient or buckets styler that is used to determine the line color and opacity.
-    #[serde(alias="strokeColorStyler")]
+    #[serde(rename="strokeColorStyler")]
     pub stroke_color_styler: StyleFunction,
 }
 
@@ -676,28 +676,28 @@ impl Part for LineStyle {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolygonStyle {
     /// Column-value, gradient or buckets styler that is used to determine the border color and opacity.
-    #[serde(alias="strokeColorStyler")]
+    #[serde(rename="strokeColorStyler")]
     pub stroke_color_styler: StyleFunction,
     /// Width of the polyon border in pixels.
-    #[serde(alias="strokeWeight")]
+    #[serde(rename="strokeWeight")]
     pub stroke_weight: i32,
     /// Opacity of the polygon border: 0.0 (transparent) to 1.0 (opaque).
-    #[serde(alias="strokeOpacity")]
+    #[serde(rename="strokeOpacity")]
     pub stroke_opacity: f64,
     /// Column-value or bucket styler that is used to determine the width of the polygon border.
-    #[serde(alias="strokeWeightStyler")]
+    #[serde(rename="strokeWeightStyler")]
     pub stroke_weight_styler: StyleFunction,
     /// Column-value, gradient, or bucket styler that is used to determine the interior color and opacity of the polygon.
-    #[serde(alias="fillColorStyler")]
+    #[serde(rename="fillColorStyler")]
     pub fill_color_styler: StyleFunction,
     /// Color of the interior of the polygon in #RRGGBB format.
-    #[serde(alias="fillColor")]
+    #[serde(rename="fillColor")]
     pub fill_color: String,
     /// Color of the polygon border in #RRGGBB format.
-    #[serde(alias="strokeColor")]
+    #[serde(rename="strokeColor")]
     pub stroke_color: String,
     /// Opacity of the interior of the polygon: 0.0 (transparent) to 1.0 (opaque).
-    #[serde(alias="fillOpacity")]
+    #[serde(rename="fillOpacity")]
     pub fill_opacity: f64,
 }
 
@@ -716,14 +716,14 @@ impl Part for PolygonStyle {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct StyleSettingList {
     /// Token used to access the next page of this result. No token is displayed if there are no more styles left.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// All requested style settings.
     pub items: Vec<StyleSetting>,
     /// The kind of item this is. For a style list, this is always fusiontables#styleSettingList .
     pub kind: String,
     /// Total number of styles for the table.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -760,10 +760,10 @@ impl ResponseResult for Sqlresponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointStyle {
     /// Column or a bucket value from which the icon name is to be determined.
-    #[serde(alias="iconStyler")]
+    #[serde(rename="iconStyler")]
     pub icon_styler: StyleFunction,
     /// Name of the icon. Use values defined in http://www.google.com/fusiontables/DataSource?dsrcid=308519
-    #[serde(alias="iconName")]
+    #[serde(rename="iconName")]
     pub icon_name: String,
 }
 
@@ -785,23 +785,23 @@ impl Part for PointStyle {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StyleSetting {
     /// Style definition for points in the table.
-    #[serde(alias="markerOptions")]
+    #[serde(rename="markerOptions")]
     pub marker_options: Option<PointStyle>,
     /// The kind of item this is. A StyleSetting contains the style definitions for points, lines, and polygons in a table. Since a table can have any one or all of them, a style definition can have point, line and polygon style definitions.
     pub kind: Option<String>,
     /// Identifier for the table.
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: Option<String>,
     /// Optional name for the style setting.
     pub name: Option<String>,
     /// Style definition for polygons in the table.
-    #[serde(alias="polygonOptions")]
+    #[serde(rename="polygonOptions")]
     pub polygon_options: Option<PolygonStyle>,
     /// Style definition for lines in the table.
-    #[serde(alias="polylineOptions")]
+    #[serde(rename="polylineOptions")]
     pub polyline_options: Option<LineStyle>,
     /// Identifier for the style setting (unique only within tables).
-    #[serde(alias="styleId")]
+    #[serde(rename="styleId")]
     pub style_id: Option<i32>,
 }
 
@@ -821,7 +821,7 @@ impl ResponseResult for StyleSetting {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableList {
     /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of all requested tables.
     pub items: Vec<Table>,
@@ -844,14 +844,14 @@ impl ResponseResult for TableList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TemplateList {
     /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of all requested templates.
     pub items: Vec<Template>,
     /// The kind of item this is. For a template list, this is always fusiontables#templateList .
     pub kind: String,
     /// Total number of templates for the table.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -875,7 +875,7 @@ impl ResponseResult for TemplateList {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
     /// JSON schema for validating the JSON table properties.
-    #[serde(alias="tablePropertiesJsonSchema")]
+    #[serde(rename="tablePropertiesJsonSchema")]
     pub table_properties_json_schema: Option<String>,
     /// The kind of item this is. For a table, this is always fusiontables#table.
     pub kind: Option<String>,
@@ -884,24 +884,24 @@ pub struct Table {
     /// Description assigned to the table.
     pub description: Option<String>,
     /// Default JSON schema for validating all JSON column properties.
-    #[serde(alias="columnPropertiesJsonSchema")]
+    #[serde(rename="columnPropertiesJsonSchema")]
     pub column_properties_json_schema: Option<String>,
     /// Variable for whether table is exportable.
-    #[serde(alias="isExportable")]
+    #[serde(rename="isExportable")]
     pub is_exportable: Option<bool>,
     /// Base table identifier if this table is a view or merged table.
-    #[serde(alias="baseTableIds")]
+    #[serde(rename="baseTableIds")]
     pub base_table_ids: Option<Vec<String>>,
     /// JSON object containing custom table properties.
-    #[serde(alias="tablePropertiesJson")]
+    #[serde(rename="tablePropertiesJson")]
     pub table_properties_json: Option<String>,
     /// Optional link for attribution.
-    #[serde(alias="attributionLink")]
+    #[serde(rename="attributionLink")]
     pub attribution_link: Option<String>,
     /// SQL that encodes the table definition for derived tables.
     pub sql: Option<String>,
     /// Encrypted unique alphanumeric identifier for the table.
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: Option<String>,
     /// Columns in the table.
     pub columns: Option<Vec<Column>>,

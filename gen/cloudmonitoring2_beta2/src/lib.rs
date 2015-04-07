@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -320,7 +320,7 @@ impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
         CloudMonitoring {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -336,7 +336,7 @@ impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -359,7 +359,7 @@ pub struct PointDistributionUnderflowBucket {
     /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
     /// The upper bound of the value interval of this bucket (exclusive).
-    #[serde(alias="upperBound")]
+    #[serde(rename="upperBound")]
     pub upper_bound: f64,
 }
 
@@ -380,7 +380,7 @@ pub struct ListMetricDescriptorsResponse {
     /// The returned metric descriptors.
     pub metrics: Vec<MetricDescriptor>,
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, pass this value to the pageToken query parameter.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsResponse".
     pub kind: String,
@@ -432,7 +432,7 @@ impl RequestValue for ListTimeseriesDescriptorsRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TimeseriesPoint {
     /// The descriptor of this time series.
-    #[serde(alias="timeseriesDesc")]
+    #[serde(rename="timeseriesDesc")]
     pub timeseries_desc: TimeseriesDescriptor,
     /// The data point in this time series snapshot.
     pub point: Point,
@@ -450,10 +450,10 @@ pub struct PointDistribution {
     /// The finite buckets.
     pub buckets: Vec<PointDistributionBucket>,
     /// The underflow bucket.
-    #[serde(alias="underflowBucket")]
+    #[serde(rename="underflowBucket")]
     pub underflow_bucket: PointDistributionUnderflowBucket,
     /// The overflow bucket.
-    #[serde(alias="overflowBucket")]
+    #[serde(rename="overflowBucket")]
     pub overflow_bucket: PointDistributionOverflowBucket,
 }
 
@@ -467,10 +467,10 @@ impl Part for PointDistribution {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptorTypeDescriptor {
     /// The type of data that is written to a timeseries point for this metric.
-    #[serde(alias="valueType")]
+    #[serde(rename="valueType")]
     pub value_type: String,
     /// The method of collecting data for the metric.
-    #[serde(alias="metricType")]
+    #[serde(rename="metricType")]
     pub metric_type: String,
 }
 
@@ -501,10 +501,10 @@ pub struct PointDistributionBucket {
     /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
     /// The lower bound of the value interval of this bucket (inclusive).
-    #[serde(alias="lowerBound")]
+    #[serde(rename="lowerBound")]
     pub lower_bound: f64,
     /// The upper bound of the value interval of this bucket (exclusive).
-    #[serde(alias="upperBound")]
+    #[serde(rename="upperBound")]
     pub upper_bound: f64,
 }
 
@@ -551,7 +551,7 @@ pub struct MetricDescriptor {
     /// The name of this metric.
     pub name: Option<String>,
     /// Type description for this metric.
-    #[serde(alias="typeDescriptor")]
+    #[serde(rename="typeDescriptor")]
     pub type_descriptor: Option<MetricDescriptorTypeDescriptor>,
 }
 
@@ -608,7 +608,7 @@ impl ResponseResult for DeleteMetricDescriptorResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct WriteTimeseriesRequest {
     /// The label's name.
-    #[serde(alias="commonLabels")]
+    #[serde(rename="commonLabels")]
     pub common_labels: Option<HashMap<String, String>>,
     /// Provide time series specific labels and the data points for each time series. The labels in timeseries and the common_labels should form a complete list of labels that required by the metric.
     pub timeseries: Option<Vec<TimeseriesPoint>>,
@@ -626,21 +626,21 @@ pub struct Point {
     /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
     pub start: String,
     /// The value of this data point. Either "true" or "false".
-    #[serde(alias="boolValue")]
+    #[serde(rename="boolValue")]
     pub bool_value: bool,
     /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
     pub end: String,
     /// The value of this data point as a distribution. A distribution value can contain a list of buckets and/or an underflowBucket and an overflowBucket. The values of these points can be used to create a histogram.
-    #[serde(alias="distributionValue")]
+    #[serde(rename="distributionValue")]
     pub distribution_value: PointDistribution,
     /// The value of this data point in string format.
-    #[serde(alias="stringValue")]
+    #[serde(rename="stringValue")]
     pub string_value: String,
     /// The value of this data point as a 64-bit integer.
-    #[serde(alias="int64Value")]
+    #[serde(rename="int64Value")]
     pub int64_value: String,
     /// The value of this data point as a double-precision floating-point number.
-    #[serde(alias="doubleValue")]
+    #[serde(rename="doubleValue")]
     pub double_value: f64,
 }
 
@@ -676,7 +676,7 @@ impl Resource for TimeseriesDescriptor {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Timeseries {
     /// The descriptor of this time series.
-    #[serde(alias="timeseriesDesc")]
+    #[serde(rename="timeseriesDesc")]
     pub timeseries_desc: TimeseriesDescriptor,
     /// The data points of this time series. The points are listed in order of their end timestamp, from younger to older.
     pub points: Vec<Point>,
@@ -694,7 +694,7 @@ pub struct PointDistributionOverflowBucket {
     /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
     /// The lower bound of the value interval of this bucket (inclusive).
-    #[serde(alias="lowerBound")]
+    #[serde(rename="lowerBound")]
     pub lower_bound: f64,
 }
 
@@ -713,7 +713,7 @@ impl Part for PointDistributionOverflowBucket {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTimeseriesDescriptorsResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set this value to the pageToken query parameter.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The youngest timestamp of the interval of this query, as an RFC 3339 string.
     pub youngest: String,
@@ -740,7 +740,7 @@ impl ResponseResult for ListTimeseriesDescriptorsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTimeseriesResponse {
     /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set the pageToken query parameter to this value. All of the points of a time series will be returned before returning any point of the subsequent time series.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The youngest timestamp of the interval of this query as an RFC 3339 string.
     pub youngest: String,

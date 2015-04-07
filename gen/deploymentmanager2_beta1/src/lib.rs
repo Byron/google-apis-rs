@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *deploymentmanager* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *deploymentmanager* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *deploymentmanager* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -319,7 +319,7 @@ impl<'a, C, NC, A> Deploymentmanager<C, NC, A>
         Deploymentmanager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -341,7 +341,7 @@ impl<'a, C, NC, A> Deploymentmanager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -380,7 +380,7 @@ pub struct ResourceType {
     /// ! [Output Only] The intended state of the resource.
     pub intent: String,
     /// ! [Output Only] The type of the resource, for example ! ?compute.v1.instance?, or ?replicaPools.v1beta2.instanceGroupManager?
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
@@ -436,7 +436,7 @@ impl Part for OperationWarnings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResourcesListResponse {
     /// ! A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// ! Resources contained in this list response.
     pub resources: Vec<ResourceType>,
@@ -476,14 +476,14 @@ impl Part for OperationErrorErrors {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Manifest {
     /// ! [Output Only] The fully-expanded configuration file, including any ! templates and references.
-    #[serde(alias="evaluatedConfig")]
+    #[serde(rename="evaluatedConfig")]
     pub evaluated_config: String,
     /// v2beta1: YAML with config - described above v2beta2: YAML + templates. ! The YAML configuration for this manifest.
     pub config: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Self link for the manifest.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// ! [Output Only] The name of the manifest.
     pub name: String,
@@ -537,7 +537,7 @@ impl ResponseResult for TypesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeploymentsListResponse {
     /// ! A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// ! The deployments contained in this response.
     pub deployments: Vec<Deployment>,
@@ -565,7 +565,7 @@ pub struct Deployment {
     /// ! An optional user-provided description of the deployment.
     pub description: Option<String>,
     /// ! [Input Only] The YAML configuration to use in processing this deployment. ! ! When you create a deployment, the server creates a new manifest with the ! given YAML configuration and sets the `manifest` property to the URL of ! the manifest resource.
-    #[serde(alias="targetConfig")]
+    #[serde(rename="targetConfig")]
     pub target_config: Option<String>,
     /// ! The name of the deployment, which must be unique within the project.
     pub name: Option<String>,
@@ -590,7 +590,7 @@ impl ResponseResult for Deployment {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationsListResponse {
     /// ! A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// ! Operations contained in this list response.
     pub operations: Vec<Operation>,
@@ -616,47 +616,47 @@ pub struct Operation {
     /// ! [Output Only] Status of the operation. Can be one of the following: ! "PENDING", "RUNNING", or "DONE".
     pub status: String,
     /// ! [Output Only] The time that this operation was requested. ! This is in RFC 3339 format.
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// ! [Output Only] If warning messages generated during processing of this ! operation, this field will be populated.
     pub warnings: Vec<OperationWarnings>,
     /// ! [Output Only] If operation fails, the HTTP error message returned, ! e.g. NOT FOUND.
-    #[serde(alias="httpErrorMessage")]
+    #[serde(rename="httpErrorMessage")]
     pub http_error_message: String,
     /// ! [Output Only] Unique target id which identifies a particular ! incarnation of the target.
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// ! [Output Only] URL of the resource the operation is mutating.
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// ! [Output Only] The time that this operation was started by the server. ! This is in RFC 3339 format.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// ! [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// ! [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// ! [Output Only] Name of the operation.
     pub name: String,
     /// [Output Only] Self link for the manifest.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// ! [Output Only] Type of the operation. Examples include "insert", or ! "delete"
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// ! [Output Only] If errors occurred during processing of this operation, ! this field will be populated.
     pub error: OperationError,
     /// ! [Output Only] An optional progress indicator that ranges from 0 to 100. ! There is no requirement that this be linear or support any granularity ! of operations. This should not be used to guess at when the operation will ! be complete. This number should be monotonically increasing as the ! operation progresses.
     pub progress: i32,
     /// ! [Output Only] The time that this operation was completed. This is in ! RFC3339 format.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// ! [Output Only] If operation fails, the HTTP error status code returned, ! e.g. 404.
-    #[serde(alias="httpErrorStatusCode")]
+    #[serde(rename="httpErrorStatusCode")]
     pub http_error_status_code: i32,
     /// ! [Output Only] An optional textual description of the current status of ! the operation.
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// ! [Output Only] User who requested the operation, for example ! "user@example.com"
     pub user: String,
@@ -696,7 +696,7 @@ impl Resource for Type {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ManifestsListResponse {
     /// ! A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// ! Manifests contained in this list response.
     pub manifests: Vec<Manifest>,

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *0.1.3+20150323*, where *20150323* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Android Publisher* crate version *0.1.4+20150323*, where *20150323* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -323,7 +323,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -339,7 +339,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -385,28 +385,28 @@ pub struct InAppProduct {
     /// no description provided
     pub status: Option<String>,
     /// The period of the subscription (if any), i.e. period at which payments must happen. Defined as ISO 8601 duration, i.e. "P1M" for 1 month period.
-    #[serde(alias="subscriptionPeriod")]
+    #[serde(rename="subscriptionPeriod")]
     pub subscription_period: Option<String>,
     /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.
     pub season: Option<Season>,
     /// The package name of the parent app.
-    #[serde(alias="packageName")]
+    #[serde(rename="packageName")]
     pub package_name: Option<String>,
     /// List of localized title and description data.
     pub listings: Option<HashMap<String, InAppProductListing>>,
     /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.
-    #[serde(alias="trialPeriod")]
+    #[serde(rename="trialPeriod")]
     pub trial_period: Option<String>,
     /// Purchase type enum value. Unmodifiable after creation.
-    #[serde(alias="purchaseType")]
+    #[serde(rename="purchaseType")]
     pub purchase_type: Option<String>,
     /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: Option<String>,
     /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.
     pub prices: Option<HashMap<String, Price>>,
     /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.
-    #[serde(alias="defaultPrice")]
+    #[serde(rename="defaultPrice")]
     pub default_price: Option<Price>,
 }
 
@@ -445,7 +445,7 @@ impl ResponseResult for ImagesListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExpansionFilesUploadResponse {
     /// no description provided
-    #[serde(alias="expansionFile")]
+    #[serde(rename="expansionFile")]
     pub expansion_file: ExpansionFile,
 }
 
@@ -459,10 +459,10 @@ impl ResponseResult for ExpansionFilesUploadResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SubscriptionDeferralInfo {
     /// The expected expiry time for the subscription. If the current expiry time for the subscription is not the value specified here, the deferral will not occur.
-    #[serde(alias="expectedExpiryTimeMillis")]
+    #[serde(rename="expectedExpiryTimeMillis")]
     pub expected_expiry_time_millis: String,
     /// The desired next expiry time for the subscription in milliseconds since Epoch. The given time must be after the current expiry time for the subscription.
-    #[serde(alias="desiredExpiryTimeMillis")]
+    #[serde(rename="desiredExpiryTimeMillis")]
     pub desired_expiry_time_millis: String,
 }
 
@@ -485,10 +485,10 @@ pub struct Listing {
     /// URL of a promotional YouTube video for the app.
     pub video: Option<String>,
     /// Short description of the app (previously known as promo text); this may be up to 80 characters in length.
-    #[serde(alias="shortDescription")]
+    #[serde(rename="shortDescription")]
     pub short_description: Option<String>,
     /// Full description of the app; this may be up to 4000 characters in length.
-    #[serde(alias="fullDescription")]
+    #[serde(rename="fullDescription")]
     pub full_description: Option<String>,
     /// Language localization code (for example, "de-AT" for Austrian German).
     pub language: Option<String>,
@@ -547,20 +547,20 @@ pub struct ProductPurchase {
     /// The consumption state of the inapp product. Possible values are:  
     /// - Yet to be consumed 
     /// - Consumed
-    #[serde(alias="consumptionState")]
+    #[serde(rename="consumptionState")]
     pub consumption_state: i32,
     /// A developer-specified string that contains supplemental information about an order.
-    #[serde(alias="developerPayload")]
+    #[serde(rename="developerPayload")]
     pub developer_payload: String,
     /// This kind represents an inappPurchase object in the androidpublisher service.
     pub kind: String,
     /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
-    #[serde(alias="purchaseTimeMillis")]
+    #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: String,
     /// The purchase state of the order. Possible values are:  
     /// - Purchased 
     /// - Cancelled
-    #[serde(alias="purchaseState")]
+    #[serde(rename="purchaseState")]
     pub purchase_state: i32,
 }
 
@@ -621,10 +621,10 @@ pub struct Track {
     /// no description provided
     pub track: Option<String>,
     /// no description provided
-    #[serde(alias="userFraction")]
+    #[serde(rename="userFraction")]
     pub user_fraction: Option<f64>,
     /// no description provided
-    #[serde(alias="versionCodes")]
+    #[serde(rename="versionCodes")]
     pub version_codes: Option<Vec<i32>>,
 }
 
@@ -674,7 +674,7 @@ impl Part for InAppProductListing {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SubscriptionPurchasesDeferRequest {
     /// The information about the new desired expiry time for the subscription.
-    #[serde(alias="deferralInfo")]
+    #[serde(rename="deferralInfo")]
     pub deferral_info: Option<SubscriptionDeferralInfo>,
 }
 
@@ -701,49 +701,49 @@ impl Part for InappproductsInsertResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternallyHostedApk {
     /// The icon image from the APK, as a base64 encoded byte array.
-    #[serde(alias="iconBase64")]
+    #[serde(rename="iconBase64")]
     pub icon_base64: String,
     /// A certificate (or array of certificates if a certificate-chain is used) used to signed this APK, represented as a base64 encoded byte array.
-    #[serde(alias="certificateBase64s")]
+    #[serde(rename="certificateBase64s")]
     pub certificate_base64s: Vec<String>,
     /// The URL at which the APK is hosted. This must be an https URL.
-    #[serde(alias="externallyHostedUrl")]
+    #[serde(rename="externallyHostedUrl")]
     pub externally_hosted_url: String,
     /// The maximum SDK supported by this APK (optional).
-    #[serde(alias="maximumSdk")]
+    #[serde(rename="maximumSdk")]
     pub maximum_sdk: i32,
     /// The SHA256 checksum of this APK, represented as a base64 encoded byte array.
-    #[serde(alias="fileSha256Base64")]
+    #[serde(rename="fileSha256Base64")]
     pub file_sha256_base64: String,
     /// The permissions requested by this APK.
-    #[serde(alias="usesPermissions")]
+    #[serde(rename="usesPermissions")]
     pub uses_permissions: Vec<ExternallyHostedApkUsesPermission>,
     /// The SHA1 checksum of this APK, represented as a base64 encoded byte array.
-    #[serde(alias="fileSha1Base64")]
+    #[serde(rename="fileSha1Base64")]
     pub file_sha1_base64: String,
     /// The features required by this APK (optional).
-    #[serde(alias="usesFeatures")]
+    #[serde(rename="usesFeatures")]
     pub uses_features: Vec<String>,
     /// The native code environments supported by this APK (optional).
-    #[serde(alias="nativeCodes")]
+    #[serde(rename="nativeCodes")]
     pub native_codes: Vec<String>,
     /// The file size in bytes of this APK.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: String,
     /// The version name of this APK.
-    #[serde(alias="versionName")]
+    #[serde(rename="versionName")]
     pub version_name: String,
     /// The version code of this APK.
-    #[serde(alias="versionCode")]
+    #[serde(rename="versionCode")]
     pub version_code: i32,
     /// The minimum SDK targeted by this APK.
-    #[serde(alias="minimumSdk")]
+    #[serde(rename="minimumSdk")]
     pub minimum_sdk: i32,
     /// The application label.
-    #[serde(alias="applicationLabel")]
+    #[serde(rename="applicationLabel")]
     pub application_label: String,
     /// The package name.
-    #[serde(alias="packageName")]
+    #[serde(rename="packageName")]
     pub package_name: String,
 }
 
@@ -764,16 +764,16 @@ impl Part for ExternallyHostedApk {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppDetails {
     /// The user-visible support email for this app.
-    #[serde(alias="contactEmail")]
+    #[serde(rename="contactEmail")]
     pub contact_email: Option<String>,
     /// The user-visible support telephone number for this app.
-    #[serde(alias="contactPhone")]
+    #[serde(rename="contactPhone")]
     pub contact_phone: Option<String>,
     /// The user-visible website for this app.
-    #[serde(alias="contactWebsite")]
+    #[serde(rename="contactWebsite")]
     pub contact_website: Option<String>,
     /// Default language code, in BCP 47 format (eg "en-US").
-    #[serde(alias="defaultLanguage")]
+    #[serde(rename="defaultLanguage")]
     pub default_language: Option<String>,
 }
 
@@ -788,7 +788,7 @@ impl ResponseResult for AppDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsBatchResponseEntry {
     /// no description provided
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// no description provided
     pub inappproductsinsertresponse: InappproductsInsertResponse,
@@ -819,7 +819,7 @@ impl Part for InappproductsInsertRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternallyHostedApkUsesPermission {
     /// Optionally, the maximum SDK version for which the permission is required.
-    #[serde(alias="maxSdkVersion")]
+    #[serde(rename="maxSdkVersion")]
     pub max_sdk_version: i32,
     /// The name of the permission requested.
     pub name: String,
@@ -835,12 +835,12 @@ impl Part for ExternallyHostedApkUsesPermission {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InappproductsBatchRequestEntry {
     /// no description provided
-    #[serde(alias="batchId")]
+    #[serde(rename="batchId")]
     pub batch_id: u32,
     /// no description provided
     pub inappproductsinsertrequest: InappproductsInsertRequest,
     /// no description provided
-    #[serde(alias="methodName")]
+    #[serde(rename="methodName")]
     pub method_name: String,
     /// no description provided
     pub inappproductsupdaterequest: InappproductsUpdateRequest,
@@ -881,7 +881,7 @@ impl ResponseResult for TracksListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionPurchasesDeferResponse {
     /// The new expiry time for the subscription in milliseconds since the Epoch.
-    #[serde(alias="newExpiryTimeMillis")]
+    #[serde(rename="newExpiryTimeMillis")]
     pub new_expiry_time_millis: String,
 }
 
@@ -902,10 +902,10 @@ pub struct InappproductsListResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
     pub kind: String,
     /// no description provided
-    #[serde(alias="tokenPagination")]
+    #[serde(rename="tokenPagination")]
     pub token_pagination: TokenPagination,
     /// no description provided
-    #[serde(alias="pageInfo")]
+    #[serde(rename="pageInfo")]
     pub page_info: PageInfo,
     /// no description provided
     pub inappproduct: Vec<InAppProduct>,
@@ -921,10 +921,10 @@ impl ResponseResult for InappproductsListResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TokenPagination {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
-    #[serde(alias="previousPageToken")]
+    #[serde(rename="previousPageToken")]
     pub previous_page_token: String,
 }
 
@@ -945,7 +945,7 @@ impl Part for TokenPagination {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkListing {
     /// Describe what's new in your APK.
-    #[serde(alias="recentChanges")]
+    #[serde(rename="recentChanges")]
     pub recent_changes: Option<String>,
     /// The language code, in BCP 47 format (eg "en-US").
     pub language: Option<String>,
@@ -969,10 +969,10 @@ impl ResponseResult for ApkListing {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Testers {
     /// no description provided
-    #[serde(alias="googleGroups")]
+    #[serde(rename="googleGroups")]
     pub google_groups: Option<Vec<String>>,
     /// no description provided
-    #[serde(alias="googlePlusCommunities")]
+    #[serde(rename="googlePlusCommunities")]
     pub google_plus_communities: Option<Vec<String>>,
 }
 
@@ -994,10 +994,10 @@ impl ResponseResult for Testers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExpansionFile {
     /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.
-    #[serde(alias="referencesVersion")]
+    #[serde(rename="referencesVersion")]
     pub references_version: Option<i32>,
     /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: Option<String>,
 }
 
@@ -1017,7 +1017,7 @@ impl ResponseResult for ExpansionFile {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApksAddExternallyHostedResponse {
     /// The definition of the externally-hosted APK and where it is located.
-    #[serde(alias="externallyHostedApk")]
+    #[serde(rename="externallyHostedApk")]
     pub externally_hosted_apk: ExternallyHostedApk,
 }
 
@@ -1036,15 +1036,15 @@ impl ResponseResult for ApksAddExternallyHostedResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionPurchase {
     /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
-    #[serde(alias="autoRenewing")]
+    #[serde(rename="autoRenewing")]
     pub auto_renewing: bool,
     /// This kind represents a subscriptionPurchase object in the androidpublisher service.
     pub kind: String,
     /// Time at which the subscription will expire, in milliseconds since Epoch.
-    #[serde(alias="expiryTimeMillis")]
+    #[serde(rename="expiryTimeMillis")]
     pub expiry_time_millis: String,
     /// Time at which the subscription was granted, in milliseconds since Epoch.
-    #[serde(alias="startTimeMillis")]
+    #[serde(rename="startTimeMillis")]
     pub start_time_millis: String,
 }
 
@@ -1066,7 +1066,7 @@ impl ResponseResult for SubscriptionPurchase {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppEdit {
     /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
-    #[serde(alias="expiryTimeSeconds")]
+    #[serde(rename="expiryTimeSeconds")]
     pub expiry_time_seconds: Option<String>,
     /// The ID of the edit that can be used in subsequent API calls.
     pub id: Option<String>,
@@ -1116,13 +1116,13 @@ impl Part for InappproductsUpdateRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageInfo {
     /// no description provided
-    #[serde(alias="resultPerPage")]
+    #[serde(rename="resultPerPage")]
     pub result_per_page: i32,
     /// no description provided
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// no description provided
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1159,7 +1159,7 @@ impl ResponseResult for ImagesUploadResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Apk {
     /// The version code of the APK, as specified in the APK's manifest file.
-    #[serde(alias="versionCode")]
+    #[serde(rename="versionCode")]
     pub version_code: i32,
     /// Information about the binary payload of this APK.
     pub binary: ApkBinary,
@@ -1217,7 +1217,7 @@ impl Part for Image {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ApksAddExternallyHostedRequest {
     /// The definition of the externally-hosted APK and where it is located.
-    #[serde(alias="externallyHostedApk")]
+    #[serde(rename="externallyHostedApk")]
     pub externally_hosted_apk: Option<ExternallyHostedApk>,
 }
 
@@ -1246,7 +1246,7 @@ pub struct Price {
     /// 3 letter Currency code, as defined by ISO 4217.
     pub currency: String,
     /// The price in millionths of the currency base unit represented as a string.
-    #[serde(alias="priceMicros")]
+    #[serde(rename="priceMicros")]
     pub price_micros: String,
 }
 

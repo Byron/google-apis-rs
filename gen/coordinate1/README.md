@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-coordinate1` library allows access to all features of the *Google coordinate* service.
 
-This documentation was generated from *coordinate* crate version *0.1.3+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+This documentation was generated from *coordinate* crate version *0.1.4+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 
 Everything else about the *coordinate* *v1* API can be found at the
 [official documentation site](https://developers.google.com/coordinate/).

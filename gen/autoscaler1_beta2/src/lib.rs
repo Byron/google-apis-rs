@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *autoscaler* crate version *0.1.3+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *autoscaler* crate version *0.1.4+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *autoscaler* *v1_beta2* API can be found at the
 //! [official documentation site](http://developers.google.com/compute/docs/autoscaler).
@@ -315,7 +315,7 @@ impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
         AutoscalerHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -400,19 +400,19 @@ pub struct Zone {
     /// no description provided
     pub description: Option<String>,
     /// no description provided
-    #[serde(alias="maintenanceWindows")]
+    #[serde(rename="maintenanceWindows")]
     pub maintenance_windows: Option<Vec<ZoneMaintenanceWindows>>,
     /// no description provided
     pub deprecated: Option<DeprecationStatus>,
     /// no description provided
     pub region: Option<String>,
     /// no description provided
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// no description provided
     pub id: Option<String>,
     /// Server defined URL for the resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// no description provided
     pub name: Option<String>,
@@ -451,7 +451,7 @@ impl Part for OperationWarnings {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub items: Vec<Operation>,
@@ -460,7 +460,7 @@ pub struct OperationList {
     /// no description provided
     pub id: String,
     /// no description provided
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -474,12 +474,12 @@ impl ResponseResult for OperationList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneMaintenanceWindows {
     /// no description provided
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// no description provided
     pub description: String,
     /// no description provided
-    #[serde(alias="beginTime")]
+    #[serde(rename="beginTime")]
     pub begin_time: String,
     /// no description provided
     pub name: String,
@@ -498,10 +498,10 @@ pub struct AutoscalingPolicyCustomMetricUtilization {
     /// Identifier of the metric. It should be a Cloud Monitoring metric. The metric can not have negative values. The metric should be an utilization metric (increasing number of VMs handling requests x times should reduce average value of the metric roughly x times). For example you could use: compute.googleapis.com/instance/network/received_bytes_count.
     pub metric: String,
     /// Defines type in which utilization_target is expressed.
-    #[serde(alias="utilizationTargetType")]
+    #[serde(rename="utilizationTargetType")]
     pub utilization_target_type: String,
     /// Target value of the metric which Autoscaler should maintain. Must be a positive value.
-    #[serde(alias="utilizationTarget")]
+    #[serde(rename="utilizationTarget")]
     pub utilization_target: f64,
 }
 
@@ -533,22 +533,22 @@ impl Part for OperationErrorErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicy {
     /// Configuration parameters of autoscaling based on custom metric.
-    #[serde(alias="customMetricUtilizations")]
+    #[serde(rename="customMetricUtilizations")]
     pub custom_metric_utilizations: Vec<AutoscalingPolicyCustomMetricUtilization>,
     /// The maximum number of replicas that the Autoscaler can scale up to.
-    #[serde(alias="maxNumReplicas")]
+    #[serde(rename="maxNumReplicas")]
     pub max_num_replicas: i32,
     /// Exactly one utilization policy should be provided. Configuration parameters of CPU based autoscaling policy.
-    #[serde(alias="cpuUtilization")]
+    #[serde(rename="cpuUtilization")]
     pub cpu_utilization: AutoscalingPolicyCpuUtilization,
     /// The minimum number of replicas that the Autoscaler can scale down to.
-    #[serde(alias="minNumReplicas")]
+    #[serde(rename="minNumReplicas")]
     pub min_num_replicas: i32,
     /// The number of seconds that the Autoscaler should wait between two succeeding changes to the number of virtual machines. You should define an interval that is at least as long as the initialization time of a virtual machine and the time it may take for replica pool to create the virtual machine. The default is 60 seconds.
-    #[serde(alias="coolDownPeriodSec")]
+    #[serde(rename="coolDownPeriodSec")]
     pub cool_down_period_sec: i32,
     /// Configuration parameters of autoscaling based on load balancer.
-    #[serde(alias="loadBalancingUtilization")]
+    #[serde(rename="loadBalancingUtilization")]
     pub load_balancing_utilization: AutoscalingPolicyLoadBalancingUtilization,
 }
 
@@ -576,7 +576,7 @@ impl Part for OperationError {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyCpuUtilization {
     /// The target utilization that the Autoscaler should maintain. It is represented as a fraction of used cores. For example: 6 cores used in 8-core VM are represented here as 0.75. Must be a float value between (0, 1]. If not defined, the default is 0.8.
-    #[serde(alias="utilizationTarget")]
+    #[serde(rename="utilizationTarget")]
     pub utilization_target: f64,
 }
 
@@ -590,7 +590,7 @@ impl Part for AutoscalingPolicyCpuUtilization {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyLoadBalancingUtilization {
     /// Fraction of backend capacity utilization (set in HTTP load balancing configuration) that Autoscaler should maintain. Must be a positive float value. If not defined, the default is 0.8. For example if your maxRatePerInstance capacity (in HTTP Load Balancing configuration) is set at 10 and you would like to keep number of instances such that each instance receives 7 QPS on average, set this to 0.7.
-    #[serde(alias="utilizationTarget")]
+    #[serde(rename="utilizationTarget")]
     pub utilization_target: f64,
 }
 
@@ -609,7 +609,7 @@ impl Part for AutoscalingPolicyLoadBalancingUtilization {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AutoscalerListResponse {
     /// [Output only] A token used to continue a truncated list request.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Autoscaler resources.
     pub items: Vec<Autoscaler>,
@@ -638,26 +638,26 @@ pub struct Operation {
     /// no description provided
     pub status: String,
     /// no description provided
-    #[serde(alias="insertTime")]
+    #[serde(rename="insertTime")]
     pub insert_time: String,
     /// no description provided
     pub warnings: Vec<OperationWarnings>,
     /// no description provided
     pub error: OperationError,
     /// no description provided
-    #[serde(alias="targetId")]
+    #[serde(rename="targetId")]
     pub target_id: String,
     /// no description provided
-    #[serde(alias="targetLink")]
+    #[serde(rename="targetLink")]
     pub target_link: String,
     /// no description provided
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// no description provided
-    #[serde(alias="clientOperationId")]
+    #[serde(rename="clientOperationId")]
     pub client_operation_id: String,
     /// no description provided
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: String,
     /// no description provided
     pub id: String,
@@ -670,24 +670,24 @@ pub struct Operation {
     /// no description provided
     pub region: String,
     /// no description provided
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// no description provided
-    #[serde(alias="operationType")]
+    #[serde(rename="operationType")]
     pub operation_type: String,
     /// no description provided
-    #[serde(alias="httpErrorMessage")]
+    #[serde(rename="httpErrorMessage")]
     pub http_error_message: String,
     /// no description provided
     pub progress: i32,
     /// no description provided
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// no description provided
-    #[serde(alias="httpErrorStatusCode")]
+    #[serde(rename="httpErrorStatusCode")]
     pub http_error_status_code: i32,
     /// no description provided
-    #[serde(alias="statusMessage")]
+    #[serde(rename="statusMessage")]
     pub status_message: String,
     /// no description provided
     pub user: String,
@@ -708,7 +708,7 @@ impl ResponseResult for Operation {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneList {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// no description provided
     pub items: Vec<Zone>,
@@ -717,7 +717,7 @@ pub struct ZoneList {
     /// no description provided
     pub id: String,
     /// Server defined URL for this resource (output only).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -747,15 +747,15 @@ pub struct Autoscaler {
     /// Name of the Autoscaler resource. Must be unique per project and zone.
     pub name: Option<String>,
     /// Configuration parameters for autoscaling algorithm.
-    #[serde(alias="autoscalingPolicy")]
+    #[serde(rename="autoscalingPolicy")]
     pub autoscaling_policy: Option<AutoscalingPolicy>,
     /// [Output Only] Creation timestamp in RFC3339 text format.
-    #[serde(alias="creationTimestamp")]
+    #[serde(rename="creationTimestamp")]
     pub creation_timestamp: Option<String>,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
     /// [Output Only] A self-link to the Autoscaler configuration resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// URL to the entity which will be autoscaled. Currently the only supported value is ReplicaPool?s URL. Note: it is illegal to specify multiple Autoscalers for the same target.
     pub target: Option<String>,

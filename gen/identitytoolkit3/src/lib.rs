@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *0.1.3+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Identity Toolkit* crate version *0.1.4+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -286,7 +286,7 @@ impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
         IdentityToolkit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -296,7 +296,7 @@ impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -324,23 +324,23 @@ pub struct Relyingparty {
     /// The fixed string "identitytoolkit#relyingparty".
     pub kind: Option<String>,
     /// The request type.
-    #[serde(alias="requestType")]
+    #[serde(rename="requestType")]
     pub request_type: Option<String>,
     /// The user's Gitkit login token for email change.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// The recaptcha challenge presented to the user.
     pub challenge: Option<String>,
     /// The new email if the code is for email change.
-    #[serde(alias="newEmail")]
+    #[serde(rename="newEmail")]
     pub new_email: Option<String>,
     /// The IP address of the user.
-    #[serde(alias="userIp")]
+    #[serde(rename="userIp")]
     pub user_ip: Option<String>,
     /// The email of the user.
     pub email: Option<String>,
     /// The recaptcha response from the user.
-    #[serde(alias="captchaResp")]
+    #[serde(rename="captchaResp")]
     pub captcha_resp: Option<String>,
 }
 
@@ -361,18 +361,18 @@ pub struct CreateAuthUriResponse {
     /// The fixed string identitytoolkit#CreateAuthUriResponse".
     pub kind: String,
     /// True if captcha is required.
-    #[serde(alias="captchaRequired")]
+    #[serde(rename="captchaRequired")]
     pub captcha_required: bool,
     /// The URI used by the IDP to authenticate the user.
-    #[serde(alias="authUri")]
+    #[serde(rename="authUri")]
     pub auth_uri: String,
     /// Whether the user is registered if the identifier is an email.
     pub registered: bool,
     /// The provider ID of the auth URI.
-    #[serde(alias="providerId")]
+    #[serde(rename="providerId")]
     pub provider_id: String,
     /// True if the authUri is for user's existing provider.
-    #[serde(alias="forExistingProvider")]
+    #[serde(rename="forExistingProvider")]
     pub for_existing_provider: bool,
 }
 
@@ -391,30 +391,30 @@ impl ResponseResult for CreateAuthUriResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
     /// The name of the user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The local ID of the user.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: Option<String>,
     /// Mark the user to upgrade to federated login.
-    #[serde(alias="upgradeToFederatedLogin")]
+    #[serde(rename="upgradeToFederatedLogin")]
     pub upgrade_to_federated_login: Option<bool>,
     /// Response to the captcha.
-    #[serde(alias="captchaResponse")]
+    #[serde(rename="captchaResponse")]
     pub captcha_response: Option<String>,
     /// The GITKit token of the authenticated user.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// Mark the email as verified or not.
-    #[serde(alias="emailVerified")]
+    #[serde(rename="emailVerified")]
     pub email_verified: Option<bool>,
     /// The captcha challenge.
-    #[serde(alias="captchaChallenge")]
+    #[serde(rename="captchaChallenge")]
     pub captcha_challenge: Option<String>,
     /// The associated IDPs of the user.
     pub provider: Option<Vec<String>>,
     /// The out-of-band code of the change email request.
-    #[serde(alias="oobCode")]
+    #[serde(rename="oobCode")]
     pub oob_code: Option<String>,
     /// The new password of the user.
     pub password: Option<String>,
@@ -437,7 +437,7 @@ impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
     /// The local ID of the user.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: Option<String>,
 }
 
@@ -458,7 +458,7 @@ pub struct GetOobConfirmationCodeResponse {
     /// The fixed string "identitytoolkit#GetOobConfirmationCodeResponse".
     pub kind: String,
     /// The code to be send to the user.
-    #[serde(alias="oobCode")]
+    #[serde(rename="oobCode")]
     pub oob_code: String,
 }
 
@@ -477,12 +477,12 @@ impl ResponseResult for GetOobConfirmationCodeResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
     /// The GITKit token of the authenticated user.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// The list of emails of the users to inquiry.
     pub email: Option<Vec<String>>,
     /// The list of local ID's of the users to inquiry.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: Option<Vec<String>>,
 }
 
@@ -501,7 +501,7 @@ impl RequestValue for IdentitytoolkitRelyingpartyGetAccountInfoRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadAccountResponse {
     /// The next page token. To be used in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The fixed string "identitytoolkit#DownloadAccountResponse".
     pub kind: String,
@@ -524,13 +524,13 @@ impl ResponseResult for DownloadAccountResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
     /// The new password inputted by the user.
-    #[serde(alias="newPassword")]
+    #[serde(rename="newPassword")]
     pub new_password: Option<String>,
     /// The old password inputted by the user.
-    #[serde(alias="oldPassword")]
+    #[serde(rename="oldPassword")]
     pub old_password: Option<String>,
     /// The confirmation code.
-    #[serde(alias="oobCode")]
+    #[serde(rename="oobCode")]
     pub oob_code: Option<String>,
     /// The email address of the user.
     pub email: Option<String>,
@@ -551,80 +551,80 @@ impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VerifyAssertionResponse {
     /// The unique ID identifies the IdP account.
-    #[serde(alias="federatedId")]
+    #[serde(rename="federatedId")]
     pub federated_id: String,
     /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: String,
     /// The URI of the public accessible profiel picture.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
     /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
-    #[serde(alias="inputEmail")]
+    #[serde(rename="inputEmail")]
     pub input_email: String,
     /// The value is true if the IDP is also the email provider. It means the user owns the email.
-    #[serde(alias="emailVerified")]
+    #[serde(rename="emailVerified")]
     pub email_verified: bool,
     /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.
-    #[serde(alias="needConfirmation")]
+    #[serde(rename="needConfirmation")]
     pub need_confirmation: bool,
     /// The custom scheme used by mobile app.
-    #[serde(alias="appScheme")]
+    #[serde(rename="appScheme")]
     pub app_scheme: String,
     /// The full name of the user.
-    #[serde(alias="fullName")]
+    #[serde(rename="fullName")]
     pub full_name: String,
     /// URL for OTA app installation.
-    #[serde(alias="appInstallationUrl")]
+    #[serde(rename="appInstallationUrl")]
     pub app_installation_url: String,
     /// The fixed string "identitytoolkit#VerifyAssertionResponse".
     pub kind: String,
     /// The display name of the user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The first name of the user.
-    #[serde(alias="firstName")]
+    #[serde(rename="firstName")]
     pub first_name: String,
     /// The language preference of the user.
     pub language: String,
     /// The ID token.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: String,
     /// When action is 'map', contains the idps which can be used for confirmation.
-    #[serde(alias="verifiedProvider")]
+    #[serde(rename="verifiedProvider")]
     pub verified_provider: Vec<String>,
     /// The scope for the OpenID OAuth extension.
-    #[serde(alias="oauthScope")]
+    #[serde(rename="oauthScope")]
     pub oauth_scope: String,
     /// The user approved request token for the OpenID OAuth extension.
-    #[serde(alias="oauthRequestToken")]
+    #[serde(rename="oauthRequestToken")]
     pub oauth_request_token: String,
     /// The birth date of the IdP account.
-    #[serde(alias="dateOfBirth")]
+    #[serde(rename="dateOfBirth")]
     pub date_of_birth: String,
     /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
-    #[serde(alias="originalEmail")]
+    #[serde(rename="originalEmail")]
     pub original_email: String,
     /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.
-    #[serde(alias="providerId")]
+    #[serde(rename="providerId")]
     pub provider_id: String,
     /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
     pub context: String,
     /// The last name of the user.
-    #[serde(alias="lastName")]
+    #[serde(rename="lastName")]
     pub last_name: String,
     /// The action code.
     pub action: String,
     /// The timezone of the user.
-    #[serde(alias="timeZone")]
+    #[serde(rename="timeZone")]
     pub time_zone: String,
     /// The nick name of the user.
-    #[serde(alias="nickName")]
+    #[serde(rename="nickName")]
     pub nick_name: String,
     /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: String,
     /// It's true if the email is recycled.
-    #[serde(alias="emailRecycled")]
+    #[serde(rename="emailRecycled")]
     pub email_recycled: bool,
 }
 
@@ -679,18 +679,18 @@ impl ResponseResult for UploadAccountResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     /// The password hash algorithm.
-    #[serde(alias="hashAlgorithm")]
+    #[serde(rename="hashAlgorithm")]
     pub hash_algorithm: Option<String>,
     /// Memory cost for hash calculation. Used by scrypt similar algorithms.
-    #[serde(alias="memoryCost")]
+    #[serde(rename="memoryCost")]
     pub memory_cost: Option<i32>,
     /// The account info to be stored.
     pub users: Option<Vec<UserInfo>>,
     /// The salt separator.
-    #[serde(alias="saltSeparator")]
+    #[serde(rename="saltSeparator")]
     pub salt_separator: Option<String>,
     /// The key for to hash the password.
-    #[serde(alias="signerKey")]
+    #[serde(rename="signerKey")]
     pub signer_key: Option<String>,
     /// Rounds for hash calculation. Used by scrypt and similar algorithms.
     pub rounds: Option<i32>,
@@ -713,16 +713,16 @@ pub struct VerifyPasswordResponse {
     /// The fixed string "identitytoolkit#VerifyPasswordResponse".
     pub kind: String,
     /// The name of the user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: String,
     /// The URI of the user's photo at IdP
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
     /// The GITKit token for authenticated user.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: String,
     /// Whether the email is registered.
     pub registered: bool,
@@ -783,24 +783,24 @@ impl ResponseResult for DeleteAccountResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyCreateAuthUriRequest {
     /// Optional realm for OpenID protocol. The sub string "scheme://domain:port" of the param "continueUri" is used if this is not set.
-    #[serde(alias="openidRealm")]
+    #[serde(rename="openidRealm")]
     pub openid_realm: Option<String>,
     /// The relying party OAuth client ID.
-    #[serde(alias="clientId")]
+    #[serde(rename="clientId")]
     pub client_id: Option<String>,
     /// The native app package for OTA installation.
-    #[serde(alias="otaApp")]
+    #[serde(rename="otaApp")]
     pub ota_app: Option<String>,
     /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(alias="providerId")]
+    #[serde(rename="providerId")]
     pub provider_id: Option<String>,
     /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
     pub context: Option<String>,
     /// The app ID of the mobile app, base64(CERT_SHA1):PACKAGE_NAME for Android, BUNDLE_ID for iOS.
-    #[serde(alias="appId")]
+    #[serde(rename="appId")]
     pub app_id: Option<String>,
     /// The URI to which the IDP redirects the user after the federated login flow.
-    #[serde(alias="continueUri")]
+    #[serde(rename="continueUri")]
     pub continue_uri: Option<String>,
     /// The email or federated ID of the user.
     pub identifier: Option<String>,
@@ -816,16 +816,16 @@ impl RequestValue for IdentitytoolkitRelyingpartyCreateAuthUriRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfoProviderUserInfo {
     /// User's identifier at IDP.
-    #[serde(alias="federatedId")]
+    #[serde(rename="federatedId")]
     pub federated_id: String,
     /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(alias="providerId")]
+    #[serde(rename="providerId")]
     pub provider_id: String,
     /// The user's display name at the IDP.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The user's photo url at the IDP.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
 }
 
@@ -860,17 +860,17 @@ impl ResponseResult for IdentitytoolkitRelyingpartyGetPublicKeysResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
     /// Response to the captcha.
-    #[serde(alias="captchaResponse")]
+    #[serde(rename="captchaResponse")]
     pub captcha_response: Option<String>,
     /// The captcha challenge.
-    #[serde(alias="captchaChallenge")]
+    #[serde(rename="captchaChallenge")]
     pub captcha_challenge: Option<String>,
     /// The password inputed by the user.
     pub password: Option<String>,
     /// The email of the user.
     pub email: Option<String>,
     /// The GITKit token for the non-trusted IDP, which is to be confirmed by the user.
-    #[serde(alias="pendingIdToken")]
+    #[serde(rename="pendingIdToken")]
     pub pending_id_token: Option<String>,
 }
 
@@ -889,10 +889,10 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyDownloadAccountRequest {
     /// The token for the next page. This should be taken from the previous response.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The max number of results to return in the response.
-    #[serde(alias="maxResults")]
+    #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
 }
 
@@ -906,13 +906,13 @@ impl RequestValue for IdentitytoolkitRelyingpartyDownloadAccountRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SetAccountInfoResponseProviderUserInfo {
     /// The IdP ID. For whitelisted IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
-    #[serde(alias="providerId")]
+    #[serde(rename="providerId")]
     pub provider_id: String,
     /// The user's display name at the IDP.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The user's photo url at the IDP.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
 }
 
@@ -952,13 +952,13 @@ impl ResponseResult for GetAccountInfoResponse {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
     /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.
-    #[serde(alias="requestUri")]
+    #[serde(rename="requestUri")]
     pub request_uri: Option<String>,
     /// The post body if the request is a HTTP POST.
-    #[serde(alias="postBody")]
+    #[serde(rename="postBody")]
     pub post_body: Option<String>,
     /// The GITKit token for the non-trusted IDP pending to be confirmed by the user.
-    #[serde(alias="pendingIdToken")]
+    #[serde(rename="pendingIdToken")]
     pub pending_id_token: Option<String>,
 }
 
@@ -977,17 +977,17 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SetAccountInfoResponse {
     /// The Gitkit id token to login the newly sign up user.
-    #[serde(alias="idToken")]
+    #[serde(rename="idToken")]
     pub id_token: String,
     /// The fixed string "identitytoolkit#SetAccountInfoResponse".
     pub kind: String,
     /// The name of the user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The email of the user.
     pub email: String,
     /// The user's profiles at the associated IdPs.
-    #[serde(alias="providerUserInfo")]
+    #[serde(rename="providerUserInfo")]
     pub provider_user_info: Vec<SetAccountInfoResponseProviderUserInfo>,
 }
 
@@ -1001,27 +1001,27 @@ impl ResponseResult for SetAccountInfoResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfo {
     /// The name of the user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The local ID of the user.
-    #[serde(alias="localId")]
+    #[serde(rename="localId")]
     pub local_id: String,
     /// The URL of the user profile photo.
-    #[serde(alias="photoUrl")]
+    #[serde(rename="photoUrl")]
     pub photo_url: String,
     /// Whether the email has been verified.
-    #[serde(alias="emailVerified")]
+    #[serde(rename="emailVerified")]
     pub email_verified: bool,
     /// The user's hashed password.
-    #[serde(alias="passwordHash")]
+    #[serde(rename="passwordHash")]
     pub password_hash: String,
     /// Version of the user's password.
     pub version: i32,
     /// The IDP of the user.
-    #[serde(alias="providerUserInfo")]
+    #[serde(rename="providerUserInfo")]
     pub provider_user_info: Vec<UserInfoProviderUserInfo>,
     /// The timestamp when the password was last updated.
-    #[serde(alias="passwordUpdatedAt")]
+    #[serde(rename="passwordUpdatedAt")]
     pub password_updated_at: f64,
     /// The user's password salt.
     pub salt: String,

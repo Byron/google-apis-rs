@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *0.1.3+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *analytics* crate version *0.1.4+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -343,7 +343,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
         Analytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -362,7 +362,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,25 +405,25 @@ pub struct CustomMetric {
     /// Time the custom metric was last modified.
     pub updated: Option<String>,
     /// Property ID.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// Boolean indicating whether the custom metric is active.
     pub active: Option<bool>,
     /// Scope of the custom metric: HIT or PRODUCT.
     pub scope: Option<String>,
     /// Parent link for the custom metric. Points to the property to which the custom metric belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<CustomMetricParentLink>,
     /// Data type of custom metric.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Custom metric ID.
     pub id: Option<String>,
     /// Link for the custom metric
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -448,49 +448,49 @@ pub struct Goal {
     /// Time this goal was last modified.
     pub updated: Option<String>,
     /// Internal ID for the web property to which this goal belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
     /// Web property ID to which this goal belongs. The web property ID is of the form UA-XXXXX-YY.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// Determines whether this goal is active.
     pub active: Option<bool>,
     /// Goal ID.
     pub id: Option<String>,
     /// Account ID to which this goal belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Resource type for an Analytics goal.
     pub kind: Option<String>,
     /// Details for the goal of the type VISIT_TIME_ON_SITE.
-    #[serde(alias="visitTimeOnSiteDetails")]
+    #[serde(rename="visitTimeOnSiteDetails")]
     pub visit_time_on_site_details: Option<GoalVisitTimeOnSiteDetails>,
     /// Goal name.
     pub name: Option<String>,
     /// Time this goal was created.
     pub created: Option<String>,
     /// Goal type. Possible values are URL_DESTINATION, VISIT_TIME_ON_SITE, VISIT_NUM_PAGES, AND EVENT.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Details for the goal of the type VISIT_NUM_PAGES.
-    #[serde(alias="visitNumPagesDetails")]
+    #[serde(rename="visitNumPagesDetails")]
     pub visit_num_pages_details: Option<GoalVisitNumPagesDetails>,
     /// Goal value.
     pub value: Option<f32>,
     /// Details for the goal of the type EVENT.
-    #[serde(alias="eventDetails")]
+    #[serde(rename="eventDetails")]
     pub event_details: Option<GoalEventDetails>,
     /// View (Profile) ID to which this goal belongs.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: Option<String>,
     /// Parent link for a goal. Points to the view (profile) to which this goal belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<GoalParentLink>,
     /// Details for the goal of the type URL_DESTINATION.
-    #[serde(alias="urlDestinationDetails")]
+    #[serde(rename="urlDestinationDetails")]
     pub url_destination_details: Option<GoalUrlDestinationDetails>,
     /// Link for this goal.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -523,7 +523,7 @@ pub struct FilterRef {
     /// Link for this filter.
     pub href: String,
     /// Account ID to which this filter belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// Filter ID.
     pub id: String,
@@ -541,10 +541,10 @@ impl Part for FilterRef {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalEventDetails {
     /// List of event conditions.
-    #[serde(alias="eventConditions")]
+    #[serde(rename="eventConditions")]
     pub event_conditions: Vec<GoalEventDetailsEventConditions>,
     /// Determines if the event value should be used as the value for this goal.
-    #[serde(alias="useEventValue")]
+    #[serde(rename="useEventValue")]
     pub use_event_value: bool,
 }
 
@@ -564,7 +564,7 @@ impl Part for GoalEventDetails {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AnalyticsDataimportDeleteUploadDataRequest {
     /// A list of upload UIDs.
-    #[serde(alias="customDataImportUids")]
+    #[serde(rename="customDataImportUids")]
     pub custom_data_import_uids: Option<Vec<String>>,
 }
 
@@ -578,22 +578,22 @@ impl RequestValue for AnalyticsDataimportDeleteUploadDataRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// Table ID for view (profile).
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: String,
     /// Web Property ID to which this view (profile) belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: String,
     /// View (Profile) ID.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// View (Profile) name.
-    #[serde(alias="profileName")]
+    #[serde(rename="profileName")]
     pub profile_name: String,
     /// Account ID to which this view (profile) belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -608,7 +608,7 @@ impl Part for RealtimeDataProfileInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataQuery {
     /// Maximum results per page.
-    #[serde(alias="max-results")]
+    #[serde(rename="max-results")]
     pub max_results: i32,
     /// List of dimensions or metrics based on which real time data is sorted.
     pub sort: Vec<String>,
@@ -639,13 +639,13 @@ pub struct ProfileRef {
     /// Name of this view (profile).
     pub name: String,
     /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: String,
     /// Account ID to which this view (profile) belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// Internal ID for the web property to which this view (profile) belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// View (Profile) ID.
     pub id: String,
@@ -670,41 +670,41 @@ pub struct McfData {
     /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<McfDataRows>>,
     /// Determines if the Analytics data contains sampled data.
-    #[serde(alias="containsSampledData")]
+    #[serde(rename="containsSampledData")]
     pub contains_sampled_data: bool,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
-    #[serde(alias="columnHeaders")]
+    #[serde(rename="columnHeaders")]
     pub column_headers: Vec<McfDataColumnHeaders>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
-    #[serde(alias="totalsForAllResults")]
+    #[serde(rename="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
     /// Link to next page for this Analytics data query.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The number of samples used to calculate the result.
-    #[serde(alias="sampleSize")]
+    #[serde(rename="sampleSize")]
     pub sample_size: String,
     /// Analytics data request query parameters.
     pub query: McfDataQuery,
     /// Link to previous page for this Analytics data query.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// Information for the view (profile), for which the Analytics data was requested.
-    #[serde(alias="profileInfo")]
+    #[serde(rename="profileInfo")]
     pub profile_info: McfDataProfileInfo,
     /// Unique ID for this data response.
     pub id: String,
     /// Link to this page.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Total size of the sample space from which the samples were selected.
-    #[serde(alias="sampleSpace")]
+    #[serde(rename="sampleSpace")]
     pub sample_space: String,
 }
 
@@ -729,19 +729,19 @@ pub struct CustomDataSources {
     /// Collection of custom data sources.
     pub items: Vec<CustomDataSource>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this custom data source collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this custom data source collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -766,19 +766,19 @@ pub struct Goals {
     /// A list of goals.
     pub items: Vec<Goal>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this goal collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this goal collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of resources in the result.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -800,12 +800,12 @@ pub struct Account {
     /// Time the account was last modified.
     pub updated: String,
     /// Child link for an account entry. Points to the list of web properties for this account.
-    #[serde(alias="childLink")]
+    #[serde(rename="childLink")]
     pub child_link: AccountChildLink,
     /// Account ID.
     pub id: String,
     /// Link for this account.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Permissions the user has for this account.
     pub permissions: AccountPermissions,
@@ -826,18 +826,18 @@ impl Part for Account {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaData {
     /// Determines if Analytics data contains samples.
-    #[serde(alias="containsSampledData")]
+    #[serde(rename="containsSampledData")]
     pub contains_sampled_data: bool,
     /// Link to previous page for this Analytics data query.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// no description provided
-    #[serde(alias="dataTable")]
+    #[serde(rename="dataTable")]
     pub data_table: GaDataDataTable,
     /// Analytics data request query parameters.
     pub query: GaDataQuery,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
-    #[serde(alias="totalsForAllResults")]
+    #[serde(rename="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
     /// Unique ID for this data response.
     pub id: String,
@@ -846,28 +846,28 @@ pub struct GaData {
     /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<String>>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to next page for this Analytics data query.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The number of samples used to calculate the result.
-    #[serde(alias="sampleSize")]
+    #[serde(rename="sampleSize")]
     pub sample_size: String,
     /// Information for the view (profile), for which the Analytics data was requested.
-    #[serde(alias="profileInfo")]
+    #[serde(rename="profileInfo")]
     pub profile_info: GaDataProfileInfo,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
-    #[serde(alias="columnHeaders")]
+    #[serde(rename="columnHeaders")]
     pub column_headers: Vec<GaDataColumnHeaders>,
     /// Link to this page.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Total size of the sample space from which the samples were selected.
-    #[serde(alias="sampleSpace")]
+    #[serde(rename="sampleSpace")]
     pub sample_space: String,
 }
 
@@ -883,7 +883,7 @@ pub struct ExperimentParentLink {
     /// Link to the view (profile) to which this experiment belongs. This field is read-only.
     pub href: String,
     /// Value is "analytics#profile". This field is read-only.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -908,32 +908,32 @@ pub struct UnsampledReport {
     /// Time this unsampled report was last modified.
     pub updated: Option<String>,
     /// The type of download you need to use for the report data file.
-    #[serde(alias="downloadType")]
+    #[serde(rename="downloadType")]
     pub download_type: Option<String>,
     /// The start date for the unsampled report.
-    #[serde(alias="start-date")]
+    #[serde(rename="start-date")]
     pub start_date: Option<String>,
     /// Download details for a file stored in Google Drive.
-    #[serde(alias="driveDownloadDetails")]
+    #[serde(rename="driveDownloadDetails")]
     pub drive_download_details: Option<UnsampledReportDriveDownloadDetails>,
     /// The metrics for the unsampled report.
     pub metrics: Option<String>,
     /// The filters for the unsampled report.
     pub filters: Option<String>,
     /// Web property ID to which this unsampled report belongs. The web property ID is of the form UA-XXXXX-YY.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// The segment for the unsampled report.
     pub segment: Option<String>,
     /// Unsampled report ID.
     pub id: Option<String>,
     /// Account ID to which this unsampled report belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Resource type for an Analytics unsampled report.
     pub kind: Option<String>,
     /// Download details for a file stored in Google Cloud Storage.
-    #[serde(alias="cloudStorageDownloadDetails")]
+    #[serde(rename="cloudStorageDownloadDetails")]
     pub cloud_storage_download_details: Option<UnsampledReportCloudStorageDownloadDetails>,
     /// The dimensions for the unsampled report.
     pub dimensions: Option<String>,
@@ -942,13 +942,13 @@ pub struct UnsampledReport {
     /// Title of the unsampled report.
     pub title: Option<String>,
     /// View (Profile) ID to which this unsampled report belongs.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: Option<String>,
     /// The end date for the unsampled report.
-    #[serde(alias="end-date")]
+    #[serde(rename="end-date")]
     pub end_date: Option<String>,
     /// Link for this unsampled report.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -965,7 +965,7 @@ pub struct WebpropertyParentLink {
     /// Link to the account for this web property.
     pub href: String,
     /// Type of the parent link. Its value is "analytics#account".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -982,7 +982,7 @@ pub struct ProfileParentLink {
     /// Link to the web property to which this view (profile) belongs.
     pub href: String,
     /// Value is "analytics#webproperty".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -1025,19 +1025,19 @@ pub struct Accounts {
     /// A list of accounts.
     pub items: Vec<Account>,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Previous link for this account collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Next link for this account collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1051,34 +1051,34 @@ impl ResponseResult for Accounts {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterAdvancedDetails {
     /// Field A.
-    #[serde(alias="fieldA")]
+    #[serde(rename="fieldA")]
     pub field_a: String,
     /// Indicates if the existing value of the output field, if any, should be overridden by the output expression.
-    #[serde(alias="overrideOutputField")]
+    #[serde(rename="overrideOutputField")]
     pub override_output_field: bool,
     /// Indicates if field A is required to match.
-    #[serde(alias="fieldARequired")]
+    #[serde(rename="fieldARequired")]
     pub field_a_required: bool,
     /// Expression used to construct the output value.
-    #[serde(alias="outputConstructor")]
+    #[serde(rename="outputConstructor")]
     pub output_constructor: String,
     /// Indicates if field B is required to match.
-    #[serde(alias="fieldBRequired")]
+    #[serde(rename="fieldBRequired")]
     pub field_b_required: bool,
     /// Indicates if the filter expressions are case sensitive.
-    #[serde(alias="caseSensitive")]
+    #[serde(rename="caseSensitive")]
     pub case_sensitive: bool,
     /// Field B.
-    #[serde(alias="fieldB")]
+    #[serde(rename="fieldB")]
     pub field_b: String,
     /// Expression to extract from field B.
-    #[serde(alias="extractB")]
+    #[serde(rename="extractB")]
     pub extract_b: String,
     /// Expression to extract from field A.
-    #[serde(alias="extractA")]
+    #[serde(rename="extractA")]
     pub extract_a: String,
     /// Output field.
-    #[serde(alias="outputToField")]
+    #[serde(rename="outputToField")]
     pub output_to_field: String,
 }
 
@@ -1093,7 +1093,7 @@ impl Part for FilterAdvancedDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WebPropertySummary {
     /// Website url for this web property.
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: String,
     /// Resource type for Analytics WebPropertySummary.
     pub kind: String,
@@ -1102,7 +1102,7 @@ pub struct WebPropertySummary {
     /// Level for this web property. Possible values are STANDARD or PREMIUM.
     pub level: String,
     /// Internal ID for this web property.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// List of profiles under this web property.
     pub profiles: Vec<ProfileSummary>,
@@ -1135,7 +1135,7 @@ pub struct AccountTicket {
     /// Resource type for account ticket.
     pub kind: Option<String>,
     /// Redirect URI where the user will be sent after accepting Terms of Service. Must be configured in APIs console as a callback URL.
-    #[serde(alias="redirectUri")]
+    #[serde(rename="redirectUri")]
     pub redirect_uri: Option<String>,
 }
 
@@ -1150,22 +1150,22 @@ impl ResponseResult for AccountTicket {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// Table ID for view (profile).
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: String,
     /// Web Property ID to which this view (profile) belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: String,
     /// View (Profile) ID.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// View (Profile) name.
-    #[serde(alias="profileName")]
+    #[serde(rename="profileName")]
     pub profile_name: String,
     /// Account ID to which this view (profile) belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -1180,10 +1180,10 @@ impl Part for McfDataProfileInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReportCloudStorageDownloadDetails {
     /// Id of the bucket the file object is stored in.
-    #[serde(alias="bucketId")]
+    #[serde(rename="bucketId")]
     pub bucket_id: String,
     /// Id of the file object containing the report data.
-    #[serde(alias="objectId")]
+    #[serde(rename="objectId")]
     pub object_id: String,
 }
 
@@ -1198,10 +1198,10 @@ impl Part for UnsampledReportCloudStorageDownloadDetails {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalVisitTimeOnSiteDetails {
     /// Type of comparison. Possible values are LESS_THAN or GREATER_THAN.
-    #[serde(alias="comparisonType")]
+    #[serde(rename="comparisonType")]
     pub comparison_type: String,
     /// Value used for this comparison.
-    #[serde(alias="comparisonValue")]
+    #[serde(rename="comparisonValue")]
     pub comparison_value: String,
 }
 
@@ -1244,14 +1244,14 @@ pub struct EntityUserLink {
     /// Resource type for entity user link.
     pub kind: Option<String>,
     /// User reference.
-    #[serde(alias="userRef")]
+    #[serde(rename="userRef")]
     pub user_ref: Option<UserRef>,
     /// Permissions the user has for this entity.
     pub permissions: Option<EntityUserLinkPermissions>,
     /// Entity user link ID
     pub id: Option<String>,
     /// Self link for this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Entity for this link. It can be an account, a web property, or a view (profile).
     pub entity: Option<EntityUserLinkEntity>,
@@ -1279,19 +1279,19 @@ pub struct AccountSummaries {
     /// A list of AccountSummaries.
     pub items: Vec<AccountSummary>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this AccountSummary collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this AccountSummary collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1316,19 +1316,19 @@ pub struct CustomDimensions {
     /// Collection of custom dimensions.
     pub items: Vec<CustomDimension>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this custom dimension collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this custom dimension collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1342,7 +1342,7 @@ impl ResponseResult for CustomDimensions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReportDriveDownloadDetails {
     /// Id of the document/file containing the report data.
-    #[serde(alias="documentId")]
+    #[serde(rename="documentId")]
     pub document_id: String,
 }
 
@@ -1359,15 +1359,15 @@ pub struct GoalUrlDestinationDetails {
     /// URL for this goal.
     pub url: String,
     /// Determines if the goal URL must exactly match the capitalization of visited URLs.
-    #[serde(alias="caseSensitive")]
+    #[serde(rename="caseSensitive")]
     pub case_sensitive: bool,
     /// Match type for the goal URL. Possible values are HEAD, EXACT, or REGEX.
-    #[serde(alias="matchType")]
+    #[serde(rename="matchType")]
     pub match_type: String,
     /// List of steps configured for this goal funnel.
     pub steps: Vec<GoalUrlDestinationDetailsSteps>,
     /// Determines if the first step in this goal is required.
-    #[serde(alias="firstStepRequired")]
+    #[serde(rename="firstStepRequired")]
     pub first_step_required: bool,
 }
 
@@ -1394,12 +1394,12 @@ pub struct Upload {
     /// Data import errors collection.
     pub errors: Vec<String>,
     /// Custom data source Id to which this data import belongs.
-    #[serde(alias="customDataSourceId")]
+    #[serde(rename="customDataSourceId")]
     pub custom_data_source_id: String,
     /// A unique ID for this upload.
     pub id: String,
     /// Account Id to which this upload belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -1424,19 +1424,19 @@ pub struct Profiles {
     /// A list of views (profiles).
     pub items: Vec<Profile>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this view (profile) collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this view (profile) collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1464,22 +1464,22 @@ impl Part for AccountPermissions {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataProfileInfo {
     /// Internal ID for the web property to which this view (profile) belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// Table ID for view (profile).
-    #[serde(alias="tableId")]
+    #[serde(rename="tableId")]
     pub table_id: String,
     /// Web Property ID to which this view (profile) belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: String,
     /// View (Profile) ID.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: String,
     /// View (Profile) name.
-    #[serde(alias="profileName")]
+    #[serde(rename="profileName")]
     pub profile_name: String,
     /// Account ID to which this view (profile) belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
 }
 
@@ -1496,7 +1496,7 @@ pub struct FilterParentLink {
     /// Link to the account to which this filter belongs.
     pub href: String,
     /// Value is "analytics#account".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -1522,19 +1522,19 @@ pub struct Webproperties {
     /// A list of web properties.
     pub items: Vec<Webproperty>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this web property collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this web property collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1572,15 +1572,15 @@ impl Part for EntityUserLinkPermissions {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileFilterLink {
     /// Filter for this link.
-    #[serde(alias="filterRef")]
+    #[serde(rename="filterRef")]
     pub filter_ref: Option<FilterRef>,
     /// Resource type for Analytics filter.
     pub kind: Option<String>,
     /// Link for this profile filter link.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// View (Profile) for this link.
-    #[serde(alias="profileRef")]
+    #[serde(rename="profileRef")]
     pub profile_ref: Option<ProfileRef>,
     /// Profile filter link ID.
     pub id: Option<String>,
@@ -1603,7 +1603,7 @@ pub struct AccountSummary {
     /// Resource type for Analytics AccountSummary.
     pub kind: String,
     /// List of web properties under this account.
-    #[serde(alias="webProperties")]
+    #[serde(rename="webProperties")]
     pub web_properties: Vec<WebPropertySummary>,
     /// Account ID.
     pub id: String,
@@ -1631,24 +1631,24 @@ pub struct Webproperty {
     /// Time this web property was last modified.
     pub updated: Option<String>,
     /// Default view (profile) ID.
-    #[serde(alias="defaultProfileId")]
+    #[serde(rename="defaultProfileId")]
     pub default_profile_id: Option<String>,
     /// View (Profile) count for this web property.
-    #[serde(alias="profileCount")]
+    #[serde(rename="profileCount")]
     pub profile_count: Option<i32>,
     /// Internal ID for this web property.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
     /// Child link for this web property. Points to the list of views (profiles) for this web property.
-    #[serde(alias="childLink")]
+    #[serde(rename="childLink")]
     pub child_link: Option<WebpropertyChildLink>,
     /// The industry vertical/category selected for this web property.
-    #[serde(alias="industryVertical")]
+    #[serde(rename="industryVertical")]
     pub industry_vertical: Option<String>,
     /// Web property ID of the form UA-XXXXX-YY.
     pub id: Option<String>,
     /// Account ID to which this web property belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Resource type for Analytics WebProperty.
     pub kind: Option<String>,
@@ -1659,15 +1659,15 @@ pub struct Webproperty {
     /// Level for this web property. Possible values are STANDARD or PREMIUM.
     pub level: Option<String>,
     /// Website url for this web property.
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: Option<String>,
     /// Parent link for this web property. Points to the account to which this web property belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<WebpropertyParentLink>,
     /// Permissions the user has for this web property.
     pub permissions: Option<WebpropertyPermissions>,
     /// Link for this web property.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1691,23 +1691,23 @@ pub struct RealtimeData {
     /// Real time data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<String>>,
     /// The total number of rows for the query, regardless of the number of rows in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// Information for the view (profile), for which the real time data was requested.
-    #[serde(alias="profileInfo")]
+    #[serde(rename="profileInfo")]
     pub profile_info: RealtimeDataProfileInfo,
     /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
-    #[serde(alias="columnHeaders")]
+    #[serde(rename="columnHeaders")]
     pub column_headers: Vec<RealtimeDataColumnHeaders>,
     /// Real time data request query parameters.
     pub query: RealtimeDataQuery,
     /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
-    #[serde(alias="totalsForAllResults")]
+    #[serde(rename="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
     /// Unique ID for this data response.
     pub id: String,
     /// Link to this page.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1721,13 +1721,13 @@ impl ResponseResult for RealtimeData {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterSearchAndReplaceDetails {
     /// Determines if the filter is case sensitive.
-    #[serde(alias="caseSensitive")]
+    #[serde(rename="caseSensitive")]
     pub case_sensitive: bool,
     /// Term to search.
-    #[serde(alias="searchString")]
+    #[serde(rename="searchString")]
     pub search_string: String,
     /// Term to replace the search term with.
-    #[serde(alias="replaceString")]
+    #[serde(rename="replaceString")]
     pub replace_string: String,
     /// Field to use in the filter.
     pub field: String,
@@ -1754,40 +1754,40 @@ pub struct Experiment {
     /// Experiment status. Possible values: "DRAFT", "READY_TO_RUN", "RUNNING", "ENDED". Experiments can be created in the "DRAFT", "READY_TO_RUN" or "RUNNING" state. This field is required when creating an experiment.
     pub status: Option<String>,
     /// A floating-point number between 0 and 1. Specifies the fraction of the traffic that participates in the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
-    #[serde(alias="trafficCoverage")]
+    #[serde(rename="trafficCoverage")]
     pub traffic_coverage: Option<f64>,
     /// Notes about this experiment.
     pub description: Option<String>,
     /// Web property ID to which this experiment belongs. The web property ID is of the form UA-XXXXX-YY. This field is read-only.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// Time the experiment was last modified. This field is read-only.
     pub updated: Option<String>,
     /// Internal ID for the web property to which this experiment belongs. This field is read-only.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
     /// A floating-point number between 0 and 1. Specifies the necessary confidence level to choose a winner. This field may not be changed for an experiments whose status is ENDED.
-    #[serde(alias="winnerConfidenceLevel")]
+    #[serde(rename="winnerConfidenceLevel")]
     pub winner_confidence_level: Option<f64>,
     /// The starting time of the experiment (the time the status changed from READY_TO_RUN to RUNNING). This field is present only if the experiment has started. This field is read-only.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// Whether the objectiveMetric should be minimized or maximized. Possible values: "MAXIMUM", "MINIMUM". Optional--defaults to "MAXIMUM". Cannot be specified without objectiveMetric. Cannot be modified when status is "RUNNING" or "ENDED".
-    #[serde(alias="optimizationType")]
+    #[serde(rename="optimizationType")]
     pub optimization_type: Option<String>,
     /// Boolean specifying whether a winner has been found for this experiment. This field is read-only.
-    #[serde(alias="winnerFound")]
+    #[serde(rename="winnerFound")]
     pub winner_found: Option<bool>,
     /// The metric that the experiment is optimizing. Valid values: "ga:goal(n)Completions", "ga:adsenseAdsClicks", "ga:adsenseAdsViewed", "ga:adsenseRevenue", "ga:bounces", "ga:pageviews", "ga:sessionDuration", "ga:transactions", "ga:transactionRevenue". This field is required if status is "RUNNING" and servingFramework is one of "REDIRECT" or "API".
-    #[serde(alias="objectiveMetric")]
+    #[serde(rename="objectiveMetric")]
     pub objective_metric: Option<String>,
     /// Experiment ID. Required for patch and update. Disallowed for create.
     pub id: Option<String>,
     /// Boolean specifying whether to distribute traffic evenly across all variations. If the value is False, content experiments follows the default behavior of adjusting traffic dynamically based on variation performance. Optional -- defaults to False. This field may not be changed for an experiment whose status is ENDED.
-    #[serde(alias="equalWeighting")]
+    #[serde(rename="equalWeighting")]
     pub equal_weighting: Option<bool>,
     /// Account ID to which this experiment belongs. This field is read-only.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Resource type for an Analytics experiment. This field is read-only.
     pub kind: Option<String>,
@@ -1796,38 +1796,38 @@ pub struct Experiment {
     /// Time the experiment was created. This field is read-only.
     pub created: Option<String>,
     /// Why the experiment ended. Possible values: "STOPPED_BY_USER", "WINNER_FOUND", "EXPERIMENT_EXPIRED", "ENDED_WITH_NO_WINNER", "GOAL_OBJECTIVE_CHANGED". "ENDED_WITH_NO_WINNER" means that the experiment didn't expire but no winner was projected to be found. If the experiment status is changed via the API to ENDED this field is set to STOPPED_BY_USER. This field is read-only.
-    #[serde(alias="reasonExperimentEnded")]
+    #[serde(rename="reasonExperimentEnded")]
     pub reason_experiment_ended: Option<String>,
     /// Array of variations. The first variation in the array is the original. The number of variations may not change once an experiment is in the RUNNING state. At least two variations are required before status can be set to RUNNING.
     pub variations: Option<Vec<ExperimentVariations>>,
     /// The snippet of code to include on the control page(s). This field is read-only.
     pub snippet: Option<String>,
     /// If true, the end user will be able to edit the experiment via the Google Analytics user interface.
-    #[serde(alias="editableInGaUi")]
+    #[serde(rename="editableInGaUi")]
     pub editable_in_ga_ui: Option<bool>,
     /// Boolean specifying whether variations URLS are rewritten to match those of the original. This field may not be changed for an experiments whose status is ENDED.
-    #[serde(alias="rewriteVariationUrlsAsOriginal")]
+    #[serde(rename="rewriteVariationUrlsAsOriginal")]
     pub rewrite_variation_urls_as_original: Option<bool>,
     /// An integer number in [3, 90]. Specifies the minimum length of the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
-    #[serde(alias="minimumExperimentLengthInDays")]
+    #[serde(rename="minimumExperimentLengthInDays")]
     pub minimum_experiment_length_in_days: Option<i32>,
     /// View (Profile) ID to which this experiment belongs. This field is read-only.
-    #[serde(alias="profileId")]
+    #[serde(rename="profileId")]
     pub profile_id: Option<String>,
     /// Parent link for an experiment. Points to the view (profile) to which this experiment belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<ExperimentParentLink>,
     /// The ending time of the experiment (the time the status changed from RUNNING to ENDED). This field is present only if the experiment has ended. This field is read-only.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// The framework used to serve the experiment variations and evaluate the results. One of:  
     /// - REDIRECT: Google Analytics redirects traffic to different variation pages, reports the chosen variation and evaluates the results.
     /// - API: Google Analytics chooses and reports the variation to serve and evaluates the results; the caller is responsible for serving the selected variation.
     /// - EXTERNAL: The variations will be served externally and the chosen variation reported to Google Analytics. The caller is responsible for serving the selected variation and evaluating the results.
-    #[serde(alias="servingFramework")]
+    #[serde(rename="servingFramework")]
     pub serving_framework: Option<String>,
     /// Link for this experiment. This field is read-only.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1853,19 +1853,19 @@ pub struct CustomMetrics {
     /// Collection of custom metrics.
     pub items: Vec<CustomMetric>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this custom metric collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this custom metric collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -1879,27 +1879,27 @@ impl ResponseResult for CustomMetrics {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataQuery {
     /// Maximum results per page.
-    #[serde(alias="max-results")]
+    #[serde(rename="max-results")]
     pub max_results: i32,
     /// List of dimensions or metrics based on which Analytics data is sorted.
     pub sort: Vec<String>,
     /// List of analytics dimensions.
     pub dimensions: String,
     /// Start date.
-    #[serde(alias="start-date")]
+    #[serde(rename="start-date")]
     pub start_date: String,
     /// Start index.
-    #[serde(alias="start-index")]
+    #[serde(rename="start-index")]
     pub start_index: i32,
     /// End date.
-    #[serde(alias="end-date")]
+    #[serde(rename="end-date")]
     pub end_date: String,
     /// Unique table ID.
     pub ids: String,
     /// List of analytics metrics.
     pub metrics: Vec<String>,
     /// Desired sampling level
-    #[serde(alias="samplingLevel")]
+    #[serde(rename="samplingLevel")]
     pub sampling_level: String,
     /// Comma-separated list of dimension or metric filters.
     pub filters: String,
@@ -1929,10 +1929,10 @@ pub struct Columns {
     /// Etag of collection. This etag can be compared with the last response etag to check if response has changed.
     pub etag: String,
     /// Total number of columns returned in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// List of attributes names returned by columns.
-    #[serde(alias="attributeNames")]
+    #[serde(rename="attributeNames")]
     pub attribute_names: Vec<String>,
 }
 
@@ -1946,15 +1946,15 @@ impl ResponseResult for Columns {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterExpression {
     /// Determines if the filter is case sensitive.
-    #[serde(alias="caseSensitive")]
+    #[serde(rename="caseSensitive")]
     pub case_sensitive: bool,
     /// Kind value for filter expression
     pub kind: String,
     /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
-    #[serde(alias="matchType")]
+    #[serde(rename="matchType")]
     pub match_type: String,
     /// Filter expression value
-    #[serde(alias="expressionValue")]
+    #[serde(rename="expressionValue")]
     pub expression_value: String,
     /// Field to filter. Possible values:  
     /// - Content and Traffic  
@@ -2054,10 +2054,10 @@ impl Part for FilterExpression {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataRowsConversionPathValue {
     /// Node value of an interaction on conversion path. Such as source, medium etc.
-    #[serde(alias="nodeValue")]
+    #[serde(rename="nodeValue")]
     pub node_value: String,
     /// Type of an interaction on conversion path. Such as CLICK, IMPRESSION etc.
-    #[serde(alias="interactionType")]
+    #[serde(rename="interactionType")]
     pub interaction_type: String,
 }
 
@@ -2088,10 +2088,10 @@ pub struct AdWordsAccount {
     /// Resource type for AdWords account.
     pub kind: String,
     /// Customer ID. This field is required when creating an AdWords link.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: String,
     /// True if auto-tagging is enabled on the AdWords account. Read-only after the insert operation.
-    #[serde(alias="autoTaggingEnabled")]
+    #[serde(rename="autoTaggingEnabled")]
     pub auto_tagging_enabled: bool,
 }
 
@@ -2111,10 +2111,10 @@ pub struct WebPropertyRef {
     /// Name of this web property.
     pub name: String,
     /// Account ID to which this web property belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// Internal ID for this web property.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: String,
     /// Web property ID of the form UA-XXXXX-YY.
     pub id: String,
@@ -2132,7 +2132,7 @@ pub struct WebpropertyChildLink {
     /// Link to the list of views (profiles) for this web property.
     pub href: String,
     /// Type of the parent link. Its value is "analytics#profiles".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -2189,19 +2189,19 @@ pub struct ProfileFilterLinks {
     /// A list of profile filter links.
     pub items: Vec<ProfileFilterLink>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this profile filter link collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this profile filter link collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -2232,36 +2232,36 @@ pub struct Filter {
     /// Time this filter was last modified.
     pub updated: Option<String>,
     /// Details for the filter of the type ADVANCED.
-    #[serde(alias="advancedDetails")]
+    #[serde(rename="advancedDetails")]
     pub advanced_details: Option<FilterAdvancedDetails>,
     /// Details for the filter of the type LOWER.
-    #[serde(alias="lowercaseDetails")]
+    #[serde(rename="lowercaseDetails")]
     pub lowercase_details: Option<FilterLowercaseDetails>,
     /// Parent link for this filter. Points to the account to which this filter belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<FilterParentLink>,
     /// Details for the filter of the type EXCLUDE.
-    #[serde(alias="excludeDetails")]
+    #[serde(rename="excludeDetails")]
     pub exclude_details: Option<FilterExpression>,
     /// Details for the filter of the type INCLUDE.
-    #[serde(alias="includeDetails")]
+    #[serde(rename="includeDetails")]
     pub include_details: Option<FilterExpression>,
     /// Details for the filter of the type UPPER.
-    #[serde(alias="uppercaseDetails")]
+    #[serde(rename="uppercaseDetails")]
     pub uppercase_details: Option<FilterUppercaseDetails>,
     /// Account ID to which this filter belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Type of this filter. Possible values are INCLUDE, EXCLUDE, LOWERCASE, UPPERCASE, SEARCH_AND_REPLACE and ADVANCED.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Filter ID.
     pub id: Option<String>,
     /// Link for this filter.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Details for the filter of the type SEARCH_AND_REPLACE.
-    #[serde(alias="searchAndReplaceDetails")]
+    #[serde(rename="searchAndReplaceDetails")]
     pub search_and_replace_details: Option<FilterSearchAndReplaceDetails>,
 }
 
@@ -2288,15 +2288,15 @@ pub struct EntityAdWordsLink {
     /// Name of the link. This field is required when creating an AdWords link.
     pub name: Option<String>,
     /// A list of AdWords client accounts. These cannot be MCC accounts. This field is required when creating an AdWords link. It cannot be empty.
-    #[serde(alias="adWordsAccounts")]
+    #[serde(rename="adWordsAccounts")]
     pub ad_words_accounts: Option<Vec<AdWordsAccount>>,
     /// IDs of linked Views (Profiles) represented as strings.
-    #[serde(alias="profileIds")]
+    #[serde(rename="profileIds")]
     pub profile_ids: Option<Vec<String>>,
     /// Entity AdWords link ID
     pub id: Option<String>,
     /// URL link for this Google Analytics - Google AdWords link.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Web property being linked.
     pub entity: Option<EntityAdWordsLinkEntity>,
@@ -2320,21 +2320,21 @@ pub struct Uploads {
     /// Collection type.
     pub kind: String,
     /// The total number of results for the query, regardless of the number of resources in the result.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// A list of uploads.
     pub items: Vec<Upload>,
     /// Link to previous page for this upload collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this upload collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -2364,16 +2364,16 @@ pub struct GoalEventDetailsEventConditions {
     /// Expression used for this match.
     pub expression: String,
     /// Type of the match to be performed. Possible values are REGEXP, BEGINS_WITH, or EXACT.
-    #[serde(alias="matchType")]
+    #[serde(rename="matchType")]
     pub match_type: String,
     /// Type of this event condition. Possible values are CATEGORY, ACTION, LABEL, or VALUE.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN or EQUAL.
-    #[serde(alias="comparisonType")]
+    #[serde(rename="comparisonType")]
     pub comparison_type: String,
     /// Value used for this comparison.
-    #[serde(alias="comparisonValue")]
+    #[serde(rename="comparisonValue")]
     pub comparison_value: String,
 }
 
@@ -2408,7 +2408,7 @@ pub struct CustomMetricParentLink {
     /// Link to the property to which the custom metric belongs.
     pub href: String,
     /// Type of the parent link. Set to "analytics#webproperty".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -2423,10 +2423,10 @@ impl Part for CustomMetricParentLink {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataColumnHeaders {
     /// Data type. Dimension and metric values data types such as INTEGER, DOUBLE, CURRENCY, MCF_SEQUENCE etc.
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: String,
     /// Column Type. Either DIMENSION or METRIC.
-    #[serde(alias="columnType")]
+    #[serde(rename="columnType")]
     pub column_type: String,
     /// Column name.
     pub name: String,
@@ -2445,7 +2445,7 @@ pub struct GoalParentLink {
     /// Link to the view (profile) to which this goal belongs.
     pub href: String,
     /// Value is "analytics#profile".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -2467,21 +2467,21 @@ pub struct EntityAdWordsLinks {
     /// Collection type.
     pub kind: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// A list of entity AdWords links.
     pub items: Vec<EntityAdWordsLink>,
     /// Previous link for this AdWords link collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Next link for this AdWords link collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -2495,13 +2495,13 @@ impl ResponseResult for EntityAdWordsLinks {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinkEntity {
     /// Account for this link.
-    #[serde(alias="accountRef")]
+    #[serde(rename="accountRef")]
     pub account_ref: AccountRef,
     /// View (Profile) for this link.
-    #[serde(alias="profileRef")]
+    #[serde(rename="profileRef")]
     pub profile_ref: ProfileRef,
     /// Web property for this link.
-    #[serde(alias="webPropertyRef")]
+    #[serde(rename="webPropertyRef")]
     pub web_property_ref: WebPropertyRef,
 }
 
@@ -2544,21 +2544,21 @@ pub struct EntityUserLinks {
     /// Collection type.
     pub kind: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
     /// A list of entity user links.
     pub items: Vec<EntityUserLink>,
     /// Previous link for this account collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Next link for this account collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -2583,19 +2583,19 @@ pub struct Segments {
     /// A list of segments.
     pub items: Vec<Segment>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this segment collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this segment collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -2611,7 +2611,7 @@ pub struct AccountChildLink {
     /// Link to the list of web properties for this account.
     pub href: String,
     /// Type of the child link. Its value is "analytics#webproperties".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -2640,10 +2640,10 @@ impl Part for FilterUppercaseDetails {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataRows {
     /// A primitive dimension value. A primitive metric value.
-    #[serde(alias="primitiveValue")]
+    #[serde(rename="primitiveValue")]
     pub primitive_value: String,
     /// A conversion path dimension value, containing a list of interactions with their attributes.
-    #[serde(alias="conversionPathValue")]
+    #[serde(rename="conversionPathValue")]
     pub conversion_path_value: Vec<McfDataRowsConversionPathValue>,
 }
 
@@ -2660,7 +2660,7 @@ pub struct ProfileSummary {
     /// Resource type for Analytics ProfileSummary.
     pub kind: String,
     /// View (Profile) type. Supported types: WEB or APP.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// View (profile) ID.
     pub id: String,
@@ -2696,22 +2696,22 @@ pub struct CustomDimension {
     /// Time the custom dimension was last modified.
     pub updated: Option<String>,
     /// Property ID.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// Boolean indicating whether the custom dimension is active.
     pub active: Option<bool>,
     /// Scope of the custom dimension: HIT, SESSION, USER or PRODUCT.
     pub scope: Option<String>,
     /// Parent link for the custom dimension. Points to the property to which the custom dimension belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<CustomDimensionParentLink>,
     /// Custom dimension ID.
     pub id: Option<String>,
     /// Link for the custom dimension
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Account ID.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
 
@@ -2766,19 +2766,19 @@ pub struct Segment {
     /// Resource type for Analytics segment.
     pub kind: String,
     /// Segment ID. Can be used with the 'segment' parameter in Core Reporting API.
-    #[serde(alias="segmentId")]
+    #[serde(rename="segmentId")]
     pub segment_id: String,
     /// Time the segment was created.
     pub created: String,
     /// Time the segment was last modified.
     pub updated: String,
     /// Type for a segment. Possible values are "BUILT_IN" or "CUSTOM".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Segment ID.
     pub id: String,
     /// Link for this segment.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Segment name.
     pub name: String,
@@ -2794,27 +2794,27 @@ impl Part for Segment {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataQuery {
     /// Maximum results per page.
-    #[serde(alias="max-results")]
+    #[serde(rename="max-results")]
     pub max_results: i32,
     /// List of dimensions or metrics based on which Analytics data is sorted.
     pub sort: Vec<String>,
     /// List of analytics dimensions.
     pub dimensions: String,
     /// Start date.
-    #[serde(alias="start-date")]
+    #[serde(rename="start-date")]
     pub start_date: String,
     /// Start index.
-    #[serde(alias="start-index")]
+    #[serde(rename="start-index")]
     pub start_index: i32,
     /// End date.
-    #[serde(alias="end-date")]
+    #[serde(rename="end-date")]
     pub end_date: String,
     /// Unique table ID.
     pub ids: String,
     /// List of analytics metrics.
     pub metrics: Vec<String>,
     /// Desired sampling level
-    #[serde(alias="samplingLevel")]
+    #[serde(rename="samplingLevel")]
     pub sampling_level: String,
     /// Comma-separated list of dimension or metric filters.
     pub filters: String,
@@ -2843,67 +2843,67 @@ pub struct Profile {
     /// Time this view (profile) was last modified.
     pub updated: Option<String>,
     /// The query parameters that are excluded from this view (profile).
-    #[serde(alias="excludeQueryParameters")]
+    #[serde(rename="excludeQueryParameters")]
     pub exclude_query_parameters: Option<String>,
     /// The currency type associated with this view (profile). The supported values are:
     /// ARS, AUD, BGN, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, HUF, IDR, INR, JPY, KRW, LTL, MXN, NOK, NZD, PHP, PLN, RUB, SEK, THB, TRY, TWD, USD, VND, ZAR
     pub currency: Option<String>,
     /// Internal ID for the web property to which this view (profile) belongs.
-    #[serde(alias="internalWebPropertyId")]
+    #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
     /// Child link for this view (profile). Points to the list of goals for this view (profile).
-    #[serde(alias="childLink")]
+    #[serde(rename="childLink")]
     pub child_link: Option<ProfileChildLink>,
     /// Indicates whether enhanced ecommerce tracking is enabled for this view (profile). This property can only be enabled if ecommerce tracking is enabled.
-    #[serde(alias="enhancedECommerceTracking")]
+    #[serde(rename="enhancedECommerceTracking")]
     pub enhanced_e_commerce_tracking: Option<bool>,
     /// Indicates whether ecommerce tracking is enabled for this view (profile).
-    #[serde(alias="eCommerceTracking")]
+    #[serde(rename="eCommerceTracking")]
     pub e_commerce_tracking: Option<bool>,
     /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: Option<String>,
     /// Time zone for which this view (profile) has been configured. Time zones are identified by strings from the TZ database.
     pub timezone: Option<String>,
     /// View (Profile) ID.
     pub id: Option<String>,
     /// Account ID to which this view (profile) belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Default page for this view (profile).
-    #[serde(alias="defaultPage")]
+    #[serde(rename="defaultPage")]
     pub default_page: Option<String>,
     /// Resource type for Analytics view (profile).
     pub kind: Option<String>,
     /// Whether or not Analytics will strip search query parameters from the URLs in your reports.
-    #[serde(alias="stripSiteSearchQueryParameters")]
+    #[serde(rename="stripSiteSearchQueryParameters")]
     pub strip_site_search_query_parameters: Option<bool>,
     /// Name of this view (profile).
     pub name: Option<String>,
     /// Time this view (profile) was created.
     pub created: Option<String>,
     /// The site search query parameters for this view (profile).
-    #[serde(alias="siteSearchQueryParameters")]
+    #[serde(rename="siteSearchQueryParameters")]
     pub site_search_query_parameters: Option<String>,
     /// Website URL for this view (profile).
-    #[serde(alias="websiteUrl")]
+    #[serde(rename="websiteUrl")]
     pub website_url: Option<String>,
     /// Whether or not Analytics will strip search category parameters from the URLs in your reports.
-    #[serde(alias="stripSiteSearchCategoryParameters")]
+    #[serde(rename="stripSiteSearchCategoryParameters")]
     pub strip_site_search_category_parameters: Option<bool>,
     /// Site search category parameters for this view (profile).
-    #[serde(alias="siteSearchCategoryParameters")]
+    #[serde(rename="siteSearchCategoryParameters")]
     pub site_search_category_parameters: Option<String>,
     /// Parent link for this view (profile). Points to the web property to which this view (profile) belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<ProfileParentLink>,
     /// Permissions the user has for this view (profile).
     pub permissions: Option<ProfilePermissions>,
     /// View (Profile) type. Supported types: WEB or APP.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// Link for this view (profile).
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -2918,10 +2918,10 @@ impl ResponseResult for Profile {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: String,
     /// Column Type. Either DIMENSION or METRIC.
-    #[serde(alias="columnType")]
+    #[serde(rename="columnType")]
     pub column_type: String,
     /// Column name.
     pub name: String,
@@ -2938,7 +2938,7 @@ impl Part for GaDataColumnHeaders {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataDataTableCols {
     /// no description provided
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// no description provided
     pub id: String,
@@ -2957,10 +2957,10 @@ impl Part for GaDataDataTableCols {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalVisitNumPagesDetails {
     /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN, or EQUAL.
-    #[serde(alias="comparisonType")]
+    #[serde(rename="comparisonType")]
     pub comparison_type: String,
     /// Value used for this comparison.
-    #[serde(alias="comparisonValue")]
+    #[serde(rename="comparisonValue")]
     pub comparison_value: String,
 }
 
@@ -2977,7 +2977,7 @@ pub struct CustomDataSourceChildLink {
     /// Link to the list of daily uploads for this custom data source. Link to the list of uploads for this custom data source.
     pub href: String,
     /// Value is "analytics#dailyUploads". Value is "analytics#uploads".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -3003,19 +3003,19 @@ pub struct UnsampledReports {
     /// A list of unsampled reports.
     pub items: Vec<UnsampledReport>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this unsampled report collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this unsampled report collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of resources in the result.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -3029,10 +3029,10 @@ impl ResponseResult for UnsampledReports {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataColumnHeaders {
     /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
-    #[serde(alias="dataType")]
+    #[serde(rename="dataType")]
     pub data_type: String,
     /// Column Type. Either DIMENSION or METRIC.
-    #[serde(alias="columnType")]
+    #[serde(rename="columnType")]
     pub column_type: String,
     /// Column name.
     pub name: String,
@@ -3049,7 +3049,7 @@ impl Part for RealtimeDataColumnHeaders {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityAdWordsLinkEntity {
     /// no description provided
-    #[serde(alias="webPropertyRef")]
+    #[serde(rename="webPropertyRef")]
     pub web_property_ref: WebPropertyRef,
 }
 
@@ -3066,7 +3066,7 @@ pub struct CustomDataSourceParentLink {
     /// Link to the web property to which this custom data source belongs.
     pub href: String,
     /// Value is "analytics#webproperty".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -3085,37 +3085,37 @@ pub struct CustomDataSource {
     /// Description of custom data source.
     pub description: String,
     /// IDs of views (profiles) linked to the custom data source.
-    #[serde(alias="profilesLinked")]
+    #[serde(rename="profilesLinked")]
     pub profiles_linked: Vec<String>,
     /// no description provided
-    #[serde(alias="uploadType")]
+    #[serde(rename="uploadType")]
     pub upload_type: String,
     /// Time this custom data source was created.
     pub created: String,
     /// Time this custom data source was last modified.
     pub updated: String,
     /// Account ID to which this custom data source belongs.
-    #[serde(alias="accountId")]
+    #[serde(rename="accountId")]
     pub account_id: String,
     /// no description provided
-    #[serde(alias="childLink")]
+    #[serde(rename="childLink")]
     pub child_link: CustomDataSourceChildLink,
     /// Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.
-    #[serde(alias="webPropertyId")]
+    #[serde(rename="webPropertyId")]
     pub web_property_id: String,
     /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: CustomDataSourceParentLink,
     /// no description provided
-    #[serde(alias="importBehavior")]
+    #[serde(rename="importBehavior")]
     pub import_behavior: String,
     /// Type of the custom data source.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Custom data source ID.
     pub id: String,
     /// Link for this Analytics custom data source.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// Name of this custom data source.
     pub name: String,
@@ -3133,7 +3133,7 @@ pub struct CustomDimensionParentLink {
     /// Link to the property to which the custom dimension belongs.
     pub href: String,
     /// Type of the parent link. Set to "analytics#webproperty".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -3159,19 +3159,19 @@ pub struct Experiments {
     /// A list of experiments.
     pub items: Vec<Experiment>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this experiment collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this experiment collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of resources in the result.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -3196,19 +3196,19 @@ pub struct Filters {
     /// A list of filters.
     pub items: Vec<Filter>,
     /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
-    #[serde(alias="itemsPerPage")]
+    #[serde(rename="itemsPerPage")]
     pub items_per_page: i32,
     /// Link to previous page for this filter collection.
-    #[serde(alias="previousLink")]
+    #[serde(rename="previousLink")]
     pub previous_link: String,
     /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
-    #[serde(alias="startIndex")]
+    #[serde(rename="startIndex")]
     pub start_index: i32,
     /// Link to next page for this filter collection.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
     /// The total number of results for the query, regardless of the number of results in the response.
-    #[serde(alias="totalResults")]
+    #[serde(rename="totalResults")]
     pub total_results: i32,
 }
 
@@ -3224,7 +3224,7 @@ pub struct ProfileChildLink {
     /// Link to the list of goals for this view (profile).
     pub href: String,
     /// Value is "analytics#goals".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-replicapool1_beta2"
-version = "0.1.3+20150223"
+version = "0.1.4+20150223"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with replicapool (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/replicapool1_beta2"
@@ -18,5 +18,5 @@ hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
-serde = "*"
+serde = ">= 0.3.0"
 serde_macros = "*"

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *tasks* crate version *0.1.3+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *tasks* crate version *0.1.4+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *tasks* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
@@ -329,7 +329,7 @@ impl<'a, C, NC, A> TasksHub<C, NC, A>
         TasksHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -342,7 +342,7 @@ impl<'a, C, NC, A> TasksHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -403,7 +403,7 @@ pub struct Task {
     /// Notes describing the task. Optional.
     pub notes: Option<String>,
     /// URL pointing to this task. Used to retrieve, update, or delete this task.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -435,7 +435,7 @@ pub struct TaskList {
     /// Last modification time of the task list (as a RFC 3339 timestamp).
     pub updated: Option<String>,
     /// URL pointing to this task list. Used to retrieve, update, or delete this task list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Task list identifier.
     pub id: Option<String>,
@@ -458,7 +458,7 @@ impl ResponseResult for TaskList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskLists {
     /// Token that can be used to request the next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Collection of task lists.
     pub items: Vec<TaskList>,
@@ -480,7 +480,7 @@ pub struct TaskLinks {
     /// The URL.
     pub link: String,
     /// Type of the link, e.g. "email".
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The description. In HTML speak: Everything between <a> and </a>.
     pub description: String,
@@ -502,7 +502,7 @@ impl Part for TaskLinks {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tasks {
     /// Token used to access the next page of this result.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Collection of tasks.
     pub items: Vec<Task>,

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gan* crate version *0.1.3+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *gan* crate version *0.1.4+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *gan* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/affiliate-network/).
@@ -312,7 +312,7 @@ impl<'a, C, NC, A> Gan<C, NC, A>
         Gan {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -337,7 +337,7 @@ impl<'a, C, NC, A> Gan<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,58 +366,58 @@ pub struct Advertiser {
     /// The status of the requesting publisher's relationship this advertiser.
     pub status: String,
     /// Allows advertisers to submit product listings to Google Product Search.
-    #[serde(alias="productFeedsEnabled")]
+    #[serde(rename="productFeedsEnabled")]
     pub product_feeds_enabled: bool,
     /// Phone that this advertiser would like publishers to contact them with.
-    #[serde(alias="contactPhone")]
+    #[serde(rename="contactPhone")]
     pub contact_phone: String,
     /// Description of the website the advertiser advertises from.
     pub description: String,
     /// List of merchant center ids for this advertiser
-    #[serde(alias="merchantCenterIds")]
+    #[serde(rename="merchantCenterIds")]
     pub merchant_center_ids: Vec<String>,
     /// The longest possible length of a commission (how long the cookies on the customer's browser last before they expire).
-    #[serde(alias="commissionDuration")]
+    #[serde(rename="commissionDuration")]
     pub commission_duration: i32,
     /// Email that this advertiser would like publishers to contact them with.
-    #[serde(alias="contactEmail")]
+    #[serde(rename="contactEmail")]
     pub contact_email: String,
     /// Date that this advertiser was approved as a Google Affiliate Network advertiser.
-    #[serde(alias="joinDate")]
+    #[serde(rename="joinDate")]
     pub join_date: String,
     /// The ID of this advertiser.
     pub id: String,
     /// Category that this advertiser belongs to. A valid list of categories can be found here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581
     pub category: String,
     /// The default link id for this advertiser.
-    #[serde(alias="defaultLinkId")]
+    #[serde(rename="defaultLinkId")]
     pub default_link_id: String,
     /// The kind for an advertiser.
     pub kind: String,
     /// URL of the website this advertiser advertises from.
-    #[serde(alias="siteUrl")]
+    #[serde(rename="siteUrl")]
     pub site_url: String,
     /// The name of this advertiser.
     pub name: String,
     /// A rank based on commissions paid to publishers over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
-    #[serde(alias="payoutRank")]
+    #[serde(rename="payoutRank")]
     pub payout_rank: String,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past seven days. This value should be multiplied by 100 at the time of display.
-    #[serde(alias="epcSevenDayAverage")]
+    #[serde(rename="epcSevenDayAverage")]
     pub epc_seven_day_average: Money,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past three months. This value should be multiplied by 100 at the time of display.
-    #[serde(alias="epcNinetyDayAverage")]
+    #[serde(rename="epcNinetyDayAverage")]
     pub epc_ninety_day_average: Money,
     /// True if the advertiser allows publisher created links, otherwise false.
-    #[serde(alias="allowPublisherCreatedLinks")]
+    #[serde(rename="allowPublisherCreatedLinks")]
     pub allow_publisher_created_links: bool,
     /// The requested advertiser.
     pub item: Option<Box<Advertiser>>,
     /// URL to the logo this advertiser uses on the Google Affiliate Network.
-    #[serde(alias="logoUrl")]
+    #[serde(rename="logoUrl")]
     pub logo_url: String,
     /// List of redirect URLs for this advertiser
-    #[serde(alias="redirectDomains")]
+    #[serde(rename="redirectDomains")]
     pub redirect_domains: Vec<String>,
 }
 
@@ -436,16 +436,16 @@ pub struct CcOfferRewards {
     /// The number of units rewarded per purchase dollar.
     pub amount: f64,
     /// The minimum purchase amount in the given category before this rule applies.
-    #[serde(alias="minRewardTier")]
+    #[serde(rename="minRewardTier")]
     pub min_reward_tier: f64,
     /// Other limits, for example, if this rule only applies during an introductory period.
-    #[serde(alias="additionalDetails")]
+    #[serde(rename="additionalDetails")]
     pub additional_details: String,
     /// The maximum purchase amount in the given category for this rule to apply.
-    #[serde(alias="maxRewardTier")]
+    #[serde(rename="maxRewardTier")]
     pub max_reward_tier: f64,
     /// How long rewards granted by this rule last.
-    #[serde(alias="expirationMonths")]
+    #[serde(rename="expirationMonths")]
     pub expiration_months: f64,
 }
 
@@ -465,7 +465,7 @@ impl Part for CcOfferRewards {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Links {
     /// The next page token.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The links.
     pub items: Vec<Link>,
@@ -488,7 +488,7 @@ impl ResponseResult for Links {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Publishers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The entity list.
     pub items: Vec<Publisher>,
@@ -508,7 +508,7 @@ pub struct Money {
     /// The amount of money.
     pub amount: f64,
     /// The 3-letter code of the currency in question.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
 }
 
@@ -536,20 +536,20 @@ pub struct Publisher {
     /// Classification that this publisher belongs to. See this link for all publisher classifications: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107625&ctx=cb&src=cb&cbid=-k5fihzthfaik&cbrank=4
     pub classification: String,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past seven days. Values are multiplied by 100 for display purposes.
-    #[serde(alias="epcSevenDayAverage")]
+    #[serde(rename="epcSevenDayAverage")]
     pub epc_seven_day_average: Money,
     /// Websites that this publisher uses to advertise.
     pub sites: Vec<String>,
     /// The sum of fees paid to this publisher divided by the total number of clicks over the past three months. Values are multiplied by 100 for display purposes.
-    #[serde(alias="epcNinetyDayAverage")]
+    #[serde(rename="epcNinetyDayAverage")]
     pub epc_ninety_day_average: Money,
     /// The requested publisher.
     pub item: Option<Box<Publisher>>,
     /// A rank based on commissions paid to this publisher over the past 90 days. A number between 1 and 4 where 4 means the top quartile (most money paid) and 1 means the bottom quartile (least money paid).
-    #[serde(alias="payoutRank")]
+    #[serde(rename="payoutRank")]
     pub payout_rank: String,
     /// Date that this publisher was approved as a Google Affiliate Network publisher.
-    #[serde(alias="joinDate")]
+    #[serde(rename="joinDate")]
     pub join_date: String,
     /// The ID of this publisher.
     pub id: String,
@@ -566,28 +566,28 @@ impl ResponseResult for Publisher {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkSpecialOffers {
     /// Price cut on the purchase
-    #[serde(alias="priceCut")]
+    #[serde(rename="priceCut")]
     pub price_cut: Money,
     /// Minimum purchase amount for price cut promotion
-    #[serde(alias="priceCutMin")]
+    #[serde(rename="priceCutMin")]
     pub price_cut_min: Money,
     /// Whether there is free shipping
-    #[serde(alias="freeShipping")]
+    #[serde(rename="freeShipping")]
     pub free_shipping: bool,
     /// List of promotion code associated with the link
-    #[serde(alias="promotionCodes")]
+    #[serde(rename="promotionCodes")]
     pub promotion_codes: Vec<String>,
     /// Percent off on the purchase
-    #[serde(alias="percentOff")]
+    #[serde(rename="percentOff")]
     pub percent_off: f64,
     /// Minimum purchase amount for percent off promotion
-    #[serde(alias="percentOffMin")]
+    #[serde(rename="percentOffMin")]
     pub percent_off_min: Money,
     /// Whether there is a free gift
-    #[serde(alias="freeGift")]
+    #[serde(rename="freeGift")]
     pub free_gift: bool,
     /// Minimum purchase amount for free shipping promotion
-    #[serde(alias="freeShippingMin")]
+    #[serde(rename="freeShippingMin")]
     pub free_shipping_min: Money,
 }
 
@@ -607,7 +607,7 @@ impl Part for LinkSpecialOffers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Events {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The event list.
     pub items: Vec<Event>,
@@ -643,13 +643,13 @@ pub struct CcOfferDefaultFees {
     /// The type of charge, for example Purchases.
     pub category: String,
     /// The highest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
-    #[serde(alias="maxRate")]
+    #[serde(rename="maxRate")]
     pub max_rate: f64,
     /// The lowest rate the issuer may charge for defaulting on debt in this category. Expressed as an absolute number, not as a percentage.
-    #[serde(alias="minRate")]
+    #[serde(rename="minRate")]
     pub min_rate: f64,
     /// Fixed or variable.
-    #[serde(alias="rateType")]
+    #[serde(rename="rateType")]
     pub rate_type: String,
 }
 
@@ -691,29 +691,29 @@ impl ResponseResult for CcOffers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Link {
     /// The link type.
-    #[serde(alias="linkType")]
+    #[serde(rename="linkType")]
     pub link_type: Option<String>,
     /// Date that this link becomes active.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: Option<String>,
     /// Date that this link becomes inactive.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: Option<String>,
     /// Description.
     pub description: Option<String>,
     /// Availability.
     pub availability: Option<String>,
     /// image alt text.
-    #[serde(alias="imageAltText")]
+    #[serde(rename="imageAltText")]
     pub image_alt_text: Option<String>,
     /// The advertiser id for the advertiser who owns this link.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// Tracking url for clicks.
-    #[serde(alias="clickTrackingUrl")]
+    #[serde(rename="clickTrackingUrl")]
     pub click_tracking_url: Option<String>,
     /// Promotion Type
-    #[serde(alias="promotionType")]
+    #[serde(rename="promotionType")]
     pub promotion_type: Option<String>,
     /// Duration
     pub duration: Option<String>,
@@ -722,29 +722,29 @@ pub struct Link {
     /// The ID of this link.
     pub id: Option<String>,
     /// Flag for if this link is active.
-    #[serde(alias="isActive")]
+    #[serde(rename="isActive")]
     pub is_active: Option<bool>,
     /// The destination URL for the link.
-    #[serde(alias="destinationUrl")]
+    #[serde(rename="destinationUrl")]
     pub destination_url: Option<String>,
     /// Special offers on the link.
-    #[serde(alias="specialOffers")]
+    #[serde(rename="specialOffers")]
     pub special_offers: Option<LinkSpecialOffers>,
     /// The kind for one entity.
     pub kind: Option<String>,
     /// The logical name for this link.
     pub name: Option<String>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past seven days on this link. This value should be multiplied by 100 at the time of display.
-    #[serde(alias="epcSevenDayAverage")]
+    #[serde(rename="epcSevenDayAverage")]
     pub epc_seven_day_average: Option<Money>,
     /// Date that this link was created.
-    #[serde(alias="createDate")]
+    #[serde(rename="createDate")]
     pub create_date: Option<String>,
     /// The sum of fees paid to publishers divided by the total number of clicks over the past three months on this link. This value should be multiplied by 100 at the time of display.
-    #[serde(alias="epcNinetyDayAverage")]
+    #[serde(rename="epcNinetyDayAverage")]
     pub epc_ninety_day_average: Option<Money>,
     /// Tracking url for impressions.
-    #[serde(alias="impressionTrackingUrl")]
+    #[serde(rename="impressionTrackingUrl")]
     pub impression_tracking_url: Option<String>,
 }
 
@@ -760,26 +760,26 @@ impl ResponseResult for Link {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventProducts {
     /// Fee that the advertiser paid to the Google Affiliate Network for this product.
-    #[serde(alias="networkFee")]
+    #[serde(rename="networkFee")]
     pub network_fee: Money,
     /// Sku of this product.
     pub sku: String,
     /// Name of the category this product belongs to.
-    #[serde(alias="categoryName")]
+    #[serde(rename="categoryName")]
     pub category_name: String,
     /// Sku name of this product.
-    #[serde(alias="skuName")]
+    #[serde(rename="skuName")]
     pub sku_name: String,
     /// Fee that the advertiser paid to the publisehr for this product.
-    #[serde(alias="publisherFee")]
+    #[serde(rename="publisherFee")]
     pub publisher_fee: Money,
     /// Amount earned by the publisher on this product.
     pub earnings: Money,
     /// Price per unit of this product.
-    #[serde(alias="unitPrice")]
+    #[serde(rename="unitPrice")]
     pub unit_price: Money,
     /// Id of the category this product belongs to.
-    #[serde(alias="categoryId")]
+    #[serde(rename="categoryId")]
     pub category_id: String,
     /// Quantity of this product bought/exchanged.
     pub quantity: String,
@@ -813,7 +813,7 @@ pub struct Report {
     /// The column names for the report
     pub column_names: Vec<String>,
     /// The report type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The start of the date range for this report, inclusive.
     pub start_date: String,
@@ -835,7 +835,7 @@ impl ResponseResult for Report {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Advertisers {
     /// The 'pageToken' to pass to the next request to get the next page, if there are more to retrieve.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The advertiser list.
     pub items: Vec<Advertiser>,
@@ -858,54 +858,54 @@ impl ResponseResult for Advertisers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Event {
     /// The order ID for this event. Only returned for conversion events.
-    #[serde(alias="orderId")]
+    #[serde(rename="orderId")]
     pub order_id: Option<String>,
     /// Status of the event (active|canceled). Only returned for charge and conversion events.
     pub status: Option<String>,
     /// The date-time this event was last modified as a RFC 3339 date-time value.
-    #[serde(alias="modifyDate")]
+    #[serde(rename="modifyDate")]
     pub modify_date: Option<String>,
     /// The name of the advertiser for this event.
-    #[serde(alias="advertiserName")]
+    #[serde(rename="advertiserName")]
     pub advertiser_name: Option<String>,
     /// The charge ID for this event. Only returned for charge events.
-    #[serde(alias="chargeId")]
+    #[serde(rename="chargeId")]
     pub charge_id: Option<String>,
     /// Charge type of the event (other|slotting_fee|monthly_minimum|tier_bonus|debit|credit). Only returned for charge events.
-    #[serde(alias="chargeType")]
+    #[serde(rename="chargeType")]
     pub charge_type: Option<String>,
     /// The name of the publisher for this event.
-    #[serde(alias="publisherName")]
+    #[serde(rename="publisherName")]
     pub publisher_name: Option<String>,
     /// The date-time this event was initiated as a RFC 3339 date-time value.
-    #[serde(alias="eventDate")]
+    #[serde(rename="eventDate")]
     pub event_date: Option<String>,
     /// Fee that the advertiser paid to the Google Affiliate Network.
-    #[serde(alias="networkFee")]
+    #[serde(rename="networkFee")]
     pub network_fee: Option<Money>,
     /// The ID of advertiser for this event.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
     /// The kind for one event.
     pub kind: Option<String>,
     /// The ID of the publisher for this event.
-    #[serde(alias="publisherId")]
+    #[serde(rename="publisherId")]
     pub publisher_id: Option<String>,
     /// The ID of the member attached to this event. Only returned for conversion events.
-    #[serde(alias="memberId")]
+    #[serde(rename="memberId")]
     pub member_id: Option<String>,
     /// Fee that the advertiser paid to the publisher.
-    #[serde(alias="publisherFee")]
+    #[serde(rename="publisherFee")]
     pub publisher_fee: Option<Money>,
     /// Earnings by the publisher.
     pub earnings: Option<Money>,
     /// Products associated with the event.
     pub products: Option<Vec<EventProducts>>,
     /// Amount of money exchanged during the transaction. Only returned for charge and conversion events.
-    #[serde(alias="commissionableSales")]
+    #[serde(rename="commissionableSales")]
     pub commissionable_sales: Option<Money>,
     /// Type of the event (action|transaction|charge).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
@@ -924,188 +924,188 @@ impl Resource for Event {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CcOffer {
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="luggageInsurance")]
+    #[serde(rename="luggageInsurance")]
     pub luggage_insurance: Option<String>,
     /// The low end for credit limits the issuer imposes on recipients of this card.
-    #[serde(alias="creditLimitMin")]
+    #[serde(rename="creditLimitMin")]
     pub credit_limit_min: Option<f64>,
     /// The issuer's name for the card, including any trademark or service mark designators. A summary field.
-    #[serde(alias="cardName")]
+    #[serde(rename="cardName")]
     pub card_name: Option<String>,
     /// The high end for credit limits the issuer imposes on recipients of this card.
-    #[serde(alias="creditLimitMax")]
+    #[serde(rename="creditLimitMax")]
     pub credit_limit_max: Option<f64>,
     /// Text describing the grace period before finance charges apply. A summary field.
-    #[serde(alias="gracePeriodDisplay")]
+    #[serde(rename="gracePeriodDisplay")]
     pub grace_period_display: Option<String>,
     /// Any extra fees levied on card holders.
-    #[serde(alias="additionalCardHolderFee")]
+    #[serde(rename="additionalCardHolderFee")]
     pub additional_card_holder_fee: Option<String>,
     /// This offer's ID. A summary field.
-    #[serde(alias="offerId")]
+    #[serde(rename="offerId")]
     pub offer_id: Option<String>,
     /// The lowest interest rate the issuer charges on this card. Expressed as an absolute number, not as a percentage.
-    #[serde(alias="minPurchaseRate")]
+    #[serde(rename="minPurchaseRate")]
     pub min_purchase_rate: Option<f64>,
     /// A list of what the issuer thinks are the most important benefits of the card. Usually summarizes the rewards program, if there is one. A summary field.
-    #[serde(alias="cardBenefits")]
+    #[serde(rename="cardBenefits")]
     pub card_benefits: Option<Vec<String>>,
     /// Fees for defaulting on your payments.
-    #[serde(alias="defaultFees")]
+    #[serde(rename="defaultFees")]
     pub default_fees: Option<Vec<CcOfferDefaultFees>>,
     /// Whether a cash reward program lets you get cash back sooner than end of year or other longish period.
-    #[serde(alias="offersImmediateCashReward")]
+    #[serde(rename="offersImmediateCashReward")]
     pub offers_immediate_cash_reward: Option<bool>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="travelInsurance")]
+    #[serde(rename="travelInsurance")]
     pub travel_insurance: Option<String>,
     /// Text describing the fee for a payment that doesn't clear. A summary field.
-    #[serde(alias="returnedPaymentFee")]
+    #[serde(rename="returnedPaymentFee")]
     pub returned_payment_fee: Option<String>,
     /// Name of card issuer. A summary field.
     pub issuer: Option<String>,
     /// Whether this card is only available to existing customers of the issuer.
-    #[serde(alias="existingCustomerOnly")]
+    #[serde(rename="existingCustomerOnly")]
     pub existing_customer_only: Option<bool>,
     /// Text describing the annual fee, including any difference for the first year. A summary field.
-    #[serde(alias="annualFeeDisplay")]
+    #[serde(rename="annualFeeDisplay")]
     pub annual_fee_display: Option<String>,
     /// Fee for setting up the card.
-    #[serde(alias="initialSetupAndProcessingFee")]
+    #[serde(rename="initialSetupAndProcessingFee")]
     pub initial_setup_and_processing_fee: Option<String>,
     /// Text describing how much missing the grace period will cost.
-    #[serde(alias="minimumFinanceCharge")]
+    #[serde(rename="minimumFinanceCharge")]
     pub minimum_finance_charge: Option<String>,
     /// Text describing any additional details for the purchase rate. A summary field.
-    #[serde(alias="purchaseRateAdditionalDetails")]
+    #[serde(rename="purchaseRateAdditionalDetails")]
     pub purchase_rate_additional_details: Option<String>,
     /// For cards with rewards programs, the unit of reward. For example, miles, cash back, points.
-    #[serde(alias="rewardUnit")]
+    #[serde(rename="rewardUnit")]
     pub reward_unit: Option<String>,
     /// Text describing the credit ratings required for recipients of this card, for example "Excellent/Good." A summary field.
-    #[serde(alias="creditRatingDisplay")]
+    #[serde(rename="creditRatingDisplay")]
     pub credit_rating_display: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="fraudLiability")]
+    #[serde(rename="fraudLiability")]
     pub fraud_liability: Option<String>,
     /// Text describing the terms for cash advances. A summary field.
-    #[serde(alias="cashAdvanceTerms")]
+    #[serde(rename="cashAdvanceTerms")]
     pub cash_advance_terms: Option<String>,
     /// The link to the issuer's page for this card. A summary field.
-    #[serde(alias="landingPageUrl")]
+    #[serde(rename="landingPageUrl")]
     pub landing_page_url: Option<String>,
     /// Text describing the terms for introductory period cash advances. A summary field.
-    #[serde(alias="introCashAdvanceTerms")]
+    #[serde(rename="introCashAdvanceTerms")]
     pub intro_cash_advance_terms: Option<String>,
     /// The annual fee for the first year, if different from the ongoing fee. Optional.
-    #[serde(alias="firstYearAnnualFee")]
+    #[serde(rename="firstYearAnnualFee")]
     pub first_year_annual_fee: Option<f64>,
     /// Text describing the terms for introductory period purchases. A summary field.
-    #[serde(alias="introPurchaseTerms")]
+    #[serde(rename="introPurchaseTerms")]
     pub intro_purchase_terms: Option<String>,
     /// For cards with rewards programs, detailed rules about how the program works.
     pub rewards: Option<Vec<CcOfferRewards>>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="extendedWarranty")]
+    #[serde(rename="extendedWarranty")]
     pub extended_warranty: Option<String>,
     /// The highest interest rate the issuer charges on this card. Expressed as an absolute number, not as a percentage.
-    #[serde(alias="maxPurchaseRate")]
+    #[serde(rename="maxPurchaseRate")]
     pub max_purchase_rate: Option<f64>,
     /// The link to ping to register a click on this offer. A summary field.
-    #[serde(alias="trackingUrl")]
+    #[serde(rename="trackingUrl")]
     pub tracking_url: Option<String>,
     /// Text describing how much a late payment will cost, eg "up to $35." A summary field.
-    #[serde(alias="latePaymentFee")]
+    #[serde(rename="latePaymentFee")]
     pub late_payment_fee: Option<String>,
     /// Fee for exceeding the card's charge limit.
-    #[serde(alias="overLimitFee")]
+    #[serde(rename="overLimitFee")]
     pub over_limit_fee: Option<String>,
     /// What kind of credit card this is, for example secured or unsecured.
-    #[serde(alias="cardType")]
+    #[serde(rename="cardType")]
     pub card_type: Option<String>,
     /// Possible categories for this card, eg "Low Interest" or "Good." A summary field.
-    #[serde(alias="approvedCategories")]
+    #[serde(rename="approvedCategories")]
     pub approved_categories: Option<Vec<String>>,
     /// The company that redeems the rewards, if different from the issuer.
-    #[serde(alias="rewardPartner")]
+    #[serde(rename="rewardPartner")]
     pub reward_partner: Option<String>,
     /// Text describing the terms for introductory period balance transfers. A summary field.
-    #[serde(alias="introBalanceTransferTerms")]
+    #[serde(rename="introBalanceTransferTerms")]
     pub intro_balance_transfer_terms: Option<String>,
     /// The largest number of units you may accumulate in a year.
-    #[serde(alias="annualRewardMaximum")]
+    #[serde(rename="annualRewardMaximum")]
     pub annual_reward_maximum: Option<f64>,
     /// Fee for each transaction involving a foreign currency.
-    #[serde(alias="foreignCurrencyTransactionFee")]
+    #[serde(rename="foreignCurrencyTransactionFee")]
     pub foreign_currency_transaction_fee: Option<String>,
     /// The ongoing annual fee, in dollars.
-    #[serde(alias="annualFee")]
+    #[serde(rename="annualFee")]
     pub annual_fee: Option<f64>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="carRentalInsurance")]
+    #[serde(rename="carRentalInsurance")]
     pub car_rental_insurance: Option<String>,
     /// How often variable rates are updated.
-    #[serde(alias="variableRatesUpdateFrequency")]
+    #[serde(rename="variableRatesUpdateFrequency")]
     pub variable_rates_update_frequency: Option<String>,
     /// The kind for one credit card offer. A summary field.
     pub kind: Option<String>,
     /// More marketing copy about the card's benefits. A summary field.
-    #[serde(alias="additionalCardBenefits")]
+    #[serde(rename="additionalCardBenefits")]
     pub additional_card_benefits: Option<Vec<String>>,
     /// The generic link to the issuer's site.
-    #[serde(alias="issuerWebsite")]
+    #[serde(rename="issuerWebsite")]
     pub issuer_website: Option<String>,
     /// Text describing how the balance is computed. A summary field.
-    #[serde(alias="balanceComputationMethod")]
+    #[serde(rename="balanceComputationMethod")]
     pub balance_computation_method: Option<String>,
     /// Text describing the purchase APR. A summary field.
-    #[serde(alias="aprDisplay")]
+    #[serde(rename="aprDisplay")]
     pub apr_display: Option<String>,
     /// The link to the image of the card that is shown on Connect Commerce. A summary field.
-    #[serde(alias="imageUrl")]
+    #[serde(rename="imageUrl")]
     pub image_url: Option<String>,
     /// Categories in which the issuer does not wish the card to be displayed. A summary field.
-    #[serde(alias="prohibitedCategories")]
+    #[serde(rename="prohibitedCategories")]
     pub prohibited_categories: Option<Vec<String>>,
     /// When variable rates were last updated.
-    #[serde(alias="variableRatesLastUpdated")]
+    #[serde(rename="variableRatesLastUpdated")]
     pub variable_rates_last_updated: Option<String>,
     /// The youngest a recipient of this card may be.
-    #[serde(alias="ageMinimum")]
+    #[serde(rename="ageMinimum")]
     pub age_minimum: Option<f64>,
     /// Which network (eg Visa) the card belongs to. A summary field.
     pub network: Option<String>,
     /// Fixed or variable.
-    #[serde(alias="purchaseRateType")]
+    #[serde(rename="purchaseRateType")]
     pub purchase_rate_type: Option<String>,
     /// Fee for requesting a copy of your statement.
-    #[serde(alias="statementCopyFee")]
+    #[serde(rename="statementCopyFee")]
     pub statement_copy_fee: Option<String>,
     /// For airline miles rewards, tells whether blackout dates apply to the miles.
-    #[serde(alias="rewardsHaveBlackoutDates")]
+    #[serde(rename="rewardsHaveBlackoutDates")]
     pub rewards_have_blackout_dates: Option<bool>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="emergencyInsurance")]
+    #[serde(rename="emergencyInsurance")]
     pub emergency_insurance: Option<String>,
     /// If you get coverage when you use the card for the given activity, this field describes it.
-    #[serde(alias="flightAccidentInsurance")]
+    #[serde(rename="flightAccidentInsurance")]
     pub flight_accident_insurance: Option<String>,
     /// Whether accumulated rewards ever expire.
-    #[serde(alias="rewardsExpire")]
+    #[serde(rename="rewardsExpire")]
     pub rewards_expire: Option<bool>,
     /// Text describing the terms for balance transfers. A summary field.
-    #[serde(alias="balanceTransferTerms")]
+    #[serde(rename="balanceTransferTerms")]
     pub balance_transfer_terms: Option<String>,
     /// A notice that, if present, is referenced via an asterisk by many of the other summary fields. If this field is present, it will always start with an asterisk ("*"), and must be prominently displayed with the offer. A summary field.
     pub disclaimer: Option<String>,
     /// The Google Affiliate Network ID of the advertiser making this offer.
-    #[serde(alias="issuerId")]
+    #[serde(rename="issuerId")]
     pub issuer_id: Option<String>,
     /// Text describing the details of the age minimum restriction.
-    #[serde(alias="ageMinimumDetails")]
+    #[serde(rename="ageMinimumDetails")]
     pub age_minimum_details: Option<String>,
     /// For cards with rewards programs, extra circumstances whereby additional rewards may be granted.
-    #[serde(alias="bonusRewards")]
+    #[serde(rename="bonusRewards")]
     pub bonus_rewards: Option<Vec<CcOfferBonusRewards>>,
 }
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.3+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *books* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -343,7 +343,7 @@ impl<'a, C, NC, A> Books<C, NC, A>
         Books {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -377,7 +377,7 @@ impl<'a, C, NC, A> Books<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -418,10 +418,10 @@ impl ResponseResult for Category {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CategoryItems {
     /// no description provided
-    #[serde(alias="badgeUrl")]
+    #[serde(rename="badgeUrl")]
     pub badge_url: String,
     /// no description provided
-    #[serde(alias="categoryId")]
+    #[serde(rename="categoryId")]
     pub category_id: String,
     /// no description provided
     pub name: String,
@@ -444,23 +444,23 @@ pub struct ConcurrentAccessRestriction {
     /// Whether this volume has any concurrent access restrictions.
     pub restricted: bool,
     /// Identifies the volume for which this entry applies.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// The maximum number of concurrent access licenses for this volume.
-    #[serde(alias="maxConcurrentDevices")]
+    #[serde(rename="maxConcurrentDevices")]
     pub max_concurrent_devices: i32,
     /// Whether access is granted for this (user, device, volume).
-    #[serde(alias="deviceAllowed")]
+    #[serde(rename="deviceAllowed")]
     pub device_allowed: bool,
     /// Client app identifier for verification. Download access and client-validation only.
     pub source: String,
     /// Time in seconds for license auto-expiration.
-    #[serde(alias="timeWindowSeconds")]
+    #[serde(rename="timeWindowSeconds")]
     pub time_window_seconds: i32,
     /// Response signature.
     pub signature: String,
     /// Error/warning reason code.
-    #[serde(alias="reasonCode")]
+    #[serde(rename="reasonCode")]
     pub reason_code: String,
     /// Error/warning message.
     pub message: String,
@@ -498,16 +498,16 @@ pub struct VolumeVolumeInfo {
     /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)
     pub description: String,
     /// Total number of pages as per publisher metadata.
-    #[serde(alias="pageCount")]
+    #[serde(rename="pageCount")]
     pub page_count: i32,
     /// A list of image links for all the sizes that are available. (In LITE projection.)
-    #[serde(alias="imageLinks")]
+    #[serde(rename="imageLinks")]
     pub image_links: VolumeVolumeInfoImageLinks,
     /// The number of review ratings for this volume.
-    #[serde(alias="ratingsCount")]
+    #[serde(rename="ratingsCount")]
     pub ratings_count: i32,
     /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
-    #[serde(alias="mainCategory")]
+    #[serde(rename="mainCategory")]
     pub main_category: String,
     /// The names of the authors and/or editors for this volume. (In LITE projection)
     pub authors: Vec<String>,
@@ -520,39 +520,39 @@ pub struct VolumeVolumeInfo {
     /// Best language for this volume (based on content). It is the two-letter ISO 639-1 code such as 'fr', 'en', etc.
     pub language: String,
     /// URL to preview this volume on the Google Books site.
-    #[serde(alias="previewLink")]
+    #[serde(rename="previewLink")]
     pub preview_link: String,
     /// The reading modes available for this volume.
-    #[serde(alias="readingModes")]
+    #[serde(rename="readingModes")]
     pub reading_modes: String,
     /// Date of publication. (In LITE projection.)
-    #[serde(alias="publishedDate")]
+    #[serde(rename="publishedDate")]
     pub published_date: String,
     /// Type of publication of this volume. Possible values are BOOK or MAGAZINE.
-    #[serde(alias="printType")]
+    #[serde(rename="printType")]
     pub print_type: String,
     /// Total number of sample pages as per publisher metadata.
-    #[serde(alias="samplePageCount")]
+    #[serde(rename="samplePageCount")]
     pub sample_page_count: i32,
     /// An identifier for the version of the volume content (text & images). (In LITE projection)
-    #[serde(alias="contentVersion")]
+    #[serde(rename="contentVersion")]
     pub content_version: String,
     /// Total number of printed pages in generated pdf representation.
-    #[serde(alias="printedPageCount")]
+    #[serde(rename="printedPageCount")]
     pub printed_page_count: i32,
     /// Industry standard identifiers for this volume.
-    #[serde(alias="industryIdentifiers")]
+    #[serde(rename="industryIdentifiers")]
     pub industry_identifiers: Vec<VolumeVolumeInfoIndustryIdentifiers>,
     /// Volume title. (In LITE projection.)
     pub title: String,
     /// The mean review rating for this volume. (min = 1.0, max = 5.0)
-    #[serde(alias="averageRating")]
+    #[serde(rename="averageRating")]
     pub average_rating: f64,
     /// URL to view information about this volume on the Google Books site. (In LITE projection)
-    #[serde(alias="infoLink")]
+    #[serde(rename="infoLink")]
     pub info_link: String,
     /// Canonical URL for a volume. (In LITE projection.)
-    #[serde(alias="canonicalVolumeLink")]
+    #[serde(rename="canonicalVolumeLink")]
     pub canonical_volume_link: String,
 }
 
@@ -567,19 +567,19 @@ impl Part for VolumeVolumeInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationClientVersionRanges {
     /// Range in image CFI format for this annotation sent by client.
-    #[serde(alias="imageCfiRange")]
+    #[serde(rename="imageCfiRange")]
     pub image_cfi_range: BooksAnnotationsRange,
     /// Range in GB text format for this annotation sent by client.
-    #[serde(alias="gbTextRange")]
+    #[serde(rename="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
     /// Content version the client sent in.
-    #[serde(alias="contentVersion")]
+    #[serde(rename="contentVersion")]
     pub content_version: String,
     /// Range in CFI format for this annotation sent by client.
-    #[serde(alias="cfiRange")]
+    #[serde(rename="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
     /// Range in GB image format for this annotation sent by client.
-    #[serde(alias="gbImageRange")]
+    #[serde(rename="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
 }
 
@@ -599,12 +599,12 @@ impl Part for AnnotationClientVersionRanges {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RequestAccess {
     /// A download access response.
-    #[serde(alias="downloadAccess")]
+    #[serde(rename="downloadAccess")]
     pub download_access: DownloadAccessRestriction,
     /// Resource type.
     pub kind: String,
     /// A concurrent access response.
-    #[serde(alias="concurrentAccess")]
+    #[serde(rename="concurrentAccess")]
     pub concurrent_access: ConcurrentAccessRestriction,
 }
 
@@ -624,13 +624,13 @@ pub struct OffersItemsItems {
     /// no description provided
     pub title: String,
     /// no description provided
-    #[serde(alias="coverUrl")]
+    #[serde(rename="coverUrl")]
     pub cover_url: String,
     /// no description provided
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// no description provided
-    #[serde(alias="canonicalVolumeLink")]
+    #[serde(rename="canonicalVolumeLink")]
     pub canonical_volume_link: String,
 }
 
@@ -650,14 +650,14 @@ impl Part for OffersItemsItems {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of annotations.
     pub items: Vec<Annotation>,
     /// Resource type.
     pub kind: String,
     /// Total number of annotations found. This may be greater than the number of notes returned in this response if results have been paginated.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -671,16 +671,16 @@ impl ResponseResult for Annotations {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffers {
     /// The rental duration (for rental offers only).
-    #[serde(alias="rentalDuration")]
+    #[serde(rename="rentalDuration")]
     pub rental_duration: VolumeSaleInfoOffersRentalDuration,
     /// Offer retail (=discounted) price in Micros
-    #[serde(alias="retailPrice")]
+    #[serde(rename="retailPrice")]
     pub retail_price: VolumeSaleInfoOffersRetailPrice,
     /// Offer list (=undiscounted) price in Micros.
-    #[serde(alias="listPrice")]
+    #[serde(rename="listPrice")]
     pub list_price: VolumeSaleInfoOffersListPrice,
     /// The finsky offer type (e.g., PURCHASE=0 RENTAL=3)
-    #[serde(alias="finskyOfferType")]
+    #[serde(rename="finskyOfferType")]
     pub finsky_offer_type: i32,
 }
 
@@ -728,32 +728,32 @@ pub struct Volume {
     /// Resource type for a volume. (In LITE projection.)
     pub kind: String,
     /// Any information about a volume related to reading or obtaining that volume text. This information can depend on country (books may be public domain in one country but not in another, e.g.).
-    #[serde(alias="accessInfo")]
+    #[serde(rename="accessInfo")]
     pub access_info: VolumeAccessInfo,
     /// Search result information related to this volume.
-    #[serde(alias="searchInfo")]
+    #[serde(rename="searchInfo")]
     pub search_info: VolumeSearchInfo,
     /// Any information about a volume related to the eBookstore and/or purchaseability. This information can depend on the country where the request originates from (i.e. books may not be for sale in certain countries).
-    #[serde(alias="saleInfo")]
+    #[serde(rename="saleInfo")]
     pub sale_info: VolumeSaleInfo,
     /// Opaque identifier for a specific version of a volume resource. (In LITE projection)
     pub etag: String,
     /// What layers exist in this volume and high level information about them.
-    #[serde(alias="layerInfo")]
+    #[serde(rename="layerInfo")]
     pub layer_info: VolumeLayerInfo,
     /// General volume information.
-    #[serde(alias="volumeInfo")]
+    #[serde(rename="volumeInfo")]
     pub volume_info: VolumeVolumeInfo,
     /// Recommendation related information for this volume.
-    #[serde(alias="recommendedInfo")]
+    #[serde(rename="recommendedInfo")]
     pub recommended_info: VolumeRecommendedInfo,
     /// Unique identifier for a volume. (In LITE projection.)
     pub id: String,
     /// URL to this resource. (In LITE projection.)
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// User specific information related to this volume. (e.g. page this user last read or whether they purchased this book)
-    #[serde(alias="userInfo")]
+    #[serde(rename="userInfo")]
     pub user_info: VolumeUserInfo,
 }
 
@@ -790,7 +790,7 @@ pub struct Usersettings {
     /// Resource type.
     pub kind: Option<String>,
     /// User settings in sub-objects, each for different purposes.
-    #[serde(alias="notesExport")]
+    #[serde(rename="notesExport")]
     pub notes_export: Option<UsersettingsNotesExport>,
 }
 
@@ -841,7 +841,7 @@ impl Part for MetadataItems {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReviewAuthor {
     /// Name of this person.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
 }
 
@@ -868,7 +868,7 @@ pub struct Bookshelf {
     /// Title of this bookshelf.
     pub title: String,
     /// Number of volumes in this bookshelf.
-    #[serde(alias="volumeCount")]
+    #[serde(rename="volumeCount")]
     pub volume_count: i32,
     /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
     pub created: String,
@@ -877,12 +877,12 @@ pub struct Bookshelf {
     /// Whether this bookshelf is PUBLIC or PRIVATE.
     pub access: String,
     /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
-    #[serde(alias="volumesLastUpdated")]
+    #[serde(rename="volumesLastUpdated")]
     pub volumes_last_updated: String,
     /// Id of this bookshelf, only unique by user.
     pub id: i32,
     /// URL to this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -896,10 +896,10 @@ impl ResponseResult for Bookshelf {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotesExport {
     /// no description provided
-    #[serde(alias="isEnabled")]
+    #[serde(rename="isEnabled")]
     pub is_enabled: bool,
     /// no description provided
-    #[serde(alias="folderName")]
+    #[serde(rename="folderName")]
     pub folder_name: String,
 }
 
@@ -924,16 +924,16 @@ pub struct Annotation {
     /// Indicates that this annotation is deleted.
     pub deleted: Option<bool>,
     /// Selection ranges for the most recent content version.
-    #[serde(alias="currentVersionRanges")]
+    #[serde(rename="currentVersionRanges")]
     pub current_version_ranges: Option<AnnotationCurrentVersionRanges>,
     /// Anchor text after excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
-    #[serde(alias="afterSelectedText")]
+    #[serde(rename="afterSelectedText")]
     pub after_selected_text: Option<String>,
     /// The volume that this annotation belongs to.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: Option<String>,
     /// Excerpt from the volume.
-    #[serde(alias="selectedText")]
+    #[serde(rename="selectedText")]
     pub selected_text: Option<String>,
     /// User-created data for this annotation.
     pub data: Option<String>,
@@ -944,25 +944,25 @@ pub struct Annotation {
     /// Timestamp for the created time of this annotation.
     pub created: Option<String>,
     /// Anchor text before excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
-    #[serde(alias="beforeSelectedText")]
+    #[serde(rename="beforeSelectedText")]
     pub before_selected_text: Option<String>,
     /// Selection ranges sent from the client.
-    #[serde(alias="clientVersionRanges")]
+    #[serde(rename="clientVersionRanges")]
     pub client_version_ranges: Option<AnnotationClientVersionRanges>,
     /// Pages that this annotation spans.
-    #[serde(alias="pageIds")]
+    #[serde(rename="pageIds")]
     pub page_ids: Option<Vec<String>>,
     /// The layer this annotation is for.
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: Option<String>,
     /// The highlight style for this annotation.
-    #[serde(alias="highlightStyle")]
+    #[serde(rename="highlightStyle")]
     pub highlight_style: Option<String>,
     /// no description provided
-    #[serde(alias="layerSummary")]
+    #[serde(rename="layerSummary")]
     pub layer_summary: Option<AnnotationLayerSummary>,
     /// URL to this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -985,7 +985,7 @@ pub struct Review {
     /// Author of this review.
     pub author: ReviewAuthor,
     /// Volume that this review is for.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// Review text.
     pub content: String,
@@ -994,10 +994,10 @@ pub struct Review {
     /// Date of this review.
     pub date: String,
     /// Source type for this review. Possible values are EDITORIAL, WEB_USER or GOOGLE_USER.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// URL for the full review text, for reviews gathered from the web.
-    #[serde(alias="fullTextUrl")]
+    #[serde(rename="fullTextUrl")]
     pub full_text_url: String,
 }
 
@@ -1015,26 +1015,26 @@ pub struct DownloadAccessRestriction {
     /// Resource type.
     pub kind: String,
     /// If deviceAllowed, whether access was just acquired with this request.
-    #[serde(alias="justAcquired")]
+    #[serde(rename="justAcquired")]
     pub just_acquired: bool,
     /// If restricted, the maximum number of content download licenses for this volume.
-    #[serde(alias="maxDownloadDevices")]
+    #[serde(rename="maxDownloadDevices")]
     pub max_download_devices: i32,
     /// If restricted, the number of content download licenses already acquired (including the requesting client, if licensed).
-    #[serde(alias="downloadsAcquired")]
+    #[serde(rename="downloadsAcquired")]
     pub downloads_acquired: i32,
     /// Identifies the volume for which this entry applies.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// If restricted, whether access is granted for this (user, device, volume).
-    #[serde(alias="deviceAllowed")]
+    #[serde(rename="deviceAllowed")]
     pub device_allowed: bool,
     /// Client app identifier for verification. Download access and client-validation only.
     pub source: String,
     /// Response signature.
     pub signature: String,
     /// Error/warning reason code. Additional codes may be added in the future. 0 OK 100 ACCESS_DENIED_PUBLISHER_LIMIT 101 ACCESS_DENIED_LIMIT 200 WARNING_USED_LAST_ACCESS
-    #[serde(alias="reasonCode")]
+    #[serde(rename="reasonCode")]
     pub reason_code: String,
     /// Error/warning message.
     pub message: String,
@@ -1057,7 +1057,7 @@ impl Part for DownloadAccessRestriction {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadAccesses {
     /// A list of download access responses.
-    #[serde(alias="downloadAccessList")]
+    #[serde(rename="downloadAccessList")]
     pub download_access_list: Vec<DownloadAccessRestriction>,
     /// Resource type.
     pub kind: String,
@@ -1073,7 +1073,7 @@ impl ResponseResult for DownloadAccesses {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReviewSource {
     /// Extra text about the source of the review.
-    #[serde(alias="extraDescription")]
+    #[serde(rename="extraDescription")]
     pub extra_description: String,
     /// URL of the source of the review.
     pub url: String,
@@ -1097,23 +1097,23 @@ impl Part for ReviewSource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReadingPosition {
     /// Position in a PDF file.
-    #[serde(alias="pdfPosition")]
+    #[serde(rename="pdfPosition")]
     pub pdf_position: String,
     /// Resource type for a reading position.
     pub kind: String,
     /// Position in a volume for image-based content.
-    #[serde(alias="gbImagePosition")]
+    #[serde(rename="gbImagePosition")]
     pub gb_image_position: String,
     /// Position in a volume for text-based content.
-    #[serde(alias="gbTextPosition")]
+    #[serde(rename="gbTextPosition")]
     pub gb_text_position: String,
     /// Position in an EPUB as a CFI.
-    #[serde(alias="epubCfiPosition")]
+    #[serde(rename="epubCfiPosition")]
     pub epub_cfi_position: String,
     /// Timestamp when this reading position was last updated (formatted UTC timestamp with millisecond resolution).
     pub updated: String,
     /// Volume id associated with this reading position.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
 }
 
@@ -1127,10 +1127,10 @@ impl ResponseResult for ReadingPosition {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffersRetailPrice {
     /// no description provided
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// no description provided
-    #[serde(alias="amountInMicros")]
+    #[serde(rename="amountInMicros")]
     pub amount_in_micros: f64,
 }
 
@@ -1145,7 +1145,7 @@ impl Part for VolumeSaleInfoOffersRetailPrice {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSearchInfo {
     /// A text snippet containing the search query.
-    #[serde(alias="textSnippet")]
+    #[serde(rename="textSnippet")]
     pub text_snippet: String,
 }
 
@@ -1160,18 +1160,18 @@ impl Part for VolumeSearchInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnnotationsSummaryLayers {
     /// no description provided
-    #[serde(alias="limitType")]
+    #[serde(rename="limitType")]
     pub limit_type: String,
     /// no description provided
-    #[serde(alias="remainingCharacterCount")]
+    #[serde(rename="remainingCharacterCount")]
     pub remaining_character_count: i32,
     /// no description provided
     pub updated: String,
     /// no description provided
-    #[serde(alias="allowedCharacterCount")]
+    #[serde(rename="allowedCharacterCount")]
     pub allowed_character_count: i32,
     /// no description provided
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: String,
 }
 
@@ -1191,26 +1191,26 @@ impl Part for AnnotationsSummaryLayers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotationdata {
     /// The type of annotation this data is for.
-    #[serde(alias="annotationType")]
+    #[serde(rename="annotationType")]
     pub annotation_type: String,
     /// Resource Type
     pub kind: String,
     /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
     /// The volume id for this data. *
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// Base64 encoded data for this annotation data.
     pub encoded_data: String,
     /// The Layer id for this data. *
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: String,
     /// no description provided
     pub data: String,
     /// Unique id for this annotation data.
     pub id: String,
     /// URL for this resource. *
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1226,12 +1226,12 @@ pub struct VolumeVolumeInfoImageLinks {
     /// Image link for large size (width of ~800 pixels). (In LITE projection)
     pub large: String,
     /// Image link for extra large size (width of ~1280 pixels). (In LITE projection)
-    #[serde(alias="extraLarge")]
+    #[serde(rename="extraLarge")]
     pub extra_large: String,
     /// Image link for medium size (width of ~575 pixels). (In LITE projection)
     pub medium: String,
     /// Image link for small thumbnail size (width of ~80 pixels). (In LITE projection)
-    #[serde(alias="smallThumbnail")]
+    #[serde(rename="smallThumbnail")]
     pub small_thumbnail: String,
     /// Image link for small size (width of ~300 pixels). (In LITE projection)
     pub small: String,
@@ -1252,7 +1252,7 @@ pub struct VolumeSaleInfoRetailPrice {
     /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
 }
 
@@ -1274,38 +1274,38 @@ pub struct Layersummary {
     /// Resource Type
     pub kind: String,
     /// The number of annotations for this layer.
-    #[serde(alias="annotationCount")]
+    #[serde(rename="annotationCount")]
     pub annotation_count: i32,
     /// The number of data items for this layer.
-    #[serde(alias="dataCount")]
+    #[serde(rename="dataCount")]
     pub data_count: i32,
     /// The list of annotation types contained for this layer.
-    #[serde(alias="annotationTypes")]
+    #[serde(rename="annotationTypes")]
     pub annotation_types: Vec<String>,
     /// Timestamp for the last time an item in this layer was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
     /// The volume id this resource is for.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// Link to get data for this annotation.
-    #[serde(alias="annotationsDataLink")]
+    #[serde(rename="annotationsDataLink")]
     pub annotations_data_link: String,
     /// The link to get the annotations for this layer.
-    #[serde(alias="annotationsLink")]
+    #[serde(rename="annotationsLink")]
     pub annotations_link: String,
     /// The content version this resource is for.
-    #[serde(alias="contentVersion")]
+    #[serde(rename="contentVersion")]
     pub content_version: String,
     /// The layer id for this summary.
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: String,
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
-    #[serde(alias="volumeAnnotationsVersion")]
+    #[serde(rename="volumeAnnotationsVersion")]
     pub volume_annotations_version: String,
     /// Unique id of this layer summary.
     pub id: String,
     /// URL to this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1319,10 +1319,10 @@ impl ResponseResult for Layersummary {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffersListPrice {
     /// no description provided
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// no description provided
-    #[serde(alias="amountInMicros")]
+    #[serde(rename="amountInMicros")]
     pub amount_in_micros: f64,
 }
 
@@ -1342,41 +1342,41 @@ impl Part for VolumeSaleInfoOffersListPrice {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumeannotation {
     /// The type of annotation this is.
-    #[serde(alias="annotationType")]
+    #[serde(rename="annotationType")]
     pub annotation_type: String,
     /// Resource Type
     pub kind: String,
     /// Indicates that this annotation is deleted.
     pub deleted: bool,
     /// The content ranges to identify the selected text.
-    #[serde(alias="contentRanges")]
+    #[serde(rename="contentRanges")]
     pub content_ranges: VolumeannotationContentRanges,
     /// Timestamp for the last time this anntoation was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
     /// The Volume this annotation is for.
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: String,
     /// The annotation data id for this volume annotation.
-    #[serde(alias="annotationDataId")]
+    #[serde(rename="annotationDataId")]
     pub annotation_data_id: String,
     /// Link to get data for this annotation.
-    #[serde(alias="annotationDataLink")]
+    #[serde(rename="annotationDataLink")]
     pub annotation_data_link: String,
     /// Pages the annotation spans.
-    #[serde(alias="pageIds")]
+    #[serde(rename="pageIds")]
     pub page_ids: Vec<String>,
     /// The Layer this annotation is for.
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: String,
     /// Excerpt from the volume.
-    #[serde(alias="selectedText")]
+    #[serde(rename="selectedText")]
     pub selected_text: String,
     /// Data for this annotation.
     pub data: String,
     /// Unique id of this volume annotation.
     pub id: String,
     /// URL to this resource.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1395,7 +1395,7 @@ impl ResponseResult for Volumeannotation {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumeannotations {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of volume annotations.
     pub items: Vec<Volumeannotation>,
@@ -1404,7 +1404,7 @@ pub struct Volumeannotations {
     /// The version string for all of the volume annotations in this layer (not just the ones in this response). Note: the version string doesn't apply to the annotation data, just the information in this response (e.g. the location of annotations in the book).
     pub version: String,
     /// The total number of volume annotations found.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -1423,14 +1423,14 @@ impl ResponseResult for Volumeannotations {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotationsdata {
     /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of Annotation Data.
     pub items: Vec<Annotationdata>,
     /// Resource type
     pub kind: String,
     /// The total number of volume annotations found.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
 }
 
@@ -1446,7 +1446,7 @@ pub struct VolumeVolumeInfoIndustryIdentifiers {
     /// Industry specific volume identifier.
     pub identifier: String,
     /// Identifier type. Possible values are ISBN_10, ISBN_13, ISSN and OTHER.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -1461,13 +1461,13 @@ impl Part for VolumeVolumeInfoIndustryIdentifiers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationLayerSummary {
     /// Type of limitation on this layer. "limited" or "unlimited" for the "copy" layer.
-    #[serde(alias="limitType")]
+    #[serde(rename="limitType")]
     pub limit_type: String,
     /// Remaining allowed characters on this layer, especially for the "copy" layer.
-    #[serde(alias="remainingCharacterCount")]
+    #[serde(rename="remainingCharacterCount")]
     pub remaining_character_count: i32,
     /// Maximum allowed characters on this layer, especially for the "copy" layer.
-    #[serde(alias="allowedCharacterCount")]
+    #[serde(rename="allowedCharacterCount")]
     pub allowed_character_count: i32,
 }
 
@@ -1502,13 +1502,13 @@ impl ResponseResult for Offers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfoEpub {
     /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)
-    #[serde(alias="isAvailable")]
+    #[serde(rename="isAvailable")]
     pub is_available: bool,
     /// URL to download epub. (In LITE projection.)
-    #[serde(alias="downloadLink")]
+    #[serde(rename="downloadLink")]
     pub download_link: String,
     /// URL to retrieve ACS token for epub download. (In LITE projection.)
-    #[serde(alias="acsTokenLink")]
+    #[serde(rename="acsTokenLink")]
     pub acs_token_link: String,
 }
 
@@ -1528,7 +1528,7 @@ impl Part for VolumeAccessInfoEpub {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volume2 {
     /// no description provided
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// A list of volumes.
     pub items: Vec<Volume>,
@@ -1546,13 +1546,13 @@ impl ResponseResult for Volume2 {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfoPdf {
     /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)
-    #[serde(alias="isAvailable")]
+    #[serde(rename="isAvailable")]
     pub is_available: bool,
     /// URL to download pdf. (In LITE projection.)
-    #[serde(alias="downloadLink")]
+    #[serde(rename="downloadLink")]
     pub download_link: String,
     /// URL to retrieve ACS token for pdf download. (In LITE projection.)
-    #[serde(alias="acsTokenLink")]
+    #[serde(rename="acsTokenLink")]
     pub acs_token_link: String,
 }
 
@@ -1608,10 +1608,10 @@ impl ResponseResult for Bookshelves {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeLayerInfoLayers {
     /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
-    #[serde(alias="volumeAnnotationsVersion")]
+    #[serde(rename="volumeAnnotationsVersion")]
     pub volume_annotations_version: String,
     /// The layer id of this layer (e.g. "geo").
-    #[serde(alias="layerId")]
+    #[serde(rename="layerId")]
     pub layer_id: String,
 }
 
@@ -1631,7 +1631,7 @@ impl Part for VolumeLayerInfoLayers {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Layersummaries {
     /// The total number of layer summaries found.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// A list of layer summary items.
     pub items: Vec<Layersummary>,
@@ -1649,12 +1649,12 @@ impl ResponseResult for Layersummaries {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OffersItems {
     /// no description provided
-    #[serde(alias="gservicesKey")]
+    #[serde(rename="gservicesKey")]
     pub gservices_key: String,
     /// no description provided
     pub items: Vec<OffersItemsItems>,
     /// no description provided
-    #[serde(alias="artUrl")]
+    #[serde(rename="artUrl")]
     pub art_url: String,
     /// no description provided
     pub id: String,
@@ -1671,15 +1671,15 @@ impl Part for OffersItems {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoCopy {
     /// no description provided
-    #[serde(alias="limitType")]
+    #[serde(rename="limitType")]
     pub limit_type: String,
     /// no description provided
-    #[serde(alias="remainingCharacterCount")]
+    #[serde(rename="remainingCharacterCount")]
     pub remaining_character_count: i32,
     /// no description provided
     pub updated: String,
     /// no description provided
-    #[serde(alias="allowedCharacterCount")]
+    #[serde(rename="allowedCharacterCount")]
     pub allowed_character_count: i32,
 }
 
@@ -1712,34 +1712,34 @@ impl ResponseResult for BooksVolumesRecommendedRateResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfo {
     /// Whether or not this volume is currently in "my books."
-    #[serde(alias="isInMyBooks")]
+    #[serde(rename="isInMyBooks")]
     pub is_in_my_books: bool,
     /// Period during this book is/was a valid rental.
-    #[serde(alias="rentalPeriod")]
+    #[serde(rename="rentalPeriod")]
     pub rental_period: VolumeUserInfoRentalPeriod,
     /// Timestamp when this volume was last modified by a user action, such as a reading position update, volume purchase or writing a review. (RFC 3339 UTC date-time format).
     pub updated: String,
     /// no description provided
-    #[serde(alias="userUploadedVolumeInfo")]
+    #[serde(rename="userUploadedVolumeInfo")]
     pub user_uploaded_volume_info: VolumeUserInfoUserUploadedVolumeInfo,
     /// Whether this book is an active or an expired rental.
-    #[serde(alias="rentalState")]
+    #[serde(rename="rentalState")]
     pub rental_state: String,
     /// Whether or not this volume was purchased by the authenticated user making the request. (In LITE projection.)
-    #[serde(alias="isPurchased")]
+    #[serde(rename="isPurchased")]
     pub is_purchased: bool,
     /// The user's current reading position in the volume, if one is available. (In LITE projection.)
-    #[serde(alias="readingPosition")]
+    #[serde(rename="readingPosition")]
     pub reading_position: ReadingPosition,
     /// Whether or not this volume was pre-ordered by the authenticated user making the request. (In LITE projection.)
-    #[serde(alias="isPreordered")]
+    #[serde(rename="isPreordered")]
     pub is_preordered: bool,
     /// Copy/Paste accounting information.
     pub copy: VolumeUserInfoCopy,
     /// This user's review of this volume, if one exists.
     pub review: Review,
     /// Whether or not this volume was user uploaded.
-    #[serde(alias="isUploaded")]
+    #[serde(rename="isUploaded")]
     pub is_uploaded: bool,
 }
 
@@ -1762,10 +1762,10 @@ pub struct BooksCloudloadingResource {
     /// no description provided
     pub author: Option<String>,
     /// no description provided
-    #[serde(alias="processingState")]
+    #[serde(rename="processingState")]
     pub processing_state: Option<String>,
     /// no description provided
-    #[serde(alias="volumeId")]
+    #[serde(rename="volumeId")]
     pub volume_id: Option<String>,
     /// no description provided
     pub title: Option<String>,
@@ -1782,7 +1782,7 @@ impl ResponseResult for BooksCloudloadingResource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoUserUploadedVolumeInfo {
     /// no description provided
-    #[serde(alias="processingState")]
+    #[serde(rename="processingState")]
     pub processing_state: String,
 }
 
@@ -1799,7 +1799,7 @@ pub struct VolumeSaleInfoListPrice {
     /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
     /// An ISO 4217, three-letter currency code. (In LITE projection.)
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
 }
 
@@ -1814,16 +1814,16 @@ impl Part for VolumeSaleInfoListPrice {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksAnnotationsRange {
     /// The starting position for the range.
-    #[serde(alias="startPosition")]
+    #[serde(rename="startPosition")]
     pub start_position: String,
     /// The ending position for the range.
-    #[serde(alias="endPosition")]
+    #[serde(rename="endPosition")]
     pub end_position: String,
     /// The offset from the starting position.
-    #[serde(alias="startOffset")]
+    #[serde(rename="startOffset")]
     pub start_offset: String,
     /// The offset from the ending position.
-    #[serde(alias="endOffset")]
+    #[serde(rename="endOffset")]
     pub end_offset: String,
 }
 
@@ -1837,41 +1837,41 @@ impl Part for BooksAnnotationsRange {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfo {
     /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.
-    #[serde(alias="webReaderLink")]
+    #[serde(rename="webReaderLink")]
     pub web_reader_link: String,
     /// Whether or not this book is public domain in the country listed above.
-    #[serde(alias="publicDomain")]
+    #[serde(rename="publicDomain")]
     pub public_domain: bool,
     /// Whether this volume requires that the client explicitly request offline download license rather than have it done automatically when loading the content, if the client supports it.
-    #[serde(alias="explicitOfflineLicenseManagement")]
+    #[serde(rename="explicitOfflineLicenseManagement")]
     pub explicit_offline_license_management: bool,
     /// Whether this volume can be embedded in a viewport using the Embedded Viewer API.
     pub embeddable: bool,
     /// Information about a volume's download license access restrictions.
-    #[serde(alias="downloadAccess")]
+    #[serde(rename="downloadAccess")]
     pub download_access: DownloadAccessRestriction,
     /// The two-letter ISO_3166-1 country code for which this access information is valid. (In LITE projection.)
     pub country: String,
     /// For ordered but not yet processed orders, we give a URL that can be used to go to the appropriate Google Wallet page.
-    #[serde(alias="viewOrderUrl")]
+    #[serde(rename="viewOrderUrl")]
     pub view_order_url: String,
     /// Whether text-to-speech is permitted for this volume. Values can be ALLOWED, ALLOWED_FOR_ACCESSIBILITY, or NOT_ALLOWED.
-    #[serde(alias="textToSpeechPermission")]
+    #[serde(rename="textToSpeechPermission")]
     pub text_to_speech_permission: String,
     /// URL to the Google Drive viewer if this volume is uploaded by the user by selecting the file from Google Drive.
-    #[serde(alias="driveImportedContentLink")]
+    #[serde(rename="driveImportedContentLink")]
     pub drive_imported_content_link: String,
     /// Information about pdf content. (In LITE projection.)
     pub pdf: VolumeAccessInfoPdf,
     /// Whether quote sharing is allowed for this volume.
-    #[serde(alias="quoteSharingAllowed")]
+    #[serde(rename="quoteSharingAllowed")]
     pub quote_sharing_allowed: bool,
     /// The read access of a volume. Possible values are PARTIAL, ALL_PAGES, NO_PAGES or UNKNOWN. This value depends on the country listed above. A value of PARTIAL means that the publisher has allowed some portion of the volume to be viewed publicly, without purchase. This can apply to eBooks as well as non-eBooks. Public domain books will always have a value of ALL_PAGES.
     pub viewability: String,
     /// Information about epub content. (In LITE projection.)
     pub epub: VolumeAccessInfoEpub,
     /// Combines the access and viewability of this volume into a single status field for this user. Values can be FULL_PURCHASED, FULL_PUBLIC_DOMAIN, SAMPLE or NONE. (In LITE projection.)
-    #[serde(alias="accessViewStatus")]
+    #[serde(rename="accessViewStatus")]
     pub access_view_status: String,
 }
 
@@ -1886,19 +1886,19 @@ impl Part for VolumeAccessInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationCurrentVersionRanges {
     /// Range in image CFI format for this annotation for version above.
-    #[serde(alias="imageCfiRange")]
+    #[serde(rename="imageCfiRange")]
     pub image_cfi_range: BooksAnnotationsRange,
     /// Range in GB text format for this annotation for version above.
-    #[serde(alias="gbTextRange")]
+    #[serde(rename="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
     /// Content version applicable to ranges below.
-    #[serde(alias="contentVersion")]
+    #[serde(rename="contentVersion")]
     pub content_version: String,
     /// Range in CFI format for this annotation for version above.
-    #[serde(alias="cfiRange")]
+    #[serde(rename="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
     /// Range in GB image format for this annotation for version above.
-    #[serde(alias="gbImageRange")]
+    #[serde(rename="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
 }
 
@@ -1915,23 +1915,23 @@ pub struct VolumeSaleInfo {
     /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)
     pub country: String,
     /// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
-    #[serde(alias="retailPrice")]
+    #[serde(rename="retailPrice")]
     pub retail_price: VolumeSaleInfoRetailPrice,
     /// Whether or not this volume is an eBook (can be added to the My eBooks shelf).
-    #[serde(alias="isEbook")]
+    #[serde(rename="isEbook")]
     pub is_ebook: bool,
     /// Offers available for this volume (sales and rentals).
     pub offers: Vec<VolumeSaleInfoOffers>,
     /// Whether or not this book is available for sale or offered for free in the Google eBookstore for the country listed above. Possible values are FOR_SALE, FOR_RENTAL_ONLY, FOR_SALE_AND_RENTAL, FREE, NOT_FOR_SALE, or FOR_PREORDER.
     pub saleability: String,
     /// URL to purchase this volume on the Google Books site. (In LITE projection)
-    #[serde(alias="buyLink")]
+    #[serde(rename="buyLink")]
     pub buy_link: String,
     /// The date on which this book is available for sale.
-    #[serde(alias="onSaleDate")]
+    #[serde(rename="onSaleDate")]
     pub on_sale_date: String,
     /// Suggested retail price. (In LITE projection.)
-    #[serde(alias="listPrice")]
+    #[serde(rename="listPrice")]
     pub list_price: VolumeSaleInfoListPrice,
 }
 
@@ -1958,7 +1958,7 @@ impl Part for VolumeSaleInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumes {
     /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.
-    #[serde(alias="totalItems")]
+    #[serde(rename="totalItems")]
     pub total_items: i32,
     /// A list of volumes.
     pub items: Vec<Volume>,
@@ -1976,10 +1976,10 @@ impl ResponseResult for Volumes {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoRentalPeriod {
     /// no description provided
-    #[serde(alias="startUtcSec")]
+    #[serde(rename="startUtcSec")]
     pub start_utc_sec: String,
     /// no description provided
-    #[serde(alias="endUtcSec")]
+    #[serde(rename="endUtcSec")]
     pub end_utc_sec: String,
 }
 
@@ -1994,16 +1994,16 @@ impl Part for VolumeUserInfoRentalPeriod {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeannotationContentRanges {
     /// Range in GB image format for this annotation for version above.
-    #[serde(alias="gbImageRange")]
+    #[serde(rename="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
     /// Range in GB text format for this annotation for version above.
-    #[serde(alias="gbTextRange")]
+    #[serde(rename="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
     /// Content version applicable to ranges below.
-    #[serde(alias="contentVersion")]
+    #[serde(rename="contentVersion")]
     pub content_version: String,
     /// Range in CFI format for this annotation for version above.
-    #[serde(alias="cfiRange")]
+    #[serde(rename="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
 }
 

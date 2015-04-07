@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *drive* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -411,7 +411,7 @@ impl<'a, C, NC, A> Drive<C, NC, A>
         Drive {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -457,7 +457,7 @@ impl<'a, C, NC, A> Drive<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -484,17 +484,17 @@ impl<'a, C, NC, A> Drive<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParentReference {
     /// Whether or not the parent is the root folder.
-    #[serde(alias="isRoot")]
+    #[serde(rename="isRoot")]
     pub is_root: Option<bool>,
     /// This is always drive#parentReference.
     pub kind: Option<String>,
     /// The ID of the parent.
     pub id: Option<String>,
     /// A link back to this reference.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// A link to the parent.
-    #[serde(alias="parentLink")]
+    #[serde(rename="parentLink")]
     pub parent_link: Option<String>,
 }
 
@@ -523,7 +523,7 @@ pub struct Comment {
     /// - "resolved" - The comment has been resolved by one of its replies.
     pub status: Option<String>,
     /// A link back to this comment.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// This is always drive#comment.
     pub kind: Option<String>,
@@ -532,30 +532,30 @@ pub struct Comment {
     /// Whether this comment has been deleted. If a comment has been deleted the content will be cleared and this will only represent a comment that once existed.
     pub deleted: Option<bool>,
     /// The date when this comment was first created.
-    #[serde(alias="createdDate")]
+    #[serde(rename="createdDate")]
     pub created_date: Option<String>,
     /// HTML formatted content for this comment.
-    #[serde(alias="htmlContent")]
+    #[serde(rename="htmlContent")]
     pub html_content: Option<String>,
     /// The plain text content used to create this comment. This is not HTML safe and should only be used as a starting point to make edits to a comment's content.
     pub content: Option<String>,
     /// The date when this comment or any of its replies were last modified.
-    #[serde(alias="modifiedDate")]
+    #[serde(rename="modifiedDate")]
     pub modified_date: Option<String>,
     /// The context of the file which is being commented on.
     pub context: Option<CommentContext>,
     /// Replies to this post.
     pub replies: Option<Vec<CommentReply>>,
     /// The ID of the comment.
-    #[serde(alias="commentId")]
+    #[serde(rename="commentId")]
     pub comment_id: Option<String>,
     /// A region of the document represented as a JSON string. See anchor documentation for details on how to define and interpret anchor properties.
     pub anchor: Option<String>,
     /// The title of the file which this comment is addressing.
-    #[serde(alias="fileTitle")]
+    #[serde(rename="fileTitle")]
     pub file_title: Option<String>,
     /// The file which this comment is addressing.
-    #[serde(alias="fileId")]
+    #[serde(rename="fileId")]
     pub file_id: Option<String>,
 }
 
@@ -576,73 +576,73 @@ impl ResponseResult for Comment {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct About {
     /// The user's language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
-    #[serde(alias="languageCode")]
+    #[serde(rename="languageCode")]
     pub language_code: String,
     /// The amount of storage quota used by different Google services.
-    #[serde(alias="quotaBytesByService")]
+    #[serde(rename="quotaBytesByService")]
     pub quota_bytes_by_service: Vec<AboutQuotaBytesByService>,
     /// List of additional features enabled on this account.
     pub features: Vec<AboutFeatures>,
     /// The number of quota bytes used by Google Drive.
-    #[serde(alias="quotaBytesUsed")]
+    #[serde(rename="quotaBytesUsed")]
     pub quota_bytes_used: String,
     /// This is always drive#about.
     pub kind: String,
     /// Information about supported additional roles per file type. The most specific type takes precedence.
-    #[serde(alias="additionalRoleInfo")]
+    #[serde(rename="additionalRoleInfo")]
     pub additional_role_info: Vec<AboutAdditionalRoleInfo>,
     /// The palette of allowable folder colors as RGB hex strings.
-    #[serde(alias="folderColorPalette")]
+    #[serde(rename="folderColorPalette")]
     pub folder_color_palette: Vec<String>,
     /// The authenticated user.
     pub user: User,
     /// The type of the user's storage quota. Possible values are:  
     /// - LIMITED 
     /// - UNLIMITED
-    #[serde(alias="quotaType")]
+    #[serde(rename="quotaType")]
     pub quota_type: String,
     /// The number of quota bytes used by all Google apps (Drive, Picasa, etc.).
-    #[serde(alias="quotaBytesUsedAggregate")]
+    #[serde(rename="quotaBytesUsedAggregate")]
     pub quota_bytes_used_aggregate: String,
     /// List of max upload sizes for each file type. The most specific type takes precedence.
-    #[serde(alias="maxUploadSizes")]
+    #[serde(rename="maxUploadSizes")]
     pub max_upload_sizes: Vec<AboutMaxUploadSizes>,
     /// The current user's ID as visible in the permissions collection.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: String,
     /// The name of the current user.
     pub name: String,
     /// The total number of quota bytes.
-    #[serde(alias="quotaBytesTotal")]
+    #[serde(rename="quotaBytesTotal")]
     pub quota_bytes_total: String,
     /// The number of remaining change ids.
-    #[serde(alias="remainingChangeIds")]
+    #[serde(rename="remainingChangeIds")]
     pub remaining_change_ids: String,
     /// The ETag of the item.
     pub etag: String,
     /// The allowable import formats.
-    #[serde(alias="importFormats")]
+    #[serde(rename="importFormats")]
     pub import_formats: Vec<AboutImportFormats>,
     /// The id of the root folder.
-    #[serde(alias="rootFolderId")]
+    #[serde(rename="rootFolderId")]
     pub root_folder_id: String,
     /// The largest change id.
-    #[serde(alias="largestChangeId")]
+    #[serde(rename="largestChangeId")]
     pub largest_change_id: String,
     /// The number of quota bytes used by trashed items.
-    #[serde(alias="quotaBytesUsedInTrash")]
+    #[serde(rename="quotaBytesUsedInTrash")]
     pub quota_bytes_used_in_trash: String,
     /// The allowable export formats.
-    #[serde(alias="exportFormats")]
+    #[serde(rename="exportFormats")]
     pub export_formats: Vec<AboutExportFormats>,
     /// The domain sharing policy for the current user.
-    #[serde(alias="domainSharingPolicy")]
+    #[serde(rename="domainSharingPolicy")]
     pub domain_sharing_policy: String,
     /// A link back to this item.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A boolean indicating whether the authenticated app is installed by the authenticated user.
-    #[serde(alias="isCurrentAppInstalled")]
+    #[serde(rename="isCurrentAppInstalled")]
     pub is_current_app_installed: bool,
 }
 
@@ -656,7 +656,7 @@ impl ResponseResult for About {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileThumbnail {
     /// The MIME type of the thumbnail.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: String,
     /// The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.
     pub image: String,
@@ -689,59 +689,59 @@ impl Part for FileThumbnail {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
     /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).
-    #[serde(alias="lastViewedByMeDate")]
+    #[serde(rename="lastViewedByMeDate")]
     pub last_viewed_by_me_date: Option<String>,
     /// Whether this file is in the Application Data folder.
-    #[serde(alias="appDataContents")]
+    #[serde(rename="appDataContents")]
     pub app_data_contents: Option<bool>,
     /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours.
-    #[serde(alias="thumbnailLink")]
+    #[serde(rename="thumbnailLink")]
     pub thumbnail_link: Option<String>,
     /// A group of labels for the file.
     pub labels: Option<FileLabels>,
     /// Indexable text attributes for the file (can only be written)
-    #[serde(alias="indexableText")]
+    #[serde(rename="indexableText")]
     pub indexable_text: Option<FileIndexableText>,
     /// Whether this file has been explicitly trashed, as opposed to recursively trashed. This will only be populated if the file is trashed.
-    #[serde(alias="explicitlyTrashed")]
+    #[serde(rename="explicitlyTrashed")]
     pub explicitly_trashed: Option<bool>,
     /// ETag of the file.
     pub etag: Option<String>,
     /// Name of the last user to modify this file.
-    #[serde(alias="lastModifyingUserName")]
+    #[serde(rename="lastModifyingUserName")]
     pub last_modifying_user_name: Option<String>,
     /// Whether writers can share the document with other users.
-    #[serde(alias="writersCanShare")]
+    #[serde(rename="writersCanShare")]
     pub writers_can_share: Option<bool>,
     /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).
-    #[serde(alias="sharedWithMeDate")]
+    #[serde(rename="sharedWithMeDate")]
     pub shared_with_me_date: Option<String>,
     /// User that shared the item with the current user, if available.
-    #[serde(alias="sharingUser")]
+    #[serde(rename="sharingUser")]
     pub sharing_user: Option<User>,
     /// Metadata about video media. This will only be present for video types.
-    #[serde(alias="videoMediaMetadata")]
+    #[serde(rename="videoMediaMetadata")]
     pub video_media_metadata: Option<FileVideoMediaMetadata>,
     /// The last user to modify this file.
-    #[serde(alias="lastModifyingUser")]
+    #[serde(rename="lastModifyingUser")]
     pub last_modifying_user: Option<User>,
     /// Whether the file can be copied by the current user.
     pub copyable: Option<bool>,
     /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette.
-    #[serde(alias="folderColorRgb")]
+    #[serde(rename="folderColorRgb")]
     pub folder_color_rgb: Option<String>,
     /// Name(s) of the owner(s) of this file.
-    #[serde(alias="ownerNames")]
+    #[serde(rename="ownerNames")]
     pub owner_names: Option<Vec<String>>,
     /// The type of file. This is always drive#file.
     pub kind: Option<String>,
     /// The ID of the file.
     pub id: Option<String>,
     /// A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive's Website Hosting.
-    #[serde(alias="webViewLink")]
+    #[serde(rename="webViewLink")]
     pub web_view_link: Option<String>,
     /// A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.
     pub version: Option<String>,
@@ -749,83 +749,83 @@ pub struct File {
     /// Setting this field will put the file in all of the provided folders. On insert, if no folders are provided, the file will be placed in the default root folder.
     pub parents: Option<Vec<ParentReference>>,
     /// Links for exporting Google Docs to specific formats.
-    #[serde(alias="exportLinks")]
+    #[serde(rename="exportLinks")]
     pub export_links: Option<HashMap<String, String>>,
     /// Whether the file has been shared.
     pub shared: Option<bool>,
     /// A link to the file's icon.
-    #[serde(alias="iconLink")]
+    #[serde(rename="iconLink")]
     pub icon_link: Option<String>,
     /// Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by Google.
     pub thumbnail: Option<FileThumbnail>,
     /// A map of the id of each of the user's apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.
-    #[serde(alias="openWithLinks")]
+    #[serde(rename="openWithLinks")]
     pub open_with_links: Option<HashMap<String, String>>,
     /// A link to open this file with the user's default app for this file. Only populated when the drive.apps.readonly scope is used.
-    #[serde(alias="defaultOpenWithLink")]
+    #[serde(rename="defaultOpenWithLink")]
     pub default_open_with_link: Option<String>,
     /// A short description of the file.
     pub description: Option<String>,
     /// A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.
-    #[serde(alias="webContentLink")]
+    #[serde(rename="webContentLink")]
     pub web_content_link: Option<String>,
     /// Whether the file can be edited by the current user.
     pub editable: Option<bool>,
     /// A link for embedding the file.
-    #[serde(alias="embedLink")]
+    #[serde(rename="embedLink")]
     pub embed_link: Option<String>,
     /// Time this file was explicitly marked viewed by the user (formatted RFC 3339 timestamp).
-    #[serde(alias="markedViewedByMeDate")]
+    #[serde(rename="markedViewedByMeDate")]
     pub marked_viewed_by_me_date: Option<String>,
     /// The file extension used when downloading this file. This field is read only. To set the extension, include it in the title when creating the file. This is only populated for files with content stored in Drive.
-    #[serde(alias="fileExtension")]
+    #[serde(rename="fileExtension")]
     pub file_extension: Option<String>,
     /// The size of the file in bytes. This is only populated for files with content stored in Drive.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: Option<String>,
     /// Create time for this file (formatted RFC 3339 timestamp).
-    #[serde(alias="createdDate")]
+    #[serde(rename="createdDate")]
     pub created_date: Option<String>,
     /// The list of properties.
     pub properties: Option<Vec<Property>>,
     /// An MD5 checksum for the content of this file. This is populated only for files with content stored in Drive.
-    #[serde(alias="md5Checksum")]
+    #[serde(rename="md5Checksum")]
     pub md5_checksum: Option<String>,
     /// The list of permissions for users with access to this file.
     pub permissions: Option<Vec<Permission>>,
     /// Metadata about image media. This will only be present for image types, and its contents will depend on what can be parsed from the image content.
-    #[serde(alias="imageMediaMetadata")]
+    #[serde(rename="imageMediaMetadata")]
     pub image_media_metadata: Option<FileImageMediaMetadata>,
     /// The owner(s) of this file.
     pub owners: Option<Vec<User>>,
     /// A link for opening the file in a relevant Google editor or viewer.
-    #[serde(alias="alternateLink")]
+    #[serde(rename="alternateLink")]
     pub alternate_link: Option<String>,
     /// The title of this file.
     pub title: Option<String>,
     /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.
-    #[serde(alias="modifiedByMeDate")]
+    #[serde(rename="modifiedByMeDate")]
     pub modified_by_me_date: Option<String>,
     /// Short lived download URL for the file. This is only populated for files with content stored in Drive.
-    #[serde(alias="downloadUrl")]
+    #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
     /// The permissions for the authenticated user on this file.
-    #[serde(alias="userPermission")]
+    #[serde(rename="userPermission")]
     pub user_permission: Option<Permission>,
     /// The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive.
-    #[serde(alias="originalFilename")]
+    #[serde(rename="originalFilename")]
     pub original_filename: Option<String>,
     /// The number of quota bytes used by this file.
-    #[serde(alias="quotaBytesUsed")]
+    #[serde(rename="quotaBytesUsed")]
     pub quota_bytes_used: Option<String>,
     /// The ID of the file's head revision. This will only be populated for files with content stored in Drive.
-    #[serde(alias="headRevisionId")]
+    #[serde(rename="headRevisionId")]
     pub head_revision_id: Option<String>,
     /// A link back to this file.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.
-    #[serde(alias="modifiedDate")]
+    #[serde(rename="modifiedDate")]
     pub modified_date: Option<String>,
 }
 
@@ -841,10 +841,10 @@ impl ResponseResult for File {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutAdditionalRoleInfo {
     /// The supported additional roles per primary role.
-    #[serde(alias="roleSets")]
+    #[serde(rename="roleSets")]
     pub role_sets: Vec<AboutAdditionalRoleInfoRoleSets>,
     /// The content type that this additional role info applies to.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -864,22 +864,22 @@ impl Part for AboutAdditionalRoleInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChangeList {
     /// The page token for the next page of changes.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// This is always drive#changeList.
     pub kind: String,
     /// The ETag of the list.
     pub etag: String,
     /// The current largest change ID.
-    #[serde(alias="largestChangeId")]
+    #[serde(rename="largestChangeId")]
     pub largest_change_id: String,
     /// The actual list of changes.
     pub items: Vec<Change>,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A link to the next page of changes.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -904,7 +904,7 @@ pub struct PropertyList {
     /// The ETag of the list.
     pub etag: String,
     /// The link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -952,10 +952,10 @@ impl Part for FileIndexableText {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutAdditionalRoleInfoRoleSets {
     /// A primary permission role.
-    #[serde(alias="primaryRole")]
+    #[serde(rename="primaryRole")]
     pub primary_role: String,
     /// The supported additional roles with the primary role.
-    #[serde(alias="additionalRoles")]
+    #[serde(rename="additionalRoles")]
     pub additional_roles: Vec<String>,
 }
 
@@ -975,17 +975,17 @@ impl Part for AboutAdditionalRoleInfoRoleSets {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentReplyList {
     /// The token to use to request the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of reply.
     pub items: Vec<CommentReply>,
     /// This is always drive#commentReplyList.
     pub kind: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A link to the next page of replies.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -1026,7 +1026,7 @@ pub struct RevisionList {
     /// The ETag of the list.
     pub etag: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1040,7 +1040,7 @@ impl ResponseResult for RevisionList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutMaxUploadSizes {
     /// The file type.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The max upload size for this type.
     pub size: String,
@@ -1092,7 +1092,7 @@ impl Part for FileLabels {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Property {
     /// The link back to this property.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// This is always drive#property.
     pub kind: Option<String>,
@@ -1124,12 +1124,12 @@ impl ResponseResult for Property {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// A version-specific identifier for the watched resource.
-    #[serde(alias="resourceUri")]
+    #[serde(rename="resourceUri")]
     pub resource_uri: Option<String>,
     /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
     /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
     /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
@@ -1142,7 +1142,7 @@ pub struct Channel {
     /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
     /// The type of delivery mechanism used for this channel.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
@@ -1169,53 +1169,53 @@ impl ResponseResult for Channel {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Revision {
     /// The MIME type of the revision.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: Option<String>,
     /// A link to the published revision.
-    #[serde(alias="publishedLink")]
+    #[serde(rename="publishedLink")]
     pub published_link: Option<String>,
     /// Whether this revision is published outside the domain. This is only populated and can only be modified for Google Docs.
-    #[serde(alias="publishedOutsideDomain")]
+    #[serde(rename="publishedOutsideDomain")]
     pub published_outside_domain: Option<bool>,
     /// Whether subsequent revisions will be automatically republished. This is only populated and can only be modified for Google Docs.
-    #[serde(alias="publishAuto")]
+    #[serde(rename="publishAuto")]
     pub publish_auto: Option<bool>,
     /// The size of the revision in bytes. This will only be populated on files with content stored in Drive.
-    #[serde(alias="fileSize")]
+    #[serde(rename="fileSize")]
     pub file_size: Option<String>,
     /// Name of the last user to modify this revision.
-    #[serde(alias="lastModifyingUserName")]
+    #[serde(rename="lastModifyingUserName")]
     pub last_modifying_user_name: Option<String>,
     /// The ID of the revision.
     pub id: Option<String>,
     /// An MD5 checksum for the content of this revision. This will only be populated on files with content stored in Drive.
-    #[serde(alias="md5Checksum")]
+    #[serde(rename="md5Checksum")]
     pub md5_checksum: Option<String>,
     /// Short term download URL for the file. This will only be populated on files with content stored in Drive.
-    #[serde(alias="downloadUrl")]
+    #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
     /// This is always drive#revision.
     pub kind: Option<String>,
     /// The last user to modify this revision.
-    #[serde(alias="lastModifyingUser")]
+    #[serde(rename="lastModifyingUser")]
     pub last_modifying_user: Option<User>,
     /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.
     pub pinned: Option<bool>,
     /// The ETag of the revision.
     pub etag: Option<String>,
     /// The original filename when this revision was created. This will only be populated on files with content stored in Drive.
-    #[serde(alias="originalFilename")]
+    #[serde(rename="originalFilename")]
     pub original_filename: Option<String>,
     /// Links for exporting Google Docs to specific formats.
-    #[serde(alias="exportLinks")]
+    #[serde(rename="exportLinks")]
     pub export_links: Option<HashMap<String, String>>,
     /// Whether this revision is published. This is only populated and can only be modified for Google Docs.
     pub published: Option<bool>,
     /// A link back to this revision.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// Last time this revision was modified (formatted RFC 3339 timestamp).
-    #[serde(alias="modifiedDate")]
+    #[serde(rename="modifiedDate")]
     pub modified_date: Option<String>,
 }
 
@@ -1236,17 +1236,17 @@ impl ResponseResult for Revision {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentList {
     /// The token to use to request the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of comments.
     pub items: Vec<Comment>,
     /// This is always drive#commentList.
     pub kind: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A link to the next page of comments.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -1271,7 +1271,7 @@ pub struct ParentList {
     /// The ETag of the list.
     pub etag: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1296,7 +1296,7 @@ pub struct PermissionList {
     /// The ETag of the list.
     pub etag: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
 }
 
@@ -1310,10 +1310,10 @@ impl ResponseResult for PermissionList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutQuotaBytesByService {
     /// The service's name, e.g. DRIVE, GMAIL, or PHOTOS.
-    #[serde(alias="serviceName")]
+    #[serde(rename="serviceName")]
     pub service_name: String,
     /// The storage quota bytes used by the service.
-    #[serde(alias="bytesUsed")]
+    #[serde(rename="bytesUsed")]
     pub bytes_used: String,
 }
 
@@ -1339,7 +1339,7 @@ impl Part for AboutQuotaBytesByService {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
     /// Whether the link is required for this permission.
-    #[serde(alias="withLink")]
+    #[serde(rename="withLink")]
     pub with_link: Option<bool>,
     /// The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.
     pub domain: Option<String>,
@@ -1350,18 +1350,18 @@ pub struct Permission {
     /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
     pub value: Option<String>,
     /// Additional roles for this user. Only commenter is currently allowed.
-    #[serde(alias="additionalRoles")]
+    #[serde(rename="additionalRoles")]
     pub additional_roles: Option<Vec<String>>,
     /// The authkey parameter required for this permission.
-    #[serde(alias="authKey")]
+    #[serde(rename="authKey")]
     pub auth_key: Option<String>,
     /// The ETag of the permission.
     pub etag: Option<String>,
     /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
     /// A link to the profile photo, if available.
-    #[serde(alias="photoLink")]
+    #[serde(rename="photoLink")]
     pub photo_link: Option<String>,
     /// The primary role for this user. Allowed values are:  
     /// - owner 
@@ -1373,12 +1373,12 @@ pub struct Permission {
     /// - group 
     /// - domain 
     /// - anyone
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
     /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
     pub id: Option<String>,
     /// A link back to this permission.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1394,16 +1394,16 @@ impl ResponseResult for Permission {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileImageMediaMetadata {
     /// The exposure bias of the photo (APEX value).
-    #[serde(alias="exposureBias")]
+    #[serde(rename="exposureBias")]
     pub exposure_bias: f32,
     /// The length of the exposure, in seconds.
-    #[serde(alias="exposureTime")]
+    #[serde(rename="exposureTime")]
     pub exposure_time: f32,
     /// The smallest f-number of the lens at the focal length used to create the photo (APEX value).
-    #[serde(alias="maxApertureValue")]
+    #[serde(rename="maxApertureValue")]
     pub max_aperture_value: f32,
     /// The color space of the photo.
-    #[serde(alias="colorSpace")]
+    #[serde(rename="colorSpace")]
     pub color_space: String,
     /// The height of the image in pixels.
     pub height: i32,
@@ -1416,35 +1416,35 @@ pub struct FileImageMediaMetadata {
     /// The rotation in clockwise degrees from the image's original orientation.
     pub rotation: i32,
     /// The white balance mode used to create the photo.
-    #[serde(alias="whiteBalance")]
+    #[serde(rename="whiteBalance")]
     pub white_balance: String,
     /// The model of the camera used to create the photo.
-    #[serde(alias="cameraModel")]
+    #[serde(rename="cameraModel")]
     pub camera_model: String,
     /// Whether a flash was used to create the photo.
-    #[serde(alias="flashUsed")]
+    #[serde(rename="flashUsed")]
     pub flash_used: bool,
     /// The make of the camera used to create the photo.
-    #[serde(alias="cameraMake")]
+    #[serde(rename="cameraMake")]
     pub camera_make: String,
     /// The focal length used to create the photo, in millimeters.
-    #[serde(alias="focalLength")]
+    #[serde(rename="focalLength")]
     pub focal_length: f32,
     /// The exposure mode used to create the photo.
-    #[serde(alias="exposureMode")]
+    #[serde(rename="exposureMode")]
     pub exposure_mode: String,
     /// The distance to the subject of the photo, in meters.
-    #[serde(alias="subjectDistance")]
+    #[serde(rename="subjectDistance")]
     pub subject_distance: i32,
     /// The width of the image in pixels.
     pub width: i32,
     /// The metering mode used to create the photo.
-    #[serde(alias="meteringMode")]
+    #[serde(rename="meteringMode")]
     pub metering_mode: String,
     /// Geographic location information stored in the image.
     pub location: FileImageMediaMetadataLocation,
     /// The ISO speed used to create the photo.
-    #[serde(alias="isoSpeed")]
+    #[serde(rename="isoSpeed")]
     pub iso_speed: i32,
     /// The type of sensor used to create the photo.
     pub sensor: String,
@@ -1467,70 +1467,70 @@ impl Part for FileImageMediaMetadata {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct App {
     /// The list of secondary mime types.
-    #[serde(alias="secondaryMimeTypes")]
+    #[serde(rename="secondaryMimeTypes")]
     pub secondary_mime_types: Vec<String>,
     /// Whether the app is selected as the default handler for the types it supports.
-    #[serde(alias="useByDefault")]
+    #[serde(rename="useByDefault")]
     pub use_by_default: bool,
     /// Whether the app is installed.
     pub installed: bool,
     /// A link to the product listing for this app.
-    #[serde(alias="productUrl")]
+    #[serde(rename="productUrl")]
     pub product_url: String,
     /// Whether this app supports importing Google Docs.
-    #[serde(alias="supportsImport")]
+    #[serde(rename="supportsImport")]
     pub supports_import: bool,
     /// Whether this app supports creating new objects.
-    #[serde(alias="supportsCreate")]
+    #[serde(rename="supportsCreate")]
     pub supports_create: bool,
     /// A long description of the app.
-    #[serde(alias="longDescription")]
+    #[serde(rename="longDescription")]
     pub long_description: String,
     /// A short description of the app.
-    #[serde(alias="shortDescription")]
+    #[serde(rename="shortDescription")]
     pub short_description: String,
     /// The ID of the app.
     pub id: String,
     /// Whether the app has drive-wide scope. An app with drive-wide scope can access all files in the user's drive.
-    #[serde(alias="hasDriveWideScope")]
+    #[serde(rename="hasDriveWideScope")]
     pub has_drive_wide_scope: bool,
     /// The type of object this app creates (e.g. Chart). If empty, the app name should be used instead.
-    #[serde(alias="objectType")]
+    #[serde(rename="objectType")]
     pub object_type: String,
     /// This is always drive#app.
     pub kind: String,
     /// The list of primary file extensions.
-    #[serde(alias="primaryFileExtensions")]
+    #[serde(rename="primaryFileExtensions")]
     pub primary_file_extensions: Vec<String>,
     /// The list of primary mime types.
-    #[serde(alias="primaryMimeTypes")]
+    #[serde(rename="primaryMimeTypes")]
     pub primary_mime_types: Vec<String>,
     /// The url to create a new file with this app.
-    #[serde(alias="createUrl")]
+    #[serde(rename="createUrl")]
     pub create_url: String,
     /// The various icons for the app.
     pub icons: Vec<AppIcons>,
     /// Whether this app supports creating new files when offline.
-    #[serde(alias="supportsOfflineCreate")]
+    #[serde(rename="supportsOfflineCreate")]
     pub supports_offline_create: bool,
     /// The list of secondary file extensions.
-    #[serde(alias="secondaryFileExtensions")]
+    #[serde(rename="secondaryFileExtensions")]
     pub secondary_file_extensions: Vec<String>,
     /// The name of the app.
     pub name: String,
     /// Whether the app is authorized to access data on the user's Drive.
     pub authorized: bool,
     /// Whether this app supports opening more than one file.
-    #[serde(alias="supportsMultiOpen")]
+    #[serde(rename="supportsMultiOpen")]
     pub supports_multi_open: bool,
     /// The template url to create a new file with this app in a given folder. The template will contain {folderId} to be replaced by the folder to create the new file in.
-    #[serde(alias="createInFolderTemplate")]
+    #[serde(rename="createInFolderTemplate")]
     pub create_in_folder_template: String,
     /// The template url for opening files with this app. The template will contain {ids} and/or {exportIds} to be replaced by the actual file ids. See  Open Files  for the full documentation.
-    #[serde(alias="openUrlTemplate")]
+    #[serde(rename="openUrlTemplate")]
     pub open_url_template: String,
     /// The ID of the product listing for this app.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -1568,7 +1568,7 @@ impl Part for FileImageMediaMetadataLocation {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FileList {
     /// The page token for the next page of files.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// This is always drive#fileList.
     pub kind: String,
@@ -1577,10 +1577,10 @@ pub struct FileList {
     /// The actual list of files.
     pub items: Vec<File>,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A link to the next page of files.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -1599,7 +1599,7 @@ impl ResponseResult for FileList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChildList {
     /// The page token for the next page of children.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// This is always drive#childList.
     pub kind: String,
@@ -1608,10 +1608,10 @@ pub struct ChildList {
     /// The actual list of children.
     pub items: Vec<ChildReference>,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// A link to the next page of children.
-    #[serde(alias="nextLink")]
+    #[serde(rename="nextLink")]
     pub next_link: String,
 }
 
@@ -1639,7 +1639,7 @@ pub struct CommentReply {
     /// Whether this reply has been deleted. If a reply has been deleted the content will be cleared and this will only represent a reply that once existed.
     pub deleted: Option<bool>,
     /// HTML formatted content for this reply.
-    #[serde(alias="htmlContent")]
+    #[serde(rename="htmlContent")]
     pub html_content: Option<String>,
     /// The plain text content used to create this reply. This is not HTML safe and should only be used as a starting point to make edits to a reply's content. This field is required on inserts if no verb is specified (resolve/reopen).
     pub content: Option<String>,
@@ -1648,13 +1648,13 @@ pub struct CommentReply {
     /// - "reopen" - To reopen (un-resolve) a comment.
     pub verb: Option<String>,
     /// The ID of the reply.
-    #[serde(alias="replyId")]
+    #[serde(rename="replyId")]
     pub reply_id: Option<String>,
     /// The date when this reply was last modified.
-    #[serde(alias="modifiedDate")]
+    #[serde(rename="modifiedDate")]
     pub modified_date: Option<String>,
     /// The date when this reply was first created.
-    #[serde(alias="createdDate")]
+    #[serde(rename="createdDate")]
     pub created_date: Option<String>,
 }
 
@@ -1683,10 +1683,10 @@ impl Part for UserPicture {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutFeatures {
     /// The name of the feature.
-    #[serde(alias="featureName")]
+    #[serde(rename="featureName")]
     pub feature_name: String,
     /// The request limit rate for this feature, in queries per second.
-    #[serde(alias="featureRate")]
+    #[serde(rename="featureRate")]
     pub feature_rate: f64,
 }
 
@@ -1705,16 +1705,16 @@ pub struct User {
     /// This is always drive#user.
     pub kind: String,
     /// Whether this user is the same as the authenticated user for whom the request was made.
-    #[serde(alias="isAuthenticatedUser")]
+    #[serde(rename="isAuthenticatedUser")]
     pub is_authenticated_user: bool,
     /// A plain text displayable name for this user.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: String,
     /// The email address of the user.
-    #[serde(alias="emailAddress")]
+    #[serde(rename="emailAddress")]
     pub email_address: String,
     /// The user's ID as visible in the permissions collection.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: String,
 }
 
@@ -1739,10 +1739,10 @@ pub struct AppList {
     /// The ETag of the list.
     pub etag: String,
     /// A link back to this list.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// List of app IDs that the user has specified to use by default. The list is in reverse-priority order (lowest to highest).
-    #[serde(alias="defaultAppIds")]
+    #[serde(rename="defaultAppIds")]
     pub default_app_ids: Vec<String>,
 }
 
@@ -1761,7 +1761,7 @@ pub struct AppIcons {
     /// - documentShared - icon for a shared file associated with the app
     pub category: String,
     /// URL for the icon.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// Size of the icon. Represented as the maximum of the width and height.
     pub size: i32,
@@ -1778,7 +1778,7 @@ impl Part for AppIcons {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentContext {
     /// The MIME type of the context snippet.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Data representation of the segment of the file being commented on. In the case of a text file for example, this would be the actual text that the comment is about.
     pub value: String,
@@ -1803,12 +1803,12 @@ pub struct ChildReference {
     /// This is always drive#childReference.
     pub kind: Option<String>,
     /// A link to the child.
-    #[serde(alias="childLink")]
+    #[serde(rename="childLink")]
     pub child_link: Option<String>,
     /// The ID of the child.
     pub id: Option<String>,
     /// A link back to this reference.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
 
@@ -1825,7 +1825,7 @@ pub struct FileVideoMediaMetadata {
     /// The width of the video in pixels.
     pub width: i32,
     /// The duration of the video in milliseconds.
-    #[serde(alias="durationMillis")]
+    #[serde(rename="durationMillis")]
     pub duration_millis: String,
     /// The height of the video in pixels.
     pub height: i32,
@@ -1865,7 +1865,7 @@ impl Part for AboutExportFormats {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Change {
     /// The time of this modification.
-    #[serde(alias="modificationDate")]
+    #[serde(rename="modificationDate")]
     pub modification_date: String,
     /// This is always drive#change.
     pub kind: String,
@@ -1876,10 +1876,10 @@ pub struct Change {
     /// The ID of the change.
     pub id: String,
     /// A link back to this change.
-    #[serde(alias="selfLink")]
+    #[serde(rename="selfLink")]
     pub self_link: String,
     /// The ID of the file associated with this change.
-    #[serde(alias="fileId")]
+    #[serde(rename="fileId")]
     pub file_id: String,
 }
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Management* crate version *0.1.3+20150325*, where *20150325* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Games Management* crate version *0.1.4+20150325*, where *20150325* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Games Management* *v1_management* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -315,7 +315,7 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
         GamesManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -346,7 +346,7 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -372,19 +372,19 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementResetResponse {
     /// The ID of an achievement for which player state has been updated.
-    #[serde(alias="definitionId")]
+    #[serde(rename="definitionId")]
     pub definition_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetResponse.
     pub kind: String,
     /// Flag to indicate if the requested update actually occurred.
-    #[serde(alias="updateOccurred")]
+    #[serde(rename="updateOccurred")]
     pub update_occurred: bool,
     /// The current state of the achievement. This is the same as the initial state of the achievement.
     /// Possible values are:  
     /// - "HIDDEN"- Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="currentState")]
+    #[serde(rename="currentState")]
     pub current_state: String,
 }
 
@@ -398,10 +398,10 @@ impl ResponseResult for AchievementResetResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerName {
     /// The given name of this player. In some places, this is known as the first name.
-    #[serde(alias="givenName")]
+    #[serde(rename="givenName")]
     pub given_name: String,
     /// The family name of this player. In some places, this is known as the last name.
-    #[serde(alias="familyName")]
+    #[serde(rename="familyName")]
     pub family_name: String,
 }
 
@@ -416,16 +416,16 @@ impl Part for PlayerName {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayerExperienceInfoResource {
     /// The current number of experience points for the player.
-    #[serde(alias="currentExperiencePoints")]
+    #[serde(rename="currentExperiencePoints")]
     pub current_experience_points: String,
     /// The next level of the player. If the current level is the maximum level, this should be same as the current level.
-    #[serde(alias="nextLevel")]
+    #[serde(rename="nextLevel")]
     pub next_level: GamesPlayerLevelResource,
     /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.
-    #[serde(alias="lastLevelUpTimestampMillis")]
+    #[serde(rename="lastLevelUpTimestampMillis")]
     pub last_level_up_timestamp_millis: String,
     /// The current level of the player.
-    #[serde(alias="currentLevel")]
+    #[serde(rename="currentLevel")]
     pub current_level: GamesPlayerLevelResource,
 }
 
@@ -479,10 +479,10 @@ impl RequestValue for AchievementResetMultipleForAllRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayedResource {
     /// True if the player was auto-matched with the currently authenticated user.
-    #[serde(alias="autoMatched")]
+    #[serde(rename="autoMatched")]
     pub auto_matched: bool,
     /// The last time the player played the game in milliseconds since the epoch in UTC.
-    #[serde(alias="timeMillis")]
+    #[serde(rename="timeMillis")]
     pub time_millis: String,
 }
 
@@ -524,23 +524,23 @@ pub struct Player {
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#player.
     pub kind: Option<String>,
     /// The name to display for the player.
-    #[serde(alias="displayName")]
+    #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
     pub name: Option<PlayerName>,
     /// The player's title rewarded for their game activities.
     pub title: Option<String>,
     /// The ID of the player.
-    #[serde(alias="playerId")]
+    #[serde(rename="playerId")]
     pub player_id: Option<String>,
     /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.
-    #[serde(alias="lastPlayedWith")]
+    #[serde(rename="lastPlayedWith")]
     pub last_played_with: Option<GamesPlayedResource>,
     /// An object to represent Play Game experience information for the player.
-    #[serde(alias="experienceInfo")]
+    #[serde(rename="experienceInfo")]
     pub experience_info: Option<GamesPlayerExperienceInfoResource>,
     /// The base URL for the image that represents the player.
-    #[serde(alias="avatarImageUrl")]
+    #[serde(rename="avatarImageUrl")]
     pub avatar_image_url: Option<String>,
 }
 
@@ -574,10 +574,10 @@ impl RequestValue for QuestsResetMultipleForAllRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayerLevelResource {
     /// The maximum experience points for this level.
-    #[serde(alias="maxExperiencePoints")]
+    #[serde(rename="maxExperiencePoints")]
     pub max_experience_points: String,
     /// The minimum experience points for this level.
-    #[serde(alias="minExperiencePoints")]
+    #[serde(rename="minExperiencePoints")]
     pub min_experience_points: String,
     /// The level for the user.
     pub level: i32,
@@ -598,7 +598,7 @@ impl Part for GamesPlayerLevelResource {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HiddenPlayerList {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The players.
     pub items: Vec<HiddenPlayer>,
@@ -661,7 +661,7 @@ impl RequestValue for ScoresResetMultipleForAllRequest {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreResetResponse {
     /// The ID of an leaderboard for which player state has been updated.
-    #[serde(alias="definitionId")]
+    #[serde(rename="definitionId")]
     pub definition_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#playerScoreResetResponse.
     pub kind: String,
@@ -670,7 +670,7 @@ pub struct PlayerScoreResetResponse {
     /// - "ALL_TIME" - The score is an all-time score. 
     /// - "WEEKLY" - The score is a weekly score. 
     /// - "DAILY" - The score is a daily score.
-    #[serde(alias="resetScoreTimeSpans")]
+    #[serde(rename="resetScoreTimeSpans")]
     pub reset_score_time_spans: Vec<String>,
 }
 
@@ -688,7 +688,7 @@ pub struct HiddenPlayer {
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#hiddenPlayer.
     pub kind: String,
     /// The time this player was hidden.
-    #[serde(alias="hiddenTimeMillis")]
+    #[serde(rename="hiddenTimeMillis")]
     pub hidden_time_millis: String,
 }
 

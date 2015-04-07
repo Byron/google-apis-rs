@@ -26,9 +26,9 @@ make:
     - source: lib.rs
       output_dir: src
 cargo:
-  build_version: "0.1.3"
+  build_version: "0.1.4"
   keywords: [protocol, web, api]
   dependencies:
     - url = "*"
-    - serde = "*"
+    - serde = ">= 0.3.0"
     - serde_macros = "*"

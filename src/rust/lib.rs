@@ -1,11 +1,11 @@
-#![feature(core,io,old_path, custom_derive, custom_attribute, plugin)]
+#![feature(core,io,old_path, custom_derive, custom_attribute, plugin, slice_patterns, std_misc)]
 #![allow(dead_code, deprecated, unused_features, unused_variables, unused_imports)]
 //! library with code shared by all generated implementations
 #![plugin(serde_macros)]
 #[macro_use]
 extern crate hyper;
 extern crate mime;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate serde;
 
 // just pull it in the check if it compiles
@@ -15,7 +15,7 @@ mod cli;
 /// This module is for testing only, its code is used in mako templates
 #[cfg(test)]
 mod test_api {
-    extern crate "yup-hyper-mock" as hyper_mock;
+    extern crate yup_hyper_mock as hyper_mock;
     use super::api::cmn::*;
     use self::hyper_mock::*;
     use std::io::Read;
@@ -51,14 +51,14 @@ bar\r\n\
            .add_part(&mut r2, 25, "application/plain".parse().unwrap());
 
         let mut res = String::new();
-        let r = mpr.read_to_string(&mut res);
-        assert_eq!(res.len(), r.clone().unwrap());
+        let r = mpr.read_to_string(&mut res).unwrap();
+        assert_eq!(res.len(), r);
 
         // NOTE: This CAN fail, as the underlying header hashmap is not sorted
         // As the test is just for dev, and doesn't run on travis, we are fine, 
         // for now. Possible solution would be to omit the size field (make it 
         // optional)
-        assert_eq!(r, Ok(EXPECTED_LEN));
+        assert_eq!(r, EXPECTED_LEN);
         // assert_eq!(res, EXPECTED);
     }
 
@@ -106,7 +106,7 @@ bar\r\n\
 
         #[derive(Default, Serialize, Deserialize)]
         struct Bar {
-            #[serde(alias="snooSnoo")]
+            #[serde(rename="snooSnoo")]
             snoo_snoo: String
         }
         json::to_string(&<Bar as Default>::default()).unwrap();
@@ -119,7 +119,7 @@ bar\r\n\
         // We can't have unknown fields with structs.
         // #[derive(Default, Serialize, Deserialize)]
         // struct BarOpt {
-        //     #[serde(alias="snooSnoo")]
+        //     #[serde(rename="snooSnoo")]
         //     snoo_snoo: Option<String>
         // }
         // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";

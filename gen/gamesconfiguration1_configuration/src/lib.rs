@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *0.1.3+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Games Configuration* crate version *0.1.4+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -313,7 +313,7 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
         GamesConfiguration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -329,7 +329,7 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -350,17 +350,17 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesNumberFormatConfiguration {
     /// The curreny code string. Only used for CURRENCY format type.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// The formatting for the number.
     /// Possible values are:  
     /// - "NUMERIC" - Numbers are formatted to have no digits or a fixed number of digits after the decimal point according to locale. An optional custom unit can be added.
     /// - "TIME_DURATION" - Numbers are formatted to hours, minutes and seconds.
     /// - "CURRENCY" - Numbers are formatted to currency according to locale.
-    #[serde(alias="numberFormatType")]
+    #[serde(rename="numberFormatType")]
     pub number_format_type: String,
     /// The number of decimal places for number. Only used for NUMERIC format type.
-    #[serde(alias="numDecimalPlaces")]
+    #[serde(rename="numDecimalPlaces")]
     pub num_decimal_places: i32,
     /// An optional suffix for the NUMERIC format type. These strings follow the same  plural rules as all Android string resources.
     pub suffix: GamesNumberAffixConfiguration,
@@ -413,7 +413,7 @@ impl Part for LocalizedString {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementConfigurationListResponse {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The achievement configurations.
     pub items: Vec<AchievementConfiguration>,
@@ -438,12 +438,12 @@ pub struct ImageConfiguration {
     /// The url for this image.
     pub url: String,
     /// The resource ID of resource which the image belongs to.
-    #[serde(alias="resourceId")]
+    #[serde(rename="resourceId")]
     pub resource_id: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#imageConfiguration.
     pub kind: String,
     /// The image type for the image.
-    #[serde(alias="imageType")]
+    #[serde(rename="imageType")]
     pub image_type: String,
 }
 
@@ -494,10 +494,10 @@ pub struct AchievementConfiguration {
     /// Possible values are:  
     /// - "STANDARD" - Achievement is either locked or unlocked. 
     /// - "INCREMENTAL" - Achievement is incremental.
-    #[serde(alias="achievementType")]
+    #[serde(rename="achievementType")]
     pub achievement_type: Option<String>,
     /// Steps to unlock. Only applicable to incremental achievements.
-    #[serde(alias="stepsToUnlock")]
+    #[serde(rename="stepsToUnlock")]
     pub steps_to_unlock: Option<i32>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfiguration.
     pub kind: Option<String>,
@@ -506,7 +506,7 @@ pub struct AchievementConfiguration {
     /// - "HIDDEN" - Achievement is hidden. 
     /// - "REVEALED" - Achievement is revealed. 
     /// - "UNLOCKED" - Achievement is unlocked.
-    #[serde(alias="initialState")]
+    #[serde(rename="initialState")]
     pub initial_state: Option<String>,
     /// The token for this resource.
     pub token: Option<String>,
@@ -545,15 +545,15 @@ pub struct LeaderboardConfiguration {
     /// Possible values are:  
     /// - "LARGER_IS_BETTER" - Larger scores posted are ranked higher. 
     /// - "SMALLER_IS_BETTER" - Smaller scores posted are ranked higher.
-    #[serde(alias="scoreOrder")]
+    #[serde(rename="scoreOrder")]
     pub score_order: Option<String>,
     /// Minimum score that can be posted to this leaderboard.
-    #[serde(alias="scoreMin")]
+    #[serde(rename="scoreMin")]
     pub score_min: Option<String>,
     /// The token for this resource.
     pub token: Option<String>,
     /// Maximum score that can be posted to this leaderboard.
-    #[serde(alias="scoreMax")]
+    #[serde(rename="scoreMax")]
     pub score_max: Option<String>,
     /// The read-only published data of the leaderboard.
     pub published: Option<LeaderboardConfigurationDetail>,
@@ -580,7 +580,7 @@ impl ResponseResult for LeaderboardConfiguration {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardConfigurationListResponse {
     /// The pagination token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The leaderboard configurations.
     pub items: Vec<LeaderboardConfiguration>,
@@ -598,17 +598,17 @@ impl ResponseResult for LeaderboardConfigurationListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementConfigurationDetail {
     /// The icon url of this achievement. Writes to this field are ignored.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfigurationDetail.
     pub kind: String,
     /// Localized strings for the achievement name.
     pub name: LocalizedStringBundle,
     /// Point value for the achievement.
-    #[serde(alias="pointValue")]
+    #[serde(rename="pointValue")]
     pub point_value: i32,
     /// The sort rank of this achievement. Writes to this field are ignored.
-    #[serde(alias="sortRank")]
+    #[serde(rename="sortRank")]
     pub sort_rank: i32,
     /// Localized strings for the achievement description.
     pub description: LocalizedStringBundle,
@@ -624,17 +624,17 @@ impl Part for AchievementConfigurationDetail {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardConfigurationDetail {
     /// The score formatting for the leaderboard.
-    #[serde(alias="scoreFormat")]
+    #[serde(rename="scoreFormat")]
     pub score_format: GamesNumberFormatConfiguration,
     /// The icon url of this leaderboard. Writes to this field are ignored.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfigurationDetail.
     pub kind: String,
     /// Localized strings for the leaderboard name.
     pub name: LocalizedStringBundle,
     /// The sort rank of this leaderboard. Writes to this field are ignored.
-    #[serde(alias="sortRank")]
+    #[serde(rename="sortRank")]
     pub sort_rank: i32,
 }
 

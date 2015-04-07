@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *admin* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *admin* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *admin* *v2_email_migration* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/email-migration/v2/).
@@ -314,7 +314,7 @@ impl<'a, C, NC, A> Admin<C, NC, A>
         Admin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -324,7 +324,7 @@ impl<'a, C, NC, A> Admin<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -350,29 +350,29 @@ impl<'a, C, NC, A> Admin<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct MailItem {
     /// Boolean indicating if the mail is in trash
-    #[serde(alias="isTrash")]
+    #[serde(rename="isTrash")]
     pub is_trash: Option<bool>,
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// List of labels (strings)
     pub labels: Option<Vec<String>>,
     /// Boolean indicating if the mail is draft
-    #[serde(alias="isDraft")]
+    #[serde(rename="isDraft")]
     pub is_draft: Option<bool>,
     /// Boolean indicating if the mail is in inbox
-    #[serde(alias="isInbox")]
+    #[serde(rename="isInbox")]
     pub is_inbox: Option<bool>,
     /// Boolean indicating if the mail is in 'sent mails'
-    #[serde(alias="isSent")]
+    #[serde(rename="isSent")]
     pub is_sent: Option<bool>,
     /// Boolean indicating if the mail is starred
-    #[serde(alias="isStarred")]
+    #[serde(rename="isStarred")]
     pub is_starred: Option<bool>,
     /// Boolean indicating if the mail is unread
-    #[serde(alias="isUnread")]
+    #[serde(rename="isUnread")]
     pub is_unread: Option<bool>,
     /// Boolean indicating if the mail is deleted (used in Vault)
-    #[serde(alias="isDeleted")]
+    #[serde(rename="isDeleted")]
     pub is_deleted: Option<bool>,
 }
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.3+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Android Enterprise* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1).
 //! # Features
 //! 
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> AndroidEnterprise<C, NC, A>
         AndroidEnterprise {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -371,7 +371,7 @@ impl<'a, C, NC, A> AndroidEnterprise<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -410,7 +410,7 @@ impl ResponseResult for AppRestrictionsSchema {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppRestrictionsSchemaRestriction {
     /// The type of the restriction.
-    #[serde(alias="restrictionType")]
+    #[serde(rename="restrictionType")]
     pub restriction_type: String,
     /// A longer description of the restriction, giving more detail of what it affects.
     pub description: String,
@@ -421,10 +421,10 @@ pub struct AppRestrictionsSchemaRestriction {
     /// For choice or multiselect restrictions, the list of possible entries' human-readable names.
     pub entry: Vec<String>,
     /// The default value of the restriction.
-    #[serde(alias="defaultValue")]
+    #[serde(rename="defaultValue")]
     pub default_value: AppRestrictionsSchemaRestrictionRestrictionValue,
     /// For choice or multiselect restrictions, the list of possible entries' machine-readable values.
-    #[serde(alias="entryValue")]
+    #[serde(rename="entryValue")]
     pub entry_value: Vec<String>,
 }
 
@@ -438,19 +438,19 @@ impl Part for AppRestrictionsSchemaRestriction {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
     /// The boolean value - this will only be present if type is bool.
-    #[serde(alias="valueBool")]
+    #[serde(rename="valueBool")]
     pub value_bool: bool,
     /// The integer value - this will only be present if type is integer.
-    #[serde(alias="valueInteger")]
+    #[serde(rename="valueInteger")]
     pub value_integer: i32,
     /// The type of the value being provided.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The list of string values - this will only be present if type is multiselect.
-    #[serde(alias="valueMultiselect")]
+    #[serde(rename="valueMultiselect")]
     pub value_multiselect: Vec<String>,
     /// The string value - this will be present for types string, choice and hidden.
-    #[serde(alias="valueString")]
+    #[serde(rename="valueString")]
     pub value_string: String,
 }
 
@@ -505,7 +505,7 @@ pub struct Entitlement {
     /// The reason for the entitlement, e.g. "free" for free apps. This is temporary, it will be replaced by the acquisition kind field of group licenses.
     pub reason: Option<String>,
     /// The ID of the product that the entitlement is for, e.g. "app:com.google.android.gm".
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
 
@@ -600,15 +600,15 @@ impl ResponseResult for DevicesListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Install {
     /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
-    #[serde(alias="installState")]
+    #[serde(rename="installState")]
     pub install_state: Option<String>,
     /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
-    #[serde(alias="versionCode")]
+    #[serde(rename="versionCode")]
     pub version_code: Option<i32>,
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
     pub kind: Option<String>,
     /// The ID of the product that the install is for, e.g. "app:com.google.android.gm".
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
 
@@ -645,7 +645,7 @@ pub struct Enterprise {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprise".
     pub kind: Option<String>,
     /// The enterprise's primary domain, e.g. "example.com".
-    #[serde(alias="primaryDomain")]
+    #[serde(rename="primaryDomain")]
     pub primary_domain: Option<String>,
     /// The unique ID for the enterprise.
     pub id: Option<String>,
@@ -672,7 +672,7 @@ pub struct UserToken {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".
     pub kind: String,
     /// The unique ID for the user.
-    #[serde(alias="userId")]
+    #[serde(rename="userId")]
     pub user_id: String,
     /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.
     pub token: String,
@@ -698,7 +698,7 @@ pub struct ProductPermissions {
     /// The permissions required by the app.
     pub permission: Option<Vec<ProductPermission>>,
     /// The ID of the app that the permissions relate to, e.g. "app:com.google.android.gm".
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
 
@@ -721,7 +721,7 @@ pub struct DeviceState {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#deviceState".
     pub kind: Option<String>,
     /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
-    #[serde(alias="accountState")]
+    #[serde(rename="accountState")]
     pub account_state: Option<String>,
 }
 
@@ -738,7 +738,7 @@ impl ResponseResult for DeviceState {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPermission {
     /// An opaque string uniquely identifying the permission.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: String,
     /// Whether the permission has been accepted or not.
     pub state: String,
@@ -764,24 +764,24 @@ impl Part for ProductPermission {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Product {
     /// A link to an image that can be used as an icon for the product.
-    #[serde(alias="iconUrl")]
+    #[serde(rename="iconUrl")]
     pub icon_url: String,
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#product".
     pub kind: String,
     /// The name of the product.
     pub title: String,
     /// A link to the (consumer) Google Play details page for the product.
-    #[serde(alias="detailsUrl")]
+    #[serde(rename="detailsUrl")]
     pub details_url: String,
     /// A link to the Google Play for Work details page for the product, for use by an Enterprise administrator.
-    #[serde(alias="workDetailsUrl")]
+    #[serde(rename="workDetailsUrl")]
     pub work_details_url: String,
     /// The name of the author of the product (e.g. the app developer).
-    #[serde(alias="authorName")]
+    #[serde(rename="authorName")]
     pub author_name: String,
     /// A string of the form "app:
     /// " - e.g. "app:com.google.android.gm" represents the GMail app.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -803,7 +803,7 @@ impl ResponseResult for Product {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Permission {
     /// An opaque string uniquely identifying the permission.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: String,
     /// A longer description of the permissions giving more details of what it affects.
     pub description: String,
@@ -878,14 +878,14 @@ pub struct Collection {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collection".
     pub kind: Option<String>,
     /// Arbitrary unique ID, allocated by the API on creation.
-    #[serde(alias="collectionId")]
+    #[serde(rename="collectionId")]
     pub collection_id: Option<String>,
     /// A user-friendly name for the collection (should be unique), e.g. "Accounting apps".
     pub name: Option<String>,
     /// Whether this collection is visible to all users, or only to the users that have been granted access through the collection_viewers api. Even if a collection is visible to allUsers, it is possible to add and remove viewers, but this will have no effect until the collection's visibility changes to viewersOnly.
     pub visibility: Option<String>,
     /// The IDs of the products in the collection, in the order in which they should be displayed.
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: Option<Vec<String>>,
 }
 
@@ -938,7 +938,7 @@ pub struct User {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#user".
     pub kind: Option<String>,
     /// The user's primary email, e.g. "jsmith@example.com".
-    #[serde(alias="primaryEmail")]
+    #[serde(rename="primaryEmail")]
     pub primary_email: Option<String>,
     /// The unique ID for the user.
     pub id: Option<String>,
@@ -983,7 +983,7 @@ pub struct EnterpriseAccount {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterpriseAccount".
     pub kind: Option<String>,
     /// The email address of the service account.
-    #[serde(alias="accountEmail")]
+    #[serde(rename="accountEmail")]
     pub account_email: Option<String>,
 }
 
@@ -1010,7 +1010,7 @@ pub struct Device {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".
     pub kind: String,
     /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".
-    #[serde(alias="androidId")]
+    #[serde(rename="androidId")]
     pub android_id: String,
 }
 
@@ -1036,18 +1036,18 @@ pub struct GroupLicense {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicense".
     pub kind: String,
     /// The number of purchased licenses (possibly in multiple purchases). If this field is omitted then there is no limit on the number of licenses that can be provisioned (e.g. if the acquisition kind is "free").
-    #[serde(alias="numPurchased")]
+    #[serde(rename="numPurchased")]
     pub num_purchased: i32,
     /// The total number of provisioned licenses for this product. Returned by read operations, but ignored in write operations.
-    #[serde(alias="numProvisioned")]
+    #[serde(rename="numProvisioned")]
     pub num_provisioned: i32,
     /// How this group license was acquired. "bulkPurchase" means that this group license object was created because the enterprise purchased licenses for this product; this is "free" otherwise (for free products).
-    #[serde(alias="acquisitionKind")]
+    #[serde(rename="acquisitionKind")]
     pub acquisition_kind: String,
     /// Whether the product to which this group license relates is currently approved by the enterprise, as either "approved" or "unapproved". Products are approved when a group license is first created, but this approval may be revoked by an enterprise admin via Google Play. Unapproved products will not be visible to end users in collections and new entitlements to them should not normally be created.
     pub approval: String,
     /// The ID of the product that the license is for, e.g. "app:com.google.android.gm".
-    #[serde(alias="productId")]
+    #[serde(rename="productId")]
     pub product_id: String,
 }
 
@@ -1067,7 +1067,7 @@ impl ResponseResult for GroupLicense {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupLicensesListResponse {
     /// A group license for a product approved for use in the enterprise.
-    #[serde(alias="groupLicense")]
+    #[serde(rename="groupLicense")]
     pub group_license: Vec<GroupLicense>,
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".
     pub kind: String,

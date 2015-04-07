@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reseller* crate version *0.1.3+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *reseller* crate version *0.1.4+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *reseller* *v1_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/reseller/).
@@ -321,7 +321,7 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
         Reseller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -334,7 +334,7 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -363,24 +363,24 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Customer {
     /// The alternate email of the customer.
-    #[serde(alias="alternateEmail")]
+    #[serde(rename="alternateEmail")]
     pub alternate_email: Option<String>,
     /// The domain name of the customer.
-    #[serde(alias="customerDomain")]
+    #[serde(rename="customerDomain")]
     pub customer_domain: Option<String>,
     /// The phone number of the customer.
-    #[serde(alias="phoneNumber")]
+    #[serde(rename="phoneNumber")]
     pub phone_number: Option<String>,
     /// Ui url for customer resource.
-    #[serde(alias="resourceUiUrl")]
+    #[serde(rename="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
     /// The postal address of the customer.
-    #[serde(alias="postalAddress")]
+    #[serde(rename="postalAddress")]
     pub postal_address: Option<Address>,
     /// Identifies the resource as a customer.
     pub kind: Option<String>,
     /// The id of the customer.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: Option<String>,
 }
 
@@ -403,7 +403,7 @@ pub struct RenewalSettings {
     /// Identifies the resource as a subscription renewal setting.
     pub kind: Option<String>,
     /// Subscription renewal type.
-    #[serde(alias="renewalType")]
+    #[serde(rename="renewalType")]
     pub renewal_type: Option<String>,
 }
 
@@ -424,13 +424,13 @@ pub struct Seats {
     /// Identifies the resource as a subscription change plan request.
     pub kind: Option<String>,
     /// Number of seats to purchase. This is applicable only for a commitment plan.
-    #[serde(alias="numberOfSeats")]
+    #[serde(rename="numberOfSeats")]
     pub number_of_seats: Option<i32>,
     /// Maximum number of seats that can be purchased. This needs to be provided only for a non-commitment plan. For a commitment plan it is decided by the contract.
-    #[serde(alias="maximumNumberOfSeats")]
+    #[serde(rename="maximumNumberOfSeats")]
     pub maximum_number_of_seats: Option<i32>,
     /// Read-only field containing the current number of licensed seats for FLEXIBLE Google-Apps subscriptions and secondary subscriptions such as Google-Vault and Drive-storage.
-    #[serde(alias="licensedNumberOfSeats")]
+    #[serde(rename="licensedNumberOfSeats")]
     pub licensed_number_of_seats: Option<i32>,
 }
 
@@ -444,10 +444,10 @@ impl RequestValue for Seats {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionTransferInfo {
     /// Time when transfer token or intent to transfer will expire.
-    #[serde(alias="transferabilityExpirationTime")]
+    #[serde(rename="transferabilityExpirationTime")]
     pub transferability_expiration_time: String,
     /// no description provided
-    #[serde(alias="minimumTransferableSeats")]
+    #[serde(rename="minimumTransferableSeats")]
     pub minimum_transferable_seats: i32,
 }
 
@@ -462,10 +462,10 @@ impl Part for SubscriptionTransferInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPlanCommitmentInterval {
     /// End time of the commitment interval in milliseconds since Unix epoch.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// Start time of the commitment interval in milliseconds since Unix epoch.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
 }
 
@@ -485,7 +485,7 @@ impl Part for SubscriptionPlanCommitmentInterval {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Subscriptions {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// Identifies the resource as a collection of subscriptions.
     pub kind: String,
@@ -508,12 +508,12 @@ impl ResponseResult for Subscriptions {}
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ChangePlanRequest {
     /// Name of the plan to change to.
-    #[serde(alias="planName")]
+    #[serde(rename="planName")]
     pub plan_name: Option<String>,
     /// Identifies the resource as a subscription change plan request.
     pub kind: Option<String>,
     /// Purchase order id for your order tracking purposes.
-    #[serde(alias="purchaseOrderId")]
+    #[serde(rename="purchaseOrderId")]
     pub purchase_order_id: Option<String>,
     /// Number/Limit of seats in the new plan.
     pub seats: Option<Seats>,
@@ -529,10 +529,10 @@ impl RequestValue for ChangePlanRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionTrialSettings {
     /// End time of the trial in milliseconds since Unix epoch.
-    #[serde(alias="trialEndTime")]
+    #[serde(rename="trialEndTime")]
     pub trial_end_time: String,
     /// Whether the subscription is in trial.
-    #[serde(alias="isInTrial")]
+    #[serde(rename="isInTrial")]
     pub is_in_trial: bool,
 }
 
@@ -547,13 +547,13 @@ impl Part for SubscriptionTrialSettings {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPlan {
     /// The plan name of this subscription's plan.
-    #[serde(alias="planName")]
+    #[serde(rename="planName")]
     pub plan_name: String,
     /// Interval of the commitment if it is a commitment plan.
-    #[serde(alias="commitmentInterval")]
+    #[serde(rename="commitmentInterval")]
     pub commitment_interval: SubscriptionPlanCommitmentInterval,
     /// Whether the plan is a commitment plan or not.
-    #[serde(alias="isCommitmentPlan")]
+    #[serde(rename="isCommitmentPlan")]
     pub is_commitment_plan: bool,
 }
 
@@ -570,29 +570,29 @@ pub struct Address {
     /// Identifies the resource as a customer address.
     pub kind: String,
     /// Name of the organization.
-    #[serde(alias="organizationName")]
+    #[serde(rename="organizationName")]
     pub organization_name: String,
     /// ISO 3166 country code.
-    #[serde(alias="countryCode")]
+    #[serde(rename="countryCode")]
     pub country_code: String,
     /// Name of the locality. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     pub locality: String,
     /// Name of the region. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     pub region: String,
     /// Address line 2 of the address.
-    #[serde(alias="addressLine2")]
+    #[serde(rename="addressLine2")]
     pub address_line2: String,
     /// Address line 3 of the address.
-    #[serde(alias="addressLine3")]
+    #[serde(rename="addressLine3")]
     pub address_line3: String,
     /// Name of the contact person.
-    #[serde(alias="contactName")]
+    #[serde(rename="contactName")]
     pub contact_name: String,
     /// Address line 1 of the address.
-    #[serde(alias="addressLine1")]
+    #[serde(rename="addressLine1")]
     pub address_line1: String,
     /// The postal code. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
-    #[serde(alias="postalCode")]
+    #[serde(rename="postalCode")]
     pub postal_code: String,
 }
 
@@ -620,27 +620,27 @@ impl Part for Address {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
     /// Renewal settings of the subscription.
-    #[serde(alias="renewalSettings")]
+    #[serde(rename="renewalSettings")]
     pub renewal_settings: Option<RenewalSettings>,
     /// Name of the sku for which this subscription is purchased.
-    #[serde(alias="skuId")]
+    #[serde(rename="skuId")]
     pub sku_id: Option<String>,
     /// Identifies the resource as a Subscription.
     pub kind: Option<String>,
     /// Trial Settings of the subscription.
-    #[serde(alias="trialSettings")]
+    #[serde(rename="trialSettings")]
     pub trial_settings: Option<SubscriptionTrialSettings>,
     /// Transfer related information for the subscription.
-    #[serde(alias="transferInfo")]
+    #[serde(rename="transferInfo")]
     pub transfer_info: Option<SubscriptionTransferInfo>,
     /// Ui url for subscription resource.
-    #[serde(alias="resourceUiUrl")]
+    #[serde(rename="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
     /// Purchase order id for your order tracking purposes.
-    #[serde(alias="purchaseOrderId")]
+    #[serde(rename="purchaseOrderId")]
     pub purchase_order_id: Option<String>,
     /// Creation time of this subscription in milliseconds since Unix epoch.
-    #[serde(alias="creationTime")]
+    #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// Status of the subscription.
     pub status: Option<String>,
@@ -649,13 +649,13 @@ pub struct Subscription {
     /// Number/Limit of seats in the new plan.
     pub seats: Option<Seats>,
     /// The id of the subscription.
-    #[serde(alias="subscriptionId")]
+    #[serde(rename="subscriptionId")]
     pub subscription_id: Option<String>,
     /// Billing method of this subscription.
-    #[serde(alias="billingMethod")]
+    #[serde(rename="billingMethod")]
     pub billing_method: Option<String>,
     /// The id of the customer to whom the subscription belongs.
-    #[serde(alias="customerId")]
+    #[serde(rename="customerId")]
     pub customer_id: Option<String>,
 }
 

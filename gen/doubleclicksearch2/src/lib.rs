@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *doubleclicksearch* crate version *0.1.3+20150303*, where *20150303* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *doubleclicksearch* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -307,7 +307,7 @@ impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
         Doubleclicksearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -323,7 +323,7 @@ impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -374,78 +374,78 @@ impl Part for CustomMetric {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Conversion {
     /// Custom dimensions for the conversion, which can be used to filter data in a report.
-    #[serde(alias="customDimension")]
+    #[serde(rename="customDimension")]
     pub custom_dimension: Vec<CustomDimension>,
     /// DS ad group ID.
-    #[serde(alias="adGroupId")]
+    #[serde(rename="adGroupId")]
     pub ad_group_id: String,
     /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
-    #[serde(alias="segmentationId")]
+    #[serde(rename="segmentationId")]
     pub segmentation_id: String,
     /// Attribution model name. This field is ignored.
-    #[serde(alias="attributionModel")]
+    #[serde(rename="attributionModel")]
     pub attribution_model: String,
     /// DS campaign ID.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: String,
     /// The revenue amount of this TRANSACTION conversion, in micros.
-    #[serde(alias="revenueMicros")]
+    #[serde(rename="revenueMicros")]
     pub revenue_micros: String,
     /// DS advertiser ID.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: String,
     /// The quantity of this conversion, in millis.
-    #[serde(alias="quantityMillis")]
+    #[serde(rename="quantityMillis")]
     pub quantity_millis: String,
     /// The number of conversions, formatted in millis (conversions multiplied by 1000). This field is ignored.
-    #[serde(alias="countMillis")]
+    #[serde(rename="countMillis")]
     pub count_millis: String,
     /// DS criterion (keyword) ID.
-    #[serde(alias="criterionId")]
+    #[serde(rename="criterionId")]
     pub criterion_id: String,
     /// The time at which the conversion took place, in epoch millis UTC.
-    #[serde(alias="conversionTimestamp")]
+    #[serde(rename="conversionTimestamp")]
     pub conversion_timestamp: String,
     /// The advertiser-provided order id for the conversion.
-    #[serde(alias="floodlightOrderId")]
+    #[serde(rename="floodlightOrderId")]
     pub floodlight_order_id: String,
     /// The segmentation type of this conversion (for example, FLOODLIGHT).
-    #[serde(alias="segmentationType")]
+    #[serde(rename="segmentationType")]
     pub segmentation_type: String,
     /// DS click ID for the conversion.
-    #[serde(alias="clickId")]
+    #[serde(rename="clickId")]
     pub click_id: String,
     /// Custom metrics for the conversion.
-    #[serde(alias="customMetric")]
+    #[serde(rename="customMetric")]
     pub custom_metric: Vec<CustomMetric>,
     /// DS conversion ID.
-    #[serde(alias="dsConversionId")]
+    #[serde(rename="dsConversionId")]
     pub ds_conversion_id: String,
     /// DS engine account ID.
-    #[serde(alias="engineAccountId")]
+    #[serde(rename="engineAccountId")]
     pub engine_account_id: String,
     /// The time at which the conversion was last modified, in epoch millis UTC.
-    #[serde(alias="conversionModifiedTimestamp")]
+    #[serde(rename="conversionModifiedTimestamp")]
     pub conversion_modified_timestamp: String,
     /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
-    #[serde(alias="segmentationName")]
+    #[serde(rename="segmentationName")]
     pub segmentation_name: String,
     /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
     pub state: String,
     /// DS ad ID.
-    #[serde(alias="adId")]
+    #[serde(rename="adId")]
     pub ad_id: String,
     /// DS agency ID.
-    #[serde(alias="agencyId")]
+    #[serde(rename="agencyId")]
     pub agency_id: String,
     /// Advertiser-provided ID for the conversion, also known as the order ID.
-    #[serde(alias="conversionId")]
+    #[serde(rename="conversionId")]
     pub conversion_id: String,
     /// The type of the conversion, that is, either ACTION or TRANSACTION. An ACTION conversion is an action by the user that has no monetarily quantifiable value, while a TRANSACTION conversion is an action that does have a monetarily quantifiable value. Examples are email list signups (ACTION) versus ecommerce purchases (TRANSACTION).
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
 }
 
@@ -471,7 +471,7 @@ pub struct ReportFiles {
     /// Use this url to download the report file.
     pub url: String,
     /// The size of this report file in bytes.
-    #[serde(alias="byteCount")]
+    #[serde(rename="byteCount")]
     pub byte_count: i64,
 }
 
@@ -486,25 +486,25 @@ impl Part for ReportFiles {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestReportScope {
     /// DS advertiser ID.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: String,
     /// DS ad group ID.
-    #[serde(alias="adGroupId")]
+    #[serde(rename="adGroupId")]
     pub ad_group_id: String,
     /// DS keyword ID.
-    #[serde(alias="keywordId")]
+    #[serde(rename="keywordId")]
     pub keyword_id: String,
     /// DS ad ID.
-    #[serde(alias="adId")]
+    #[serde(rename="adId")]
     pub ad_id: String,
     /// DS agency ID.
-    #[serde(alias="agencyId")]
+    #[serde(rename="agencyId")]
     pub agency_id: String,
     /// DS engine account ID.
-    #[serde(alias="engineAccountId")]
+    #[serde(rename="engineAccountId")]
     pub engine_account_id: String,
     /// DS campaign ID.
-    #[serde(alias="campaignId")]
+    #[serde(rename="campaignId")]
     pub campaign_id: String,
 }
 
@@ -539,7 +539,7 @@ pub struct ReportRequestOrderBy {
     /// Column to perform the sort on. This can be a DoubleClick Search-defined column or a saved column.
     pub column: ReportApiColumnSpec,
     /// The sort direction, which is either ascending or descending.
-    #[serde(alias="sortOrder")]
+    #[serde(rename="sortOrder")]
     pub sort_order: String,
 }
 
@@ -554,32 +554,32 @@ impl Part for ReportRequestOrderBy {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportApiColumnSpec {
     /// Synchronous report only. Set to true to group by this column. Defaults to false.
-    #[serde(alias="groupByColumn")]
+    #[serde(rename="groupByColumn")]
     pub group_by_column: bool,
     /// Inclusive day in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with startDate.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// Name of a saved column to include in the report. The report must be scoped at advertiser or lower, and this saved column must already be created in the DoubleClick Search UI.
-    #[serde(alias="savedColumnName")]
+    #[serde(rename="savedColumnName")]
     pub saved_column_name: String,
     /// Segments a report by a custom dimension. The report must be scoped to an advertiser or lower, and the custom dimension must already be set up in DoubleClick Search. The custom dimension name, which appears in DoubleClick Search, is case sensitive.
     /// If used in a conversion report, returns the value of the specified custom dimension for the given conversion, if set. This column does not segment the conversion report.
-    #[serde(alias="customDimensionName")]
+    #[serde(rename="customDimensionName")]
     pub custom_dimension_name: String,
     /// Text used to identify this column in the report output; defaults to columnName or savedColumnName when not specified. This can be used to prevent collisions between DoubleClick Search columns and saved columns with the same name.
-    #[serde(alias="headerText")]
+    #[serde(rename="headerText")]
     pub header_text: String,
     /// Name of a DoubleClick Search column to include in the report.
-    #[serde(alias="columnName")]
+    #[serde(rename="columnName")]
     pub column_name: String,
     /// The platform that is used to provide data for the custom dimension. Acceptable values are "Floodlight".
-    #[serde(alias="platformSource")]
+    #[serde(rename="platformSource")]
     pub platform_source: String,
     /// Inclusive date in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with endDate.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
     /// Name of a custom metric to include in the report. The report must be scoped to an advertiser or lower, and the custom metric must already be set up in DoubleClick Search. The custom metric name, which appears in DoubleClick Search, is case sensitive.
-    #[serde(alias="customMetricName")]
+    #[serde(rename="customMetricName")]
     pub custom_metric_name: String,
 }
 
@@ -593,22 +593,22 @@ impl Part for ReportApiColumnSpec {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Availability {
     /// DS advertiser ID.
-    #[serde(alias="advertiserId")]
+    #[serde(rename="advertiserId")]
     pub advertiser_id: String,
     /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
-    #[serde(alias="segmentationId")]
+    #[serde(rename="segmentationId")]
     pub segmentation_id: String,
     /// The segmentation type that this availability is for (its default value is FLOODLIGHT).
-    #[serde(alias="segmentationType")]
+    #[serde(rename="segmentationType")]
     pub segmentation_type: String,
     /// DS agency ID.
-    #[serde(alias="agencyId")]
+    #[serde(rename="agencyId")]
     pub agency_id: String,
     /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
-    #[serde(alias="segmentationName")]
+    #[serde(rename="segmentationName")]
     pub segmentation_name: String,
     /// The time by which all conversions have been uploaded, in epoch millis UTC.
-    #[serde(alias="availabilityTimestamp")]
+    #[serde(rename="availabilityTimestamp")]
     pub availability_timestamp: String,
 }
 
@@ -628,44 +628,44 @@ impl Part for Availability {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequest {
     /// Synchronous report only. A list of columns and directions defining sorting to be performed on the report rows.
-    #[serde(alias="orderBy")]
+    #[serde(rename="orderBy")]
     pub order_by: Option<Vec<ReportRequestOrderBy>>,
     /// The reportScope is a set of IDs that are used to determine which subset of entities will be returned in the report. The full lineage of IDs from the lowest scoped level desired up through agency is required.
-    #[serde(alias="reportScope")]
+    #[serde(rename="reportScope")]
     pub report_scope: Option<ReportRequestReportScope>,
     /// Asynchronous report only. The maximum number of rows per report file. A large report is split into many files based on this field. Acceptable values are 1000000 to 100000000, inclusive.
-    #[serde(alias="maxRowsPerFile")]
+    #[serde(rename="maxRowsPerFile")]
     pub max_rows_per_file: Option<i32>,
     /// Specifies the currency in which monetary will be returned. Possible values are: usd, agency (valid if the report is scoped to agency or lower), advertiser (valid if the report is scoped to * advertiser or lower), or account (valid if the report is scoped to engine account or lower).
-    #[serde(alias="statisticsCurrency")]
+    #[serde(rename="statisticsCurrency")]
     pub statistics_currency: Option<String>,
     /// If metrics are requested in a report, this argument will be used to restrict the metrics to a specific time range.
-    #[serde(alias="timeRange")]
+    #[serde(rename="timeRange")]
     pub time_range: Option<ReportRequestTimeRange>,
     /// Synchronous report only. Zero-based index of the first row to return. Acceptable values are 0 to 50000, inclusive. Defaults to 0.
-    #[serde(alias="startRow")]
+    #[serde(rename="startRow")]
     pub start_row: Option<i32>,
     /// Synchronous report only. The maxinum number of rows to return; additional rows are dropped. Acceptable values are 0 to 10000, inclusive. Defaults to 10000.
-    #[serde(alias="rowCount")]
+    #[serde(rename="rowCount")]
     pub row_count: Option<i32>,
     /// Determines the type of rows that are returned in the report. For example, if you specify reportType: keyword, each row in the report will contain data about a keyword. See the Types of Reports reference for the columns that are available for each type.
-    #[serde(alias="reportType")]
+    #[serde(rename="reportType")]
     pub report_type: Option<String>,
     /// The columns to include in the report. This includes both DoubleClick Search columns and saved columns. For DoubleClick Search columns, only the columnName parameter is required. For saved columns only the savedColumnName parameter is required. Both columnName and savedColumnName cannot be set in the same stanza.
     pub columns: Option<Vec<ReportApiColumnSpec>>,
     /// A list of filters to be applied to the report.
     pub filters: Option<Vec<ReportRequestFilters>>,
     /// Determines if removed entities should be included in the report. Defaults to false.
-    #[serde(alias="includeRemovedEntities")]
+    #[serde(rename="includeRemovedEntities")]
     pub include_removed_entities: Option<bool>,
     /// Determines if removed entities should be included in the report. Defaults to false. Deprecated, please use includeRemovedEntities instead.
-    #[serde(alias="includeDeletedEntities")]
+    #[serde(rename="includeDeletedEntities")]
     pub include_deleted_entities: Option<bool>,
     /// If true, the report would only be created if all the requested stat data are sourced from a single timezone. Defaults to false.
-    #[serde(alias="verifySingleTimeZone")]
+    #[serde(rename="verifySingleTimeZone")]
     pub verify_single_time_zone: Option<bool>,
     /// Format that the report should be returned in. Currently csv or tsv is supported.
-    #[serde(alias="downloadFormat")]
+    #[serde(rename="downloadFormat")]
     pub download_format: Option<String>,
 }
 
@@ -695,16 +695,16 @@ pub struct Report {
     /// The request that created the report. Optional fields not specified in the original request are filled with default values.
     pub request: ReportRequest,
     /// Asynchronous report only. True if and only if the report has completed successfully and the report files are ready to be downloaded.
-    #[serde(alias="isReportReady")]
+    #[serde(rename="isReportReady")]
     pub is_report_ready: bool,
     /// The number of report rows generated by the report, not including headers.
-    #[serde(alias="rowCount")]
+    #[serde(rename="rowCount")]
     pub row_count: i32,
     /// If all statistics of the report are sourced from the same time zone, this would be it. Otherwise the field is unset.
-    #[serde(alias="statisticsTimeZone")]
+    #[serde(rename="statisticsTimeZone")]
     pub statistics_time_zone: String,
     /// The currency code of all monetary values produced in the report, including values that are set by users (e.g., keyword bid settings) and metrics (e.g., cost and revenue). The currency code of a report is determined by the statisticsCurrency field of the report request.
-    #[serde(alias="statisticsCurrencyCode")]
+    #[serde(rename="statisticsCurrencyCode")]
     pub statistics_currency_code: String,
     /// Asynchronous report only. Id of the report.
     pub id: String,
@@ -721,16 +721,16 @@ impl ResponseResult for Report {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestTimeRange {
     /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed metrics reports work.
-    #[serde(alias="changedMetricsSinceTimestamp")]
+    #[serde(rename="changedMetricsSinceTimestamp")]
     pub changed_metrics_since_timestamp: String,
     /// Inclusive date in YYYY-MM-DD format.
-    #[serde(alias="endDate")]
+    #[serde(rename="endDate")]
     pub end_date: String,
     /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed attribute reports work.
-    #[serde(alias="changedAttributesSinceTimestamp")]
+    #[serde(rename="changedAttributesSinceTimestamp")]
     pub changed_attributes_since_timestamp: String,
     /// Inclusive date in YYYY-MM-DD format.
-    #[serde(alias="startDate")]
+    #[serde(rename="startDate")]
     pub start_date: String,
 }
 
@@ -770,12 +770,12 @@ impl ResponseResult for SavedColumnList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedColumn {
     /// The name of the saved column.
-    #[serde(alias="savedColumnName")]
+    #[serde(rename="savedColumnName")]
     pub saved_column_name: Option<String>,
     /// Identifies this as a SavedColumn resource. Value: the fixed string doubleclicksearch#savedColumn.
     pub kind: Option<String>,
     /// The type of data this saved column will produce.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: Option<String>,
 }
 

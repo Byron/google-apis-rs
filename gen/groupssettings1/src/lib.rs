@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *0.1.3+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *groupssettings* crate version *0.1.4+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -310,7 +310,7 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
         Groupssettings {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -320,7 +320,7 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -348,84 +348,84 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
     /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
-    #[serde(alias="messageModerationLevel")]
+    #[serde(rename="messageModerationLevel")]
     pub message_moderation_level: Option<String>,
     /// Description of the group
     pub description: Option<String>,
     /// Are external members allowed to join the group.
-    #[serde(alias="allowExternalMembers")]
+    #[serde(rename="allowExternalMembers")]
     pub allow_external_members: Option<String>,
     /// Whome should the default reply to a message go to. Possible values are: REPLY_TO_CUSTOM REPLY_TO_SENDER REPLY_TO_LIST REPLY_TO_OWNER REPLY_TO_IGNORE REPLY_TO_MANAGERS
-    #[serde(alias="replyTo")]
+    #[serde(rename="replyTo")]
     pub reply_to: Option<String>,
     /// Default email to which reply to any message should go.
-    #[serde(alias="customReplyTo")]
+    #[serde(rename="customReplyTo")]
     pub custom_reply_to: Option<String>,
     /// Should the member be notified if his message is denied by owner.
-    #[serde(alias="sendMessageDenyNotification")]
+    #[serde(rename="sendMessageDenyNotification")]
     pub send_message_deny_notification: Option<String>,
     /// Permission to contact owner of the group via web UI. Possbile values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
-    #[serde(alias="whoCanContactOwner")]
+    #[serde(rename="whoCanContactOwner")]
     pub who_can_contact_owner: Option<String>,
     /// Default message display font. Possible values are: DEFAULT_FONT FIXED_WIDTH_FONT
-    #[serde(alias="messageDisplayFont")]
+    #[serde(rename="messageDisplayFont")]
     pub message_display_font: Option<String>,
     /// If the contents of the group are archived.
-    #[serde(alias="isArchived")]
+    #[serde(rename="isArchived")]
     pub is_archived: Option<String>,
     /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST
-    #[serde(alias="whoCanPostMessage")]
+    #[serde(rename="whoCanPostMessage")]
     pub who_can_post_message: Option<String>,
     /// Primary language for the group.
-    #[serde(alias="primaryLanguage")]
+    #[serde(rename="primaryLanguage")]
     pub primary_language: Option<String>,
     /// Permissions to view membership. Possbile values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
-    #[serde(alias="whoCanViewMembership")]
+    #[serde(rename="whoCanViewMembership")]
     pub who_can_view_membership: Option<String>,
     /// Permissions to invite members. Possbile values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE
-    #[serde(alias="whoCanInvite")]
+    #[serde(rename="whoCanInvite")]
     pub who_can_invite: Option<String>,
     /// Permissions to join the group. Possible values are: ANYONE_CAN_JOIN ALL_IN_DOMAIN_CAN_JOIN INVITED_CAN_JOIN CAN_REQUEST_TO_JOIN
-    #[serde(alias="whoCanJoin")]
+    #[serde(rename="whoCanJoin")]
     pub who_can_join: Option<String>,
     /// The type of the resource.
     pub kind: Option<String>,
     /// Name of the Group
     pub name: Option<String>,
     /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
-    #[serde(alias="spamModerationLevel")]
+    #[serde(rename="spamModerationLevel")]
     pub spam_moderation_level: Option<String>,
     /// Default message deny notification message
-    #[serde(alias="defaultMessageDenyNotificationText")]
+    #[serde(rename="defaultMessageDenyNotificationText")]
     pub default_message_deny_notification_text: Option<String>,
     /// Permissions to view group. Possbile values are: ANYONE_CAN_VIEW ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
-    #[serde(alias="whoCanViewGroup")]
+    #[serde(rename="whoCanViewGroup")]
     pub who_can_view_group: Option<String>,
     /// If this groups should be included in global address list or not.
-    #[serde(alias="includeInGlobalAddressList")]
+    #[serde(rename="includeInGlobalAddressList")]
     pub include_in_global_address_list: Option<String>,
     /// If the group is archive only
-    #[serde(alias="archiveOnly")]
+    #[serde(rename="archiveOnly")]
     pub archive_only: Option<String>,
     /// Is the group listed in groups directory
-    #[serde(alias="showInGroupDirectory")]
+    #[serde(rename="showInGroupDirectory")]
     pub show_in_group_directory: Option<String>,
     /// Permission to leave the group. Possible values are: ALL_MANAGERS_CAN_LEAVE ALL_MEMBERS_CAN_LEAVE
-    #[serde(alias="whoCanLeaveGroup")]
+    #[serde(rename="whoCanLeaveGroup")]
     pub who_can_leave_group: Option<String>,
     /// Can members post using the group email address.
-    #[serde(alias="membersCanPostAsTheGroup")]
+    #[serde(rename="membersCanPostAsTheGroup")]
     pub members_can_post_as_the_group: Option<String>,
     /// Maximum message size allowed.
-    #[serde(alias="maxMessageBytes")]
+    #[serde(rename="maxMessageBytes")]
     pub max_message_bytes: Option<i32>,
     /// If posting from web is allowed.
-    #[serde(alias="allowWebPosting")]
+    #[serde(rename="allowWebPosting")]
     pub allow_web_posting: Option<String>,
     /// Email id of the group
     pub email: Option<String>,
     /// Is google allowed to contact admins.
-    #[serde(alias="allowGoogleCommunication")]
+    #[serde(rename="allowGoogleCommunication")]
     pub allow_google_communication: Option<String>,
 }
 

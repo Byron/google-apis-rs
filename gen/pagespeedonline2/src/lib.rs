@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *0.1.3+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *pagespeedonline* crate version *0.1.4+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *pagespeedonline* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
@@ -284,7 +284,7 @@ impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
         Pagespeedonline {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -294,7 +294,7 @@ impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -386,43 +386,43 @@ impl Part for ResultFormattedResultsRuleResultsUrlBlocksUrls {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultPageStats {
     /// Number of response bytes for flash resources on the page.
-    #[serde(alias="flashResponseBytes")]
+    #[serde(rename="flashResponseBytes")]
     pub flash_response_bytes: String,
     /// Total size of all request bytes sent by the page.
-    #[serde(alias="totalRequestBytes")]
+    #[serde(rename="totalRequestBytes")]
     pub total_request_bytes: String,
     /// Number of CSS resources referenced by the page.
-    #[serde(alias="numberCssResources")]
+    #[serde(rename="numberCssResources")]
     pub number_css_resources: i32,
     /// Number of uncompressed response bytes for text resources not covered by other statistics (i.e non-HTML, non-script, non-CSS resources) on the page.
-    #[serde(alias="textResponseBytes")]
+    #[serde(rename="textResponseBytes")]
     pub text_response_bytes: String,
     /// Number of HTTP resources loaded by the page.
-    #[serde(alias="numberResources")]
+    #[serde(rename="numberResources")]
     pub number_resources: i32,
     /// Number of response bytes for other resources on the page.
-    #[serde(alias="otherResponseBytes")]
+    #[serde(rename="otherResponseBytes")]
     pub other_response_bytes: String,
     /// Number of response bytes for image resources on the page.
-    #[serde(alias="imageResponseBytes")]
+    #[serde(rename="imageResponseBytes")]
     pub image_response_bytes: String,
     /// Number of unique hosts referenced by the page.
-    #[serde(alias="numberHosts")]
+    #[serde(rename="numberHosts")]
     pub number_hosts: i32,
     /// Number of uncompressed response bytes for JS resources on the page.
-    #[serde(alias="javascriptResponseBytes")]
+    #[serde(rename="javascriptResponseBytes")]
     pub javascript_response_bytes: String,
     /// Number of uncompressed response bytes for the main HTML document and all iframes on the page.
-    #[serde(alias="htmlResponseBytes")]
+    #[serde(rename="htmlResponseBytes")]
     pub html_response_bytes: String,
     /// Number of uncompressed response bytes for CSS resources on the page.
-    #[serde(alias="cssResponseBytes")]
+    #[serde(rename="cssResponseBytes")]
     pub css_response_bytes: String,
     /// Number of JavaScript resources referenced by the page.
-    #[serde(alias="numberJsResources")]
+    #[serde(rename="numberJsResources")]
     pub number_js_resources: i32,
     /// Number of static (i.e. cacheable) resources on the page.
-    #[serde(alias="numberStaticResources")]
+    #[serde(rename="numberStaticResources")]
     pub number_static_resources: i32,
 }
 
@@ -437,15 +437,15 @@ impl Part for ResultPageStats {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultFormattedResultsRuleResults {
     /// Localized name of the rule, intended for presentation to a user.
-    #[serde(alias="localizedRuleName")]
+    #[serde(rename="localizedRuleName")]
     pub localized_rule_name: String,
     /// List of blocks of URLs. Each block may contain a heading and a list of URLs. Each URL may optionally include additional details.
-    #[serde(alias="urlBlocks")]
+    #[serde(rename="urlBlocks")]
     pub url_blocks: Vec<ResultFormattedResultsRuleResultsUrlBlocks>,
     /// List of rule groups that this rule belongs to. Each entry in the list is one of "SPEED" or "USABILITY".
     pub groups: Vec<String>,
     /// The impact (unbounded floating point value) that implementing the suggestions for this rule would have on making the page faster. Impact is comparable between rules to determine which rule's suggestions would have a higher or lower impact on making a page faster. For instance, if enabling compression would save 1MB, while optimizing images would save 500kB, the enable compression rule would have 2x the impact of the image optimization rule, all other things being equal.
-    #[serde(alias="ruleImpact")]
+    #[serde(rename="ruleImpact")]
     pub rule_impact: f64,
     /// A brief summary description for the rule, indicating at a high level what should be done to follow the rule and what benefit can be gained by doing so.
     pub summary: PagespeedApiFormatStringV2,
@@ -482,7 +482,7 @@ pub struct PagespeedApiFormatStringV2Args {
     /// The placeholder key for this arg, as a string.
     pub key: String,
     /// Type of argument. One of URL, STRING_LITERAL, INT_LITERAL, BYTES, DURATION, VERBATIM_STRING, PERCENTAGE, HYPERLINK, or SNAPSHOT_RECT.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// Secondary screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments.
     pub secondary_rects: Vec<PagespeedApiFormatStringV2ArgsSecondaryRects>,
@@ -547,25 +547,25 @@ pub struct ResultType {
     /// Kind of result.
     pub kind: String,
     /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.
-    #[serde(alias="responseCode")]
+    #[serde(rename="responseCode")]
     pub response_code: i32,
     /// Base64-encoded screenshot of the page that was analyzed.
     pub screenshot: PagespeedApiImageV2,
     /// Title of the page, as displayed in the browser's title bar.
     pub title: String,
     /// A map with one entry for each rule group in these results.
-    #[serde(alias="ruleGroups")]
+    #[serde(rename="ruleGroups")]
     pub rule_groups: HashMap<String, ResultRuleGroups>,
     /// The version of PageSpeed used to generate these results.
     pub version: ResultVersion,
     /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.
-    #[serde(alias="formattedResults")]
+    #[serde(rename="formattedResults")]
     pub formatted_results: ResultFormattedResults,
     /// List of rules that were specified in the request, but which the server did not know how to instantiate.
-    #[serde(alias="invalidRules")]
+    #[serde(rename="invalidRules")]
     pub invalid_rules: Vec<String>,
     /// Summary statistics for the page, such as number of JavaScript bytes, number of HTML bytes, etc.
-    #[serde(alias="pageStats")]
+    #[serde(rename="pageStats")]
     pub page_stats: ResultPageStats,
     /// Canonicalized and final URL for the document, after following page redirects (if any).
     pub id: String,
@@ -603,7 +603,7 @@ pub struct ResultFormattedResults {
     /// The locale of the formattedResults, e.g. "en_US".
     pub locale: String,
     /// Dictionary of formatted rule results, with one entry for each PageSpeed rule instantiated and run by the server.
-    #[serde(alias="ruleResults")]
+    #[serde(rename="ruleResults")]
     pub rule_results: HashMap<String, ResultFormattedResultsRuleResults>,
 }
 

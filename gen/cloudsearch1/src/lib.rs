@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudsearch* crate version *0.1.3+20150309*, where *20150309* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *cloudsearch* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudsearch1).
 //! # Features
 //! 
@@ -302,7 +302,7 @@ impl<'a, C, NC, A> Cloudsearch<C, NC, A>
         Cloudsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -312,7 +312,7 @@ impl<'a, C, NC, A> Cloudsearch<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -338,7 +338,7 @@ impl<'a, C, NC, A> Cloudsearch<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDocumentsResponse {
     /// If there are more results, retrieve them by invoking list documents call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of documents.
     pub documents: Vec<Document>,
@@ -354,13 +354,13 @@ impl ResponseResult for ListDocumentsResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct IndexInfo {
     /// The project associated with the index. It cannot be the empty string.
-    #[serde(alias="projectId")]
+    #[serde(rename="projectId")]
     pub project_id: String,
     /// The index identifier. It cannot be the empty string. It must contain only visible, printable ASCII characters (ASCII codes 33 through 126 inclusive) and be no longer than 100 characters. It cannot begin with an exclamation point ('!'), and it can't begin and end with double underscores ("__").
-    #[serde(alias="indexId")]
+    #[serde(rename="indexId")]
     pub index_id: String,
     /// Names of indexed fields.
-    #[serde(alias="indexedField")]
+    #[serde(rename="indexedField")]
     pub indexed_field: FieldNames,
 }
 
@@ -374,12 +374,12 @@ impl Part for IndexInfo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResult {
     /// If there are more results, retrieve them by invoking search call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The list of fields in the result. Each field is either from the stored document, the built-in fields (`_rank`, the document rank, and `_score` if scoring is enabled), or computed from any extra `fieldExpressions` defined in the request. For example, if a request contains a `fieldExpressions` named `"TotalPrice"` and expressed as `"Price + Tax"`, the result will have a field whose name is `"TotalPrice"` and whose value is set to the computed sum of the value of field `"Price"` and the value of field `"Tax"`. If a request contains a `fieldExpressions` named `"snippet"` and expressed as `"snippet(\"good times\", content)"`, the result will have a field whose name is `"snippet"` and whose value contains a snippet of text from field `"content"` matching the query "good times".
     pub fields: HashMap<String, FieldValueList>,
     /// The unique identifier of the document.
-    #[serde(alias="docId")]
+    #[serde(rename="docId")]
     pub doc_id: String,
 }
 
@@ -393,22 +393,22 @@ impl Part for SearchResult {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FieldNames {
     /// The names of fields in which TEXT values are stored.
-    #[serde(alias="textFields")]
+    #[serde(rename="textFields")]
     pub text_fields: Vec<String>,
     /// The names of fields in which DATE values are stored.
-    #[serde(alias="dateFields")]
+    #[serde(rename="dateFields")]
     pub date_fields: Vec<String>,
     /// The names of fields in which NUMBER values are stored.
-    #[serde(alias="numberFields")]
+    #[serde(rename="numberFields")]
     pub number_fields: Vec<String>,
     /// The names of fields in which GEO values are stored.
-    #[serde(alias="geoFields")]
+    #[serde(rename="geoFields")]
     pub geo_fields: Vec<String>,
     /// The names of fields in which ATOM values are stored.
-    #[serde(alias="atomFields")]
+    #[serde(rename="atomFields")]
     pub atom_fields: Vec<String>,
     /// The names of fields in which HTML values are stored.
-    #[serde(alias="htmlFields")]
+    #[serde(rename="htmlFields")]
     pub html_fields: Vec<String>,
 }
 
@@ -440,7 +440,7 @@ impl Part for FieldValueList {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListIndexesResponse {
     /// If there are more results, retrieve them by invoking list indexes call with the same arguments and this `nextPageToken`. If there are no more results, this field is not set.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The information about available indexes.
     pub indexes: Vec<IndexInfo>,
@@ -461,7 +461,7 @@ impl ResponseResult for ListIndexesResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResponse {
     /// The number of documents that match the query. It is greater than or equal to the number of documents actually returned. This is an approximation and not an exact count unless it is less than or equal to `matchedCountAccuracy` in search parameter.
-    #[serde(alias="matchedCount")]
+    #[serde(rename="matchedCount")]
     pub matched_count: i64,
     /// The list of documents that match the search query.
     pub results: Vec<SearchResult>,
@@ -485,7 +485,7 @@ pub struct Document {
     /// The list of fields in the document. It cannot be the empty list. Each field has a name and a list of values. The field name is unique to a document and is case sensitive. The name can only contain ASCII characters. It must start with a letter and can contain letters, digits, or underscore. It cannot be longer than 500 characters and cannot be the empty string. A field can have multiple values with same or different types, however, it cannot have multiple Timestamp or number values.
     pub fields: Option<HashMap<String, FieldValueList>>,
     /// The unique identifier of the document. It must contain only visible, printable ASCII characters (ASCII codes 33 through 126 inclusive) and be no longer than 500 characters. It cannot begin with an exclamation point ('!'), and it can't begin and end with double underscores ("__"). If missing, it is automatically assigned for the document.
-    #[serde(alias="docId")]
+    #[serde(rename="docId")]
     pub doc_id: Option<String>,
     /// A positive integer which determines the default ordering of documents returned from a search. The rank can be set explicitly when the document is created. It is a bad idea to assign the same rank to many documents, and the same rank should never be assigned to more than 10,000 documents. By default (when it is not specified or set to 0), it is set at the time the document is created to the number of seconds since January 1, 2011. The rank can be used in field_expressions, order_by or return_fields in a search request, where it is referenced as `_rank`.
     pub rank: Option<i32>,
@@ -504,19 +504,19 @@ pub struct FieldValue {
     /// The language of a string value. If given, the language must be a valid `ISO 639-1` code.
     pub lang: String,
     /// The value of a number-valued field.
-    #[serde(alias="numberValue")]
+    #[serde(rename="numberValue")]
     pub number_value: f64,
     /// The value of a timestamp-valued field.
-    #[serde(alias="timestampValue")]
+    #[serde(rename="timestampValue")]
     pub timestamp_value: String,
     /// The value of a string-valued field.
-    #[serde(alias="stringValue")]
+    #[serde(rename="stringValue")]
     pub string_value: String,
     /// The format of a string value. By default, the string format is `DEFAULT`, where a format will be automatically detected.
-    #[serde(alias="stringFormat")]
+    #[serde(rename="stringFormat")]
     pub string_format: String,
     /// The value of a GEO-valued field, represented in string with any of the listed [ways of writing coordinates](http://en.wikipedia.org/wiki/Geographic_coordinate_conversion#Ways_of_writing_coordinates)
-    #[serde(alias="geoValue")]
+    #[serde(rename="geoValue")]
     pub geo_value: String,
 }
 

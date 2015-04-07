@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appsactivity* crate version *0.1.3+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *appsactivity* crate version *0.1.4+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *appsactivity* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/activity/).
@@ -322,7 +322,7 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
         Appsactivity {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -332,7 +332,7 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -353,10 +353,10 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Rename {
     /// The new title.
-    #[serde(alias="newTitle")]
+    #[serde(rename="newTitle")]
     pub new_title: String,
     /// The old title.
-    #[serde(alias="oldTitle")]
+    #[serde(rename="oldTitle")]
     pub old_title: String,
 }
 
@@ -370,10 +370,10 @@ impl Part for Rename {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PermissionChange {
     /// Lists all Permission objects removed.
-    #[serde(alias="removedPermissions")]
+    #[serde(rename="removedPermissions")]
     pub removed_permissions: Vec<Permission>,
     /// Lists all Permission objects added.
-    #[serde(alias="addedPermissions")]
+    #[serde(rename="addedPermissions")]
     pub added_permissions: Vec<Permission>,
 }
 
@@ -387,7 +387,7 @@ impl Part for PermissionChange {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Target {
     /// The MIME type of the target.
-    #[serde(alias="mimeType")]
+    #[serde(rename="mimeType")]
     pub mime_type: String,
     /// The ID of the target. For example, in Google Drive, this is the file or folder ID.
     pub id: String,
@@ -407,7 +407,7 @@ pub struct Parent {
     /// The parent's ID.
     pub id: String,
     /// Whether this is the root folder.
-    #[serde(alias="isRoot")]
+    #[serde(rename="isRoot")]
     pub is_root: bool,
     /// The parent's title.
     pub title: String,
@@ -423,17 +423,17 @@ impl Part for Parent {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Permission {
     /// Whether the permission requires a link to the file.
-    #[serde(alias="withLink")]
+    #[serde(rename="withLink")]
     pub with_link: bool,
     /// The ID for this permission. Corresponds to the Drive API's permission ID returned as part of the Drive Permissions resource.
-    #[serde(alias="permissionId")]
+    #[serde(rename="permissionId")]
     pub permission_id: String,
     /// Indicates the Google Drive permissions role. The role determines a user's ability to read, write, or comment on the file.
     pub role: String,
     /// The name of the user or group the permission applies to.
     pub name: String,
     /// Indicates how widely permissions are granted.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The user's information if the type is USER.
     pub user: User,
@@ -462,10 +462,10 @@ impl Part for Photo {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Move {
     /// The removed parent(s).
-    #[serde(alias="removedParents")]
+    #[serde(rename="removedParents")]
     pub removed_parents: Vec<Parent>,
     /// The added parent(s).
-    #[serde(alias="addedParents")]
+    #[serde(rename="addedParents")]
     pub added_parents: Vec<Parent>,
 }
 
@@ -484,7 +484,7 @@ impl Part for Move {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListActivitiesResponse {
     /// Token for the next page of results.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// List of activities.
     pub activities: Vec<Activity>,
@@ -515,10 +515,10 @@ impl Part for User {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activity {
     /// The fields common to all of the singleEvents that make up the Activity.
-    #[serde(alias="combinedEvent")]
+    #[serde(rename="combinedEvent")]
     pub combined_event: Event,
     /// A list of all the Events that make up the Activity.
-    #[serde(alias="singleEvents")]
+    #[serde(rename="singleEvents")]
     pub single_events: Vec<Event>,
 }
 
@@ -536,24 +536,24 @@ pub struct Event {
     /// Information specific to the Target object modified by the event.
     pub target: Target,
     /// Additional event types. Some events may have multiple types when multiple actions are part of a single event. For example, creating a document, renaming it, and sharing it may be part of a single file-creation event.
-    #[serde(alias="additionalEventTypes")]
+    #[serde(rename="additionalEventTypes")]
     pub additional_event_types: Vec<String>,
     /// Extra information for move type events, such as changes in an object's parents.
-    #[serde(alias="move")]
+    #[serde(rename="move")]
     pub move_: Move,
     /// Extra information for permissionChange type events, such as the user or group the new permission applies to.
-    #[serde(alias="permissionChanges")]
+    #[serde(rename="permissionChanges")]
     pub permission_changes: Vec<PermissionChange>,
     /// Represents the user responsible for the event.
     pub user: User,
     /// The time at which the event occurred formatted as Unix time in milliseconds.
-    #[serde(alias="eventTimeMillis")]
+    #[serde(rename="eventTimeMillis")]
     pub event_time_millis: String,
     /// The main type of event that occurred.
-    #[serde(alias="primaryEventType")]
+    #[serde(rename="primaryEventType")]
     pub primary_event_type: String,
     /// Whether this event is caused by a user being deleted.
-    #[serde(alias="fromUserDeletion")]
+    #[serde(rename="fromUserDeletion")]
     pub from_user_deletion: bool,
 }
 

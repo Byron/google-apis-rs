@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Seller* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *adexchangeseller:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
+//! This documentation was generated from *Ad Exchange Seller* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *adexchangeseller:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
 //! 
 //! Everything else about the *Ad Exchange Seller* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/seller-rest/).
@@ -331,7 +331,7 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
         AdExchangeSeller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.3".to_string(),
+            _user_agent: "google-api-rust-client/0.1.4".to_string(),
             _m: PhantomData
         }
     }
@@ -341,7 +341,7 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.3`.
+    /// It defaults to `google-api-rust-client/0.1.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -367,7 +367,7 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlChannels {
     /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The URL channels returned in this list response.
     pub items: Vec<UrlChannel>,
@@ -428,7 +428,7 @@ impl ResponseResult for Account {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannels {
     /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The custom channels returned in this list response.
     pub items: Vec<CustomChannel>,
@@ -485,17 +485,17 @@ impl Part for SavedReport {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClient {
     /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
-    #[serde(alias="productCode")]
+    #[serde(rename="productCode")]
     pub product_code: String,
     /// Kind of resource this is, in this case adexchangeseller#adClient.
     pub kind: String,
     /// Unique identifier of this ad client.
     pub id: String,
     /// Whether this ad client is opted in to ARC.
-    #[serde(alias="arcOptIn")]
+    #[serde(rename="arcOptIn")]
     pub arc_opt_in: bool,
     /// Whether this ad client supports being reported on.
-    #[serde(alias="supportsReporting")]
+    #[serde(rename="supportsReporting")]
     pub supports_reporting: bool,
 }
 
@@ -529,23 +529,23 @@ impl ResponseResult for PreferredDeals {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportingMetadataEntry {
     /// The names of the metrics which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
-    #[serde(alias="requiredMetrics")]
+    #[serde(rename="requiredMetrics")]
     pub required_metrics: Vec<String>,
     /// Kind of resource this is, in this case adexchangeseller#reportingMetadataEntry.
     pub kind: String,
     /// The names of the metrics the dimension or metric this reporting metadata entry describes is compatible with.
-    #[serde(alias="compatibleMetrics")]
+    #[serde(rename="compatibleMetrics")]
     pub compatible_metrics: Vec<String>,
     /// For metrics this is a list of dimension IDs which the metric is compatible with, for dimensions it is a list of compatibility groups the dimension belongs to.
-    #[serde(alias="compatibleDimensions")]
+    #[serde(rename="compatibleDimensions")]
     pub compatible_dimensions: Vec<String>,
     /// Unique identifier of this reporting metadata entry, corresponding to the name of the appropriate dimension or metric.
     pub id: String,
     /// The names of the dimensions which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
-    #[serde(alias="requiredDimensions")]
+    #[serde(rename="requiredDimensions")]
     pub required_dimensions: Vec<String>,
     /// The codes of the projects supported by the dimension or metric this reporting metadata entry describes.
-    #[serde(alias="supportedProducts")]
+    #[serde(rename="supportedProducts")]
     pub supported_products: Vec<String>,
 }
 
@@ -561,12 +561,12 @@ pub struct CustomChannelTargetingInfo {
     /// The external description of the channel.
     pub description: String,
     /// The language of the sites ads will be displayed on.
-    #[serde(alias="siteLanguage")]
+    #[serde(rename="siteLanguage")]
     pub site_language: String,
     /// The locations in which ads appear. (Only valid for content and mobile content ads). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.
     pub location: String,
     /// The name used to describe this channel externally.
-    #[serde(alias="adsAppearOn")]
+    #[serde(rename="adsAppearOn")]
     pub ads_appear_on: String,
 }
 
@@ -606,7 +606,7 @@ pub struct UrlChannel {
     /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
     /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home
-    #[serde(alias="urlPattern")]
+    #[serde(rename="urlPattern")]
     pub url_pattern: String,
 }
 
@@ -625,7 +625,7 @@ impl Part for UrlChannel {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClients {
     /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The ad clients returned in this list response.
     pub items: Vec<AdClient>,
@@ -652,22 +652,22 @@ pub struct PreferredDeal {
     /// Kind of resource this is, in this case adexchangeseller#preferredDeal.
     pub kind: String,
     /// The name of the buyer network this deal is for.
-    #[serde(alias="buyerNetworkName")]
+    #[serde(rename="buyerNetworkName")]
     pub buyer_network_name: String,
     /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
-    #[serde(alias="currencyCode")]
+    #[serde(rename="currencyCode")]
     pub currency_code: String,
     /// The name of the advertiser this deal is for.
-    #[serde(alias="advertiserName")]
+    #[serde(rename="advertiserName")]
     pub advertiser_name: String,
     /// The fixed price for this preferred deal. In cpm micros of currency according to currencyCode. If set, then this preferred deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
-    #[serde(alias="fixedCpm")]
+    #[serde(rename="fixedCpm")]
     pub fixed_cpm: String,
     /// Time when this deal becomes active in seconds since the epoch (GMT). If not set then this deal is active immediately upon creation.
-    #[serde(alias="startTime")]
+    #[serde(rename="startTime")]
     pub start_time: String,
     /// Time when this deal stops being active in seconds since the epoch (GMT). If not set then this deal is valid until manually disabled by the publisher.
-    #[serde(alias="endTime")]
+    #[serde(rename="endTime")]
     pub end_time: String,
     /// Unique identifier of this preferred deal.
     pub id: String,
@@ -688,7 +688,7 @@ impl ResponseResult for PreferredDeal {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedReports {
     /// Continuation token used to page through saved reports. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The saved reports returned in this list response.
     pub items: Vec<SavedReport>,
@@ -710,7 +710,7 @@ pub struct ReportHeaders {
     /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
     pub currency: String,
     /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The name of the header.
     pub name: String,
@@ -731,7 +731,7 @@ pub struct Alert {
     /// Kind of resource this is, in this case adexchangeseller#alert.
     pub kind: String,
     /// Type of this alert. Possible values: SELF_HOLD, MIGRATED_TO_BILLING3, ADDRESS_PIN_VERIFICATION, PHONE_PIN_VERIFICATION, CORPORATE_ENTITY, GRAYLISTED_PUBLISHER, API_HOLD.
-    #[serde(alias="type")]
+    #[serde(rename="type")]
     pub type_: String,
     /// The localized alert message.
     pub message: String,
@@ -754,7 +754,7 @@ impl Part for Alert {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Accounts {
     /// Continuation token used to page through accounts. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(alias="nextPageToken")]
+    #[serde(rename="nextPageToken")]
     pub next_page_token: String,
     /// The accounts returned in this list response.
     pub items: Vec<Account>,
@@ -786,7 +786,7 @@ pub struct Report {
     /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.
     pub rows: Vec<Vec<String>>,
     /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.
-    #[serde(alias="totalMatchedRows")]
+    #[serde(rename="totalMatchedRows")]
     pub total_matched_rows: String,
     /// Any warnings associated with generation of the report.
     pub warnings: Vec<String>,
@@ -815,7 +815,7 @@ pub struct CustomChannel {
     /// Code of this custom channel, not necessarily unique across ad clients.
     pub code: String,
     /// The targeting information of this custom channel, if activated.
-    #[serde(alias="targetingInfo")]
+    #[serde(rename="targetingInfo")]
     pub targeting_info: CustomChannelTargetingInfo,
     /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
