@@ -11,7 +11,7 @@ repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclic
 homepage = "https://developers.google.com/bid-manager/"
 documentation = "http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1"
 license = "MIT"
-keywords = ["doubleclickbidmanager", "google", "protocol", "web", "api"]
+keywords = ["doubleclickbidmanage", "google", "protocol", "web", "api"]
 
 [dependencies]
 hyper = "*"

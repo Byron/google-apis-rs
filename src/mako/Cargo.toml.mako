@@ -10,12 +10,12 @@ version = "${util.crate_version()}"
 authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
 description = "A complete library to interact with ${util.canonical_name()} (protocol ${version})"
 repository = "${util.github_source_root_url()}"
-% if documentationLink is not UNDEFINED:
+% if documentationLink is not UNDEFINED and documentationLink:
 homepage = "${documentationLink}"
 % endif
 documentation = "${cargo.doc_base_url}/${util.crate_name()}"
 license = "${copyright.license_abbrev}"
-keywords = ["${name}", ${", ".join(estr(cargo.keywords))}]
+keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 
 [dependencies]
 hyper = "*"
