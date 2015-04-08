@@ -481,8 +481,8 @@ impl HeaderFormat for RangeResponseHeader {
 }
 
 /// A utility type to perform a resumable upload from start to end.
-pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
-    pub client: &'a mut hyper::client::Client<NC>,
+pub struct ResumableUploadHelper<'a, A: 'a> {
+    pub client: &'a mut hyper::client::Client,
     pub delegate: &'a mut Delegate,
     pub start_at: Option<u64>,
     pub auth: &'a mut A,
@@ -494,9 +494,8 @@ pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub content_length: u64
 }
 
-impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
-    where NC: hyper::net::NetworkConnector,
-          A: oauth2::GetToken {
+impl<'a, A> ResumableUploadHelper<'a, A>
+    where A: oauth2::GetToken {
 
     fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::HttpResult<hyper::client::Response>> {
         loop {

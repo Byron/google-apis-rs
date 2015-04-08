@@ -1,4 +1,4 @@
-<%! from util import (estr, hash_comment, library_to_crate_name) %>\
+<%! from util import (estr, hash_comment, library_to_crate_name, to_extern_crate_name) %>\
 <%namespace name="util" file="lib/util.mako"/>\
 <%block filter="hash_comment">\
 <%util:gen_info source="${self.uri}" />\
@@ -13,7 +13,7 @@ repository = "${util.github_source_root_url()}"
 % if documentationLink is not UNDEFINED and documentationLink:
 homepage = "${documentationLink}"
 % endif
-documentation = "${cargo.doc_base_url}/${util.crate_name()}"
+documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 

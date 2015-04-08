@@ -46,7 +46,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -79,8 +78,6 @@ pub struct ${hub_type}${ht_params} {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> Hub for ${hub_type}${ht_params} {}
@@ -93,7 +90,6 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "${default_user_agent}".to_string(),
-            _m: PhantomData
         }
     }
 

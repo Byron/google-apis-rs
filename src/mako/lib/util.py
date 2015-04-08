@@ -109,7 +109,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-HUB_TYPE_PARAMETERS = ('C', 'NC', 'A')
+HUB_TYPE_PARAMETERS = ('C', 'A')
 
 # ==============================================================================
 ## @name Filters
@@ -827,8 +827,7 @@ def hub_type_params_s():
 
 # return a list of where statements to server as bounds for the hub.
 def hub_type_bounds():
-    return ['NC: hyper::net::NetworkConnector',
-            'C: BorrowMut<hyper::Client<NC>>',
+    return ['C: BorrowMut<hyper::Client>',
             'A: oauth2::GetToken']
 
 # Returns True if this API has particular authentication scopes to choose from
