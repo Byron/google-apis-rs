@@ -11,10 +11,10 @@ Everything else about the *Tag Manager* *v1* API can be found at the
 [official documentation site](https://developers.google.com/tag-manager/api/v1/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.TagManager.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.TagManager.html) ... 
 
-* [accounts](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.Account.html)
- * [*containers create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerCreateCall.html), [*containers delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerDeleteCall.html), [*containers get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerGetCall.html), [*containers list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerListCall.html), [*containers macros create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerMacroCreateCall.html), [*containers macros delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerMacroDeleteCall.html), [*containers macros get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerMacroGetCall.html), [*containers macros list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerMacroListCall.html), [*containers macros update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerMacroUpdateCall.html), [*containers rules create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerRuleCreateCall.html), [*containers rules delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerRuleDeleteCall.html), [*containers rules get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerRuleGetCall.html), [*containers rules list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerRuleListCall.html), [*containers rules update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerRuleUpdateCall.html), [*containers tags create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTagCreateCall.html), [*containers tags delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTagDeleteCall.html), [*containers tags get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTagGetCall.html), [*containers tags list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTagListCall.html), [*containers tags update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTagUpdateCall.html), [*containers triggers create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTriggerCreateCall.html), [*containers triggers delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTriggerDeleteCall.html), [*containers triggers get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTriggerGetCall.html), [*containers triggers list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTriggerListCall.html), [*containers triggers update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerTriggerUpdateCall.html), [*containers update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerUpdateCall.html), [*containers variables create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVariableCreateCall.html), [*containers variables delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVariableDeleteCall.html), [*containers variables get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVariableGetCall.html), [*containers variables list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVariableListCall.html), [*containers variables update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVariableUpdateCall.html), [*containers versions create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionCreateCall.html), [*containers versions delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionGetCall.html), [*containers versions list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionListCall.html), [*containers versions publish*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionPublishCall.html), [*containers versions restore*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionRestoreCall.html), [*containers versions undelete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountContainerVersionUpdateCall.html), [*get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountListCall.html), [*permissions create*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountPermissionCreateCall.html), [*permissions delete*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountPermissionDeleteCall.html), [*permissions get*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountPermissionGetCall.html), [*permissions list*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountPermissionListCall.html), [*permissions update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountPermissionUpdateCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.AccountUpdateCall.html)
+* [accounts](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.Account.html)
+ * [*containers create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerCreateCall.html), [*containers delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerDeleteCall.html), [*containers get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerGetCall.html), [*containers list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerListCall.html), [*containers macros create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerMacroCreateCall.html), [*containers macros delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerMacroDeleteCall.html), [*containers macros get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerMacroGetCall.html), [*containers macros list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerMacroListCall.html), [*containers macros update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerMacroUpdateCall.html), [*containers rules create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerRuleCreateCall.html), [*containers rules delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerRuleDeleteCall.html), [*containers rules get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerRuleGetCall.html), [*containers rules list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerRuleListCall.html), [*containers rules update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerRuleUpdateCall.html), [*containers tags create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTagCreateCall.html), [*containers tags delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTagDeleteCall.html), [*containers tags get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTagGetCall.html), [*containers tags list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTagListCall.html), [*containers tags update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTagUpdateCall.html), [*containers triggers create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTriggerCreateCall.html), [*containers triggers delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTriggerDeleteCall.html), [*containers triggers get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTriggerGetCall.html), [*containers triggers list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTriggerListCall.html), [*containers triggers update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerTriggerUpdateCall.html), [*containers update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerUpdateCall.html), [*containers variables create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVariableCreateCall.html), [*containers variables delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVariableDeleteCall.html), [*containers variables get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVariableGetCall.html), [*containers variables list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVariableListCall.html), [*containers variables update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVariableUpdateCall.html), [*containers versions create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionCreateCall.html), [*containers versions delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionDeleteCall.html), [*containers versions get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionGetCall.html), [*containers versions list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionListCall.html), [*containers versions publish*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionPublishCall.html), [*containers versions restore*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionRestoreCall.html), [*containers versions undelete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionUndeleteCall.html), [*containers versions update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountContainerVersionUpdateCall.html), [*get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountListCall.html), [*permissions create*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountPermissionCreateCall.html), [*permissions delete*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountPermissionDeleteCall.html), [*permissions get*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountPermissionGetCall.html), [*permissions list*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountPermissionListCall.html), [*permissions update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountPermissionUpdateCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.AccountUpdateCall.html)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-tagmanager1/struct.TagManager.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_tagmanager1/struct.TagManager.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -164,17 +164,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-tagmanager1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_tagmanager1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-tagmanager1/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_tagmanager1/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-tagmanager1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_tagmanager1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -184,29 +184,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-tagmanager1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_tagmanager1/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

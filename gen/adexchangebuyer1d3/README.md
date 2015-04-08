@@ -11,22 +11,22 @@ Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AdExchangeBuyer.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AdExchangeBuyer.html) ... 
 
-* [accounts](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.Account.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AccountGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AccountListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AccountPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AccountUpdateCall.html)
-* [billing info](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BillingInfo.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BillingInfoGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BillingInfoListCall.html)
-* [budget](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.Budget.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BudgetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BudgetPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.BudgetUpdateCall.html)
-* [creatives](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.Creative.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.CreativeGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.CreativeInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.CreativeListCall.html)
-* [direct deals](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.DirectDeal.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.DirectDealGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.DirectDealListCall.html)
-* [performance report](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PerformanceReport.html)
- * [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PerformanceReportListCall.html)
-* [pretargeting config](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfig.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.PretargetingConfigUpdateCall.html)
+* [accounts](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.Account.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AccountGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AccountListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AccountPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AccountUpdateCall.html)
+* [billing info](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BillingInfo.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BillingInfoGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BillingInfoListCall.html)
+* [budget](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.Budget.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BudgetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BudgetPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.BudgetUpdateCall.html)
+* [creatives](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.Creative.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.CreativeGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.CreativeInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.CreativeListCall.html)
+* [direct deals](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.DirectDeal.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.DirectDealGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.DirectDealListCall.html)
+* [performance report](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PerformanceReport.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PerformanceReportListCall.html)
+* [pretargeting config](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfig.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.PretargetingConfigUpdateCall.html)
 
 
 
@@ -35,17 +35,17 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/struct.AdExchangeBuyer.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/struct.AdExchangeBuyer.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -133,17 +133,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -153,29 +153,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

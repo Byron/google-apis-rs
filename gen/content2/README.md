@@ -11,26 +11,26 @@ Everything else about the *Shopping Content* *v2* API can be found at the
 [official documentation site](https://developers.google.com/shopping-content/v2/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-content2/struct.ShoppingContent.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_content2/struct.ShoppingContent.html) ... 
 
-* [accounts](http://byron.github.io/google-apis-rs/google-content2/struct.Account.html)
- * [*authinfo*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountAuthinfoCall.html), [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountUpdateCall.html)
+* [accounts](http://byron.github.io/google-apis-rs/google_content2/struct.Account.html)
+ * [*authinfo*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountAuthinfoCall.html), [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountUpdateCall.html)
 * accountshipping
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountshippingCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountshippingGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountshippingListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountshippingPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountshippingUpdateCall.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountshippingCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountshippingGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountshippingListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountshippingPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountshippingUpdateCall.html)
 * accountstatuses
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.AccountstatuseListCall.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.AccountstatuseListCall.html)
 * accounttax
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccounttaxCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.AccounttaxGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.AccounttaxListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-content2/struct.AccounttaxPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-content2/struct.AccounttaxUpdateCall.html)
-* [datafeeds](http://byron.github.io/google-apis-rs/google-content2/struct.Datafeed.html)
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedUpdateCall.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccounttaxCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.AccounttaxGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.AccounttaxListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_content2/struct.AccounttaxPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_content2/struct.AccounttaxUpdateCall.html)
+* [datafeeds](http://byron.github.io/google-apis-rs/google_content2/struct.Datafeed.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedUpdateCall.html)
 * datafeedstatuses
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.DatafeedstatuseListCall.html)
-* [inventory](http://byron.github.io/google-apis-rs/google-content2/struct.Inventory.html)
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.InventoryCustombatchCall.html) and [*set*](http://byron.github.io/google-apis-rs/google-content2/struct.InventorySetCall.html)
-* [products](http://byron.github.io/google-apis-rs/google-content2/struct.Product.html)
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductListCall.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseListCall.html)
+* [inventory](http://byron.github.io/google-apis-rs/google_content2/struct.Inventory.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.InventoryCustombatchCall.html) and [*set*](http://byron.github.io/google-apis-rs/google_content2/struct.InventorySetCall.html)
+* [products](http://byron.github.io/google-apis-rs/google_content2/struct.Product.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductListCall.html)
 * productstatuses
- * [*custombatch*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-content2/struct.ProductstatuseListCall.html)
+ * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductstatuseListCall.html)
 
 
 
@@ -39,17 +39,17 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-content2/struct.ShoppingContent.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_content2/struct.ShoppingContent.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-content2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-content2/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-content2/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_content2/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_content2/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_content2/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-content2/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_content2/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-content2/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_content2/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -141,17 +141,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-content2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_content2/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-content2/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-content2/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_content2/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_content2/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-content2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_content2/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-content2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_content2/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -161,29 +161,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-content2/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-content2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_content2/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_content2/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-content2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_content2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-content2/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-content2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_content2/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_content2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-content2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_content2/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-content2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_content2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-content2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_content2/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

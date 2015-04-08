@@ -11,21 +11,21 @@ Everything else about the *Android Publisher* *v2* API can be found at the
 [official documentation site](https://developers.google.com/android-publisher).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.AndroidPublisher.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.AndroidPublisher.html) ... 
 
 * edits
- * [*apklistings delete*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingDeleteCall.html), [*apklistings deleteall*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingDeleteallCall.html), [*apklistings get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingGetCall.html), [*apklistings list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingListCall.html), [*apklistings patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingPatchCall.html), [*apklistings update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApklistingUpdateCall.html), [*apks addexternallyhosted*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApkAddexternallyhostedCall.html), [*apks list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApkListCall.html), [*apks upload*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApkUploadCall.html), [*commit*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditCommitCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditDeleteCall.html), [*details get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditDetailGetCall.html), [*details patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditDetailPatchCall.html), [*details update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditDetailUpdateCall.html), [*expansionfiles get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditExpansionfileGetCall.html), [*expansionfiles patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditExpansionfilePatchCall.html), [*expansionfiles update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditExpansionfileUpdateCall.html), [*expansionfiles upload*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditExpansionfileUploadCall.html), [*get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditGetCall.html), [*images delete*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditImageDeleteCall.html), [*images deleteall*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditImageDeleteallCall.html), [*images list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditImageListCall.html), [*images upload*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditImageUploadCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditInsertCall.html), [*listings delete*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingDeleteCall.html), [*listings deleteall*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingDeleteallCall.html), [*listings get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingGetCall.html), [*listings list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingListCall.html), [*listings patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingPatchCall.html), [*listings update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditListingUpdateCall.html), [*testers get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTesterGetCall.html), [*testers patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTesterPatchCall.html), [*testers update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTesterUpdateCall.html), [*tracks get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTrackGetCall.html), [*tracks list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTrackListCall.html), [*tracks patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTrackPatchCall.html), [*tracks update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditTrackUpdateCall.html) and [*validate*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditValidateCall.html)
+ * [*apklistings delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingDeleteCall.html), [*apklistings deleteall*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingDeleteallCall.html), [*apklistings get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingGetCall.html), [*apklistings list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingListCall.html), [*apklistings patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingPatchCall.html), [*apklistings update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApklistingUpdateCall.html), [*apks addexternallyhosted*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApkAddexternallyhostedCall.html), [*apks list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApkListCall.html), [*apks upload*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApkUploadCall.html), [*commit*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditCommitCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditDeleteCall.html), [*details get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditDetailGetCall.html), [*details patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditDetailPatchCall.html), [*details update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditDetailUpdateCall.html), [*expansionfiles get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditExpansionfileGetCall.html), [*expansionfiles patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditExpansionfilePatchCall.html), [*expansionfiles update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditExpansionfileUpdateCall.html), [*expansionfiles upload*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditExpansionfileUploadCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditGetCall.html), [*images delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditImageDeleteCall.html), [*images deleteall*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditImageDeleteallCall.html), [*images list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditImageListCall.html), [*images upload*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditImageUploadCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditInsertCall.html), [*listings delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingDeleteCall.html), [*listings deleteall*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingDeleteallCall.html), [*listings get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingGetCall.html), [*listings list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingListCall.html), [*listings patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingPatchCall.html), [*listings update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditListingUpdateCall.html), [*testers get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTesterGetCall.html), [*testers patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTesterPatchCall.html), [*testers update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTesterUpdateCall.html), [*tracks get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTrackGetCall.html), [*tracks list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTrackListCall.html), [*tracks patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTrackPatchCall.html), [*tracks update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditTrackUpdateCall.html) and [*validate*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditValidateCall.html)
 * inappproducts
- * [*batch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductBatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.InappproductUpdateCall.html)
+ * [*batch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductBatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.InappproductUpdateCall.html)
 * purchases
- * [*products get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseProductGetCall.html), [*subscriptions cancel*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseSubscriptionCancelCall.html), [*subscriptions defer*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseSubscriptionDeferCall.html), [*subscriptions get*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseSubscriptionGetCall.html), [*subscriptions refund*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseSubscriptionRefundCall.html) and [*subscriptions revoke*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.PurchaseSubscriptionRevokeCall.html)
+ * [*products get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseProductGetCall.html), [*subscriptions cancel*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionCancelCall.html), [*subscriptions defer*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionDeferCall.html), [*subscriptions get*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionGetCall.html), [*subscriptions refund*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionRefundCall.html) and [*subscriptions revoke*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.PurchaseSubscriptionRevokeCall.html)
 
 
 Upload supported by ...
 
-* [*images upload edits*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditImageUploadCall.html)
-* [*expansionfiles upload edits*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditExpansionfileUploadCall.html)
-* [*apks upload edits*](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.EditApkUploadCall.html)
+* [*images upload edits*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditImageUploadCall.html)
+* [*expansionfiles upload edits*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditExpansionfileUploadCall.html)
+* [*apks upload edits*](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.EditApkUploadCall.html)
 
 
 
@@ -33,17 +33,17 @@ Upload supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-androidpublisher2/struct.AndroidPublisher.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_androidpublisher2/struct.AndroidPublisher.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -132,17 +132,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-androidpublisher2/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_androidpublisher2/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-androidpublisher2/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_androidpublisher2/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-androidpublisher2/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_androidpublisher2/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -152,29 +152,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-androidpublisher2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_androidpublisher2/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

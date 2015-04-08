@@ -11,38 +11,38 @@ Everything else about the *storage* *v1* API can be found at the
 [official documentation site](https://developers.google.com/storage/docs/json_api/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-storage1/struct.Storage.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_storage1/struct.Storage.html) ... 
 
-* [bucket access controls](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControl.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketAccessControlUpdateCall.html)
-* [buckets](http://byron.github.io/google-apis-rs/google-storage1/struct.Bucket.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-storage1/struct.BucketUpdateCall.html)
-* [channels](http://byron.github.io/google-apis-rs/google-storage1/struct.Channel.html)
- * [*stop*](http://byron.github.io/google-apis-rs/google-storage1/struct.ChannelStopCall.html)
+* [bucket access controls](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControl.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketAccessControlUpdateCall.html)
+* [buckets](http://byron.github.io/google-apis-rs/google_storage1/struct.Bucket.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.BucketUpdateCall.html)
+* [channels](http://byron.github.io/google-apis-rs/google_storage1/struct.Channel.html)
+ * [*stop*](http://byron.github.io/google-apis-rs/google_storage1/struct.ChannelStopCall.html)
 * default object access controls
- * [*delete*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-storage1/struct.DefaultObjectAccessControlUpdateCall.html)
-* [object access controls](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControl.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectAccessControlUpdateCall.html)
-* [objects](http://byron.github.io/google-apis-rs/google-storage1/struct.Object.html)
- * [*compose*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectComposeCall.html), [*copy*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectPatchCall.html), [*update*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectUpdateCall.html) and [*watch all*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectWatchAllCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.DefaultObjectAccessControlUpdateCall.html)
+* [object access controls](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControl.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectAccessControlUpdateCall.html)
+* [objects](http://byron.github.io/google-apis-rs/google_storage1/struct.Object.html)
+ * [*compose*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectComposeCall.html), [*copy*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectCopyCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectPatchCall.html), [*update*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectUpdateCall.html) and [*watch all*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectWatchAllCall.html)
 
 
 Upload supported by ...
 
-* [*insert objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectInsertCall.html)
+* [*insert objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectInsertCall.html)
 
 Download supported by ...
 
-* [*get objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectGetCall.html)
-* [*update objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectUpdateCall.html)
-* [*insert objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectInsertCall.html)
-* [*compose objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectComposeCall.html)
-* [*copy objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectCopyCall.html)
+* [*get objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectGetCall.html)
+* [*update objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectUpdateCall.html)
+* [*insert objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectInsertCall.html)
+* [*compose objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectComposeCall.html)
+* [*copy objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectCopyCall.html)
 
 Subscription supported by ...
 
-* [*watch all objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectWatchAllCall.html)
-* [*list objects*](http://byron.github.io/google-apis-rs/google-storage1/struct.ObjectListCall.html)
+* [*watch all objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectWatchAllCall.html)
+* [*list objects*](http://byron.github.io/google-apis-rs/google_storage1/struct.ObjectListCall.html)
 
 
 
@@ -50,17 +50,17 @@ Subscription supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-storage1/struct.Storage.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_storage1/struct.Storage.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-storage1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-storage1/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-storage1/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_storage1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_storage1/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_storage1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-storage1/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_storage1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-storage1/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_storage1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -155,17 +155,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-storage1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_storage1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-storage1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-storage1/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_storage1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_storage1/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-storage1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_storage1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-storage1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_storage1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -175,29 +175,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-storage1/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-storage1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_storage1/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_storage1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-storage1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_storage1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-storage1/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-storage1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_storage1/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_storage1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-storage1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_storage1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-storage1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_storage1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-storage1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_storage1/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

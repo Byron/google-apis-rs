@@ -11,20 +11,20 @@ Everything else about the *gmail* *v1* API can be found at the
 [official documentation site](https://developers.google.com/gmail/api/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-gmail1/struct.Gmail.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_gmail1/struct.Gmail.html) ... 
 
 * users
- * [*drafts create*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftCreateCall.html), [*drafts delete*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftDeleteCall.html), [*drafts get*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftGetCall.html), [*drafts list*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftListCall.html), [*drafts send*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftSendCall.html), [*drafts update*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftUpdateCall.html), [*get profile*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserGetProfileCall.html), [*history list*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserHistoryListCall.html), [*labels create*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelCreateCall.html), [*labels delete*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelDeleteCall.html), [*labels get*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelGetCall.html), [*labels list*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelListCall.html), [*labels patch*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelPatchCall.html), [*labels update*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserLabelUpdateCall.html), [*messages attachments get*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageAttachmentGetCall.html), [*messages delete*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageDeleteCall.html), [*messages get*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageGetCall.html), [*messages import*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageImportCall.html), [*messages insert*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageInsertCall.html), [*messages list*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageListCall.html), [*messages modify*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageModifyCall.html), [*messages send*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageSendCall.html), [*messages trash*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageTrashCall.html), [*messages untrash*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageUntrashCall.html), [*threads delete*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadDeleteCall.html), [*threads get*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadGetCall.html), [*threads list*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadListCall.html), [*threads modify*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadModifyCall.html), [*threads trash*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadTrashCall.html) and [*threads untrash*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserThreadUntrashCall.html)
+ * [*drafts create*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftCreateCall.html), [*drafts delete*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftDeleteCall.html), [*drafts get*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftGetCall.html), [*drafts list*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftListCall.html), [*drafts send*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftSendCall.html), [*drafts update*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftUpdateCall.html), [*get profile*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserGetProfileCall.html), [*history list*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserHistoryListCall.html), [*labels create*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelCreateCall.html), [*labels delete*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelDeleteCall.html), [*labels get*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelGetCall.html), [*labels list*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelListCall.html), [*labels patch*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelPatchCall.html), [*labels update*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserLabelUpdateCall.html), [*messages attachments get*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageAttachmentGetCall.html), [*messages delete*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageDeleteCall.html), [*messages get*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageGetCall.html), [*messages import*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageImportCall.html), [*messages insert*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageInsertCall.html), [*messages list*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageListCall.html), [*messages modify*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageModifyCall.html), [*messages send*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageSendCall.html), [*messages trash*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageTrashCall.html), [*messages untrash*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageUntrashCall.html), [*threads delete*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadDeleteCall.html), [*threads get*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadGetCall.html), [*threads list*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadListCall.html), [*threads modify*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadModifyCall.html), [*threads trash*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadTrashCall.html) and [*threads untrash*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserThreadUntrashCall.html)
 
 
 Upload supported by ...
 
-* [*messages import users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageImportCall.html)
-* [*drafts create users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftCreateCall.html)
-* [*drafts send users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftSendCall.html)
-* [*messages send users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageSendCall.html)
-* [*drafts update users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserDraftUpdateCall.html)
-* [*messages insert users*](http://byron.github.io/google-apis-rs/google-gmail1/struct.UserMessageInsertCall.html)
+* [*messages import users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageImportCall.html)
+* [*drafts create users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftCreateCall.html)
+* [*drafts send users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftSendCall.html)
+* [*messages send users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageSendCall.html)
+* [*drafts update users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserDraftUpdateCall.html)
+* [*messages insert users*](http://byron.github.io/google-apis-rs/google_gmail1/struct.UserMessageInsertCall.html)
 
 
 
@@ -32,17 +32,17 @@ Upload supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-gmail1/struct.Gmail.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_gmail1/struct.Gmail.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-gmail1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-gmail1/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-gmail1/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_gmail1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_gmail1/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_gmail1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-gmail1/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_gmail1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-gmail1/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_gmail1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -139,17 +139,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-gmail1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_gmail1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-gmail1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-gmail1/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_gmail1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_gmail1/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-gmail1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_gmail1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-gmail1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_gmail1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -159,29 +159,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-gmail1/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-gmail1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_gmail1/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_gmail1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-gmail1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_gmail1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-gmail1/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-gmail1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_gmail1/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_gmail1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-gmail1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_gmail1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-gmail1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_gmail1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-gmail1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_gmail1/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

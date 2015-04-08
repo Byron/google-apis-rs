@@ -11,38 +11,38 @@ Everything else about the *Games* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-games1/struct.Games.html) ... 
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_games1/struct.Games.html) ... 
 
-* [achievement definitions](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementDefinition.html)
- * [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementDefinitionListCall.html)
+* [achievement definitions](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementDefinition.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementDefinitionListCall.html)
 * achievements
- * [*increment*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementIncrementCall.html), [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementListCall.html), [*reveal*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementRevealCall.html), [*set steps at least*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementSetStepsAtLeastCall.html), [*unlock*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementUnlockCall.html) and [*update multiple*](http://byron.github.io/google-apis-rs/google-games1/struct.AchievementUpdateMultipleCall.html)
-* [applications](http://byron.github.io/google-apis-rs/google-games1/struct.Application.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.ApplicationGetCall.html) and [*played*](http://byron.github.io/google-apis-rs/google-games1/struct.ApplicationPlayedCall.html)
+ * [*increment*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementIncrementCall.html), [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementListCall.html), [*reveal*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementRevealCall.html), [*set steps at least*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementSetStepsAtLeastCall.html), [*unlock*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementUnlockCall.html) and [*update multiple*](http://byron.github.io/google-apis-rs/google_games1/struct.AchievementUpdateMultipleCall.html)
+* [applications](http://byron.github.io/google-apis-rs/google_games1/struct.Application.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationGetCall.html) and [*played*](http://byron.github.io/google-apis-rs/google_games1/struct.ApplicationPlayedCall.html)
 * events
- * [*list by player*](http://byron.github.io/google-apis-rs/google-games1/struct.EventListByPlayerCall.html), [*list definitions*](http://byron.github.io/google-apis-rs/google-games1/struct.EventListDefinitionCall.html) and [*record*](http://byron.github.io/google-apis-rs/google-games1/struct.EventRecordCall.html)
-* [leaderboards](http://byron.github.io/google-apis-rs/google-games1/struct.Leaderboard.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.LeaderboardGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.LeaderboardListCall.html)
+ * [*list by player*](http://byron.github.io/google-apis-rs/google_games1/struct.EventListByPlayerCall.html), [*list definitions*](http://byron.github.io/google-apis-rs/google_games1/struct.EventListDefinitionCall.html) and [*record*](http://byron.github.io/google-apis-rs/google_games1/struct.EventRecordCall.html)
+* [leaderboards](http://byron.github.io/google-apis-rs/google_games1/struct.Leaderboard.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.LeaderboardGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.LeaderboardListCall.html)
 * metagame
- * [*get metagame config*](http://byron.github.io/google-apis-rs/google-games1/struct.MetagameGetMetagameConfigCall.html) and [*list categories by player*](http://byron.github.io/google-apis-rs/google-games1/struct.MetagameListCategoriesByPlayerCall.html)
-* [players](http://byron.github.io/google-apis-rs/google-games1/struct.Player.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.PlayerGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.PlayerListCall.html)
+ * [*get metagame config*](http://byron.github.io/google-apis-rs/google_games1/struct.MetagameGetMetagameConfigCall.html) and [*list categories by player*](http://byron.github.io/google-apis-rs/google_games1/struct.MetagameListCategoriesByPlayerCall.html)
+* [players](http://byron.github.io/google-apis-rs/google_games1/struct.Player.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.PlayerGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.PlayerListCall.html)
 * pushtokens
- * [*remove*](http://byron.github.io/google-apis-rs/google-games1/struct.PushtokenRemoveCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-games1/struct.PushtokenUpdateCall.html)
-* [quest milestones](http://byron.github.io/google-apis-rs/google-games1/struct.QuestMilestone.html)
- * [*claim*](http://byron.github.io/google-apis-rs/google-games1/struct.QuestMilestoneClaimCall.html)
-* [quests](http://byron.github.io/google-apis-rs/google-games1/struct.Quest.html)
- * [*accept*](http://byron.github.io/google-apis-rs/google-games1/struct.QuestAcceptCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.QuestListCall.html)
+ * [*remove*](http://byron.github.io/google-apis-rs/google_games1/struct.PushtokenRemoveCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_games1/struct.PushtokenUpdateCall.html)
+* [quest milestones](http://byron.github.io/google-apis-rs/google_games1/struct.QuestMilestone.html)
+ * [*claim*](http://byron.github.io/google-apis-rs/google_games1/struct.QuestMilestoneClaimCall.html)
+* [quests](http://byron.github.io/google-apis-rs/google_games1/struct.Quest.html)
+ * [*accept*](http://byron.github.io/google-apis-rs/google_games1/struct.QuestAcceptCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.QuestListCall.html)
 * revisions
- * [*check*](http://byron.github.io/google-apis-rs/google-games1/struct.RevisionCheckCall.html)
-* [rooms](http://byron.github.io/google-apis-rs/google-games1/struct.Room.html)
- * [*create*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomCreateCall.html), [*decline*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomDeclineCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomDismisCall.html), [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomGetCall.html), [*join*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomJoinCall.html), [*leave*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomLeaveCall.html), [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomListCall.html) and [*report status*](http://byron.github.io/google-apis-rs/google-games1/struct.RoomReportStatuCall.html)
+ * [*check*](http://byron.github.io/google-apis-rs/google_games1/struct.RevisionCheckCall.html)
+* [rooms](http://byron.github.io/google-apis-rs/google_games1/struct.Room.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomCreateCall.html), [*decline*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomDeclineCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomDismisCall.html), [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomGetCall.html), [*join*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomJoinCall.html), [*leave*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomLeaveCall.html), [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomListCall.html) and [*report status*](http://byron.github.io/google-apis-rs/google_games1/struct.RoomReportStatuCall.html)
 * scores
- * [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.ScoreGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.ScoreListCall.html), [*list window*](http://byron.github.io/google-apis-rs/google-games1/struct.ScoreListWindowCall.html), [*submit*](http://byron.github.io/google-apis-rs/google-games1/struct.ScoreSubmitCall.html) and [*submit multiple*](http://byron.github.io/google-apis-rs/google-games1/struct.ScoreSubmitMultipleCall.html)
-* [snapshots](http://byron.github.io/google-apis-rs/google-games1/struct.Snapshot.html)
- * [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.SnapshotGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.SnapshotListCall.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.ScoreGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.ScoreListCall.html), [*list window*](http://byron.github.io/google-apis-rs/google_games1/struct.ScoreListWindowCall.html), [*submit*](http://byron.github.io/google-apis-rs/google_games1/struct.ScoreSubmitCall.html) and [*submit multiple*](http://byron.github.io/google-apis-rs/google_games1/struct.ScoreSubmitMultipleCall.html)
+* [snapshots](http://byron.github.io/google-apis-rs/google_games1/struct.Snapshot.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.SnapshotGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.SnapshotListCall.html)
 * turn based matches
- * [*cancel*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheCancelCall.html), [*create*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheCreateCall.html), [*decline*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheDeclineCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheDismisCall.html), [*finish*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheFinishCall.html), [*get*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheGetCall.html), [*join*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheJoinCall.html), [*leave*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheLeaveCall.html), [*leave turn*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheLeaveTurnCall.html), [*list*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheListCall.html), [*rematch*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheRematchCall.html), [*sync*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheSyncCall.html) and [*take turn*](http://byron.github.io/google-apis-rs/google-games1/struct.TurnBasedMatcheTakeTurnCall.html)
+ * [*cancel*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheCancelCall.html), [*create*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheCreateCall.html), [*decline*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheDeclineCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheDismisCall.html), [*finish*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheFinishCall.html), [*get*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheGetCall.html), [*join*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheJoinCall.html), [*leave*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheLeaveCall.html), [*leave turn*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheLeaveTurnCall.html), [*list*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheListCall.html), [*rematch*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheRematchCall.html), [*sync*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheSyncCall.html) and [*take turn*](http://byron.github.io/google-apis-rs/google_games1/struct.TurnBasedMatcheTakeTurnCall.html)
 
 
 
@@ -51,17 +51,17 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 The API is structured into the following primary items:
 
-* **[Hub](http://byron.github.io/google-apis-rs/google-games1/struct.Games.html)**
+* **[Hub](http://byron.github.io/google-apis-rs/google_games1/struct.Games.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-games1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-games1/trait.CallBuilder.html)
-* **[Resources](http://byron.github.io/google-apis-rs/google-games1/trait.Resource.html)**
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google_games1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google_games1/trait.CallBuilder.html)
+* **[Resources](http://byron.github.io/google-apis-rs/google_games1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](http://byron.github.io/google-apis-rs/google-games1/trait.Part.html)**
+    * **[Parts](http://byron.github.io/google-apis-rs/google_games1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-games1/trait.CallBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google_games1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -149,17 +149,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google-games1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_games1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](http://byron.github.io/google-apis-rs/google-games1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google-games1/../yup-oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](http://byron.github.io/google-apis-rs/google_games1/trait.Delegate.html), or the [Authenticator Delegate](http://byron.github.io/google-apis-rs/google_games1/../yup-oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-games1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google_games1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-games1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google_games1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -169,29 +169,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-games1/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-games1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google_games1/trait.Delegate.html) to the 
+[Method Builder](http://byron.github.io/google-apis-rs/google_games1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](http://byron.github.io/google-apis-rs/google-games1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](http://byron.github.io/google-apis-rs/google_games1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-games1/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-games1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google_games1/trait.RequestValue.html) and 
+[decodable](http://byron.github.io/google-apis-rs/google_games1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-games1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google_games1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-games1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google_games1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google-games1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_games1/trait.RequestValue.html) are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
