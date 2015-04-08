@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *blogger* crate version *0.1.4+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *blogger* crate version *0.1.5+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *blogger* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
@@ -221,7 +221,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -326,55 +325,52 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Blogger<C, NC, A> {
+pub struct Blogger<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Blogger<C, NC, A> {}
+impl<'a, C, A> Hub for Blogger<C, A> {}
 
-impl<'a, C, NC, A> Blogger<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Blogger<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Blogger<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Blogger<C, A> {
         Blogger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn blog_user_infos(&'a self) -> BlogUserInfoMethods<'a, C, NC, A> {
+    pub fn blog_user_infos(&'a self) -> BlogUserInfoMethods<'a, C, A> {
         BlogUserInfoMethods { hub: &self }
     }
-    pub fn blogs(&'a self) -> BlogMethods<'a, C, NC, A> {
+    pub fn blogs(&'a self) -> BlogMethods<'a, C, A> {
         BlogMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a, C, NC, A> {
+    pub fn comments(&'a self) -> CommentMethods<'a, C, A> {
         CommentMethods { hub: &self }
     }
-    pub fn page_views(&'a self) -> PageViewMethods<'a, C, NC, A> {
+    pub fn page_views(&'a self) -> PageViewMethods<'a, C, A> {
         PageViewMethods { hub: &self }
     }
-    pub fn pages(&'a self) -> PageMethods<'a, C, NC, A> {
+    pub fn pages(&'a self) -> PageMethods<'a, C, A> {
         PageMethods { hub: &self }
     }
-    pub fn post_user_infos(&'a self) -> PostUserInfoMethods<'a, C, NC, A> {
+    pub fn post_user_infos(&'a self) -> PostUserInfoMethods<'a, C, A> {
         PostUserInfoMethods { hub: &self }
     }
-    pub fn posts(&'a self) -> PostMethods<'a, C, NC, A> {
+    pub fn posts(&'a self) -> PostMethods<'a, C, A> {
         PostMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a, C, NC, A> {
+    pub fn users(&'a self) -> UserMethods<'a, C, A> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1248,15 +1244,15 @@ impl Part for BlogLocale {}
 /// let rb = hub.page_views();
 /// # }
 /// ```
-pub struct PageViewMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageViewMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PageViewMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PageViewMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PageViewMethods<'a, C, NC, A> {
+impl<'a, C, A> PageViewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1265,7 +1261,7 @@ impl<'a, C, NC, A> PageViewMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `blogId` - The ID of the blog to get.
-    pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a, C, NC, A> {
+    pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a, C, A> {
         PageViewGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1307,15 +1303,15 @@ impl<'a, C, NC, A> PageViewMethods<'a, C, NC, A> {
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
+impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1324,7 +1320,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The ID of the user to get.
-    pub fn get(&self, user_id: &str) -> UserGetCall<'a, C, NC, A> {
+    pub fn get(&self, user_id: &str) -> UserGetCall<'a, C, A> {
         UserGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1365,15 +1361,15 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 /// let rb = hub.blogs();
 /// # }
 /// ```
-pub struct BlogMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BlogMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BlogMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
+impl<'a, C, A> BlogMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1382,7 +1378,7 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a, C, A> {
         BlogListByUserCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1403,7 +1399,7 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `blogId` - The ID of the blog to get.
-    pub fn get(&self, blog_id: &str) -> BlogGetCall<'a, C, NC, A> {
+    pub fn get(&self, blog_id: &str) -> BlogGetCall<'a, C, A> {
         BlogGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1422,7 +1418,7 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `url` - The URL of the blog to retrieve.
-    pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
+    pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a, C, A> {
         BlogGetByUrlCall {
             hub: self.hub,
             _url: url.to_string(),
@@ -1464,15 +1460,15 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
 /// let rb = hub.posts();
 /// # }
 /// ```
-pub struct PostMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PostMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PostMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
+impl<'a, C, A> PostMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1483,7 +1479,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
-    pub fn update(&self, request: &Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a, C, A> {
         PostUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1508,7 +1504,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - ID of the blog to fetch the post from.
     /// * `path` - Path of the Post to retrieve.
-    pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a, C, A> {
         PostGetByPathCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1529,7 +1525,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - ID of the blog to fetch the post from.
     /// * `postId` - The ID of the post
-    pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a, C, NC, A> {
+    pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a, C, A> {
         PostGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1552,7 +1548,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `blogId` - ID of the blog to add the post to.
-    pub fn insert(&self, request: &Post, blog_id: &str) -> PostInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Post, blog_id: &str) -> PostInsertCall<'a, C, A> {
         PostInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1574,7 +1570,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
-    pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a, C, NC, A> {
+    pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a, C, A> {
         PostPublishCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1594,7 +1590,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
-    pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a, C, A> {
         PostDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1613,7 +1609,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
-    pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a, C, NC, A> {
+    pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a, C, A> {
         PostRevertCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1632,7 +1628,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - ID of the blog to fetch the post from.
     /// * `q` - Query terms to search this blog for matching posts.
-    pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a, C, NC, A> {
+    pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a, C, A> {
         PostSearchCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1654,7 +1650,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
-    pub fn patch(&self, request: &Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a, C, A> {
         PostPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1678,7 +1674,7 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `blogId` - ID of the blog to fetch posts from.
-    pub fn list(&self, blog_id: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn list(&self, blog_id: &str) -> PostListCall<'a, C, A> {
         PostListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1729,15 +1725,15 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CommentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CommentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
+impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1748,7 +1744,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `blogId` - ID of the blog to containing the comment.
     /// * `postId` - ID of the post to fetch posts from.
     /// * `commentId` - The ID of the comment to get.
-    pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a, C, A> {
         CommentGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1770,7 +1766,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
     /// * `commentId` - The ID of the comment to delete content from.
-    pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
+    pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a, C, A> {
         CommentRemoveContentCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1789,7 +1785,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `blogId` - ID of the blog to fetch comments from.
-    pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a, C, A> {
         CommentListByBlogCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1814,7 +1810,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
     /// * `commentId` - The ID of the comment to mark as spam.
-    pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
+    pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         CommentMarkAsSpamCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1834,7 +1830,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - ID of the blog to fetch comments from.
     /// * `postId` - ID of the post to fetch posts from.
-    pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a, C, A> {
         CommentListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1861,7 +1857,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
     /// * `commentId` - The ID of the comment to mark as not spam.
-    pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a, C, NC, A> {
+    pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a, C, A> {
         CommentApproveCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1882,7 +1878,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `blogId` - The ID of the Blog.
     /// * `postId` - The ID of the Post.
     /// * `commentId` - The ID of the comment to delete.
-    pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, A> {
         CommentDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1925,15 +1921,15 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
 /// let rb = hub.post_user_infos();
 /// # }
 /// ```
-pub struct PostUserInfoMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostUserInfoMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PostUserInfoMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PostUserInfoMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
+impl<'a, C, A> PostUserInfoMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1944,7 +1940,7 @@ impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
     /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     /// * `blogId` - The ID of the blog.
     /// * `postId` - The ID of the post to get.
-    pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a, C, A> {
         PostUserInfoGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
     ///
     /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     /// * `blogId` - ID of the blog to fetch posts from.
-    pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a, C, A> {
         PostUserInfoListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2016,15 +2012,15 @@ impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
 /// let rb = hub.blog_user_infos();
 /// # }
 /// ```
-pub struct BlogUserInfoMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogUserInfoMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BlogUserInfoMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BlogUserInfoMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogUserInfoMethods<'a, C, NC, A> {
+impl<'a, C, A> BlogUserInfoMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2034,7 +2030,7 @@ impl<'a, C, NC, A> BlogUserInfoMethods<'a, C, NC, A> {
     ///
     /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     /// * `blogId` - The ID of the blog to get.
-    pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
+    pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a, C, A> {
         BlogUserInfoGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2077,15 +2073,15 @@ impl<'a, C, NC, A> BlogUserInfoMethods<'a, C, NC, A> {
 /// let rb = hub.pages();
 /// # }
 /// ```
-pub struct PageMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PageMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PageMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
+impl<'a, C, A> PageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2095,7 +2091,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - ID of the blog containing the page.
     /// * `pageId` - The ID of the page to get.
-    pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a, C, NC, A> {
+    pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a, C, A> {
         PageGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -2114,7 +2110,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `blogId` - ID of the blog to fetch Pages from.
-    pub fn list(&self, blog_id: &str) -> PageListCall<'a, C, NC, A> {
+    pub fn list(&self, blog_id: &str) -> PageListCall<'a, C, A> {
         PageListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -2137,7 +2133,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the blog.
     /// * `pageId` - The ID of the page.
-    pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a, C, NC, A> {
+    pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a, C, A> {
         PageRevertCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -2156,7 +2152,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `blogId` - ID of the blog to add the page to.
-    pub fn insert(&self, request: &Page, blog_id: &str) -> PageInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Page, blog_id: &str) -> PageInsertCall<'a, C, A> {
         PageInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2177,7 +2173,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `blogId` - The ID of the Blog.
     /// * `pageId` - The ID of the Page.
-    pub fn patch(&self, request: &Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a, C, A> {
         PagePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2199,7 +2195,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the blog.
     /// * `pageId` - The ID of the page.
-    pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a, C, NC, A> {
+    pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a, C, A> {
         PagePublishCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -2219,7 +2215,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `blogId` - The ID of the Blog.
     /// * `pageId` - The ID of the Page.
-    pub fn update(&self, request: &Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a, C, A> {
         PageUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2241,7 +2237,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     ///
     /// * `blogId` - The ID of the Blog.
     /// * `pageId` - The ID of the Page.
-    pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a, C, A> {
         PageDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -2292,10 +2288,10 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct PageViewGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageViewGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _range: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -2303,9 +2299,9 @@ pub struct PageViewGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageViewGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageViewGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2444,7 +2440,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog to get.
-    pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -2452,7 +2448,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a, C, NC, A> {
+    pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a, C, A> {
         self._range.push(new_value.to_string());
         self
     }
@@ -2463,7 +2459,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageViewGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageViewGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2484,7 +2480,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageViewGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageViewGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2501,7 +2497,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageViewGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageViewGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2539,19 +2535,19 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2683,7 +2679,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the user to get.
-    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2694,7 +2690,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2715,7 +2711,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2732,7 +2728,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2774,10 +2770,10 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct BlogListByUserCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogListByUserCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _user_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -2788,9 +2784,9 @@ pub struct BlogListByUserCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BlogListByUserCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BlogListByUserCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BlogListByUserCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2942,7 +2938,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2950,7 +2946,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Access level with which to view the blogs. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -2959,7 +2955,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.
-    pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -2968,7 +2964,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.
-    pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, C, A> {
         self._role.push(new_value.to_string());
         self
     }
@@ -2976,7 +2972,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Whether the response is a list of blogs with per-user information instead of just blogs.
-    pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, C, A> {
         self._fetch_user_info = Some(new_value);
         self
     }
@@ -2987,7 +2983,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogListByUserCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogListByUserCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3008,7 +3004,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BlogListByUserCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogListByUserCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3025,7 +3021,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BlogListByUserCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BlogListByUserCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3065,10 +3061,10 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct BlogGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _view: Option<String>,
     _max_posts: Option<u32>,
@@ -3077,9 +3073,9 @@ pub struct BlogGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BlogGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BlogGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BlogGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3217,7 +3213,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog to get.
-    pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -3225,7 +3221,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Access level with which to view the blog. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -3233,7 +3229,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Maximum number of posts to pull back with the blog.
-    pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, C, NC, A> {
+    pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, C, A> {
         self._max_posts = Some(new_value);
         self
     }
@@ -3244,7 +3240,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3265,7 +3261,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BlogGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3282,7 +3278,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BlogGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BlogGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3321,10 +3317,10 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct BlogGetByUrlCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogGetByUrlCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _url: String,
     _view: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -3332,9 +3328,9 @@ pub struct BlogGetByUrlCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BlogGetByUrlCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BlogGetByUrlCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BlogGetByUrlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3445,7 +3441,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The URL of the blog to retrieve.
-    pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
+    pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
@@ -3453,7 +3449,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Access level with which to view the blog. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -3464,7 +3460,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetByUrlCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogGetByUrlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3485,7 +3481,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BlogGetByUrlCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogGetByUrlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3502,7 +3498,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BlogGetByUrlCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BlogGetByUrlCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3551,10 +3547,10 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct PostUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Post,
     _blog_id: String,
     _post_id: String,
@@ -3568,9 +3564,9 @@ pub struct PostUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3725,7 +3721,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Post) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Post) -> PostUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3735,7 +3731,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -3745,7 +3741,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -3753,7 +3749,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether a revert action should be performed when the post is updated (default: false).
-    pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
@@ -3761,7 +3757,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether a publish action should be performed when the post is updated (default: false).
-    pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
@@ -3769,7 +3765,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of comments to retrieve with the returned post.
-    pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
@@ -3777,7 +3773,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
-    pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
@@ -3785,7 +3781,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether the body content of the post is included with the result (default: true).
-    pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -3796,7 +3792,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3817,7 +3813,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3834,7 +3830,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3874,10 +3870,10 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PostGetByPathCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostGetByPathCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _path: String,
     _view: Option<String>,
@@ -3887,9 +3883,9 @@ pub struct PostGetByPathCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostGetByPathCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostGetByPathCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostGetByPathCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4028,7 +4024,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch the post from.
-    pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4038,7 +4034,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Path of the Post to retrieve.
-    pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._path = new_value.to_string();
         self
     }
@@ -4046,7 +4042,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -4054,7 +4050,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Maximum number of comments to pull back on a post.
-    pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
@@ -4065,7 +4061,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetByPathCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetByPathCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4086,7 +4082,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostGetByPathCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostGetByPathCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4103,7 +4099,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostGetByPathCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostGetByPathCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4145,10 +4141,10 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PostGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _view: Option<String>,
@@ -4160,9 +4156,9 @@ pub struct PostGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4307,7 +4303,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch the post from.
-    pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4317,7 +4313,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the post
-    pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -4325,7 +4321,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PostGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -4333,7 +4329,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Maximum number of comments to pull back on a post.
-    pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, C, NC, A> {
+    pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
@@ -4341,7 +4337,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Whether image URL metadata for each post is included (default: false).
-    pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, C, NC, A> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
@@ -4349,7 +4345,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Whether the body content of the post is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
-    pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, C, NC, A> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -4360,7 +4356,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4381,7 +4377,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4398,7 +4394,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4445,10 +4441,10 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct PostInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Post,
     _blog_id: String,
     _is_draft: Option<bool>,
@@ -4459,9 +4455,9 @@ pub struct PostInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4609,7 +4605,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Post) -> PostInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Post) -> PostInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4619,7 +4615,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to add the post to.
-    pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4627,7 +4623,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to create the post as a draft (default: false).
-    pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
+    pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._is_draft = Some(new_value);
         self
     }
@@ -4635,7 +4631,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
-    pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
@@ -4643,7 +4639,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether the body content of the post is included with the result (default: true).
-    pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -4654,7 +4650,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4675,7 +4671,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4692,7 +4688,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4731,10 +4727,10 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PostPublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostPublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _publish_date: Option<String>,
@@ -4743,9 +4739,9 @@ pub struct PostPublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostPublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostPublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4881,7 +4877,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4891,7 +4887,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -4899,7 +4895,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Optional date and time to schedule the publishing of the Blog. If no publishDate parameter is given, the post is either published at the a previously saved schedule date (if present), or the current time. If a future date is given, the post will be scheduled to be published.
-    pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
+    pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, C, A> {
         self._publish_date = Some(new_value.to_string());
         self
     }
@@ -4910,7 +4906,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4931,7 +4927,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostPublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4948,7 +4944,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostPublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostPublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4986,10 +4982,10 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct PostDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4997,9 +4993,9 @@ pub struct PostDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5121,7 +5117,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5131,7 +5127,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -5142,7 +5138,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5163,7 +5159,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5180,7 +5176,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5218,10 +5214,10 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PostRevertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostRevertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5229,9 +5225,9 @@ pub struct PostRevertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostRevertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostRevertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5364,7 +5360,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5374,7 +5370,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -5385,7 +5381,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostRevertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5406,7 +5402,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostRevertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5423,7 +5419,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostRevertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostRevertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5463,10 +5459,10 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PostSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _q: String,
     _order_by: Option<String>,
@@ -5476,9 +5472,9 @@ pub struct PostSearchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5617,7 +5613,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch the post from.
-    pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5627,7 +5623,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Query terms to search this blog for matching posts.
-    pub fn q(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
@@ -5635,7 +5631,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Sort search results
-    pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -5643,7 +5639,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -5654,7 +5650,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5675,7 +5671,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5692,7 +5688,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5741,10 +5737,10 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PostPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Post,
     _blog_id: String,
     _post_id: String,
@@ -5758,9 +5754,9 @@ pub struct PostPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5915,7 +5911,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Post) -> PostPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Post) -> PostPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5925,7 +5921,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5935,7 +5931,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -5943,7 +5939,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether a revert action should be performed when the post is updated (default: false).
-    pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
+    pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
@@ -5951,7 +5947,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether a publish action should be performed when the post is updated (default: false).
-    pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
+    pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
@@ -5959,7 +5955,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Maximum number of comments to retrieve with the returned post.
-    pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, C, NC, A> {
+    pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
@@ -5967,7 +5963,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether image URL metadata for each post is included in the returned result (default: false).
-    pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
@@ -5975,7 +5971,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether the body content of the post is included with the result (default: true).
-    pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, C, A> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -5986,7 +5982,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6007,7 +6003,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6024,7 +6020,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6072,10 +6068,10 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct PostListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -6092,9 +6088,9 @@ pub struct PostListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6260,7 +6256,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch posts from.
-    pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -6268,7 +6264,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require escalated access.
-    pub fn view(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -6277,7 +6273,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Statuses to include in the results.
-    pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -6285,7 +6281,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
-    pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -6293,7 +6289,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Continuation token if the request is paged.
-    pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6301,7 +6297,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Sort search results
-    pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -6309,7 +6305,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of posts to fetch.
-    pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6317,7 +6313,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Comma-separated list of labels to search for.
-    pub fn labels(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn labels(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
@@ -6325,7 +6321,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether image URL metadata for each post is included.
-    pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, C, NC, A> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_images = Some(new_value);
         self
     }
@@ -6333,7 +6329,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -6341,7 +6337,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Latest post date to fetch, a date-time with RFC 3339 formatting.
-    pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -6352,7 +6348,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6373,7 +6369,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6390,7 +6386,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6429,10 +6425,10 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -6442,9 +6438,9 @@ pub struct CommentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6581,7 +6577,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to containing the comment.
-    pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -6591,7 +6587,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the post to fetch posts from.
-    pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -6601,7 +6597,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment to get.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -6609,7 +6605,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Access level for the requested comment (default: READER). Note that some comments will require elevated permissions, for example comments where the parent posts which is in a draft state, or comments that are pending moderation.
-    pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -6620,7 +6616,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6641,7 +6637,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6658,7 +6654,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6696,10 +6692,10 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentRemoveContentCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentRemoveContentCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -6708,9 +6704,9 @@ pub struct CommentRemoveContentCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentRemoveContentCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentRemoveContentCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentRemoveContentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6844,7 +6840,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -6854,7 +6850,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -6864,7 +6860,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment to delete content from.
-    pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -6875,7 +6871,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentRemoveContentCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentRemoveContentCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6896,7 +6892,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentRemoveContentCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentRemoveContentCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6913,7 +6909,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentRemoveContentCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentRemoveContentCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6957,10 +6953,10 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentListByBlogCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentListByBlogCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _status: Vec<String>,
     _start_date: Option<String>,
@@ -6973,9 +6969,9 @@ pub struct CommentListByBlogCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentListByBlogCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentListByBlogCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentListByBlogCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7129,7 +7125,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch comments from.
-    pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7137,7 +7133,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -7145,7 +7141,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
-    pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -7153,7 +7149,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Continuation token if request is paged.
-    pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7161,7 +7157,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Maximum number of comments to include in the result.
-    pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7169,7 +7165,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Whether the body content of the comments is included.
-    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -7177,7 +7173,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
-    pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -7188,7 +7184,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListByBlogCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListByBlogCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7209,7 +7205,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListByBlogCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListByBlogCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7226,7 +7222,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentListByBlogCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentListByBlogCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7264,10 +7260,10 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentMarkAsSpamCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentMarkAsSpamCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -7276,9 +7272,9 @@ pub struct CommentMarkAsSpamCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentMarkAsSpamCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentMarkAsSpamCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7412,7 +7408,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7422,7 +7418,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -7432,7 +7428,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment to mark as spam.
-    pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -7443,7 +7439,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentMarkAsSpamCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentMarkAsSpamCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7464,7 +7460,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7481,7 +7477,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7526,10 +7522,10 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _view: Option<String>,
@@ -7544,9 +7540,9 @@ pub struct CommentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7704,7 +7700,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch comments from.
-    pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7714,7 +7710,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ID of the post to fetch posts from.
-    pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -7722,7 +7718,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -7730,7 +7726,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    pub fn add_status(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -7738,7 +7734,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
-    pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -7746,7 +7742,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Continuation token if request is paged.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7754,7 +7750,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Maximum number of comments to include in the result.
-    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7762,7 +7758,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether the body content of the comments is included.
-    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -7770,7 +7766,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
-    pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -7781,7 +7777,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7802,7 +7798,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7819,7 +7815,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7857,10 +7853,10 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentApproveCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentApproveCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -7869,9 +7865,9 @@ pub struct CommentApproveCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentApproveCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentApproveCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8005,7 +8001,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8015,7 +8011,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -8025,7 +8021,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment to mark as not spam.
-    pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -8036,7 +8032,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentApproveCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentApproveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8057,7 +8053,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentApproveCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentApproveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8074,7 +8070,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentApproveCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentApproveCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8112,10 +8108,10 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -8124,9 +8120,9 @@ pub struct CommentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8249,7 +8245,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8259,7 +8255,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Post.
-    pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -8269,7 +8265,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment to delete.
-    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -8280,7 +8276,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8301,7 +8297,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8318,7 +8314,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8357,10 +8353,10 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PostUserInfoGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostUserInfoGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _user_id: String,
     _blog_id: String,
     _post_id: String,
@@ -8370,9 +8366,9 @@ pub struct PostUserInfoGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostUserInfoGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostUserInfoGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8509,7 +8505,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8519,7 +8515,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog.
-    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8529,7 +8525,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the post to get.
-    pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, A> {
         self._post_id = new_value.to_string();
         self
     }
@@ -8537,7 +8533,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Maximum number of comments to pull back on a post.
-    pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, C, A> {
         self._max_comments = Some(new_value);
         self
     }
@@ -8548,7 +8544,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8569,7 +8565,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8586,7 +8582,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostUserInfoGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostUserInfoGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8633,10 +8629,10 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct PostUserInfoListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PostUserInfoListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _user_id: String,
     _blog_id: String,
     _view: Option<String>,
@@ -8653,9 +8649,9 @@ pub struct PostUserInfoListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PostUserInfoListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PostUserInfoListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PostUserInfoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8819,7 +8815,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8829,7 +8825,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch posts from.
-    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8837,7 +8833,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -8845,7 +8841,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -8853,7 +8849,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
-    pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -8861,7 +8857,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Continuation token if the request is paged.
-    pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8869,7 +8865,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Sort order applied to search results. Default is published.
-    pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -8877,7 +8873,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Maximum number of posts to fetch.
-    pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8885,7 +8881,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Comma-separated list of labels to search for.
-    pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._labels = Some(new_value.to_string());
         self
     }
@@ -8893,7 +8889,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Whether the body content of posts is included. Default is false.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -8901,7 +8897,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Latest post date to fetch, a date-time with RFC 3339 formatting.
-    pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -8912,7 +8908,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PostUserInfoListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8933,7 +8929,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8950,7 +8946,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PostUserInfoListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PostUserInfoListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8989,10 +8985,10 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct BlogUserInfoGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BlogUserInfoGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _user_id: String,
     _blog_id: String,
     _max_posts: Option<u32>,
@@ -9001,9 +8997,9 @@ pub struct BlogUserInfoGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BlogUserInfoGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BlogUserInfoGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BlogUserInfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9139,7 +9135,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
-    pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9149,7 +9145,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog to get.
-    pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -9157,7 +9153,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Maximum number of posts to pull back with the blog.
-    pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, C, NC, A> {
+    pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, C, A> {
         self._max_posts = Some(new_value);
         self
     }
@@ -9168,7 +9164,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogUserInfoGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BlogUserInfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9189,7 +9185,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BlogUserInfoGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogUserInfoGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9206,7 +9202,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BlogUserInfoGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BlogUserInfoGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9245,10 +9241,10 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct PageGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _page_id: String,
     _view: Option<String>,
@@ -9257,9 +9253,9 @@ pub struct PageGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9395,7 +9391,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog containing the page.
-    pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -9405,14 +9401,14 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the page to get.
-    pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    pub fn view(mut self, new_value: &str) -> PageGetCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PageGetCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -9423,7 +9419,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9444,7 +9440,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9461,7 +9457,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9504,10 +9500,10 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct PageListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -9519,9 +9515,9 @@ pub struct PageListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9672,7 +9668,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to fetch Pages from.
-    pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -9680,7 +9676,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Access level with which to view the returned result. Note that some fields require elevated access.
-    pub fn view(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -9688,7 +9684,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    pub fn add_status(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
+    pub fn add_status(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._status.push(new_value.to_string());
         self
     }
@@ -9696,7 +9692,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Continuation token if the request is paged.
-    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9704,7 +9700,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of Pages to fetch.
-    pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9712,7 +9708,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to retrieve the Page bodies.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, C, NC, A> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, C, A> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -9723,7 +9719,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9744,7 +9740,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9761,7 +9757,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9799,10 +9795,10 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct PageRevertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageRevertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9810,9 +9806,9 @@ pub struct PageRevertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageRevertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageRevertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageRevertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9945,7 +9941,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog.
-    pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -9955,7 +9951,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the page.
-    pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
@@ -9966,7 +9962,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageRevertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageRevertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9987,7 +9983,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageRevertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10004,7 +10000,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageRevertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageRevertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10049,10 +10045,10 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PageInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Page,
     _blog_id: String,
     _is_draft: Option<bool>,
@@ -10061,9 +10057,9 @@ pub struct PageInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10205,7 +10201,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Page) -> PageInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Page) -> PageInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10215,7 +10211,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the blog to add the page to.
-    pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10223,7 +10219,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to create the page as a draft (default: false).
-    pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, C, NC, A> {
+    pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, C, A> {
         self._is_draft = Some(new_value);
         self
     }
@@ -10234,7 +10230,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10255,7 +10251,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10272,7 +10268,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10318,10 +10314,10 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PagePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PagePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Page,
     _blog_id: String,
     _page_id: String,
@@ -10332,9 +10328,9 @@ pub struct PagePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PagePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PagePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PagePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10480,7 +10476,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Page) -> PagePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Page) -> PagePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10490,7 +10486,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10500,7 +10496,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Page.
-    pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
@@ -10508,7 +10504,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether a revert action should be performed when the page is updated (default: false).
-    pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, C, NC, A> {
+    pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
@@ -10516,7 +10512,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether a publish action should be performed when the page is updated (default: false).
-    pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, C, NC, A> {
+    pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
@@ -10527,7 +10523,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10548,7 +10544,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PagePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PagePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10565,7 +10561,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PagePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PagePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10603,10 +10599,10 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct PagePublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PagePublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10614,9 +10610,9 @@ pub struct PagePublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PagePublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PagePublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PagePublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10749,7 +10745,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the blog.
-    pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10759,7 +10755,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the page.
-    pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
@@ -10770,7 +10766,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagePublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10791,7 +10787,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PagePublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PagePublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10808,7 +10804,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PagePublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PagePublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10854,10 +10850,10 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct PageUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _request: Page,
     _blog_id: String,
     _page_id: String,
@@ -10868,9 +10864,9 @@ pub struct PageUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11016,7 +11012,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Page) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Page) -> PageUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11026,7 +11022,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -11036,7 +11032,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Page.
-    pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
@@ -11044,7 +11040,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether a revert action should be performed when the page is updated (default: false).
-    pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
         self._revert = Some(new_value);
         self
     }
@@ -11052,7 +11048,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether a publish action should be performed when the page is updated (default: false).
-    pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, C, A> {
         self._publish = Some(new_value);
         self
     }
@@ -11063,7 +11059,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11084,7 +11080,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11101,7 +11097,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11139,10 +11135,10 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PageDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PageDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Blogger<C, NC, A>,
+    hub: &'a Blogger<C, A>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11150,9 +11146,9 @@ pub struct PageDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PageDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PageDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11274,7 +11270,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Blog.
-    pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, NC, A> {
+    pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, A> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -11284,7 +11280,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Page.
-    pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, NC, A> {
+    pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, A> {
         self._page_id = new_value.to_string();
         self
     }
@@ -11295,7 +11291,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11316,7 +11312,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11333,7 +11329,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PageDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PageDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

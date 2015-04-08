@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapoolupdater* crate version *0.1.4+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *replicapoolupdater* crate version *0.1.5+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
@@ -201,7 +201,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -304,37 +303,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Replicapoolupdater<C, NC, A> {
+pub struct Replicapoolupdater<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Replicapoolupdater<C, NC, A> {}
+impl<'a, C, A> Hub for Replicapoolupdater<C, A> {}
 
-impl<'a, C, NC, A> Replicapoolupdater<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Replicapoolupdater<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Replicapoolupdater<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Replicapoolupdater<C, A> {
         Replicapoolupdater {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn rolling_updates(&'a self) -> RollingUpdateMethods<'a, C, NC, A> {
+    pub fn rolling_updates(&'a self) -> RollingUpdateMethods<'a, C, A> {
         RollingUpdateMethods { hub: &self }
     }
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, NC, A> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, A> {
         ZoneOperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -764,15 +760,15 @@ impl ResponseResult for RollingUpdateList {}
 /// let rb = hub.rolling_updates();
 /// # }
 /// ```
-pub struct RollingUpdateMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RollingUpdateMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RollingUpdateMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
+impl<'a, C, A> RollingUpdateMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -783,7 +779,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn pause(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
+    pub fn pause(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdatePauseCall<'a, C, A> {
         RollingUpdatePauseCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -804,7 +800,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn rollback(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
+    pub fn rollback(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         RollingUpdateRollbackCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -825,7 +821,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn get(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateGetCall<'a, C, A> {
         RollingUpdateGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -846,7 +842,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn resume(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
+    pub fn resume(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateResumeCall<'a, C, A> {
         RollingUpdateResumeCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -866,7 +862,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     ///
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
-    pub fn list(&self, project: &str, zone: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> RollingUpdateListCall<'a, C, A> {
         RollingUpdateListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -890,7 +886,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
-    pub fn insert(&self, request: &RollingUpdate, project: &str, zone: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &RollingUpdate, project: &str, zone: &str) -> RollingUpdateInsertCall<'a, C, A> {
         RollingUpdateInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -911,7 +907,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn list_instance_updates(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn list_instance_updates(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         RollingUpdateListInstanceUpdateCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -935,7 +931,7 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn cancel(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
+    pub fn cancel(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateCancelCall<'a, C, A> {
         RollingUpdateCancelCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -978,15 +974,15 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneOperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -997,7 +993,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
     /// * `operation` - Name of the operation resource to return.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, A> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1048,10 +1044,10 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdatePauseCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdatePauseCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -1060,9 +1056,9 @@ pub struct RollingUpdatePauseCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdatePauseCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdatePauseCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdatePauseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1196,7 +1192,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1206,7 +1202,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1216,7 +1212,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1227,7 +1223,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdatePauseCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdatePauseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1248,7 +1244,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdatePauseCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdatePauseCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1265,7 +1261,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdatePauseCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdatePauseCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1303,10 +1299,10 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateRollbackCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateRollbackCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -1315,9 +1311,9 @@ pub struct RollingUpdateRollbackCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateRollbackCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateRollbackCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1451,7 +1447,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1461,7 +1457,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1471,7 +1467,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1482,7 +1478,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateRollbackCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateRollbackCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1503,7 +1499,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateRollbackCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateRollbackCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1520,7 +1516,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateRollbackCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateRollbackCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1558,10 +1554,10 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -1570,9 +1566,9 @@ pub struct RollingUpdateGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1706,7 +1702,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1716,7 +1712,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1726,7 +1722,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1737,7 +1733,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1758,7 +1754,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1775,7 +1771,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1813,10 +1809,10 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateResumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateResumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -1825,9 +1821,9 @@ pub struct RollingUpdateResumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateResumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateResumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateResumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1961,7 +1957,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1971,7 +1967,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1981,7 +1977,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1992,7 +1988,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateResumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateResumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2013,7 +2009,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateResumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateResumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2030,7 +2026,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateResumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateResumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2072,10 +2068,10 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -2087,9 +2083,9 @@ pub struct RollingUpdateListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2234,7 +2230,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2244,7 +2240,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2252,7 +2248,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2260,7 +2256,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
-    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2268,7 +2264,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The name of the instance group manager used for filtering.
-    pub fn instance_group_manager(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._instance_group_manager = Some(new_value.to_string());
         self
     }
@@ -2276,7 +2272,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Filter expression for filtering listed resources.
-    pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2287,7 +2283,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2308,7 +2304,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2325,7 +2321,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2369,10 +2365,10 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _request: RollingUpdate,
     _project: String,
     _zone: String,
@@ -2381,9 +2377,9 @@ pub struct RollingUpdateInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2523,7 +2519,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RollingUpdate) -> RollingUpdateInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RollingUpdate) -> RollingUpdateInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2533,7 +2529,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2543,7 +2539,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2554,7 +2550,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2575,7 +2571,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2592,7 +2588,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2633,10 +2629,10 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateListInstanceUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateListInstanceUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2648,9 +2644,9 @@ pub struct RollingUpdateListInstanceUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateListInstanceUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateListInstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2793,7 +2789,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2803,7 +2799,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2813,7 +2809,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -2821,7 +2817,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2829,7 +2825,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
-    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2837,7 +2833,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Optional. Filter expression for filtering listed resources.
-    pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2848,7 +2844,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateListInstanceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2869,7 +2865,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListInstanceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2886,7 +2882,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListInstanceUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2924,10 +2920,10 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct RollingUpdateCancelCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RollingUpdateCancelCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2936,9 +2932,9 @@ pub struct RollingUpdateCancelCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RollingUpdateCancelCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RollingUpdateCancelCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RollingUpdateCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3072,7 +3068,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3082,7 +3078,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the update's target resides.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3092,7 +3088,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the update.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, A> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -3103,7 +3099,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateCancelCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RollingUpdateCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3124,7 +3120,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateCancelCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateCancelCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3141,7 +3137,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateCancelCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateCancelCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3179,10 +3175,10 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapoolupdater<C, NC, A>,
+    hub: &'a Replicapoolupdater<C, A>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -3191,9 +3187,9 @@ pub struct ZoneOperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3327,7 +3323,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the project scoping this request.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3337,7 +3333,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the zone scoping this request.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3347,7 +3343,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the operation resource to return.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -3358,7 +3354,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3379,7 +3375,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3396,7 +3392,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

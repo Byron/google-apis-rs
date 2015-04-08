@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.4+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *container* crate version *0.1.5+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *container* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -190,7 +190,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -281,34 +280,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Container<C, NC, A> {
+pub struct Container<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Container<C, NC, A> {}
+impl<'a, C, A> Hub for Container<C, A> {}
 
-impl<'a, C, NC, A> Container<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Container<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Container<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Container<C, A> {
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -605,15 +601,15 @@ impl RequestValue for CreateClusterRequest {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -624,7 +620,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
     /// * `clusterId` - The name of the cluster to retrieve.
-    pub fn zones_clusters_get(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
+    pub fn zones_clusters_get(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         ProjectZoneClusterGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -643,7 +639,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectId` - The Google Developers Console project ID or  project number.
-    pub fn operations_list(&self, project_id: &str) -> ProjectOperationListCall<'a, C, NC, A> {
+    pub fn operations_list(&self, project_id: &str) -> ProjectOperationListCall<'a, C, A> {
         ProjectOperationListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -664,7 +660,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
     /// * `clusterId` - The name of the cluster to delete.
-    pub fn zones_clusters_delete(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
+    pub fn zones_clusters_delete(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         ProjectZoneClusterDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -683,7 +679,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectId` - The Google Developers Console project ID or  project number.
-    pub fn clusters_list(&self, project_id: &str) -> ProjectClusterListCall<'a, C, NC, A> {
+    pub fn clusters_list(&self, project_id: &str) -> ProjectClusterListCall<'a, C, A> {
         ProjectClusterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -702,7 +698,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
     /// * `operationId` - The server-assigned name of the operation.
-    pub fn zones_operations_get(&self, project_id: &str, zone_id: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zones_operations_get(&self, project_id: &str, zone_id: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         ProjectZoneOperationGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -722,7 +718,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone to return operations for.
-    pub fn zones_operations_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
+    pub fn zones_operations_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         ProjectZoneOperationListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -741,7 +737,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zones_clusters_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
+    pub fn zones_clusters_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         ProjectZoneClusterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -767,7 +763,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `projectId` - The Google Developers Console project ID or  project number.
     /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zones_clusters_create(&self, request: &CreateClusterRequest, project_id: &str, zone_id: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
+    pub fn zones_clusters_create(&self, request: &CreateClusterRequest, project_id: &str, zone_id: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         ProjectZoneClusterCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -818,10 +814,10 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneClusterGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneClusterGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _zone_id: String,
     _cluster_id: String,
@@ -830,9 +826,9 @@ pub struct ProjectZoneClusterGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneClusterGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -966,7 +962,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -976,7 +972,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -986,7 +982,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The name of the cluster to retrieve.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -997,7 +993,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1018,7 +1014,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1035,7 +1031,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1073,19 +1069,19 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectOperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectOperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectOperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1217,7 +1213,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectOperationListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectOperationListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1228,7 +1224,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1249,7 +1245,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1266,7 +1262,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectOperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectOperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1306,10 +1302,10 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneClusterDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneClusterDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _zone_id: String,
     _cluster_id: String,
@@ -1318,9 +1314,9 @@ pub struct ProjectZoneClusterDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneClusterDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1454,7 +1450,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1464,7 +1460,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -1474,7 +1470,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The name of the cluster to delete.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -1485,7 +1481,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1506,7 +1502,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1523,7 +1519,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1561,19 +1557,19 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectClusterListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectClusterListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectClusterListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectClusterListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1705,7 +1701,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectClusterListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectClusterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1716,7 +1712,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectClusterListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectClusterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1737,7 +1733,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectClusterListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectClusterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1754,7 +1750,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectClusterListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectClusterListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1792,10 +1788,10 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneOperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _zone_id: String,
     _operation_id: String,
@@ -1804,9 +1800,9 @@ pub struct ProjectZoneOperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneOperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneOperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1940,7 +1936,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1950,7 +1946,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -1960,7 +1956,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The server-assigned name of the operation.
-    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
+    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._operation_id = new_value.to_string();
         self
     }
@@ -1971,7 +1967,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1992,7 +1988,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2009,7 +2005,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2047,10 +2043,10 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneOperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _zone_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2058,9 +2054,9 @@ pub struct ProjectZoneOperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneOperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneOperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2193,7 +2189,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2203,7 +2199,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone to return operations for.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -2214,7 +2210,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2235,7 +2231,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2252,7 +2248,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneOperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2290,10 +2286,10 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneClusterListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneClusterListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _project_id: String,
     _zone_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2301,9 +2297,9 @@ pub struct ProjectZoneClusterListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneClusterListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2436,7 +2432,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2446,7 +2442,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -2457,7 +2453,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2478,7 +2474,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2495,7 +2491,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2545,10 +2541,10 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectZoneClusterCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectZoneClusterCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Container<C, NC, A>,
+    hub: &'a Container<C, A>,
     _request: CreateClusterRequest,
     _project_id: String,
     _zone_id: String,
@@ -2557,9 +2553,9 @@ pub struct ProjectZoneClusterCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectZoneClusterCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectZoneClusterCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectZoneClusterCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2699,7 +2695,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CreateClusterRequest) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CreateClusterRequest) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2709,7 +2705,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project ID or  project number.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2719,7 +2715,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The name of the Google Compute Engine zone in which the cluster resides.
-    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
+    pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._zone_id = new_value.to_string();
         self
     }
@@ -2730,7 +2726,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectZoneClusterCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2751,7 +2747,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2768,7 +2764,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectZoneClusterCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

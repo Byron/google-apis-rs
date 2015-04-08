@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *oauth2* crate version *0.1.4+20150319*, where *20150319* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *oauth2* crate version *0.1.5+20150319*, where *20150319* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *oauth2* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/accounts/docs/OAuth2).
@@ -193,7 +193,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -296,37 +295,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Oauth2<C, NC, A> {
+pub struct Oauth2<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Oauth2<C, NC, A> {}
+impl<'a, C, A> Hub for Oauth2<C, A> {}
 
-impl<'a, C, NC, A> Oauth2<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Oauth2<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Oauth2<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Oauth2<C, A> {
         Oauth2 {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn methods(&'a self) -> MethodMethods<'a, C, NC, A> {
+    pub fn methods(&'a self) -> MethodMethods<'a, C, A> {
         MethodMethods { hub: &self }
     }
-    pub fn userinfo(&'a self) -> UserinfoMethods<'a, C, NC, A> {
+    pub fn userinfo(&'a self) -> UserinfoMethods<'a, C, A> {
         UserinfoMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -489,17 +485,17 @@ impl ResponseResult for Tokeninfo {}
 /// let rb = hub.userinfo();
 /// # }
 /// ```
-pub struct UserinfoMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserinfoMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserinfoMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserinfoMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserinfoMethods<'a, C, NC, A> {
+impl<'a, C, A> UserinfoMethods<'a, C, A> {
     
-    pub fn v2_me_get(&self) -> UserinfoV2MeGetCall<'a, C, NC, A> {
+    pub fn v2_me_get(&self) -> UserinfoV2MeGetCall<'a, C, A> {
         UserinfoV2MeGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -508,7 +504,7 @@ impl<'a, C, NC, A> UserinfoMethods<'a, C, NC, A> {
         }
     }
     
-    pub fn get(&self) -> UserinfoGetCall<'a, C, NC, A> {
+    pub fn get(&self) -> UserinfoGetCall<'a, C, A> {
         UserinfoGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -548,17 +544,17 @@ impl<'a, C, NC, A> UserinfoMethods<'a, C, NC, A> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MethodMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MethodMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
+impl<'a, C, A> MethodMethods<'a, C, A> {
     
-    pub fn tokeninfo(&self) -> MethodTokeninfoCall<'a, C, NC, A> {
+    pub fn tokeninfo(&self) -> MethodTokeninfoCall<'a, C, A> {
         MethodTokeninfoCall {
             hub: self.hub,
             _token_handle: Default::default(),
@@ -570,7 +566,7 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
         }
     }
     
-    pub fn get_cert_for_open_id_connect(&self) -> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> {
+    pub fn get_cert_for_open_id_connect(&self) -> MethodGetCertForOpenIdConnectCall<'a, C, A> {
         MethodGetCertForOpenIdConnectCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -616,18 +612,18 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct UserinfoV2MeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserinfoV2MeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserinfoV2MeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserinfoV2MeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserinfoV2MeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -735,7 +731,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoV2MeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoV2MeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -756,7 +752,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserinfoV2MeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserinfoV2MeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -773,7 +769,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserinfoV2MeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserinfoV2MeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -809,18 +805,18 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserinfoGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserinfoGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserinfoGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserinfoGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserinfoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -928,7 +924,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserinfoGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -949,7 +945,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserinfoGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserinfoGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -966,7 +962,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserinfoGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserinfoGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1005,10 +1001,10 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct MethodTokeninfoCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodTokeninfoCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
     _token_handle: Option<String>,
     _id_token: Option<String>,
     _access_token: Option<String>,
@@ -1017,9 +1013,9 @@ pub struct MethodTokeninfoCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MethodTokeninfoCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MethodTokeninfoCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MethodTokeninfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1132,21 +1128,21 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *token_handle* query property to the given value.
     ///
     /// 
-    pub fn token_handle(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, NC, A> {
+    pub fn token_handle(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._token_handle = Some(new_value.to_string());
         self
     }
     /// Sets the *id_token* query property to the given value.
     ///
     /// 
-    pub fn id_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, NC, A> {
+    pub fn id_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._id_token = Some(new_value.to_string());
         self
     }
     /// Sets the *access_token* query property to the given value.
     ///
     /// 
-    pub fn access_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, NC, A> {
+    pub fn access_token(mut self, new_value: &str) -> MethodTokeninfoCall<'a, C, A> {
         self._access_token = Some(new_value.to_string());
         self
     }
@@ -1157,7 +1153,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodTokeninfoCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodTokeninfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1178,7 +1174,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodTokeninfoCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodTokeninfoCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1195,7 +1191,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MethodTokeninfoCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MethodTokeninfoCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1231,18 +1227,18 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct MethodGetCertForOpenIdConnectCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodGetCertForOpenIdConnectCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Oauth2<C, NC, A>,
+    hub: &'a Oauth2<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MethodGetCertForOpenIdConnectCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MethodGetCertForOpenIdConnectCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MethodGetCertForOpenIdConnectCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1350,7 +1346,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodGetCertForOpenIdConnectCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1371,7 +1367,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCertForOpenIdConnectCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCertForOpenIdConnectCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1388,7 +1384,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MethodGetCertForOpenIdConnectCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

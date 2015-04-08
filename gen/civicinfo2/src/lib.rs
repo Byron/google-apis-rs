@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Civic Info* crate version *0.1.4+20150302*, where *20150302* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Civic Info* crate version *0.1.5+20150302*, where *20150302* is the exact revision of the *civicinfo:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Civic Info* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/civic-information).
@@ -195,7 +195,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -266,40 +265,37 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct CivicInfo<C, NC, A> {
+pub struct CivicInfo<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for CivicInfo<C, NC, A> {}
+impl<'a, C, A> Hub for CivicInfo<C, A> {}
 
-impl<'a, C, NC, A> CivicInfo<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CivicInfo<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> CivicInfo<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> CivicInfo<C, A> {
         CivicInfo {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn divisions(&'a self) -> DivisionMethods<'a, C, NC, A> {
+    pub fn divisions(&'a self) -> DivisionMethods<'a, C, A> {
         DivisionMethods { hub: &self }
     }
-    pub fn elections(&'a self) -> ElectionMethods<'a, C, NC, A> {
+    pub fn elections(&'a self) -> ElectionMethods<'a, C, A> {
         ElectionMethods { hub: &self }
     }
-    pub fn representatives(&'a self) -> RepresentativeMethods<'a, C, NC, A> {
+    pub fn representatives(&'a self) -> RepresentativeMethods<'a, C, A> {
         RepresentativeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -880,20 +876,20 @@ impl Resource for Election {}
 /// let rb = hub.divisions();
 /// # }
 /// ```
-pub struct DivisionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DivisionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DivisionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DivisionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DivisionMethods<'a, C, NC, A> {
+impl<'a, C, A> DivisionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Searches for political divisions by their natural name or OCD ID.
-    pub fn search(&self) -> DivisionSearchCall<'a, C, NC, A> {
+    pub fn search(&self) -> DivisionSearchCall<'a, C, A> {
         DivisionSearchCall {
             hub: self.hub,
             _query: Default::default(),
@@ -933,20 +929,20 @@ impl<'a, C, NC, A> DivisionMethods<'a, C, NC, A> {
 /// let rb = hub.elections();
 /// # }
 /// ```
-pub struct ElectionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ElectionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ElectionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ElectionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ElectionMethods<'a, C, NC, A> {
+impl<'a, C, A> ElectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List of available elections to query.
-    pub fn election_query(&self) -> ElectionElectionQueryCall<'a, C, NC, A> {
+    pub fn election_query(&self) -> ElectionElectionQueryCall<'a, C, A> {
         ElectionElectionQueryCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -961,7 +957,7 @@ impl<'a, C, NC, A> ElectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `address` - The registered address of the voter to look up.
-    pub fn voter_info_query(&self, address: &str) -> ElectionVoterInfoQueryCall<'a, C, NC, A> {
+    pub fn voter_info_query(&self, address: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         ElectionVoterInfoQueryCall {
             hub: self.hub,
             _address: address.to_string(),
@@ -1003,20 +999,20 @@ impl<'a, C, NC, A> ElectionMethods<'a, C, NC, A> {
 /// let rb = hub.representatives();
 /// # }
 /// ```
-pub struct RepresentativeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RepresentativeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RepresentativeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RepresentativeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RepresentativeMethods<'a, C, NC, A> {
+impl<'a, C, A> RepresentativeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Looks up political geography and representative information for a single address.
-    pub fn representative_info_by_address(&self) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn representative_info_by_address(&self) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         RepresentativeRepresentativeInfoByAddresCall {
             hub: self.hub,
             _roles: Default::default(),
@@ -1035,7 +1031,7 @@ impl<'a, C, NC, A> RepresentativeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `ocdId` - The Open Civic Data division identifier of the division to look up.
-    pub fn representative_info_by_division(&self, ocd_id: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn representative_info_by_division(&self, ocd_id: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         RepresentativeRepresentativeInfoByDivisionCall {
             hub: self.hub,
             _ocd_id: ocd_id.to_string(),
@@ -1087,18 +1083,18 @@ impl<'a, C, NC, A> RepresentativeMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct DivisionSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DivisionSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
     _query: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for DivisionSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DivisionSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DivisionSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DivisionSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1204,7 +1200,7 @@ impl<'a, C, NC, A> DivisionSearchCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The search query. Queries can cover any parts of a OCD ID or a human readable division name. All words given in the query are treated as required patterns. In addition to that, most query operators of the Apache Lucene library are supported. See http://lucene.apache.org/core/2_9_4/queryparsersyntax.html
-    pub fn query(mut self, new_value: &str) -> DivisionSearchCall<'a, C, NC, A> {
+    pub fn query(mut self, new_value: &str) -> DivisionSearchCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1215,7 +1211,7 @@ impl<'a, C, NC, A> DivisionSearchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DivisionSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DivisionSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1236,7 +1232,7 @@ impl<'a, C, NC, A> DivisionSearchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DivisionSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DivisionSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1275,17 +1271,17 @@ impl<'a, C, NC, A> DivisionSearchCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ElectionElectionQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ElectionElectionQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ElectionElectionQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ElectionElectionQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ElectionElectionQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ElectionElectionQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1391,7 +1387,7 @@ impl<'a, C, NC, A> ElectionElectionQueryCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionElectionQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionElectionQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1412,7 +1408,7 @@ impl<'a, C, NC, A> ElectionElectionQueryCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ElectionElectionQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ElectionElectionQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1453,10 +1449,10 @@ impl<'a, C, NC, A> ElectionElectionQueryCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ElectionVoterInfoQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ElectionVoterInfoQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
     _address: String,
     _official_only: Option<bool>,
     _election_id: Option<String>,
@@ -1464,9 +1460,9 @@ pub struct ElectionVoterInfoQueryCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ElectionVoterInfoQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ElectionVoterInfoQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ElectionVoterInfoQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1578,7 +1574,7 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The registered address of the voter to look up.
-    pub fn address(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, NC, A> {
+    pub fn address(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._address = new_value.to_string();
         self
     }
@@ -1586,7 +1582,7 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// If set to true, only data from official state sources will be returned.
-    pub fn official_only(mut self, new_value: bool) -> ElectionVoterInfoQueryCall<'a, C, NC, A> {
+    pub fn official_only(mut self, new_value: bool) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._official_only = Some(new_value);
         self
     }
@@ -1594,7 +1590,7 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The unique ID of the election to look up. A list of election IDs can be obtained at https://www.googleapis.com/civicinfo/{version}/elections
-    pub fn election_id(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, NC, A> {
+    pub fn election_id(mut self, new_value: &str) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._election_id = Some(new_value.to_string());
         self
     }
@@ -1605,7 +1601,7 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionVoterInfoQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ElectionVoterInfoQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1626,7 +1622,7 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ElectionVoterInfoQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ElectionVoterInfoQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1669,10 +1665,10 @@ impl<'a, C, NC, A> ElectionVoterInfoQueryCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RepresentativeRepresentativeInfoByAddresCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
     _roles: Vec<String>,
     _levels: Vec<String>,
     _include_offices: Option<bool>,
@@ -1681,9 +1677,9 @@ pub struct RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1807,7 +1803,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     ///
     /// 
     /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
-    pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._roles.push(new_value.to_string());
         self
     }
@@ -1816,7 +1812,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     ///
     /// 
     /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
-    pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._levels.push(new_value.to_string());
         self
     }
@@ -1824,7 +1820,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     ///
     /// 
     /// Whether to return information about offices and officials. If false, only the top-level district information will be returned.
-    pub fn include_offices(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn include_offices(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._include_offices = Some(new_value);
         self
     }
@@ -1832,7 +1828,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     ///
     /// 
     /// The address to look up. May only be specified if the field ocdId is not given in the URL.
-    pub fn address(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn address(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
@@ -1843,7 +1839,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1864,7 +1860,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RepresentativeRepresentativeInfoByAddresCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1906,10 +1902,10 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByAddresCall<'a, C, NC, A> wh
 ///              .doit();
 /// # }
 /// ```
-pub struct RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RepresentativeRepresentativeInfoByDivisionCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CivicInfo<C, NC, A>,
+    hub: &'a CivicInfo<C, A>,
     _ocd_id: String,
     _roles: Vec<String>,
     _recursive: Option<bool>,
@@ -1918,9 +1914,9 @@ pub struct RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2067,7 +2063,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     /// we provide this method for API completeness.
     /// 
     /// The Open Civic Data division identifier of the division to look up.
-    pub fn ocd_id(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn ocd_id(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._ocd_id = new_value.to_string();
         self
     }
@@ -2076,7 +2072,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     ///
     /// 
     /// A list of office roles to filter by. Only offices fulfilling one of these roles will be returned. Divisions that don't contain a matching office will not be returned.
-    pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn add_roles(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._roles.push(new_value.to_string());
         self
     }
@@ -2084,7 +2080,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     ///
     /// 
     /// If true, information about all divisions contained in the division requested will be included as well. For example, if querying ocd-division/country:us/district:dc, this would also return all DC's wards and ANCs.
-    pub fn recursive(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn recursive(mut self, new_value: bool) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._recursive = Some(new_value);
         self
     }
@@ -2093,7 +2089,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     ///
     /// 
     /// A list of office levels to filter by. Only offices that serve at least one of these levels will be returned. Divisions that don't contain a matching office will not be returned.
-    pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn add_levels(mut self, new_value: &str) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._levels.push(new_value.to_string());
         self
     }
@@ -2104,7 +2100,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2125,7 +2121,7 @@ impl<'a, C, NC, A> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A> 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RepresentativeRepresentativeInfoByDivisionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

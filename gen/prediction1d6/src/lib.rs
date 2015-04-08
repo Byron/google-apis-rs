@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *prediction* crate version *0.1.4+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *prediction* crate version *0.1.5+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *prediction* *v1d6* API can be found at the
 //! [official documentation site](https://developers.google.com/prediction/docs/developer-guide).
@@ -198,7 +198,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -307,37 +306,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Prediction<C, NC, A> {
+pub struct Prediction<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Prediction<C, NC, A> {}
+impl<'a, C, A> Hub for Prediction<C, A> {}
 
-impl<'a, C, NC, A> Prediction<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Prediction<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Prediction<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Prediction<C, A> {
         Prediction {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn hostedmodels(&'a self) -> HostedmodelMethods<'a, C, NC, A> {
+    pub fn hostedmodels(&'a self) -> HostedmodelMethods<'a, C, A> {
         HostedmodelMethods { hub: &self }
     }
-    pub fn trainedmodels(&'a self) -> TrainedmodelMethods<'a, C, NC, A> {
+    pub fn trainedmodels(&'a self) -> TrainedmodelMethods<'a, C, A> {
         TrainedmodelMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -849,15 +845,15 @@ impl Part for OutputOutputMulti {}
 /// let rb = hub.trainedmodels();
 /// # }
 /// ```
-pub struct TrainedmodelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TrainedmodelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TrainedmodelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
+impl<'a, C, A> TrainedmodelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -867,7 +863,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn get(&self, project: &str, id: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, id: &str) -> TrainedmodelGetCall<'a, C, A> {
         TrainedmodelGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -887,7 +883,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn update(&self, request: &Update, project: &str, id: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Update, project: &str, id: &str) -> TrainedmodelUpdateCall<'a, C, A> {
         TrainedmodelUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -906,7 +902,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - The project associated with the model.
-    pub fn list(&self, project: &str) -> TrainedmodelListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> TrainedmodelListCall<'a, C, A> {
         TrainedmodelListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -926,7 +922,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn delete(&self, project: &str, id: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, id: &str) -> TrainedmodelDeleteCall<'a, C, A> {
         TrainedmodelDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -945,7 +941,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
-    pub fn insert(&self, request: &Insert, project: &str) -> TrainedmodelInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Insert, project: &str) -> TrainedmodelInsertCall<'a, C, A> {
         TrainedmodelInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -964,7 +960,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn analyze(&self, project: &str, id: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
+    pub fn analyze(&self, project: &str, id: &str) -> TrainedmodelAnalyzeCall<'a, C, A> {
         TrainedmodelAnalyzeCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -984,7 +980,7 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn predict(&self, request: &Input, project: &str, id: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
+    pub fn predict(&self, request: &Input, project: &str, id: &str) -> TrainedmodelPredictCall<'a, C, A> {
         TrainedmodelPredictCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1027,15 +1023,15 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
 /// let rb = hub.hostedmodels();
 /// # }
 /// ```
-pub struct HostedmodelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct HostedmodelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for HostedmodelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for HostedmodelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> HostedmodelMethods<'a, C, NC, A> {
+impl<'a, C, A> HostedmodelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1046,7 +1042,7 @@ impl<'a, C, NC, A> HostedmodelMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `hostedModelName` - The name of a hosted model.
-    pub fn predict(&self, request: &Input, project: &str, hosted_model_name: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
+    pub fn predict(&self, request: &Input, project: &str, hosted_model_name: &str) -> HostedmodelPredictCall<'a, C, A> {
         HostedmodelPredictCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1097,10 +1093,10 @@ impl<'a, C, NC, A> HostedmodelMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1108,9 +1104,9 @@ pub struct TrainedmodelGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1243,7 +1239,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1253,7 +1249,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The unique name for the predictive model.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -1264,7 +1260,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1285,7 +1281,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1302,7 +1298,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1346,10 +1342,10 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _request: Update,
     _project: String,
     _id: String,
@@ -1358,9 +1354,9 @@ pub struct TrainedmodelUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1500,7 +1496,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Update) -> TrainedmodelUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Update) -> TrainedmodelUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1510,7 +1506,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1520,7 +1516,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The unique name for the predictive model.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -1531,7 +1527,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1552,7 +1548,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1569,7 +1565,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1609,10 +1605,10 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -1621,9 +1617,9 @@ pub struct TrainedmodelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1761,7 +1757,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1769,7 +1765,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Pagination token.
-    pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1777,7 +1773,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Maximum number of results to return.
-    pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1788,7 +1784,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1809,7 +1805,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1826,7 +1822,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1864,10 +1860,10 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1875,9 +1871,9 @@ pub struct TrainedmodelDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1999,7 +1995,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2009,7 +2005,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The unique name for the predictive model.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -2020,7 +2016,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2041,7 +2037,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2058,7 +2054,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2102,10 +2098,10 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _request: Insert,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2113,9 +2109,9 @@ pub struct TrainedmodelInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2254,7 +2250,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Insert) -> TrainedmodelInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Insert) -> TrainedmodelInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2264,7 +2260,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2275,7 +2271,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2296,7 +2292,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2313,7 +2309,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2351,10 +2347,10 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelAnalyzeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelAnalyzeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2362,9 +2358,9 @@ pub struct TrainedmodelAnalyzeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelAnalyzeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelAnalyzeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2497,7 +2493,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2507,7 +2503,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The unique name for the predictive model.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -2518,7 +2514,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelAnalyzeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2539,7 +2535,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelAnalyzeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelAnalyzeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2556,7 +2552,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelAnalyzeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelAnalyzeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2600,10 +2596,10 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct TrainedmodelPredictCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TrainedmodelPredictCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _request: Input,
     _project: String,
     _id: String,
@@ -2612,9 +2608,9 @@ pub struct TrainedmodelPredictCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TrainedmodelPredictCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TrainedmodelPredictCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TrainedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2754,7 +2750,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Input) -> TrainedmodelPredictCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Input) -> TrainedmodelPredictCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2764,7 +2760,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2774,7 +2770,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The unique name for the predictive model.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -2785,7 +2781,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelPredictCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TrainedmodelPredictCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2806,7 +2802,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelPredictCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelPredictCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2823,7 +2819,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelPredictCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TrainedmodelPredictCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2867,10 +2863,10 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct HostedmodelPredictCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct HostedmodelPredictCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Prediction<C, NC, A>,
+    hub: &'a Prediction<C, A>,
     _request: Input,
     _project: String,
     _hosted_model_name: String,
@@ -2879,9 +2875,9 @@ pub struct HostedmodelPredictCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for HostedmodelPredictCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for HostedmodelPredictCall<'a, C, A> {}
 
-impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> HostedmodelPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3021,7 +3017,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Input) -> HostedmodelPredictCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Input) -> HostedmodelPredictCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3031,7 +3027,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the model.
-    pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3041,7 +3037,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The name of a hosted model.
-    pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
+    pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, A> {
         self._hosted_model_name = new_value.to_string();
         self
     }
@@ -3052,7 +3048,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> HostedmodelPredictCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> HostedmodelPredictCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3073,7 +3069,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> HostedmodelPredictCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> HostedmodelPredictCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3090,7 +3086,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> HostedmodelPredictCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> HostedmodelPredictCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

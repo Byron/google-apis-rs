@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudlatencytest* crate version *0.1.4+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *cloudlatencytest* crate version *0.1.5+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2).
 //! # Features
 //! 
@@ -191,7 +191,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -288,34 +287,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Cloudlatencytest<C, NC, A> {
+pub struct Cloudlatencytest<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Cloudlatencytest<C, NC, A> {}
+impl<'a, C, A> Hub for Cloudlatencytest<C, A> {}
 
-impl<'a, C, NC, A> Cloudlatencytest<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Cloudlatencytest<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Cloudlatencytest<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Cloudlatencytest<C, A> {
         Cloudlatencytest {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn statscollection(&'a self) -> StatscollectionMethods<'a, C, NC, A> {
+    pub fn statscollection(&'a self) -> StatscollectionMethods<'a, C, A> {
         StatscollectionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -490,15 +486,15 @@ impl ResponseResult for StatsReply {}
 /// let rb = hub.statscollection();
 /// # }
 /// ```
-pub struct StatscollectionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StatscollectionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudlatencytest<C, NC, A>,
+    hub: &'a Cloudlatencytest<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for StatscollectionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for StatscollectionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
+impl<'a, C, A> StatscollectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -507,7 +503,7 @@ impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updateaggregatedstats(&self, request: &AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> {
+    pub fn updateaggregatedstats(&self, request: &AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C, A> {
         StatscollectionUpdateaggregatedstatCall {
             hub: self.hub,
             _request: request.clone(),
@@ -524,7 +520,7 @@ impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updatestats(&self, request: &Stats) -> StatscollectionUpdatestatCall<'a, C, NC, A> {
+    pub fn updatestats(&self, request: &Stats) -> StatscollectionUpdatestatCall<'a, C, A> {
         StatscollectionUpdatestatCall {
             hub: self.hub,
             _request: request.clone(),
@@ -579,19 +575,19 @@ impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct StatscollectionUpdateaggregatedstatCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StatscollectionUpdateaggregatedstatCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudlatencytest<C, NC, A>,
+    hub: &'a Cloudlatencytest<C, A>,
     _request: AggregatedStats,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StatscollectionUpdateaggregatedstatCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StatscollectionUpdateaggregatedstatCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -705,7 +701,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -716,7 +712,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StatscollectionUpdateaggregatedstatCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -737,7 +733,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -754,7 +750,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -798,19 +794,19 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct StatscollectionUpdatestatCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StatscollectionUpdatestatCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudlatencytest<C, NC, A>,
+    hub: &'a Cloudlatencytest<C, A>,
     _request: Stats,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StatscollectionUpdatestatCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StatscollectionUpdatestatCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StatscollectionUpdatestatCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -924,7 +920,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Stats) -> StatscollectionUpdatestatCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Stats) -> StatscollectionUpdatestatCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -935,7 +931,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StatscollectionUpdatestatCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StatscollectionUpdatestatCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -956,7 +952,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -973,7 +969,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

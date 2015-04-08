@@ -4,12 +4,12 @@
 [package]
 
 name = "google-autoscaler1_beta2"
-version = "0.1.4+20141112"
+version = "0.1.5+20141112"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with autoscaler (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/autoscaler1_beta2"
 homepage = "http://developers.google.com/compute/docs/autoscaler"
-documentation = "http://byron.github.io/google-apis-rs/google-autoscaler1_beta2"
+documentation = "http://byron.github.io/google-apis-rs/google_autoscaler1_beta2"
 license = "MIT"
 keywords = ["autoscaler", "google", "protocol", "web", "api"]
 

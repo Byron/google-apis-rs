@@ -4,11 +4,11 @@
 [package]
 
 name = "google-pubsub1_beta2"
-version = "0.1.4+20150326"
+version = "0.1.5+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with pubsub (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2"
-documentation = "http://byron.github.io/google-apis-rs/google-pubsub1_beta2"
+documentation = "http://byron.github.io/google-apis-rs/google_pubsub1_beta2"
 license = "MIT"
 keywords = ["pubsub", "google", "protocol", "web", "api"]
 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-fusiontables2"
-version = "0.1.4+20150226"
+version = "0.1.5+20150226"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2"
 homepage = "https://developers.google.com/fusiontables"
-documentation = "http://byron.github.io/google-apis-rs/google-fusiontables2"
+documentation = "http://byron.github.io/google-apis-rs/google_fusiontables2"
 license = "MIT"
 keywords = ["fusiontables", "google", "protocol", "web", "api"]
 

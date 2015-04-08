@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appsactivity1` library allows access to all features of the *Google appsactivity* service.
 
-This documentation was generated from *appsactivity* crate version *0.1.4+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+This documentation was generated from *appsactivity* crate version *0.1.5+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *appsactivity* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/activity/).

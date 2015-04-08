@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudsearch* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *cloudsearch* crate version *0.1.5+20150309*, where *20150309* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudsearch1).
 //! # Features
 //! 
@@ -186,7 +186,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -285,34 +284,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Cloudsearch<C, NC, A> {
+pub struct Cloudsearch<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Cloudsearch<C, NC, A> {}
+impl<'a, C, A> Hub for Cloudsearch<C, A> {}
 
-impl<'a, C, NC, A> Cloudsearch<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Cloudsearch<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Cloudsearch<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Cloudsearch<C, A> {
         Cloudsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -571,15 +567,15 @@ impl ResponseResult for Empty {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -592,7 +588,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `pageSize` - The maximum number of indexes to return per page. If not specified, 100 indexes are returned per page.
     /// * `pageToken` - A `nextPageToken` returned from previous list indexes call as the starting point for this call. If not specified, list indexes from the beginning.
     /// * `view` - Specifies which parts of the IndexInfo resource is returned in the response. If not specified, `ID_ONLY` is used.
-    pub fn indexes_list(&self, project_id: &str, index_name_prefix: &str, page_size: i32, page_token: &str, view: &str) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn indexes_list(&self, project_id: &str, index_name_prefix: &str, page_size: i32, page_token: &str, view: &str) -> ProjectIndexeListCall<'a, C, A> {
         ProjectIndexeListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -615,7 +611,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectId` - The project associated with the index for retrieving the document. It cannot be the empty string.
     /// * `indexId` - The index from which to retrieve the document. It cannot be the empty string.
     /// * `docId` - The identifier of the document to retrieve. It cannot be the empty string.
-    pub fn indexes_documents_get(&self, project_id: &str, index_id: &str, doc_id: &str) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> {
+    pub fn indexes_documents_get(&self, project_id: &str, index_id: &str, doc_id: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         ProjectIndexeDocumentGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -645,7 +641,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `scorer` - The scoring function to invoke on a search result for this query. If `scorer` is not set, scoring is disabled and `_score` is 0 for all documents in the search result. To enable document relevancy score based on term frequency, set `"scorer=generic"`.
     /// * `scorerSize` - Maximum number of top retrieved results to score. It is valid only when `scorer` is set. If not specified, 100 retrieved results are scored.
     /// * `returnFields` - List of fields to return in `SearchResult` objects. It can be fields from `Document`, the built-in fields `_rank` and `_score`, and fields defined in `fieldExpressions`. Use `"*"` to return all fields from `Document`.
-    pub fn indexes_search(&self, project_id: &str, index_id: &str, query: &str, field_expressions: &Vec<String>, page_size: i32, page_token: &str, offset: i32, matched_count_accuracy: i32, order_by: &str, scorer: &str, scorer_size: i32, return_fields: &Vec<String>) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn indexes_search(&self, project_id: &str, index_id: &str, query: &str, field_expressions: &Vec<String>, page_size: i32, page_token: &str, offset: i32, matched_count_accuracy: i32, order_by: &str, scorer: &str, scorer_size: i32, return_fields: &Vec<String>) -> ProjectIndexeSearchCall<'a, C, A> {
         ProjectIndexeSearchCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -677,7 +673,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `pageSize` - The maximum number of documents to return per page. If not specified, 100 documents are returned per page.
     /// * `pageToken` - A `nextPageToken` returned from previous list documents call as the starting point for this call. If not specified, list documents from the beginning.
     /// * `view` - Specifies which part of the document resource is returned in the response. If not specified, `ID_ONLY` is used.
-    pub fn indexes_documents_list(&self, project_id: &str, index_id: &str, page_size: i32, page_token: &str, view: &str) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn indexes_documents_list(&self, project_id: &str, index_id: &str, page_size: i32, page_token: &str, view: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         ProjectIndexeDocumentListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -700,7 +696,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `projectId` - The project associated with the index for adding document. It cannot be the empty string.
     /// * `indexId` - The index to add document to. It cannot be the empty string.
-    pub fn indexes_documents_create(&self, request: &Document, project_id: &str, index_id: &str) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> {
+    pub fn indexes_documents_create(&self, request: &Document, project_id: &str, index_id: &str) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         ProjectIndexeDocumentCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -721,7 +717,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectId` - The project associated with the index for deleting document. It cannot be the empty string.
     /// * `indexId` - The index from which to delete the document. It cannot be the empty string.
     /// * `docId` - The document to be deleted. It cannot be the empty string.
-    pub fn indexes_documents_delete(&self, project_id: &str, index_id: &str, doc_id: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {
+    pub fn indexes_documents_delete(&self, project_id: &str, index_id: &str, doc_id: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         ProjectIndexeDocumentDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -772,10 +768,10 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _project_id: String,
     _index_name_prefix: String,
     _page_size: i32,
@@ -786,9 +782,9 @@ pub struct ProjectIndexeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -924,7 +920,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The project from which to retrieve indexes. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -934,7 +930,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The prefix of the index name. It is used to list all indexes with names that have this prefix.
-    pub fn index_name_prefix(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn index_name_prefix(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._index_name_prefix = new_value.to_string();
         self
     }
@@ -944,7 +940,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The maximum number of indexes to return per page. If not specified, 100 indexes are returned per page.
-    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeListCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
@@ -954,7 +950,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// A `nextPageToken` returned from previous list indexes call as the starting point for this call. If not specified, list indexes from the beginning.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
@@ -964,7 +960,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Specifies which parts of the IndexInfo resource is returned in the response. If not specified, `ID_ONLY` is used.
-    pub fn view(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> ProjectIndexeListCall<'a, C, A> {
         self._view = new_value.to_string();
         self
     }
@@ -975,7 +971,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1000,7 +996,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1017,7 +1013,7 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1055,10 +1051,10 @@ impl<'a, C, NC, A> ProjectIndexeListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeDocumentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeDocumentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _project_id: String,
     _index_id: String,
     _doc_id: String,
@@ -1067,9 +1063,9 @@ pub struct ProjectIndexeDocumentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeDocumentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeDocumentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeDocumentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1203,7 +1199,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the index for retrieving the document. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1213,7 +1209,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The index from which to retrieve the document. It cannot be the empty string.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
@@ -1223,7 +1219,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The identifier of the document to retrieve. It cannot be the empty string.
-    pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> {
+    pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._doc_id = new_value.to_string();
         self
     }
@@ -1234,7 +1230,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1259,7 +1255,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1276,7 +1272,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1314,10 +1310,10 @@ impl<'a, C, NC, A> ProjectIndexeDocumentGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _project_id: String,
     _index_id: String,
     _query: String,
@@ -1335,9 +1331,9 @@ pub struct ProjectIndexeSearchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1492,7 +1488,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the index for searching document. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1502,7 +1498,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The index to search. It cannot be the empty string.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
@@ -1512,7 +1508,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The query string in search query syntax. If the query is missing or empty, all documents are returned.
-    pub fn query(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn query(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._query = new_value.to_string();
         self
     }
@@ -1523,7 +1519,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Customized expressions used in `orderBy` or `returnFields`. The expression can contain fields in `Document`, the built-in fields ( `_rank`, the document rank, and `_score` if scoring is enabled) and fields defined in `fieldExpressions`. Each field expression is represented in a json object with the following fields: * `name`: the name of the field expression in string. * `expression`: the expression to be computed. It can be a combination of supported functions encoded in string. Expressions involving number fields can use the arithmetical operators (`+`, `-`, `*`, `/`) and the built-in numeric functions (`max`, `min`, `pow`, `count`, `log`, `abs`). Expressions involving geopoint fields can use the `geopoint` and `distance` functions. Expressions for text and html fields can use the `snippet` function. For example: ``` fieldExpressions={name: "TotalPrice", expression: "(Price+Tax)"} ``` ``` fieldExpressions={name: "snippet", expression: "snippet('good times', content)"} ``` The field expression names can be used in `orderBy` and `returnFields` after they are defined in `fieldExpressions`.
-    pub fn add_field_expressions(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn add_field_expressions(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._field_expressions.push(new_value.to_string());
         self
     }
@@ -1533,7 +1529,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The maximum number of search results to return per page. Searches perform best when the `pageSize` is kept as small as possible. If not specified, 10 results are returned per page.
-    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
@@ -1543,7 +1539,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// A `nextPageToken` returned from previous Search call as the starting point for this call. Pagination tokens provide better performance and consistency than offsets, and they cannot be used in combination with offsets.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
@@ -1553,7 +1549,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Offset is used to move to an arbitrary result, independent of the previous results. Offsets are inefficient when compared to `pageToken`. `pageToken` and `offset` cannot be both set. The default value of `offset` is 0.
-    pub fn offset(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn offset(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._offset = new_value;
         self
     }
@@ -1563,7 +1559,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Minimum accuracy requirement for `matchedCount` in search response. If specified, `matchedCount` will be accurate up to at least that number. For example, when set to 100, any `matchedCount <= 100` is accurate. This option may add considerable latency/expense. By default (when it is not specified or set to 0), the accuracy is the same as `pageSize`.
-    pub fn matched_count_accuracy(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn matched_count_accuracy(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._matched_count_accuracy = new_value;
         self
     }
@@ -1573,7 +1569,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Comma-separated list of fields for sorting on the search result, including fields from `Document`, the built-in fields (`_rank` and `_score`), and fields defined in `fieldExpressions`. For example: `orderBy="foo,bar"`. The default sorting order is ascending. To specify descending order for a field, a suffix `" desc"` should be appended to the field name. For example: `orderBy="foo desc,bar"`. The default value for text sort is the empty string, and the default value for numeric sort is 0. If not specified, the search results are automatically sorted by descending `_rank`. Sorting by ascending `_rank` is not allowed.
-    pub fn order_by(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._order_by = new_value.to_string();
         self
     }
@@ -1583,7 +1579,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The scoring function to invoke on a search result for this query. If `scorer` is not set, scoring is disabled and `_score` is 0 for all documents in the search result. To enable document relevancy score based on term frequency, set `"scorer=generic"`.
-    pub fn scorer(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn scorer(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._scorer = new_value.to_string();
         self
     }
@@ -1593,7 +1589,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Maximum number of top retrieved results to score. It is valid only when `scorer` is set. If not specified, 100 retrieved results are scored.
-    pub fn scorer_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn scorer_size(mut self, new_value: i32) -> ProjectIndexeSearchCall<'a, C, A> {
         self._scorer_size = new_value;
         self
     }
@@ -1604,7 +1600,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// List of fields to return in `SearchResult` objects. It can be fields from `Document`, the built-in fields `_rank` and `_score`, and fields defined in `fieldExpressions`. Use `"*"` to return all fields from `Document`.
-    pub fn add_return_fields(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn add_return_fields(mut self, new_value: &str) -> ProjectIndexeSearchCall<'a, C, A> {
         self._return_fields.push(new_value.to_string());
         self
     }
@@ -1615,7 +1611,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1640,7 +1636,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1657,7 +1653,7 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1695,10 +1691,10 @@ impl<'a, C, NC, A> ProjectIndexeSearchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeDocumentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeDocumentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _project_id: String,
     _index_id: String,
     _page_size: i32,
@@ -1709,9 +1705,9 @@ pub struct ProjectIndexeDocumentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeDocumentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeDocumentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeDocumentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1847,7 +1843,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the index for listing documents. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1857,7 +1853,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The index from which to list the documents. It cannot be the empty string.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
@@ -1867,7 +1863,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The maximum number of documents to return per page. If not specified, 100 documents are returned per page.
-    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._page_size = new_value;
         self
     }
@@ -1877,7 +1873,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// A `nextPageToken` returned from previous list documents call as the starting point for this call. If not specified, list documents from the beginning.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._page_token = new_value.to_string();
         self
     }
@@ -1887,7 +1883,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Specifies which part of the document resource is returned in the response. If not specified, `ID_ONLY` is used.
-    pub fn view(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn view(mut self, new_value: &str) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._view = new_value.to_string();
         self
     }
@@ -1898,7 +1894,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1923,7 +1919,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1940,7 +1936,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1984,10 +1980,10 @@ impl<'a, C, NC, A> ProjectIndexeDocumentListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeDocumentCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeDocumentCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _request: Document,
     _project_id: String,
     _index_id: String,
@@ -1996,9 +1992,9 @@ pub struct ProjectIndexeDocumentCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeDocumentCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeDocumentCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeDocumentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2138,7 +2134,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Document) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Document) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2148,7 +2144,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the index for adding document. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2158,7 +2154,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The index to add document to. It cannot be the empty string.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
@@ -2169,7 +2165,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2194,7 +2190,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2211,7 +2207,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2249,10 +2245,10 @@ impl<'a, C, NC, A> ProjectIndexeDocumentCreateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIndexeDocumentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIndexeDocumentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Cloudsearch<C, NC, A>,
+    hub: &'a Cloudsearch<C, A>,
     _project_id: String,
     _index_id: String,
     _doc_id: String,
@@ -2261,9 +2257,9 @@ pub struct ProjectIndexeDocumentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeDocumentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeDocumentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2397,7 +2393,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The project associated with the index for deleting document. It cannot be the empty string.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2407,7 +2403,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The index from which to delete the document. It cannot be the empty string.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._index_id = new_value.to_string();
         self
     }
@@ -2417,7 +2413,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The document to be deleted. It cannot be the empty string.
-    pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {
+    pub fn doc_id(mut self, new_value: &str) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._doc_id = new_value.to_string();
         self
     }
@@ -2428,7 +2424,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIndexeDocumentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2453,7 +2449,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDocumentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2470,7 +2466,7 @@ impl<'a, C, NC, A> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIndexeDocumentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

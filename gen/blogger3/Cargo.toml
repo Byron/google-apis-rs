@@ -4,12 +4,12 @@
 [package]
 
 name = "google-blogger3"
-version = "0.1.4+20150208"
+version = "0.1.5+20150208"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with blogger (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3"
 homepage = "https://developers.google.com/blogger/docs/3.0/getting_started"
-documentation = "http://byron.github.io/google-apis-rs/google-blogger3"
+documentation = "http://byron.github.io/google-apis-rs/google_blogger3"
 license = "MIT"
 keywords = ["blogger", "google", "protocol", "web", "api"]
 

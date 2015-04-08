@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *0.1.4+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *reports* crate version *0.1.5+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -214,7 +214,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -323,43 +322,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Reports<C, NC, A> {
+pub struct Reports<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Reports<C, NC, A> {}
+impl<'a, C, A> Hub for Reports<C, A> {}
 
-impl<'a, C, NC, A> Reports<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Reports<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Reports<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Reports<C, A> {
         Reports {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a, C, NC, A> {
+    pub fn activities(&'a self) -> ActivityMethods<'a, C, A> {
         ActivityMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C, NC, A> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, C, A> {
         ChannelMethods { hub: &self }
     }
-    pub fn customer_usage_reports(&'a self) -> CustomerUsageReportMethods<'a, C, NC, A> {
+    pub fn customer_usage_reports(&'a self) -> CustomerUsageReportMethods<'a, C, A> {
         CustomerUsageReportMethods { hub: &self }
     }
-    pub fn user_usage_report(&'a self) -> UserUsageReportMethods<'a, C, NC, A> {
+    pub fn user_usage_report(&'a self) -> UserUsageReportMethods<'a, C, A> {
         UserUsageReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -729,15 +725,15 @@ impl ResponseResult for Channel {}
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
+impl<'a, C, A> ChannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -746,7 +742,7 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, A> {
         ChannelStopCall {
             hub: self.hub,
             _request: request.clone(),
@@ -787,15 +783,15 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ActivityMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
+impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -806,7 +802,7 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     /// * `applicationName` - Application name for which the events are to be retrieved.
-    pub fn watch(&self, request: &Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, A> {
         ActivityWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -834,7 +830,7 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     ///
     /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     /// * `applicationName` - Application name for which the events are to be retrieved.
-    pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, A> {
         ActivityListCall {
             hub: self.hub,
             _user_key: user_key.to_string(),
@@ -884,15 +880,15 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 /// let rb = hub.customer_usage_reports();
 /// # }
 /// ```
-pub struct CustomerUsageReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerUsageReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CustomerUsageReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CustomerUsageReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerUsageReportMethods<'a, C, NC, A> {
+impl<'a, C, A> CustomerUsageReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -901,7 +897,7 @@ impl<'a, C, NC, A> CustomerUsageReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
-    pub fn get(&self, date: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn get(&self, date: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         CustomerUsageReportGetCall {
             hub: self.hub,
             _date: date.to_string(),
@@ -945,15 +941,15 @@ impl<'a, C, NC, A> CustomerUsageReportMethods<'a, C, NC, A> {
 /// let rb = hub.user_usage_report();
 /// # }
 /// ```
-pub struct UserUsageReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserUsageReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserUsageReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserUsageReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserUsageReportMethods<'a, C, NC, A> {
+impl<'a, C, A> UserUsageReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -963,7 +959,7 @@ impl<'a, C, NC, A> UserUsageReportMethods<'a, C, NC, A> {
     ///
     /// * `userKey` - Represents the profile id or the user email for which the data should be filtered.
     /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
-    pub fn get(&self, user_key: &str, date: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn get(&self, user_key: &str, date: &str) -> UserUsageReportGetCall<'a, C, A> {
         UserUsageReportGetCall {
             hub: self.hub,
             _user_key: user_key.to_string(),
@@ -1024,19 +1020,19 @@ impl<'a, C, NC, A> UserUsageReportMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelStopCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
     _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelStopCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1139,7 +1135,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1150,7 +1146,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1171,7 +1167,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1188,7 +1184,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1240,10 +1236,10 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
     _request: Channel,
     _user_key: String,
     _application_name: String,
@@ -1260,9 +1256,9 @@ pub struct ActivityWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ActivityWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1426,7 +1422,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ActivityWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1436,7 +1432,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
-    pub fn user_key(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn user_key(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
@@ -1446,7 +1442,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Application name for which the events are to be retrieved.
-    pub fn application_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn application_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._application_name = new_value.to_string();
         self
     }
@@ -1454,7 +1450,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Return events which occured at or after this time.
-    pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -1462,7 +1458,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Token to specify next page.
-    pub fn page_token(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1470,7 +1466,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Number of activity records to be shown in each page.
-    pub fn max_results(mut self, new_value: i32) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ActivityWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1478,7 +1474,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
-    pub fn filters(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -1486,7 +1482,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Name of the event being queried.
-    pub fn event_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn event_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
@@ -1494,7 +1490,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Return events which occured at or before this time.
-    pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -1502,7 +1498,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Represents the customer for which the data is to be fetched.
-    pub fn customer_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1510,7 +1506,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
-    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
@@ -1521,7 +1517,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1542,7 +1538,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1559,7 +1555,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1605,10 +1601,10 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
     _user_key: String,
     _application_name: String,
     _start_time: Option<String>,
@@ -1624,9 +1620,9 @@ pub struct ActivityListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ActivityListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1783,7 +1779,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
-    pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
@@ -1793,7 +1789,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Application name for which the events are to be retrieved.
-    pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._application_name = new_value.to_string();
         self
     }
@@ -1801,7 +1797,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Return events which occured at or after this time.
-    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -1809,7 +1805,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Token to specify next page.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1817,7 +1813,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Number of activity records to be shown in each page.
-    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1825,7 +1821,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
-    pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -1833,7 +1829,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Name of the event being queried.
-    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
@@ -1841,7 +1837,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Return events which occured at or before this time.
-    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -1849,7 +1845,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Represents the customer for which the data is to be fetched.
-    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1857,7 +1853,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
-    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
@@ -1868,7 +1864,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1889,7 +1885,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1906,7 +1902,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1947,10 +1943,10 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomerUsageReportGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerUsageReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
     _date: String,
     _parameters: Option<String>,
     _page_token: Option<String>,
@@ -1960,9 +1956,9 @@ pub struct CustomerUsageReportGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomerUsageReportGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomerUsageReportGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2103,7 +2099,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
-    pub fn date(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn date(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._date = new_value.to_string();
         self
     }
@@ -2111,7 +2107,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
-    pub fn parameters(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn parameters(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
@@ -2119,7 +2115,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// Token to specify next page.
-    pub fn page_token(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2127,7 +2123,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// Represents the customer for which the data is to be fetched.
-    pub fn customer_id(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2138,7 +2134,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUsageReportGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUsageReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2159,7 +2155,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerUsageReportGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerUsageReportGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2176,7 +2172,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerUsageReportGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerUsageReportGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2219,10 +2215,10 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserUsageReportGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserUsageReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reports<C, NC, A>,
+    hub: &'a Reports<C, A>,
     _user_key: String,
     _date: String,
     _parameters: Option<String>,
@@ -2235,9 +2231,9 @@ pub struct UserUsageReportGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserUsageReportGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserUsageReportGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2385,7 +2381,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Represents the profile id or the user email for which the data should be filtered.
-    pub fn user_key(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn user_key(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._user_key = new_value.to_string();
         self
     }
@@ -2395,7 +2391,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
-    pub fn date(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn date(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._date = new_value.to_string();
         self
     }
@@ -2403,7 +2399,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
-    pub fn parameters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn parameters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
@@ -2411,7 +2407,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Token to specify next page.
-    pub fn page_token(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2419,7 +2415,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Maximum number of results to return. Maximum allowed is 1000
-    pub fn max_results(mut self, new_value: u32) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> UserUsageReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2427,7 +2423,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Represents the set of filters including parameter operator value.
-    pub fn filters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -2435,7 +2431,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Represents the customer for which the data is to be fetched.
-    pub fn customer_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2446,7 +2442,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUsageReportGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUsageReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2467,7 +2463,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserUsageReportGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserUsageReportGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2484,7 +2480,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserUsageReportGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserUsageReportGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gmail1"
-version = "0.1.4+20150303"
+version = "0.1.5+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with gmail (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1"
 homepage = "https://developers.google.com/gmail/api/"
-documentation = "http://byron.github.io/google-apis-rs/google-gmail1"
+documentation = "http://byron.github.io/google-apis-rs/google_gmail1"
 license = "MIT"
 keywords = ["gmail", "google", "protocol", "web", "api"]
 

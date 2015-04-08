@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *genomics* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *genomics* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/genomics/v1beta2/reference).
@@ -224,7 +224,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -333,70 +332,67 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Genomics<C, NC, A> {
+pub struct Genomics<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Genomics<C, NC, A> {}
+impl<'a, C, A> Hub for Genomics<C, A> {}
 
-impl<'a, C, NC, A> Genomics<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Genomics<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Genomics<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Genomics<C, A> {
         Genomics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn annotation_sets(&'a self) -> AnnotationSetMethods<'a, C, NC, A> {
+    pub fn annotation_sets(&'a self) -> AnnotationSetMethods<'a, C, A> {
         AnnotationSetMethods { hub: &self }
     }
-    pub fn annotations(&'a self) -> AnnotationMethods<'a, C, NC, A> {
+    pub fn annotations(&'a self) -> AnnotationMethods<'a, C, A> {
         AnnotationMethods { hub: &self }
     }
-    pub fn callsets(&'a self) -> CallsetMethods<'a, C, NC, A> {
+    pub fn callsets(&'a self) -> CallsetMethods<'a, C, A> {
         CallsetMethods { hub: &self }
     }
-    pub fn datasets(&'a self) -> DatasetMethods<'a, C, NC, A> {
+    pub fn datasets(&'a self) -> DatasetMethods<'a, C, A> {
         DatasetMethods { hub: &self }
     }
-    pub fn experimental(&'a self) -> ExperimentalMethods<'a, C, NC, A> {
+    pub fn experimental(&'a self) -> ExperimentalMethods<'a, C, A> {
         ExperimentalMethods { hub: &self }
     }
-    pub fn jobs(&'a self) -> JobMethods<'a, C, NC, A> {
+    pub fn jobs(&'a self) -> JobMethods<'a, C, A> {
         JobMethods { hub: &self }
     }
-    pub fn readgroupsets(&'a self) -> ReadgroupsetMethods<'a, C, NC, A> {
+    pub fn readgroupsets(&'a self) -> ReadgroupsetMethods<'a, C, A> {
         ReadgroupsetMethods { hub: &self }
     }
-    pub fn reads(&'a self) -> ReadMethods<'a, C, NC, A> {
+    pub fn reads(&'a self) -> ReadMethods<'a, C, A> {
         ReadMethods { hub: &self }
     }
-    pub fn references(&'a self) -> ReferenceMethods<'a, C, NC, A> {
+    pub fn references(&'a self) -> ReferenceMethods<'a, C, A> {
         ReferenceMethods { hub: &self }
     }
-    pub fn referencesets(&'a self) -> ReferencesetMethods<'a, C, NC, A> {
+    pub fn referencesets(&'a self) -> ReferencesetMethods<'a, C, A> {
         ReferencesetMethods { hub: &self }
     }
-    pub fn streaming_variant_store(&'a self) -> StreamingVariantStoreMethods<'a, C, NC, A> {
+    pub fn streaming_variant_store(&'a self) -> StreamingVariantStoreMethods<'a, C, A> {
         StreamingVariantStoreMethods { hub: &self }
     }
-    pub fn variants(&'a self) -> VariantMethods<'a, C, NC, A> {
+    pub fn variants(&'a self) -> VariantMethods<'a, C, A> {
         VariantMethods { hub: &self }
     }
-    pub fn variantsets(&'a self) -> VariantsetMethods<'a, C, NC, A> {
+    pub fn variantsets(&'a self) -> VariantsetMethods<'a, C, A> {
         VariantsetMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2439,15 +2435,15 @@ impl RequestValue for SearchReferenceSetsRequest {}
 /// let rb = hub.datasets();
 /// # }
 /// ```
-pub struct DatasetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DatasetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DatasetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
+impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2456,7 +2452,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Dataset) -> DatasetCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Dataset) -> DatasetCreateCall<'a, C, A> {
         DatasetCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2474,7 +2470,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - The ID of the dataset to be updated.
-    pub fn update(&self, request: &Dataset, dataset_id: &str) -> DatasetUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Dataset, dataset_id: &str) -> DatasetUpdateCall<'a, C, A> {
         DatasetUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2492,7 +2488,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `datasetId` - The ID of the dataset to be deleted.
-    pub fn delete(&self, dataset_id: &str) -> DatasetDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, dataset_id: &str) -> DatasetDeleteCall<'a, C, A> {
         DatasetDeleteCall {
             hub: self.hub,
             _dataset_id: dataset_id.to_string(),
@@ -2509,7 +2505,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `datasetId` - The ID of the dataset to be undeleted.
-    pub fn undelete(&self, dataset_id: &str) -> DatasetUndeleteCall<'a, C, NC, A> {
+    pub fn undelete(&self, dataset_id: &str) -> DatasetUndeleteCall<'a, C, A> {
         DatasetUndeleteCall {
             hub: self.hub,
             _dataset_id: dataset_id.to_string(),
@@ -2526,7 +2522,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `datasetId` - The ID of the dataset.
-    pub fn get(&self, dataset_id: &str) -> DatasetGetCall<'a, C, NC, A> {
+    pub fn get(&self, dataset_id: &str) -> DatasetGetCall<'a, C, A> {
         DatasetGetCall {
             hub: self.hub,
             _dataset_id: dataset_id.to_string(),
@@ -2544,7 +2540,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - The ID of the dataset to be updated.
-    pub fn patch(&self, request: &Dataset, dataset_id: &str) -> DatasetPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Dataset, dataset_id: &str) -> DatasetPatchCall<'a, C, A> {
         DatasetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2558,7 +2554,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists datasets within a project.
-    pub fn list(&self) -> DatasetListCall<'a, C, NC, A> {
+    pub fn list(&self) -> DatasetListCall<'a, C, A> {
         DatasetListCall {
             hub: self.hub,
             _project_number: Default::default(),
@@ -2601,15 +2597,15 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
 /// let rb = hub.jobs();
 /// # }
 /// ```
-pub struct JobMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for JobMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for JobMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
+impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2618,7 +2614,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `jobId` - Required. The ID of the job.
-    pub fn cancel(&self, job_id: &str) -> JobCancelCall<'a, C, NC, A> {
+    pub fn cancel(&self, job_id: &str) -> JobCancelCall<'a, C, A> {
         JobCancelCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -2635,7 +2631,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `jobId` - Required. The ID of the job.
-    pub fn get(&self, job_id: &str) -> JobGetCall<'a, C, NC, A> {
+    pub fn get(&self, job_id: &str) -> JobGetCall<'a, C, A> {
         JobGetCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -2652,7 +2648,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchJobsRequest) -> JobSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchJobsRequest) -> JobSearchCall<'a, C, A> {
         JobSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2693,15 +2689,15 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
 /// let rb = hub.referencesets();
 /// # }
 /// ```
-pub struct ReferencesetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferencesetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReferencesetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReferencesetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
+impl<'a, C, A> ReferencesetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2712,7 +2708,7 @@ impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, A> {
         ReferencesetSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2731,7 +2727,7 @@ impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `referenceSetId` - The ID of the reference set.
-    pub fn get(&self, reference_set_id: &str) -> ReferencesetGetCall<'a, C, NC, A> {
+    pub fn get(&self, reference_set_id: &str) -> ReferencesetGetCall<'a, C, A> {
         ReferencesetGetCall {
             hub: self.hub,
             _reference_set_id: reference_set_id.to_string(),
@@ -2772,15 +2768,15 @@ impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
 /// let rb = hub.streaming_variant_store();
 /// # }
 /// ```
-pub struct StreamingVariantStoreMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StreamingVariantStoreMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for StreamingVariantStoreMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for StreamingVariantStoreMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> StreamingVariantStoreMethods<'a, C, NC, A> {
+impl<'a, C, A> StreamingVariantStoreMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2789,7 +2785,7 @@ impl<'a, C, NC, A> StreamingVariantStoreMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn streamvariants(&self, request: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> {
+    pub fn streamvariants(&self, request: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
         StreamingVariantStoreStreamvariantCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2830,15 +2826,15 @@ impl<'a, C, NC, A> StreamingVariantStoreMethods<'a, C, NC, A> {
 /// let rb = hub.callsets();
 /// # }
 /// ```
-pub struct CallsetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CallsetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CallsetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
+impl<'a, C, A> CallsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2847,7 +2843,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `callSetId` - The ID of the call set to be deleted.
-    pub fn delete(&self, call_set_id: &str) -> CallsetDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, call_set_id: &str) -> CallsetDeleteCall<'a, C, A> {
         CallsetDeleteCall {
             hub: self.hub,
             _call_set_id: call_set_id.to_string(),
@@ -2866,7 +2862,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, A> {
         CallsetSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2884,7 +2880,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `callSetId` - The ID of the call set to be updated.
-    pub fn patch(&self, request: &CallSet, call_set_id: &str) -> CallsetPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &CallSet, call_set_id: &str) -> CallsetPatchCall<'a, C, A> {
         CallsetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2902,7 +2898,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &CallSet) -> CallsetCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &CallSet) -> CallsetCreateCall<'a, C, A> {
         CallsetCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2919,7 +2915,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `callSetId` - The ID of the call set.
-    pub fn get(&self, call_set_id: &str) -> CallsetGetCall<'a, C, NC, A> {
+    pub fn get(&self, call_set_id: &str) -> CallsetGetCall<'a, C, A> {
         CallsetGetCall {
             hub: self.hub,
             _call_set_id: call_set_id.to_string(),
@@ -2937,7 +2933,7 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `callSetId` - The ID of the call set to be updated.
-    pub fn update(&self, request: &CallSet, call_set_id: &str) -> CallsetUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &CallSet, call_set_id: &str) -> CallsetUpdateCall<'a, C, A> {
         CallsetUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2979,15 +2975,15 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
 /// let rb = hub.reads();
 /// # }
 /// ```
-pub struct ReadMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReadMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReadMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadMethods<'a, C, NC, A> {
+impl<'a, C, A> ReadMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3002,7 +2998,7 @@ impl<'a, C, NC, A> ReadMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchReadsRequest) -> ReadSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchReadsRequest) -> ReadSearchCall<'a, C, A> {
         ReadSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3043,15 +3039,15 @@ impl<'a, C, NC, A> ReadMethods<'a, C, NC, A> {
 /// let rb = hub.readgroupsets();
 /// # }
 /// ```
-pub struct ReadgroupsetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReadgroupsetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReadgroupsetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
+impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3061,7 +3057,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn update(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
         ReadgroupsetUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3081,7 +3077,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn export(&self, request: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, NC, A> {
+    pub fn export(&self, request: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, A> {
         ReadgroupsetExportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3100,7 +3096,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn import(&self, request: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, NC, A> {
+    pub fn import(&self, request: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
         ReadgroupsetImportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3118,7 +3114,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn patch(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetPatchCall<'a, C, A> {
         ReadgroupsetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3136,7 +3132,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn call(&self, request: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, NC, A> {
+    pub fn call(&self, request: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, A> {
         ReadgroupsetCallCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3153,7 +3149,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn align(&self, request: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, NC, A> {
+    pub fn align(&self, request: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, A> {
         ReadgroupsetAlignCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3172,7 +3168,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `readGroupSetId` - Required. The ID of the read group set over which coverage is requested.
-    pub fn coveragebuckets_list(&self, read_group_set_id: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn coveragebuckets_list(&self, read_group_set_id: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         ReadgroupsetCoveragebucketListCall {
             hub: self.hub,
             _read_group_set_id: read_group_set_id.to_string(),
@@ -3195,7 +3191,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `readGroupSetId` - The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn delete(&self, read_group_set_id: &str) -> ReadgroupsetDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, read_group_set_id: &str) -> ReadgroupsetDeleteCall<'a, C, A> {
         ReadgroupsetDeleteCall {
             hub: self.hub,
             _read_group_set_id: read_group_set_id.to_string(),
@@ -3214,7 +3210,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, A> {
         ReadgroupsetSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3231,7 +3227,7 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `readGroupSetId` - The ID of the read group set.
-    pub fn get(&self, read_group_set_id: &str) -> ReadgroupsetGetCall<'a, C, NC, A> {
+    pub fn get(&self, read_group_set_id: &str) -> ReadgroupsetGetCall<'a, C, A> {
         ReadgroupsetGetCall {
             hub: self.hub,
             _read_group_set_id: read_group_set_id.to_string(),
@@ -3272,15 +3268,15 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
 /// let rb = hub.references();
 /// # }
 /// ```
-pub struct ReferenceMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferenceMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReferenceMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReferenceMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
+impl<'a, C, A> ReferenceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3291,7 +3287,7 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `referenceId` - The ID of the reference.
-    pub fn bases_list(&self, reference_id: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn bases_list(&self, reference_id: &str) -> ReferenceBaseListCall<'a, C, A> {
         ReferenceBaseListCall {
             hub: self.hub,
             _reference_id: reference_id.to_string(),
@@ -3314,7 +3310,7 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, A> {
         ReferenceSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3333,7 +3329,7 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `referenceId` - The ID of the reference.
-    pub fn get(&self, reference_id: &str) -> ReferenceGetCall<'a, C, NC, A> {
+    pub fn get(&self, reference_id: &str) -> ReferenceGetCall<'a, C, A> {
         ReferenceGetCall {
             hub: self.hub,
             _reference_id: reference_id.to_string(),
@@ -3374,15 +3370,15 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
 /// let rb = hub.annotation_sets();
 /// # }
 /// ```
-pub struct AnnotationSetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AnnotationSetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AnnotationSetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
+impl<'a, C, A> AnnotationSetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3391,7 +3387,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `annotationSetId` - The ID of the annotation set to be retrieved.
-    pub fn get(&self, annotation_set_id: &str) -> AnnotationSetGetCall<'a, C, NC, A> {
+    pub fn get(&self, annotation_set_id: &str) -> AnnotationSetGetCall<'a, C, A> {
         AnnotationSetGetCall {
             hub: self.hub,
             _annotation_set_id: annotation_set_id.to_string(),
@@ -3409,7 +3405,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `annotationSetId` - The ID of the annotation set to be updated.
-    pub fn update(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetUpdateCall<'a, C, A> {
         AnnotationSetUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3427,7 +3423,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, A> {
         AnnotationSetCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3444,7 +3440,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, A> {
         AnnotationSetSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3462,7 +3458,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `annotationSetId` - The ID of the annotation set to be updated.
-    pub fn patch(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetPatchCall<'a, C, A> {
         AnnotationSetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3480,7 +3476,7 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `annotationSetId` - The ID of the annotation set to be deleted.
-    pub fn delete(&self, annotation_set_id: &str) -> AnnotationSetDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, annotation_set_id: &str) -> AnnotationSetDeleteCall<'a, C, A> {
         AnnotationSetDeleteCall {
             hub: self.hub,
             _annotation_set_id: annotation_set_id.to_string(),
@@ -3521,15 +3517,15 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
 /// let rb = hub.variants();
 /// # }
 /// ```
-pub struct VariantMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for VariantMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for VariantMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
+impl<'a, C, A> VariantMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3540,7 +3536,7 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchVariantsRequest) -> VariantSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchVariantsRequest) -> VariantSearchCall<'a, C, A> {
         VariantSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3557,7 +3553,7 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `variantId` - The ID of the variant to be deleted.
-    pub fn delete(&self, variant_id: &str) -> VariantDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, variant_id: &str) -> VariantDeleteCall<'a, C, A> {
         VariantDeleteCall {
             hub: self.hub,
             _variant_id: variant_id.to_string(),
@@ -3574,7 +3570,7 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `variantId` - The ID of the variant.
-    pub fn get(&self, variant_id: &str) -> VariantGetCall<'a, C, NC, A> {
+    pub fn get(&self, variant_id: &str) -> VariantGetCall<'a, C, A> {
         VariantGetCall {
             hub: self.hub,
             _variant_id: variant_id.to_string(),
@@ -3591,7 +3587,7 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Variant) -> VariantCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Variant) -> VariantCreateCall<'a, C, A> {
         VariantCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3609,7 +3605,7 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantId` - The ID of the variant to be updated.
-    pub fn update(&self, request: &Variant, variant_id: &str) -> VariantUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Variant, variant_id: &str) -> VariantUpdateCall<'a, C, A> {
         VariantUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3651,15 +3647,15 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
 /// let rb = hub.annotations();
 /// # }
 /// ```
-pub struct AnnotationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AnnotationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AnnotationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
+impl<'a, C, A> AnnotationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3669,7 +3665,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `annotationId` - The ID of the annotation set to be updated.
-    pub fn patch(&self, request: &Annotation, annotation_id: &str) -> AnnotationPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Annotation, annotation_id: &str) -> AnnotationPatchCall<'a, C, A> {
         AnnotationPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3688,7 +3684,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `annotationId` - The ID of the annotation set to be updated.
-    pub fn update(&self, request: &Annotation, annotation_id: &str) -> AnnotationUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Annotation, annotation_id: &str) -> AnnotationUpdateCall<'a, C, A> {
         AnnotationUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3706,7 +3702,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, A> {
         AnnotationSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3723,7 +3719,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `annotationId` - The ID of the annotation set to be deleted.
-    pub fn delete(&self, annotation_id: &str) -> AnnotationDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, annotation_id: &str) -> AnnotationDeleteCall<'a, C, A> {
         AnnotationDeleteCall {
             hub: self.hub,
             _annotation_id: annotation_id.to_string(),
@@ -3740,7 +3736,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `annotationId` - The ID of the annotation set to be retrieved.
-    pub fn get(&self, annotation_id: &str) -> AnnotationGetCall<'a, C, NC, A> {
+    pub fn get(&self, annotation_id: &str) -> AnnotationGetCall<'a, C, A> {
         AnnotationGetCall {
             hub: self.hub,
             _annotation_id: annotation_id.to_string(),
@@ -3757,7 +3753,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Annotation) -> AnnotationCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Annotation) -> AnnotationCreateCall<'a, C, A> {
         AnnotationCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3777,7 +3773,7 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_create(&self, request: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, NC, A> {
+    pub fn batch_create(&self, request: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, A> {
         AnnotationBatchCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3818,15 +3814,15 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
 /// let rb = hub.experimental();
 /// # }
 /// ```
-pub struct ExperimentalMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ExperimentalMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ExperimentalMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ExperimentalMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ExperimentalMethods<'a, C, NC, A> {
+impl<'a, C, A> ExperimentalMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3835,7 +3831,7 @@ impl<'a, C, NC, A> ExperimentalMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn jobs_create(&self, request: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, NC, A> {
+    pub fn jobs_create(&self, request: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, A> {
         ExperimentalJobCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3876,15 +3872,15 @@ impl<'a, C, NC, A> ExperimentalMethods<'a, C, NC, A> {
 /// let rb = hub.variantsets();
 /// # }
 /// ```
-pub struct VariantsetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for VariantsetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for VariantsetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
+impl<'a, C, A> VariantsetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3894,7 +3890,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantSetId` - The ID of the variant to be updated.
-    pub fn update(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetUpdateCall<'a, C, A> {
         VariantsetUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3913,7 +3909,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantSetId` - Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
-    pub fn export(&self, request: &ExportVariantSetRequest, variant_set_id: &str) -> VariantsetExportCall<'a, C, NC, A> {
+    pub fn export(&self, request: &ExportVariantSetRequest, variant_set_id: &str) -> VariantsetExportCall<'a, C, A> {
         VariantsetExportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3932,7 +3928,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantSetId` - The ID of the variant to be updated.
-    pub fn patch(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetPatchCall<'a, C, A> {
         VariantsetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3952,7 +3948,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, A> {
         VariantsetSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3969,7 +3965,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `variantSetId` - Required. The ID of the variant set.
-    pub fn get(&self, variant_set_id: &str) -> VariantsetGetCall<'a, C, NC, A> {
+    pub fn get(&self, variant_set_id: &str) -> VariantsetGetCall<'a, C, A> {
         VariantsetGetCall {
             hub: self.hub,
             _variant_set_id: variant_set_id.to_string(),
@@ -3989,7 +3985,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantSetId` - The destination variant set.
-    pub fn merge_variants(&self, request: &MergeVariantsRequest, variant_set_id: &str) -> VariantsetMergeVariantCall<'a, C, NC, A> {
+    pub fn merge_variants(&self, request: &MergeVariantsRequest, variant_set_id: &str) -> VariantsetMergeVariantCall<'a, C, A> {
         VariantsetMergeVariantCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4007,7 +4003,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `variantSetId` - The ID of the variant set to be deleted.
-    pub fn delete(&self, variant_set_id: &str) -> VariantsetDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, variant_set_id: &str) -> VariantsetDeleteCall<'a, C, A> {
         VariantsetDeleteCall {
             hub: self.hub,
             _variant_set_id: variant_set_id.to_string(),
@@ -4027,7 +4023,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `variantSetId` - Required. The variant set to which variant data should be imported.
-    pub fn import_variants(&self, request: &ImportVariantsRequest, variant_set_id: &str) -> VariantsetImportVariantCall<'a, C, NC, A> {
+    pub fn import_variants(&self, request: &ImportVariantsRequest, variant_set_id: &str) -> VariantsetImportVariantCall<'a, C, A> {
         VariantsetImportVariantCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4083,19 +4079,19 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Dataset,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4209,7 +4205,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Dataset) -> DatasetCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Dataset) -> DatasetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4220,7 +4216,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4241,7 +4237,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4258,7 +4254,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4302,10 +4298,10 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Dataset,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4313,9 +4309,9 @@ pub struct DatasetUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4454,7 +4450,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Dataset) -> DatasetUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Dataset) -> DatasetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4464,7 +4460,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the dataset to be updated.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -4475,7 +4471,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4496,7 +4492,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4513,7 +4509,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4551,19 +4547,19 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4684,7 +4680,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the dataset to be deleted.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -4695,7 +4691,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4716,7 +4712,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4733,7 +4729,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4771,19 +4767,19 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetUndeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetUndeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetUndeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetUndeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4915,7 +4911,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the dataset to be undeleted.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetUndeleteCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetUndeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -4926,7 +4922,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUndeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4947,7 +4943,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetUndeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetUndeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4964,7 +4960,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetUndeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetUndeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5002,19 +4998,19 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5146,7 +5142,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -5157,7 +5153,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5178,7 +5174,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5195,7 +5191,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5239,10 +5235,10 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Dataset,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5250,9 +5246,9 @@ pub struct DatasetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5391,7 +5387,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Dataset) -> DatasetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Dataset) -> DatasetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5401,7 +5397,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the dataset to be updated.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -5412,7 +5408,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5433,7 +5429,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5450,7 +5446,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5491,10 +5487,10 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _project_number: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5503,9 +5499,9 @@ pub struct DatasetListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5619,7 +5615,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The project to list datasets for.
-    pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
+    pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._project_number = Some(new_value.to_string());
         self
     }
@@ -5627,7 +5623,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5635,7 +5631,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of results returned by this request. If unspecified, defaults to 50.
-    pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -5646,7 +5642,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5667,7 +5663,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5684,7 +5680,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5722,19 +5718,19 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct JobCancelCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobCancelCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _job_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobCancelCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobCancelCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5855,7 +5851,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Required. The ID of the job.
-    pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -5866,7 +5862,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobCancelCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5887,7 +5883,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobCancelCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobCancelCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5904,7 +5900,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobCancelCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobCancelCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5942,19 +5938,19 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct JobGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _job_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6086,7 +6082,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// Required. The ID of the job.
-    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -6097,7 +6093,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6118,7 +6114,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6135,7 +6131,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6179,19 +6175,19 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct JobSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchJobsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6305,7 +6301,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchJobsRequest) -> JobSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchJobsRequest) -> JobSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6316,7 +6312,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6337,7 +6333,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6354,7 +6350,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6400,19 +6396,19 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ReferencesetSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferencesetSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchReferenceSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReferencesetSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReferencesetSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6526,7 +6522,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6537,7 +6533,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6558,7 +6554,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReferencesetSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReferencesetSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6575,7 +6571,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReferencesetSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReferencesetSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6615,19 +6611,19 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReferencesetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferencesetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _reference_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReferencesetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReferencesetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6759,7 +6755,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reference set.
-    pub fn reference_set_id(mut self, new_value: &str) -> ReferencesetGetCall<'a, C, NC, A> {
+    pub fn reference_set_id(mut self, new_value: &str) -> ReferencesetGetCall<'a, C, A> {
         self._reference_set_id = new_value.to_string();
         self
     }
@@ -6770,7 +6766,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferencesetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6791,7 +6787,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReferencesetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReferencesetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6808,7 +6804,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReferencesetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReferencesetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6852,19 +6848,19 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct StreamingVariantStoreStreamvariantCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StreamingVariantStoreStreamvariantCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: StreamVariantsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StreamingVariantStoreStreamvariantCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StreamingVariantStoreStreamvariantCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StreamingVariantStoreStreamvariantCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6978,7 +6974,7 @@ impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &StreamVariantsRequest) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6989,7 +6985,7 @@ impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StreamingVariantStoreStreamvariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7010,7 +7006,7 @@ impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StreamingVariantStoreStreamvariantCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StreamingVariantStoreStreamvariantCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7027,7 +7023,7 @@ impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StreamingVariantStoreStreamvariantCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7065,19 +7061,19 @@ impl<'a, C, NC, A> StreamingVariantStoreStreamvariantCall<'a, C, NC, A> where NC
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _call_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7198,7 +7194,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the call set to be deleted.
-    pub fn call_set_id(mut self, new_value: &str) -> CallsetDeleteCall<'a, C, NC, A> {
+    pub fn call_set_id(mut self, new_value: &str) -> CallsetDeleteCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
@@ -7209,7 +7205,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7230,7 +7226,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7247,7 +7243,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7293,19 +7289,19 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchCallSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7419,7 +7415,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7430,7 +7426,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7451,7 +7447,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7468,7 +7464,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7512,10 +7508,10 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: CallSet,
     _call_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7523,9 +7519,9 @@ pub struct CallsetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7664,7 +7660,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CallSet) -> CallsetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CallSet) -> CallsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7674,7 +7670,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the call set to be updated.
-    pub fn call_set_id(mut self, new_value: &str) -> CallsetPatchCall<'a, C, NC, A> {
+    pub fn call_set_id(mut self, new_value: &str) -> CallsetPatchCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
@@ -7685,7 +7681,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7706,7 +7702,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7723,7 +7719,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7767,19 +7763,19 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: CallSet,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7893,7 +7889,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CallSet) -> CallsetCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CallSet) -> CallsetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7904,7 +7900,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7925,7 +7921,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7942,7 +7938,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7980,19 +7976,19 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _call_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8124,7 +8120,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the call set.
-    pub fn call_set_id(mut self, new_value: &str) -> CallsetGetCall<'a, C, NC, A> {
+    pub fn call_set_id(mut self, new_value: &str) -> CallsetGetCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
@@ -8135,7 +8131,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8156,7 +8152,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8173,7 +8169,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8217,10 +8213,10 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct CallsetUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CallsetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: CallSet,
     _call_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8228,9 +8224,9 @@ pub struct CallsetUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CallsetUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CallsetUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CallsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8369,7 +8365,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CallSet) -> CallsetUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CallSet) -> CallsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8379,7 +8375,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the call set to be updated.
-    pub fn call_set_id(mut self, new_value: &str) -> CallsetUpdateCall<'a, C, NC, A> {
+    pub fn call_set_id(mut self, new_value: &str) -> CallsetUpdateCall<'a, C, A> {
         self._call_set_id = new_value.to_string();
         self
     }
@@ -8390,7 +8386,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CallsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8411,7 +8407,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CallsetUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CallsetUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8428,7 +8424,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CallsetUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CallsetUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8478,19 +8474,19 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchReadsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8604,7 +8600,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchReadsRequest) -> ReadSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchReadsRequest) -> ReadSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8615,7 +8611,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8636,7 +8632,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8653,7 +8649,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8697,10 +8693,10 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ReadGroupSet,
     _read_group_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8708,9 +8704,9 @@ pub struct ReadgroupsetUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8849,7 +8845,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8859,7 +8855,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
@@ -8870,7 +8866,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8891,7 +8887,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8908,7 +8904,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8954,19 +8950,19 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetExportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetExportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ExportReadGroupSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetExportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetExportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9080,7 +9076,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9091,7 +9087,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetExportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9112,7 +9108,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetExportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetExportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9129,7 +9125,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetExportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetExportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9175,19 +9171,19 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetImportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetImportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ImportReadGroupSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetImportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetImportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9301,7 +9297,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9312,7 +9308,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetImportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9333,7 +9329,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetImportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetImportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9350,7 +9346,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetImportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetImportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9394,10 +9390,10 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ReadGroupSet,
     _read_group_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9405,9 +9401,9 @@ pub struct ReadgroupsetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9546,7 +9542,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ReadGroupSet) -> ReadgroupsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9556,7 +9552,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetPatchCall<'a, C, NC, A> {
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetPatchCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
@@ -9567,7 +9563,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9588,7 +9584,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9605,7 +9601,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9649,19 +9645,19 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetCallCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetCallCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: CallReadGroupSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetCallCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetCallCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetCallCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9775,7 +9771,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9786,7 +9782,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCallCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9807,7 +9803,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetCallCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetCallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9824,7 +9820,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetCallCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetCallCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9868,19 +9864,19 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetAlignCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetAlignCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: AlignReadGroupSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetAlignCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetAlignCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetAlignCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9994,7 +9990,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10005,7 +10001,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetAlignCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetAlignCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10026,7 +10022,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetAlignCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetAlignCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10043,7 +10039,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetAlignCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetAlignCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10089,10 +10085,10 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetCoveragebucketListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetCoveragebucketListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _read_group_set_id: String,
     _target_bucket_width: Option<String>,
     _range_start: Option<String>,
@@ -10105,9 +10101,9 @@ pub struct ReadgroupsetCoveragebucketListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetCoveragebucketListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10257,7 +10253,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Required. The ID of the read group set over which coverage is requested.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
@@ -10265,7 +10261,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The desired width of each reported coverage bucket in base pairs. This will be rounded down to the nearest precomputed bucket width; the value of which is returned as bucketWidth in the response. Defaults to infinity (each bucket spans an entire reference sequence) or the length of the target range, if specified. The smallest precomputed bucketWidth is currently 2048 base pairs; this is subject to change.
-    pub fn target_bucket_width(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn target_bucket_width(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._target_bucket_width = Some(new_value.to_string());
         self
     }
@@ -10273,7 +10269,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
-    pub fn range_start(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn range_start(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_start = Some(new_value.to_string());
         self
     }
@@ -10281,7 +10277,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The reference sequence name, for example chr1, 1, or chrX.
-    pub fn range_reference_name(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn range_reference_name(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_reference_name = Some(new_value.to_string());
         self
     }
@@ -10289,7 +10285,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
-    pub fn range_end(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn range_end(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._range_end = Some(new_value.to_string());
         self
     }
@@ -10297,7 +10293,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10305,7 +10301,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The maximum number of results to return in a single page. If unspecified, defaults to 1024. The maximum value is 2048.
-    pub fn page_size(mut self, new_value: i32) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -10316,7 +10312,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetCoveragebucketListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10337,7 +10333,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetCoveragebucketListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10354,7 +10350,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetCoveragebucketListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10392,19 +10388,19 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _read_group_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10525,7 +10521,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetDeleteCall<'a, C, NC, A> {
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetDeleteCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
@@ -10536,7 +10532,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10557,7 +10553,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10574,7 +10570,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10620,19 +10616,19 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchReadGroupSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10746,7 +10742,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10757,7 +10753,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10778,7 +10774,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10795,7 +10791,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10833,19 +10829,19 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReadgroupsetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReadgroupsetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _read_group_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReadgroupsetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReadgroupsetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10977,7 +10973,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the read group set.
-    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, NC, A> {
+    pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, A> {
         self._read_group_set_id = new_value.to_string();
         self
     }
@@ -10988,7 +10984,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReadgroupsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11009,7 +11005,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReadgroupsetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11026,7 +11022,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReadgroupsetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11070,10 +11066,10 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReferenceBaseListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferenceBaseListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _reference_id: String,
     _start: Option<String>,
     _page_token: Option<String>,
@@ -11084,9 +11080,9 @@ pub struct ReferenceBaseListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReferenceBaseListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReferenceBaseListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11230,7 +11226,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reference.
-    pub fn reference_id(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn reference_id(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._reference_id = new_value.to_string();
         self
     }
@@ -11238,7 +11234,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The start position (0-based) of this query. Defaults to 0.
-    pub fn start(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn start(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._start = Some(new_value.to_string());
         self
     }
@@ -11246,7 +11242,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11254,7 +11250,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Specifies the maximum number of bases to return in a single page.
-    pub fn page_size(mut self, new_value: i32) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ReferenceBaseListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -11262,7 +11258,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The end position (0-based, exclusive) of this query. Defaults to the length of this reference.
-    pub fn end(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn end(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, A> {
         self._end = Some(new_value.to_string());
         self
     }
@@ -11273,7 +11269,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceBaseListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceBaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11294,7 +11290,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReferenceBaseListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReferenceBaseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11311,7 +11307,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReferenceBaseListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReferenceBaseListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11357,19 +11353,19 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ReferenceSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferenceSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchReferencesRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReferenceSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReferenceSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11483,7 +11479,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11494,7 +11490,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11515,7 +11511,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReferenceSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReferenceSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11532,7 +11528,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReferenceSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReferenceSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11572,19 +11568,19 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReferenceGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReferenceGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _reference_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReferenceGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReferenceGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11716,7 +11712,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reference.
-    pub fn reference_id(mut self, new_value: &str) -> ReferenceGetCall<'a, C, NC, A> {
+    pub fn reference_id(mut self, new_value: &str) -> ReferenceGetCall<'a, C, A> {
         self._reference_id = new_value.to_string();
         self
     }
@@ -11727,7 +11723,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReferenceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11748,7 +11744,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReferenceGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReferenceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11765,7 +11761,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReferenceGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReferenceGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11803,19 +11799,19 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _annotation_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11947,7 +11943,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be retrieved.
-    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetGetCall<'a, C, NC, A> {
+    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetGetCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
@@ -11958,7 +11954,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11979,7 +11975,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11996,7 +11992,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12040,10 +12036,10 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: AnnotationSet,
     _annotation_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12051,9 +12047,9 @@ pub struct AnnotationSetUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12192,7 +12188,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12202,7 +12198,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be updated.
-    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetUpdateCall<'a, C, NC, A> {
+    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetUpdateCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
@@ -12213,7 +12209,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12234,7 +12230,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12251,7 +12247,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12295,19 +12291,19 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: AnnotationSet,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12421,7 +12417,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12432,7 +12428,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12453,7 +12449,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12470,7 +12466,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12514,19 +12510,19 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchAnnotationSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12640,7 +12636,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12651,7 +12647,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12672,7 +12668,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12689,7 +12685,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12733,10 +12729,10 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: AnnotationSet,
     _annotation_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12744,9 +12740,9 @@ pub struct AnnotationSetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12885,7 +12881,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AnnotationSet) -> AnnotationSetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12895,7 +12891,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be updated.
-    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetPatchCall<'a, C, NC, A> {
+    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetPatchCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
@@ -12906,7 +12902,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12927,7 +12923,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12944,7 +12940,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12982,19 +12978,19 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _annotation_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13115,7 +13111,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be deleted.
-    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetDeleteCall<'a, C, NC, A> {
+    pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetDeleteCall<'a, C, A> {
         self._annotation_set_id = new_value.to_string();
         self
     }
@@ -13126,7 +13122,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13147,7 +13143,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13164,7 +13160,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13210,19 +13206,19 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchVariantsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13336,7 +13332,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchVariantsRequest) -> VariantSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchVariantsRequest) -> VariantSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13347,7 +13343,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13368,7 +13364,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13385,7 +13381,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13423,19 +13419,19 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _variant_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13556,7 +13552,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant to be deleted.
-    pub fn variant_id(mut self, new_value: &str) -> VariantDeleteCall<'a, C, NC, A> {
+    pub fn variant_id(mut self, new_value: &str) -> VariantDeleteCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
@@ -13567,7 +13563,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13588,7 +13584,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13605,7 +13601,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13643,19 +13639,19 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _variant_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13787,7 +13783,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant.
-    pub fn variant_id(mut self, new_value: &str) -> VariantGetCall<'a, C, NC, A> {
+    pub fn variant_id(mut self, new_value: &str) -> VariantGetCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
@@ -13798,7 +13794,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13819,7 +13815,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13836,7 +13832,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13880,19 +13876,19 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Variant,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14006,7 +14002,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Variant) -> VariantCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Variant) -> VariantCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14017,7 +14013,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14038,7 +14034,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14055,7 +14051,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14099,10 +14095,10 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Variant,
     _variant_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14110,9 +14106,9 @@ pub struct VariantUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14251,7 +14247,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Variant) -> VariantUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Variant) -> VariantUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14261,7 +14257,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant to be updated.
-    pub fn variant_id(mut self, new_value: &str) -> VariantUpdateCall<'a, C, NC, A> {
+    pub fn variant_id(mut self, new_value: &str) -> VariantUpdateCall<'a, C, A> {
         self._variant_id = new_value.to_string();
         self
     }
@@ -14272,7 +14268,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14293,7 +14289,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14310,7 +14306,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14354,10 +14350,10 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Annotation,
     _annotation_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14365,9 +14361,9 @@ pub struct AnnotationPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14506,7 +14502,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Annotation) -> AnnotationPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Annotation) -> AnnotationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14516,7 +14512,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be updated.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -14527,7 +14523,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14548,7 +14544,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14565,7 +14561,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14609,10 +14605,10 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Annotation,
     _annotation_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14620,9 +14616,9 @@ pub struct AnnotationUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14761,7 +14757,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Annotation) -> AnnotationUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Annotation) -> AnnotationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14771,7 +14767,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be updated.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationUpdateCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationUpdateCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -14782,7 +14778,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14803,7 +14799,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14820,7 +14816,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14864,19 +14860,19 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchAnnotationsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14990,7 +14986,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15001,7 +14997,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15022,7 +15018,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15039,7 +15035,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15077,19 +15073,19 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _annotation_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15210,7 +15206,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be deleted.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationDeleteCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationDeleteCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -15221,7 +15217,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15242,7 +15238,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15259,7 +15255,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15297,19 +15293,19 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _annotation_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15441,7 +15437,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation set to be retrieved.
-    pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -15452,7 +15448,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15473,7 +15469,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15490,7 +15486,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15534,19 +15530,19 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: Annotation,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15660,7 +15656,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Annotation) -> AnnotationCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Annotation) -> AnnotationCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15671,7 +15667,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15692,7 +15688,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15709,7 +15705,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15756,19 +15752,19 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AnnotationBatchCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AnnotationBatchCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: BatchCreateAnnotationsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AnnotationBatchCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AnnotationBatchCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15882,7 +15878,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15893,7 +15889,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationBatchCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AnnotationBatchCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15914,7 +15910,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AnnotationBatchCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AnnotationBatchCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15931,7 +15927,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AnnotationBatchCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AnnotationBatchCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15975,19 +15971,19 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ExperimentalJobCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ExperimentalJobCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ExperimentalCreateJobRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ExperimentalJobCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ExperimentalJobCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ExperimentalJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16101,7 +16097,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16112,7 +16108,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ExperimentalJobCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ExperimentalJobCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16133,7 +16129,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ExperimentalJobCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ExperimentalJobCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16150,7 +16146,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ExperimentalJobCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ExperimentalJobCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16194,10 +16190,10 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: VariantSet,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -16205,9 +16201,9 @@ pub struct VariantsetUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16346,7 +16342,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &VariantSet) -> VariantsetUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &VariantSet) -> VariantsetUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16356,7 +16352,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant to be updated.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetUpdateCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetUpdateCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -16367,7 +16363,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16388,7 +16384,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16405,7 +16401,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16449,10 +16445,10 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetExportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetExportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ExportVariantSetRequest,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -16460,9 +16456,9 @@ pub struct VariantsetExportCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetExportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetExportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16601,7 +16597,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ExportVariantSetRequest) -> VariantsetExportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ExportVariantSetRequest) -> VariantsetExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16611,7 +16607,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetExportCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetExportCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -16622,7 +16618,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetExportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16643,7 +16639,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetExportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetExportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16660,7 +16656,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetExportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetExportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16704,10 +16700,10 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: VariantSet,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -16715,9 +16711,9 @@ pub struct VariantsetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16856,7 +16852,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &VariantSet) -> VariantsetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &VariantSet) -> VariantsetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16866,7 +16862,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant to be updated.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetPatchCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetPatchCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -16877,7 +16873,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16898,7 +16894,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16915,7 +16911,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16961,19 +16957,19 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: SearchVariantSetsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17087,7 +17083,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17098,7 +17094,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17119,7 +17115,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17136,7 +17132,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetSearchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetSearchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17174,19 +17170,19 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17318,7 +17314,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Required. The ID of the variant set.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetGetCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetGetCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -17329,7 +17325,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17350,7 +17346,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17367,7 +17363,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17413,10 +17409,10 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetMergeVariantCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetMergeVariantCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: MergeVariantsRequest,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -17424,9 +17420,9 @@ pub struct VariantsetMergeVariantCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetMergeVariantCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetMergeVariantCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetMergeVariantCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17554,7 +17550,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &MergeVariantsRequest) -> VariantsetMergeVariantCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &MergeVariantsRequest) -> VariantsetMergeVariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17564,7 +17560,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The destination variant set.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetMergeVariantCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetMergeVariantCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -17575,7 +17571,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetMergeVariantCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetMergeVariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17596,7 +17592,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetMergeVariantCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetMergeVariantCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17613,7 +17609,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetMergeVariantCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetMergeVariantCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17651,19 +17647,19 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17784,7 +17780,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the variant set to be deleted.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetDeleteCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetDeleteCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -17795,7 +17791,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17816,7 +17812,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17833,7 +17829,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17879,10 +17875,10 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VariantsetImportVariantCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VariantsetImportVariantCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Genomics<C, NC, A>,
+    hub: &'a Genomics<C, A>,
     _request: ImportVariantsRequest,
     _variant_set_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -17890,9 +17886,9 @@ pub struct VariantsetImportVariantCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VariantsetImportVariantCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VariantsetImportVariantCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VariantsetImportVariantCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18031,7 +18027,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ImportVariantsRequest) -> VariantsetImportVariantCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ImportVariantsRequest) -> VariantsetImportVariantCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -18041,7 +18037,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Required. The variant set to which variant data should be imported.
-    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetImportVariantCall<'a, C, NC, A> {
+    pub fn variant_set_id(mut self, new_value: &str) -> VariantsetImportVariantCall<'a, C, A> {
         self._variant_set_id = new_value.to_string();
         self
     }
@@ -18052,7 +18048,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetImportVariantCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VariantsetImportVariantCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18073,7 +18069,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VariantsetImportVariantCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VariantsetImportVariantCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18090,7 +18086,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VariantsetImportVariantCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VariantsetImportVariantCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

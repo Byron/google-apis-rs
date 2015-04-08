@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webmasters* crate version *0.1.4+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *webmasters* crate version *0.1.5+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *webmasters* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
@@ -194,7 +194,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -289,43 +288,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Webmasters<C, NC, A> {
+pub struct Webmasters<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Webmasters<C, NC, A> {}
+impl<'a, C, A> Hub for Webmasters<C, A> {}
 
-impl<'a, C, NC, A> Webmasters<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Webmasters<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Webmasters<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Webmasters<C, A> {
         Webmasters {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn sitemaps(&'a self) -> SitemapMethods<'a, C, NC, A> {
+    pub fn sitemaps(&'a self) -> SitemapMethods<'a, C, A> {
         SitemapMethods { hub: &self }
     }
-    pub fn sites(&'a self) -> SiteMethods<'a, C, NC, A> {
+    pub fn sites(&'a self) -> SiteMethods<'a, C, A> {
         SiteMethods { hub: &self }
     }
-    pub fn urlcrawlerrorscounts(&'a self) -> UrlcrawlerrorscountMethods<'a, C, NC, A> {
+    pub fn urlcrawlerrorscounts(&'a self) -> UrlcrawlerrorscountMethods<'a, C, A> {
         UrlcrawlerrorscountMethods { hub: &self }
     }
-    pub fn urlcrawlerrorssamples(&'a self) -> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
+    pub fn urlcrawlerrorssamples(&'a self) -> UrlcrawlerrorssampleMethods<'a, C, A> {
         UrlcrawlerrorssampleMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -605,15 +601,15 @@ impl ResponseResult for UrlCrawlErrorsSamplesListResponse {}
 /// let rb = hub.sitemaps();
 /// # }
 /// ```
-pub struct SitemapMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SitemapMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SitemapMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SitemapMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
+impl<'a, C, A> SitemapMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -623,7 +619,7 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     /// * `feedpath` - The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
-    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a, C, A> {
         SitemapDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -642,7 +638,7 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     /// * `feedpath` - The URL of the sitemap to add.
-    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a, C, NC, A> {
+    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a, C, A> {
         SitemapSubmitCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -661,7 +657,7 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     /// * `feedpath` - The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
-    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a, C, NC, A> {
+    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a, C, A> {
         SitemapGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -679,7 +675,7 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn list(&self, site_url: &str) -> SitemapListCall<'a, C, NC, A> {
+    pub fn list(&self, site_url: &str) -> SitemapListCall<'a, C, A> {
         SitemapListCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -721,15 +717,15 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SiteMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SiteMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SiteMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
+impl<'a, C, A> SiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -738,7 +734,7 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn get(&self, site_url: &str) -> SiteGetCall<'a, C, NC, A> {
+    pub fn get(&self, site_url: &str) -> SiteGetCall<'a, C, A> {
         SiteGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -755,7 +751,7 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URL of the site to add.
-    pub fn add(&self, site_url: &str) -> SiteAddCall<'a, C, NC, A> {
+    pub fn add(&self, site_url: &str) -> SiteAddCall<'a, C, A> {
         SiteAddCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -768,7 +764,7 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists your Webmaster Tools sites.
-    pub fn list(&self) -> SiteListCall<'a, C, NC, A> {
+    pub fn list(&self) -> SiteListCall<'a, C, A> {
         SiteListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -784,7 +780,7 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a, C, A> {
         SiteDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -825,15 +821,15 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
 /// let rb = hub.urlcrawlerrorscounts();
 /// # }
 /// ```
-pub struct UrlcrawlerrorscountMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorscountMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UrlcrawlerrorscountMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UrlcrawlerrorscountMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorscountMethods<'a, C, NC, A> {
+impl<'a, C, A> UrlcrawlerrorscountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -842,7 +838,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn query(&self, site_url: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn query(&self, site_url: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         UrlcrawlerrorscountQueryCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -886,15 +882,15 @@ impl<'a, C, NC, A> UrlcrawlerrorscountMethods<'a, C, NC, A> {
 /// let rb = hub.urlcrawlerrorssamples();
 /// # }
 /// ```
-pub struct UrlcrawlerrorssampleMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorssampleMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UrlcrawlerrorssampleMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UrlcrawlerrorssampleMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
+impl<'a, C, A> UrlcrawlerrorssampleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -906,7 +902,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     /// * `url` - The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     /// * `category` - The crawl error category, for example 'authPermissions'
     /// * `platform` - The user agent type (platform) that made the request, for example 'web'
-    pub fn get(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn get(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         UrlcrawlerrorssampleGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -928,7 +924,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     /// * `category` - The crawl error category, for example 'authPermissions'
     /// * `platform` - The user agent type (platform) that made the request, for example 'web'
-    pub fn list(&self, site_url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
+    pub fn list(&self, site_url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         UrlcrawlerrorssampleListCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -950,7 +946,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     /// * `url` - The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     /// * `category` - The crawl error category, for example 'authPermissions'
     /// * `platform` - The user agent type (platform) that made the request, for example 'web'
-    pub fn mark_as_fixed(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn mark_as_fixed(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         UrlcrawlerrorssampleMarkAsFixedCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -1002,10 +998,10 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct SitemapDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SitemapDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1013,9 +1009,9 @@ pub struct SitemapDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SitemapDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SitemapDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SitemapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1137,7 +1133,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1147,7 +1143,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
-    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, NC, A> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1158,7 +1154,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1179,7 +1175,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1196,7 +1192,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SitemapDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SitemapDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1234,10 +1230,10 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct SitemapSubmitCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SitemapSubmitCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1245,9 +1241,9 @@ pub struct SitemapSubmitCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SitemapSubmitCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SitemapSubmitCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SitemapSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1369,7 +1365,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1379,7 +1375,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The URL of the sitemap to add.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, NC, A> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1390,7 +1386,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapSubmitCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapSubmitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1411,7 +1407,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1428,7 +1424,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SitemapSubmitCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SitemapSubmitCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1466,10 +1462,10 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct SitemapGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SitemapGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1477,9 +1473,9 @@ pub struct SitemapGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SitemapGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SitemapGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SitemapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1612,7 +1608,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1622,7 +1618,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
-    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, C, NC, A> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, C, A> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1633,7 +1629,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1654,7 +1650,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1671,7 +1667,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SitemapGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SitemapGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1710,10 +1706,10 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct SitemapListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SitemapListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _sitemap_index: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1721,9 +1717,9 @@ pub struct SitemapListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SitemapListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SitemapListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SitemapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1858,7 +1854,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1866,7 +1862,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// A URL of a site's sitemap index.
-    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, C, NC, A> {
+    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, C, A> {
         self._sitemap_index = Some(new_value.to_string());
         self
     }
@@ -1877,7 +1873,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SitemapListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1898,7 +1894,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1915,7 +1911,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SitemapListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SitemapListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1953,19 +1949,19 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct SiteGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SiteGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SiteGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SiteGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2097,7 +2093,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2108,7 +2104,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2129,7 +2125,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2146,7 +2142,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SiteGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SiteGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2184,19 +2180,19 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct SiteAddCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SiteAddCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SiteAddCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SiteAddCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SiteAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2317,7 +2313,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The URL of the site to add.
-    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2328,7 +2324,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteAddCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteAddCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2349,7 +2345,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2366,7 +2362,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SiteAddCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SiteAddCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2404,18 +2400,18 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct SiteListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SiteListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SiteListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SiteListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2523,7 +2519,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2544,7 +2540,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2561,7 +2557,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SiteListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SiteListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2599,19 +2595,19 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct SiteDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SiteDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SiteDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SiteDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SiteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2732,7 +2728,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2743,7 +2739,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SiteDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2764,7 +2760,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2781,7 +2777,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SiteDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SiteDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2822,10 +2818,10 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlcrawlerrorscountQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorscountQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _platform: Option<String>,
     _latest_counts_only: Option<bool>,
@@ -2835,9 +2831,9 @@ pub struct UrlcrawlerrorscountQueryCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlcrawlerrorscountQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlcrawlerrorscountQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlcrawlerrorscountQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2978,7 +2974,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2986,7 +2982,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The user agent type (platform) that made the request, for example 'web'. If not specified, we return results for all platforms.
-    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._platform = Some(new_value.to_string());
         self
     }
@@ -2994,7 +2990,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// If true, returns only the latest crawl error counts.
-    pub fn latest_counts_only(mut self, new_value: bool) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn latest_counts_only(mut self, new_value: bool) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._latest_counts_only = Some(new_value);
         self
     }
@@ -3002,7 +2998,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The crawl error category, for example 'serverError'. If not specified, we return results for all categories.
-    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._category = Some(new_value.to_string());
         self
     }
@@ -3013,7 +3009,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorscountQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3034,7 +3030,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorscountQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3051,7 +3047,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorscountQueryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3089,10 +3085,10 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlcrawlerrorssampleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorssampleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _url: String,
     _category: String,
@@ -3102,9 +3098,9 @@ pub struct UrlcrawlerrorssampleGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlcrawlerrorssampleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlcrawlerrorssampleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlcrawlerrorssampleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3239,7 +3235,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -3249,7 +3245,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
-    pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
@@ -3259,7 +3255,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The crawl error category, for example 'authPermissions'
-    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
@@ -3269,7 +3265,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The user agent type (platform) that made the request, for example 'web'
-    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
@@ -3280,7 +3276,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3301,7 +3297,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3318,7 +3314,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3356,10 +3352,10 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlcrawlerrorssampleListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorssampleListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _category: String,
     _platform: String,
@@ -3368,9 +3364,9 @@ pub struct UrlcrawlerrorssampleListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlcrawlerrorssampleListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlcrawlerrorssampleListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlcrawlerrorssampleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3504,7 +3500,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -3514,7 +3510,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The crawl error category, for example 'authPermissions'
-    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
+    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
@@ -3524,7 +3520,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The user agent type (platform) that made the request, for example 'web'
-    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
+    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
@@ -3535,7 +3531,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3556,7 +3552,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3573,7 +3569,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3611,10 +3607,10 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Webmasters<C, NC, A>,
+    hub: &'a Webmasters<C, A>,
     _site_url: String,
     _url: String,
     _category: String,
@@ -3624,9 +3620,9 @@ pub struct UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3750,7 +3746,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The site's URL, including protocol, for example 'http://www.example.com/'
-    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._site_url = new_value.to_string();
         self
     }
@@ -3760,7 +3756,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
-    pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
@@ -3770,7 +3766,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The crawl error category, for example 'authPermissions'
-    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._category = new_value.to_string();
         self
     }
@@ -3780,7 +3776,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The user agent type (platform) that made the request, for example 'web'
-    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._platform = new_value.to_string();
         self
     }
@@ -3791,7 +3787,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3812,7 +3808,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3829,7 +3825,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

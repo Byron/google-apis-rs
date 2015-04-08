@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *0.1.4+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Games Configuration* crate version *0.1.5+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -203,7 +203,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -296,40 +295,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GamesConfiguration<C, NC, A> {
+pub struct GamesConfiguration<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for GamesConfiguration<C, NC, A> {}
+impl<'a, C, A> Hub for GamesConfiguration<C, A> {}
 
-impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GamesConfiguration<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> GamesConfiguration<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> GamesConfiguration<C, A> {
         GamesConfiguration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn achievement_configurations(&'a self) -> AchievementConfigurationMethods<'a, C, NC, A> {
+    pub fn achievement_configurations(&'a self) -> AchievementConfigurationMethods<'a, C, A> {
         AchievementConfigurationMethods { hub: &self }
     }
-    pub fn image_configurations(&'a self) -> ImageConfigurationMethods<'a, C, NC, A> {
+    pub fn image_configurations(&'a self) -> ImageConfigurationMethods<'a, C, A> {
         ImageConfigurationMethods { hub: &self }
     }
-    pub fn leaderboard_configurations(&'a self) -> LeaderboardConfigurationMethods<'a, C, NC, A> {
+    pub fn leaderboard_configurations(&'a self) -> LeaderboardConfigurationMethods<'a, C, A> {
         LeaderboardConfigurationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -674,15 +670,15 @@ impl Part for LeaderboardConfigurationDetail {}
 /// let rb = hub.image_configurations();
 /// # }
 /// ```
-pub struct ImageConfigurationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ImageConfigurationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ImageConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ImageConfigurationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ImageConfigurationMethods<'a, C, NC, A> {
+impl<'a, C, A> ImageConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -692,7 +688,7 @@ impl<'a, C, NC, A> ImageConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `resourceId` - The ID of the resource used by this method.
     /// * `imageType` - Selects which image in a resource for this method.
-    pub fn upload(&self, resource_id: &str, image_type: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
+    pub fn upload(&self, resource_id: &str, image_type: &str) -> ImageConfigurationUploadCall<'a, C, A> {
         ImageConfigurationUploadCall {
             hub: self.hub,
             _resource_id: resource_id.to_string(),
@@ -734,15 +730,15 @@ impl<'a, C, NC, A> ImageConfigurationMethods<'a, C, NC, A> {
 /// let rb = hub.achievement_configurations();
 /// # }
 /// ```
-pub struct AchievementConfigurationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AchievementConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AchievementConfigurationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
+impl<'a, C, A> AchievementConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -751,7 +747,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list(&self, application_id: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
+    pub fn list(&self, application_id: &str) -> AchievementConfigurationListCall<'a, C, A> {
         AchievementConfigurationListCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -771,7 +767,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn update(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationUpdateCall<'a, C, A> {
         AchievementConfigurationUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -790,7 +786,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn insert(&self, request: &AchievementConfiguration, application_id: &str) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &AchievementConfiguration, application_id: &str) -> AchievementConfigurationInsertCall<'a, C, A> {
         AchievementConfigurationInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -808,7 +804,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn get(&self, achievement_id: &str) -> AchievementConfigurationGetCall<'a, C, NC, A> {
+    pub fn get(&self, achievement_id: &str) -> AchievementConfigurationGetCall<'a, C, A> {
         AchievementConfigurationGetCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -826,7 +822,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn patch(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationPatchCall<'a, C, A> {
         AchievementConfigurationPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -844,7 +840,7 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn delete(&self, achievement_id: &str) -> AchievementConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, achievement_id: &str) -> AchievementConfigurationDeleteCall<'a, C, A> {
         AchievementConfigurationDeleteCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -885,15 +881,15 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
 /// let rb = hub.leaderboard_configurations();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LeaderboardConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LeaderboardConfigurationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
+impl<'a, C, A> LeaderboardConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -903,7 +899,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn insert(&self, request: &LeaderboardConfiguration, application_id: &str) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &LeaderboardConfiguration, application_id: &str) -> LeaderboardConfigurationInsertCall<'a, C, A> {
         LeaderboardConfigurationInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -921,7 +917,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, C, NC, A> {
+    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
         LeaderboardConfigurationGetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -939,7 +935,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn patch(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationPatchCall<'a, C, A> {
         LeaderboardConfigurationPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -958,7 +954,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn update(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
         LeaderboardConfigurationUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -976,7 +972,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list(&self, application_id: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
+    pub fn list(&self, application_id: &str) -> LeaderboardConfigurationListCall<'a, C, A> {
         LeaderboardConfigurationListCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -995,7 +991,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         LeaderboardConfigurationDeleteCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -1045,10 +1041,10 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ImageConfigurationUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ImageConfigurationUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _resource_id: String,
     _image_type: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1056,9 +1052,9 @@ pub struct ImageConfigurationUploadCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ImageConfigurationUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ImageConfigurationUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1300,7 +1296,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the resource used by this method.
-    pub fn resource_id(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
+    pub fn resource_id(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, A> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -1310,7 +1306,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Selects which image in a resource for this method.
-    pub fn image_type(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
+    pub fn image_type(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
@@ -1321,7 +1317,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ImageConfigurationUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ImageConfigurationUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1342,7 +1338,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ImageConfigurationUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ImageConfigurationUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1359,7 +1355,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ImageConfigurationUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ImageConfigurationUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1399,10 +1395,10 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -1411,9 +1407,9 @@ pub struct AchievementConfigurationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1551,7 +1547,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -1559,7 +1555,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The token returned by the previous request.
-    pub fn page_token(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1567,7 +1563,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
-    pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1578,7 +1574,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1599,7 +1595,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1616,7 +1612,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1660,10 +1656,10 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1671,9 +1667,9 @@ pub struct AchievementConfigurationUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1812,7 +1808,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1822,7 +1818,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationUpdateCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1833,7 +1829,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1854,7 +1850,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1871,7 +1867,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1915,10 +1911,10 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _application_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1926,9 +1922,9 @@ pub struct AchievementConfigurationInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2067,7 +2063,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2077,7 +2073,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationInsertCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -2088,7 +2084,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2109,7 +2105,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2126,7 +2122,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2164,19 +2160,19 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2308,7 +2304,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationGetCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationGetCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -2319,7 +2315,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2340,7 +2336,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2357,7 +2353,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2401,10 +2397,10 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: AchievementConfiguration,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2412,9 +2408,9 @@ pub struct AchievementConfigurationPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2553,7 +2549,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AchievementConfiguration) -> AchievementConfigurationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2563,7 +2559,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationPatchCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -2574,7 +2570,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2595,7 +2591,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2612,7 +2608,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2650,19 +2646,19 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementConfigurationDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementConfigurationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementConfigurationDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementConfigurationDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2783,7 +2779,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationDeleteCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -2794,7 +2790,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementConfigurationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2815,7 +2811,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2832,7 +2828,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementConfigurationDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2876,10 +2872,10 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _application_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2887,9 +2883,9 @@ pub struct LeaderboardConfigurationInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3028,7 +3024,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3038,7 +3034,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationInsertCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -3049,7 +3045,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3070,7 +3066,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3087,7 +3083,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3125,19 +3121,19 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3269,7 +3265,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3280,7 +3276,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3301,7 +3297,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3318,7 +3314,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3362,10 +3358,10 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3373,9 +3369,9 @@ pub struct LeaderboardConfigurationPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3514,7 +3510,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3524,7 +3520,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationPatchCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3535,7 +3531,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3556,7 +3552,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3573,7 +3569,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3617,10 +3613,10 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _request: LeaderboardConfiguration,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3628,9 +3624,9 @@ pub struct LeaderboardConfigurationUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3769,7 +3765,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LeaderboardConfiguration) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3779,7 +3775,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3790,7 +3786,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3811,7 +3807,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3828,7 +3824,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3868,10 +3864,10 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -3880,9 +3876,9 @@ pub struct LeaderboardConfigurationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4020,7 +4016,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -4028,7 +4024,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The token returned by the previous request.
-    pub fn page_token(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4036,7 +4032,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
-    pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4047,7 +4043,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4068,7 +4064,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4085,7 +4081,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4123,19 +4119,19 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LeaderboardConfigurationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesConfiguration<C, NC, A>,
+    hub: &'a GamesConfiguration<C, A>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LeaderboardConfigurationDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4256,7 +4252,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -4267,7 +4263,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4288,7 +4284,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4305,7 +4301,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *spectrum* crate version *0.1.4+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *spectrum* crate version *0.1.5+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *spectrum* *v1_explorer* API can be found at the
 //! [official documentation site](http://developers.google.com/spectrum).
@@ -194,7 +194,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -269,34 +268,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Spectrum<C, NC, A> {
+pub struct Spectrum<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Spectrum<C, NC, A> {}
+impl<'a, C, A> Hub for Spectrum<C, A> {}
 
-impl<'a, C, NC, A> Spectrum<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Spectrum<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Spectrum<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Spectrum<C, A> {
         Spectrum {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn paws(&'a self) -> PawMethods<'a, C, NC, A> {
+    pub fn paws(&'a self) -> PawMethods<'a, C, A> {
         PawMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1183,15 +1179,15 @@ impl RequestValue for PawsGetSpectrumRequest {}
 /// let rb = hub.paws();
 /// # }
 /// ```
-pub struct PawMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PawMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PawMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
+impl<'a, C, A> PawMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1200,7 +1196,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn notify_spectrum_use(&self, request: &PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, C, NC, A> {
+    pub fn notify_spectrum_use(&self, request: &PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, C, A> {
         PawNotifySpectrumUseCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1216,7 +1212,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn register(&self, request: &PawsRegisterRequest) -> PawRegisterCall<'a, C, NC, A> {
+    pub fn register(&self, request: &PawsRegisterRequest) -> PawRegisterCall<'a, C, A> {
         PawRegisterCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1232,7 +1228,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_spectrum(&self, request: &PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, C, NC, A> {
+    pub fn get_spectrum(&self, request: &PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, C, A> {
         PawGetSpectrumCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1248,7 +1244,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn init(&self, request: &PawsInitRequest) -> PawInitCall<'a, C, NC, A> {
+    pub fn init(&self, request: &PawsInitRequest) -> PawInitCall<'a, C, A> {
         PawInitCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1264,7 +1260,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_spectrum_batch(&self, request: &PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, C, NC, A> {
+    pub fn get_spectrum_batch(&self, request: &PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, C, A> {
         PawGetSpectrumBatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1280,7 +1276,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_device(&self, request: &PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, C, NC, A> {
+    pub fn verify_device(&self, request: &PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, C, A> {
         PawVerifyDeviceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1334,18 +1330,18 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct PawNotifySpectrumUseCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawNotifySpectrumUseCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsNotifySpectrumUseRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawNotifySpectrumUseCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawNotifySpectrumUseCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawNotifySpectrumUseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1457,7 +1453,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1468,7 +1464,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawNotifySpectrumUseCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawNotifySpectrumUseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1489,7 +1485,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawNotifySpectrumUseCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawNotifySpectrumUseCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1534,18 +1530,18 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct PawRegisterCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawRegisterCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsRegisterRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawRegisterCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawRegisterCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawRegisterCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1657,7 +1653,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsRegisterRequest) -> PawRegisterCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsRegisterRequest) -> PawRegisterCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1668,7 +1664,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawRegisterCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawRegisterCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1689,7 +1685,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawRegisterCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawRegisterCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1734,18 +1730,18 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct PawGetSpectrumCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawGetSpectrumCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsGetSpectrumRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawGetSpectrumCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawGetSpectrumCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawGetSpectrumCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1857,7 +1853,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1868,7 +1864,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawGetSpectrumCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawGetSpectrumCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1889,7 +1885,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1934,18 +1930,18 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct PawInitCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawInitCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsInitRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawInitCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawInitCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawInitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2057,7 +2053,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsInitRequest) -> PawInitCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsInitRequest) -> PawInitCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2068,7 +2064,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawInitCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawInitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2089,7 +2085,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawInitCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawInitCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2134,18 +2130,18 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct PawGetSpectrumBatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawGetSpectrumBatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsGetSpectrumBatchRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawGetSpectrumBatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawGetSpectrumBatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawGetSpectrumBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2257,7 +2253,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2268,7 +2264,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawGetSpectrumBatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawGetSpectrumBatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2289,7 +2285,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumBatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumBatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2334,18 +2330,18 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct PawVerifyDeviceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PawVerifyDeviceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Spectrum<C, NC, A>,
+    hub: &'a Spectrum<C, A>,
     _request: PawsVerifyDeviceRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PawVerifyDeviceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PawVerifyDeviceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PawVerifyDeviceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2457,7 +2453,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2468,7 +2464,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawVerifyDeviceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PawVerifyDeviceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2489,7 +2485,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PawVerifyDeviceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PawVerifyDeviceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

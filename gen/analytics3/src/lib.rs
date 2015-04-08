@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *0.1.4+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *analytics* crate version *0.1.5+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -209,7 +209,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -326,43 +325,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Analytics<C, NC, A> {
+pub struct Analytics<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Analytics<C, NC, A> {}
+impl<'a, C, A> Hub for Analytics<C, A> {}
 
-impl<'a, C, NC, A> Analytics<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Analytics<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Analytics<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Analytics<C, A> {
         Analytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn data(&'a self) -> DataMethods<'a, C, NC, A> {
+    pub fn data(&'a self) -> DataMethods<'a, C, A> {
         DataMethods { hub: &self }
     }
-    pub fn management(&'a self) -> ManagementMethods<'a, C, NC, A> {
+    pub fn management(&'a self) -> ManagementMethods<'a, C, A> {
         ManagementMethods { hub: &self }
     }
-    pub fn metadata(&'a self) -> MetadataMethods<'a, C, NC, A> {
+    pub fn metadata(&'a self) -> MetadataMethods<'a, C, A> {
         MetadataMethods { hub: &self }
     }
-    pub fn provisioning(&'a self) -> ProvisioningMethods<'a, C, NC, A> {
+    pub fn provisioning(&'a self) -> ProvisioningMethods<'a, C, A> {
         ProvisioningMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3265,15 +3261,15 @@ impl Part for ProfileChildLink {}
 /// let rb = hub.management();
 /// # }
 /// ```
-pub struct ManagementMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ManagementMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ManagementMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
+impl<'a, C, A> ManagementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3283,7 +3279,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to create the web property for.
-    pub fn webproperties_insert(&self, request: &Webproperty, account_id: &str) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
+    pub fn webproperties_insert(&self, request: &Webproperty, account_id: &str) -> ManagementWebpropertyInsertCall<'a, C, A> {
         ManagementWebpropertyInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3303,7 +3299,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to retrieve the goal for.
     /// * `webPropertyId` - Web property ID to retrieve the goal for.
     /// * `profileId` - View (Profile) ID to retrieve the goal for.
-    pub fn profiles_get(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
+    pub fn profiles_get(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileGetCall<'a, C, A> {
         ManagementProfileGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3318,7 +3314,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all accounts to which the user has access.
-    pub fn accounts_list(&self) -> ManagementAccountListCall<'a, C, NC, A> {
+    pub fn accounts_list(&self) -> ManagementAccountListCall<'a, C, A> {
         ManagementAccountListCall {
             hub: self.hub,
             _start_index: Default::default(),
@@ -3340,7 +3336,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property Id to which profile filter link belongs
     /// * `profileId` - Profile ID to which filter link belongs
     /// * `linkId` - ID of the profile filter link to be updated.
-    pub fn profile_filter_links_patch(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn profile_filter_links_patch(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         ManagementProfileFilterLinkPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3363,7 +3359,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to delete the user link for.
     /// * `webPropertyId` - Web Property ID to delete the user link for.
     /// * `linkId` - Link ID to delete the user link for.
-    pub fn webproperty_user_links_delete(&self, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn webproperty_user_links_delete(&self, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         ManagementWebpropertyUserLinkDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3385,7 +3381,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web Property ID to delete the user link for.
     /// * `profileId` - View (Profile) ID to delete the user link for.
     /// * `linkId` - Link ID to delete the user link for.
-    pub fn profile_user_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn profile_user_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         ManagementProfileUserLinkDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3409,7 +3405,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web Property ID to update the user link for.
     /// * `profileId` - View (Profile ID) to update the user link for.
     /// * `linkId` - Link ID to update the user link for.
-    pub fn profile_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn profile_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         ManagementProfileUserLinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3431,7 +3427,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to create filter for.
-    pub fn filters_insert(&self, request: &Filter, account_id: &str) -> ManagementFilterInsertCall<'a, C, NC, A> {
+    pub fn filters_insert(&self, request: &Filter, account_id: &str) -> ManagementFilterInsertCall<'a, C, A> {
         ManagementFilterInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3451,7 +3447,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to update the account-user link for.
     /// * `linkId` - Link ID to update the account-user link for.
-    pub fn account_user_links_update(&self, request: &EntityUserLink, account_id: &str, link_id: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_user_links_update(&self, request: &EntityUserLink, account_id: &str, link_id: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         ManagementAccountUserLinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3472,7 +3468,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to which the web property belongs
     /// * `webPropertyId` - Web property ID
-    pub fn webproperties_update(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
+    pub fn webproperties_update(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         ManagementWebpropertyUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3494,7 +3490,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to update the account-user link for.
     /// * `webPropertyId` - Web property ID to update the account-user link for.
     /// * `linkId` - Link ID to update the account-user link for.
-    pub fn webproperty_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn webproperty_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         ManagementWebpropertyUserLinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3517,7 +3513,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to create the unsampled report for.
     /// * `webPropertyId` - Web property ID to create the unsampled report for.
     /// * `profileId` - View (Profile) ID to create the unsampled report for.
-    pub fn unsampled_reports_insert(&self, request: &UnsampledReport, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn unsampled_reports_insert(&self, request: &UnsampledReport, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         ManagementUnsampledReportInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3539,7 +3535,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom metric to retrieve.
     /// * `webPropertyId` - Web property ID for the custom metric to retrieve.
     /// * `customMetricId` - The ID of the custom metric to retrieve.
-    pub fn custom_metrics_get(&self, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
+    pub fn custom_metrics_get(&self, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         ManagementCustomMetricGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3561,7 +3557,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property Id for the upload to retrieve.
     /// * `customDataSourceId` - Custom data source Id for upload to retrieve.
     /// * `uploadId` - Upload Id to retrieve.
-    pub fn uploads_get(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str, upload_id: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn uploads_get(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str, upload_id: &str) -> ManagementUploadGetCall<'a, C, A> {
         ManagementUploadGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3583,7 +3579,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - ID of the account which the given web property belongs to.
     /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
     /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
-    pub fn web_property_ad_words_links_get(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_get(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3603,7 +3599,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID which the given web property belongs to.
     /// * `webPropertyId` - Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
-    pub fn webproperty_user_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn webproperty_user_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         ManagementWebpropertyUserLinkListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3627,7 +3623,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property Id to which profile filter link belongs
     /// * `profileId` - Profile ID to which filter link belongs
     /// * `linkId` - ID of the profile filter link to be updated.
-    pub fn profile_filter_links_update(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn profile_filter_links_update(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         ManagementProfileFilterLinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3651,7 +3647,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to retrieve the experiment for.
     /// * `profileId` - View (Profile) ID to retrieve the experiment for.
     /// * `experimentId` - Experiment ID to retrieve the experiment for.
-    pub fn experiments_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn experiments_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentGetCall<'a, C, A> {
         ManagementExperimentGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3674,7 +3670,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom dimension to update.
     /// * `webPropertyId` - Web property ID for the custom dimension to update.
     /// * `customDimensionId` - Custom dimension ID for the custom dimension to update.
-    pub fn custom_dimensions_update(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn custom_dimensions_update(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         ManagementCustomDimensionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3698,7 +3694,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to retrieve unsampled reports for.
     /// * `profileId` - View (Profile) ID to retrieve unsampled report for.
     /// * `unsampledReportId` - ID of the unsampled report to retrieve.
-    pub fn unsampled_reports_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, unsampled_report_id: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn unsampled_reports_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, unsampled_report_id: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         ManagementUnsampledReportGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3721,7 +3717,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to create profile filter link for.
     /// * `webPropertyId` - Web property Id to create profile filter link for.
     /// * `profileId` - Profile ID to create filter link for.
-    pub fn profile_filter_links_insert(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn profile_filter_links_insert(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         ManagementProfileFilterLinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3743,7 +3739,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to which the filter belongs.
     /// * `filterId` - ID of the filter to be updated.
-    pub fn filters_update(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
+    pub fn filters_update(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterUpdateCall<'a, C, A> {
         ManagementFilterUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3765,7 +3761,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property Id to which the profile filter link belongs.
     /// * `profileId` - Profile ID to which the filter link belongs.
     /// * `linkId` - ID of the profile filter link to delete.
-    pub fn profile_filter_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn profile_filter_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         ManagementProfileFilterLinkDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3781,7 +3777,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists segments to which the user has access.
-    pub fn segments_list(&self) -> ManagementSegmentListCall<'a, C, NC, A> {
+    pub fn segments_list(&self) -> ManagementSegmentListCall<'a, C, A> {
         ManagementSegmentListCall {
             hub: self.hub,
             _start_index: Default::default(),
@@ -3801,7 +3797,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to delete the view (profile) for.
     /// * `webPropertyId` - Web property ID to delete the view (profile) for.
     /// * `profileId` - ID of the view (profile) to be deleted.
-    pub fn profiles_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
+    pub fn profiles_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         ManagementProfileDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3824,7 +3820,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to update the goal.
     /// * `profileId` - View (Profile) ID to update the goal.
     /// * `goalId` - Index of the goal to be updated.
-    pub fn goals_patch(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn goals_patch(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalPatchCall<'a, C, A> {
         ManagementGoalPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3848,7 +3844,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom dimension to update.
     /// * `webPropertyId` - Web property ID for the custom dimension to update.
     /// * `customDimensionId` - Custom dimension ID for the custom dimension to update.
-    pub fn custom_dimensions_patch(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn custom_dimensions_patch(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         ManagementCustomDimensionPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3873,7 +3869,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID of the experiment to update.
     /// * `profileId` - View (Profile) ID of the experiment to update.
     /// * `experimentId` - Experiment ID of the experiment to update.
-    pub fn experiments_patch(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn experiments_patch(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         ManagementExperimentPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3896,7 +3892,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to retrieve experiments for.
     /// * `webPropertyId` - Web property ID to retrieve experiments for.
     /// * `profileId` - View (Profile) ID to retrieve experiments for.
-    pub fn experiments_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn experiments_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentListCall<'a, C, A> {
         ManagementExperimentListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3918,7 +3914,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
     /// * `webPropertyId` - Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
-    pub fn profiles_list(&self, account_id: &str, web_property_id: &str) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn profiles_list(&self, account_id: &str, web_property_id: &str) -> ManagementProfileListCall<'a, C, A> {
         ManagementProfileListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3940,7 +3936,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     /// * `webPropertyId` - Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     /// * `profileId` - View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
-    pub fn goals_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn goals_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalListCall<'a, C, A> {
         ManagementGoalListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3964,7 +3960,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to create the goal for.
     /// * `webPropertyId` - Web property ID to create the goal for.
     /// * `profileId` - View (Profile) ID to create the goal for.
-    pub fn goals_insert(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn goals_insert(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalInsertCall<'a, C, A> {
         ManagementGoalInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3987,7 +3983,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom metric to update.
     /// * `webPropertyId` - Web property ID for the custom metric to update.
     /// * `customMetricId` - Custom metric ID for the custom metric to update.
-    pub fn custom_metrics_patch(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn custom_metrics_patch(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         ManagementCustomMetricPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4010,7 +4006,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account Id associated with the upload.
     /// * `webPropertyId` - Web property UA-string associated with the upload.
     /// * `customDataSourceId` - Custom data source Id to which the data being uploaded belongs.
-    pub fn uploads_upload_data(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
+    pub fn uploads_upload_data(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         ManagementUploadUploadDataCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4030,7 +4026,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to create the user link for.
-    pub fn account_user_links_insert(&self, request: &EntityUserLink, account_id: &str) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
+    pub fn account_user_links_insert(&self, request: &EntityUserLink, account_id: &str) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         ManagementAccountUserLinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4050,7 +4046,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to create the user link for.
     /// * `webPropertyId` - Web Property ID to create the user link for.
-    pub fn webproperty_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
+    pub fn webproperty_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         ManagementWebpropertyUserLinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4072,7 +4068,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to which the experiment belongs
     /// * `profileId` - View (Profile) ID to which the experiment belongs
     /// * `experimentId` - ID of the experiment to delete
-    pub fn experiments_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn experiments_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         ManagementExperimentDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4095,7 +4091,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to which the view (profile) belongs
     /// * `webPropertyId` - Web property ID to which the view (profile) belongs
     /// * `profileId` - ID of the view (profile) to be updated.
-    pub fn profiles_patch(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn profiles_patch(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfilePatchCall<'a, C, A> {
         ManagementProfilePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4116,7 +4112,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID to retrieve filters for.
     /// * `filterId` - Filter ID to retrieve filters for.
-    pub fn filters_get(&self, account_id: &str, filter_id: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
+    pub fn filters_get(&self, account_id: &str, filter_id: &str) -> ManagementFilterGetCall<'a, C, A> {
         ManagementFilterGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4135,7 +4131,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - ID of the account which the given web property belongs to.
     /// * `webPropertyId` - Web property ID to retrieve the AdWords links for.
-    pub fn web_property_ad_words_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4151,7 +4147,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access.
-    pub fn account_summaries_list(&self) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
+    pub fn account_summaries_list(&self) -> ManagementAccountSummaryListCall<'a, C, A> {
         ManagementAccountSummaryListCall {
             hub: self.hub,
             _start_index: Default::default(),
@@ -4170,7 +4166,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID for the custom dimensions to retrieve.
     /// * `webPropertyId` - Web property ID for the custom dimensions to retrieve.
-    pub fn custom_dimensions_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn custom_dimensions_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionListCall<'a, C, A> {
         ManagementCustomDimensionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4192,7 +4188,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account Id for the uploads to retrieve.
     /// * `webPropertyId` - Web property Id for the uploads to retrieve.
     /// * `customDataSourceId` - Custom data source Id for uploads to retrieve.
-    pub fn uploads_list(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn uploads_list(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadListCall<'a, C, A> {
         ManagementUploadListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4215,7 +4211,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID which the given view (profile) belongs to.
     /// * `webPropertyId` - Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     /// * `profileId` - View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
-    pub fn profile_user_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn profile_user_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         ManagementProfileUserLinkListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4236,7 +4232,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID to retrieve the user links for.
-    pub fn account_user_links_list(&self, account_id: &str) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
+    pub fn account_user_links_list(&self, account_id: &str) -> ManagementAccountUserLinkListCall<'a, C, A> {
         ManagementAccountUserLinkListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4258,7 +4254,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom metric to update.
     /// * `webPropertyId` - Web property ID for the custom metric to update.
     /// * `customMetricId` - Custom metric ID for the custom metric to update.
-    pub fn custom_metrics_update(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn custom_metrics_update(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         ManagementCustomMetricUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4282,7 +4278,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account Id for the uploads to be deleted.
     /// * `webPropertyId` - Web property Id for the uploads to be deleted.
     /// * `customDataSourceId` - Custom data source Id for the uploads to be deleted.
-    pub fn uploads_delete_upload_data(&self, request: &AnalyticsDataimportDeleteUploadDataRequest, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn uploads_delete_upload_data(&self, request: &AnalyticsDataimportDeleteUploadDataRequest, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         ManagementUploadDeleteUploadDataCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4306,7 +4302,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID of the experiment to update.
     /// * `profileId` - View (Profile) ID of the experiment to update.
     /// * `experimentId` - Experiment ID of the experiment to update.
-    pub fn experiments_update(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn experiments_update(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         ManagementExperimentUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4331,7 +4327,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to update the goal.
     /// * `profileId` - View (Profile) ID to update the goal.
     /// * `goalId` - Index of the goal to be updated.
-    pub fn goals_update(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn goals_update(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         ManagementGoalUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4353,7 +4349,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account Id for the custom data sources to retrieve.
     /// * `webPropertyId` - Web property Id for the custom data sources to retrieve.
-    pub fn custom_data_sources_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn custom_data_sources_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDataSourceListCall<'a, C, A> {
         ManagementCustomDataSourceListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4374,7 +4370,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID for the custom metrics to retrieve.
     /// * `webPropertyId` - Web property ID for the custom metrics to retrieve.
-    pub fn custom_metrics_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn custom_metrics_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomMetricListCall<'a, C, A> {
         ManagementCustomMetricListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4396,7 +4392,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
     /// * `webPropertyId` - Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
     /// * `profileId` - View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
-    pub fn unsampled_reports_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn unsampled_reports_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         ManagementUnsampledReportListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4418,7 +4414,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID to retrieve the web property for.
     /// * `webPropertyId` - ID to retrieve the web property for.
-    pub fn webproperties_get(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
+    pub fn webproperties_get(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyGetCall<'a, C, A> {
         ManagementWebpropertyGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4439,7 +4435,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to create the experiment for.
     /// * `webPropertyId` - Web property ID to create the experiment for.
     /// * `profileId` - View (Profile) ID to create the experiment for.
-    pub fn experiments_insert(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn experiments_insert(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         ManagementExperimentInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4461,7 +4457,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID for the custom dimension to retrieve.
     /// * `webPropertyId` - Web property ID for the custom dimension to retrieve.
     /// * `customDimensionId` - The ID of the custom dimension to retrieve.
-    pub fn custom_dimensions_get(&self, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
+    pub fn custom_dimensions_get(&self, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         ManagementCustomDimensionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4482,7 +4478,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to retrieve profile filter links for.
     /// * `webPropertyId` - Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     /// * `profileId` - Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
-    pub fn profile_filter_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn profile_filter_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         ManagementProfileFilterLinkListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4505,7 +4501,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to which the web property belongs
     /// * `webPropertyId` - Web property ID
-    pub fn webproperties_patch(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
+    pub fn webproperties_patch(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyPatchCall<'a, C, A> {
         ManagementWebpropertyPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4526,7 +4522,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID for the custom dimension to create.
     /// * `webPropertyId` - Web property ID for the custom dimension to create.
-    pub fn custom_dimensions_insert(&self, request: &CustomDimension, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
+    pub fn custom_dimensions_insert(&self, request: &CustomDimension, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         ManagementCustomDimensionInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4547,7 +4543,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID for the custom metric to create.
     /// * `webPropertyId` - Web property ID for the custom dimension to create.
-    pub fn custom_metrics_insert(&self, request: &CustomMetric, account_id: &str, web_property_id: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
+    pub fn custom_metrics_insert(&self, request: &CustomMetric, account_id: &str, web_property_id: &str) -> ManagementCustomMetricInsertCall<'a, C, A> {
         ManagementCustomMetricInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4569,7 +4565,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to create the user link for.
     /// * `webPropertyId` - Web Property ID to create the user link for.
     /// * `profileId` - View (Profile) ID to create the user link for.
-    pub fn profile_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn profile_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         ManagementProfileUserLinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4589,7 +4585,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
-    pub fn webproperties_list(&self, account_id: &str) -> ManagementWebpropertyListCall<'a, C, NC, A> {
+    pub fn webproperties_list(&self, account_id: &str) -> ManagementWebpropertyListCall<'a, C, A> {
         ManagementWebpropertyListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4610,7 +4606,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - ID of the Google Analytics account to create the link for.
     /// * `webPropertyId` - Web property ID to create the link for.
-    pub fn web_property_ad_words_links_insert(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_insert(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4632,7 +4628,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - ID of the account which the given web property belongs to.
     /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
     /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
-    pub fn web_property_ad_words_links_patch(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_patch(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4655,7 +4651,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property ID to retrieve the goal for.
     /// * `profileId` - View (Profile) ID to retrieve the goal for.
     /// * `goalId` - Goal ID to retrieve the goal for.
-    pub fn goals_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn goals_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalGetCall<'a, C, A> {
         ManagementGoalGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4677,7 +4673,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - ID of the account which the given web property belongs to.
     /// * `webPropertyId` - Web property ID to delete the AdWords link for.
     /// * `webPropertyAdWordsLinkId` - Web property AdWords link ID.
-    pub fn web_property_ad_words_links_delete(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_delete(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4699,7 +4695,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - ID of the account which the given web property belongs to.
     /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
     /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
-    pub fn web_property_ad_words_links_update(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_links_update(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         ManagementWebPropertyAdWordsLinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4721,7 +4717,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to which the filter belongs.
     /// * `filterId` - ID of the filter to be updated.
-    pub fn filters_patch(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
+    pub fn filters_patch(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterPatchCall<'a, C, A> {
         ManagementFilterPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4740,7 +4736,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID to retrieve filters for.
-    pub fn filters_list(&self, account_id: &str) -> ManagementFilterListCall<'a, C, NC, A> {
+    pub fn filters_list(&self, account_id: &str) -> ManagementFilterListCall<'a, C, A> {
         ManagementFilterListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4760,7 +4756,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID to delete the filter for.
     /// * `filterId` - ID of the filter to be deleted.
-    pub fn filters_delete(&self, account_id: &str, filter_id: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
+    pub fn filters_delete(&self, account_id: &str, filter_id: &str) -> ManagementFilterDeleteCall<'a, C, A> {
         ManagementFilterDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4780,7 +4776,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID to create the view (profile) for.
     /// * `webPropertyId` - Web property ID to create the view (profile) for.
-    pub fn profiles_insert(&self, request: &Profile, account_id: &str, web_property_id: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
+    pub fn profiles_insert(&self, request: &Profile, account_id: &str, web_property_id: &str) -> ManagementProfileInsertCall<'a, C, A> {
         ManagementProfileInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4800,7 +4796,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account ID to delete the user link for.
     /// * `linkId` - Link ID to delete the user link for.
-    pub fn account_user_links_delete(&self, account_id: &str, link_id: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_user_links_delete(&self, account_id: &str, link_id: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         ManagementAccountUserLinkDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4821,7 +4817,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `accountId` - Account ID to which the view (profile) belongs
     /// * `webPropertyId` - Web property ID to which the view (profile) belongs
     /// * `profileId` - ID of the view (profile) to be updated.
-    pub fn profiles_update(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn profiles_update(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         ManagementProfileUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4844,7 +4840,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     /// * `webPropertyId` - Web property Id to retrieve profile filter link for.
     /// * `profileId` - Profile ID to retrieve filter link for.
     /// * `linkId` - ID of the profile filter link.
-    pub fn profile_filter_links_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn profile_filter_links_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         ManagementProfileFilterLinkGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -4888,15 +4884,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
 /// let rb = hub.data();
 /// # }
 /// ```
-pub struct DataMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DataMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DataMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DataMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
+impl<'a, C, A> DataMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4908,7 +4904,7 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     /// * `start-date` - Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     /// * `end-date` - End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     /// * `metrics` - A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
-    pub fn mcf_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn mcf_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataMcfGetCall<'a, C, A> {
         DataMcfGetCall {
             hub: self.hub,
             _ids: ids.to_string(),
@@ -4937,7 +4933,7 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     /// * `start-date` - Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     /// * `end-date` - End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
     /// * `metrics` - A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
-    pub fn ga_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn ga_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataGaGetCall<'a, C, A> {
         DataGaGetCall {
             hub: self.hub,
             _ids: ids.to_string(),
@@ -4966,7 +4962,7 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     ///
     /// * `ids` - Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     /// * `metrics` - A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
-    pub fn realtime_get(&self, ids: &str, metrics: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn realtime_get(&self, ids: &str, metrics: &str) -> DataRealtimeGetCall<'a, C, A> {
         DataRealtimeGetCall {
             hub: self.hub,
             _ids: ids.to_string(),
@@ -5012,15 +5008,15 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
 /// let rb = hub.provisioning();
 /// # }
 /// ```
-pub struct ProvisioningMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProvisioningMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProvisioningMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProvisioningMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProvisioningMethods<'a, C, NC, A> {
+impl<'a, C, A> ProvisioningMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5029,7 +5025,7 @@ impl<'a, C, NC, A> ProvisioningMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create_account_ticket(&self, request: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A> {
+    pub fn create_account_ticket(&self, request: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, A> {
         ProvisioningCreateAccountTicketCall {
             hub: self.hub,
             _request: request.clone(),
@@ -5070,15 +5066,15 @@ impl<'a, C, NC, A> ProvisioningMethods<'a, C, NC, A> {
 /// let rb = hub.metadata();
 /// # }
 /// ```
-pub struct MetadataMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetadataMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MetadataMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MetadataMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
+impl<'a, C, A> MetadataMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5087,7 +5083,7 @@ impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `reportType` - Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
-    pub fn columns_list(&self, report_type: &str) -> MetadataColumnListCall<'a, C, NC, A> {
+    pub fn columns_list(&self, report_type: &str) -> MetadataColumnListCall<'a, C, A> {
         MetadataColumnListCall {
             hub: self.hub,
             _report_type: report_type.to_string(),
@@ -5142,10 +5138,10 @@ impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Webproperty,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5153,9 +5149,9 @@ pub struct ManagementWebpropertyInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5294,7 +5290,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5304,7 +5300,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the web property for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5315,7 +5311,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5336,7 +5332,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5353,7 +5349,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5391,10 +5387,10 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -5403,9 +5399,9 @@ pub struct ManagementProfileGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5539,7 +5535,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve the goal for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5549,7 +5545,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the goal for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -5559,7 +5555,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve the goal for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -5570,7 +5566,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5591,7 +5587,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5608,7 +5604,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5648,10 +5644,10 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -5659,9 +5655,9 @@ pub struct ManagementAccountListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5772,7 +5768,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// An index of the first account to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -5780,7 +5776,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of accounts to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5791,7 +5787,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5812,7 +5808,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5829,7 +5825,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5873,10 +5869,10 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: ProfileFilterLink,
     _account_id: String,
     _web_property_id: String,
@@ -5887,9 +5883,9 @@ pub struct ManagementProfileFilterLinkPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6031,7 +6027,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6041,7 +6037,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which profile filter link belongs.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6051,7 +6047,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Web property Id to which profile filter link belongs
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -6061,7 +6057,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to which filter link belongs
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -6071,7 +6067,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// ID of the profile filter link to be updated.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -6082,7 +6078,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6103,7 +6099,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6120,7 +6116,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6158,10 +6154,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyUserLinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _link_id: String,
@@ -6170,9 +6166,9 @@ pub struct ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6295,7 +6291,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Account ID to delete the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6305,7 +6301,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID to delete the user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -6315,7 +6311,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Link ID to delete the user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -6326,7 +6322,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6347,7 +6343,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6364,7 +6360,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6402,10 +6398,10 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileUserLinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileUserLinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -6415,9 +6411,9 @@ pub struct ManagementProfileUserLinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileUserLinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileUserLinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6541,7 +6537,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to delete the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6551,7 +6547,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID to delete the user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -6561,7 +6557,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to delete the user link for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -6571,7 +6567,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Link ID to delete the user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -6582,7 +6578,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6603,7 +6599,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6620,7 +6616,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6664,10 +6660,10 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileUserLinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileUserLinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _web_property_id: String,
@@ -6678,9 +6674,9 @@ pub struct ManagementProfileUserLinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileUserLinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileUserLinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6822,7 +6818,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6832,7 +6828,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to update the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6842,7 +6838,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID to update the user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -6852,7 +6848,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// View (Profile ID) to update the user link for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -6862,7 +6858,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Link ID to update the user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -6873,7 +6869,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6894,7 +6890,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6911,7 +6907,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6955,10 +6951,10 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Filter,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6966,9 +6962,9 @@ pub struct ManagementFilterInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7107,7 +7103,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Filter) -> ManagementFilterInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Filter) -> ManagementFilterInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7117,7 +7113,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create filter for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7128,7 +7124,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7149,7 +7145,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7166,7 +7162,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7210,10 +7206,10 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountUserLinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountUserLinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _link_id: String,
@@ -7222,9 +7218,9 @@ pub struct ManagementAccountUserLinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountUserLinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountUserLinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7364,7 +7360,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7374,7 +7370,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to update the account-user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7384,7 +7380,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Link ID to update the account-user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -7395,7 +7391,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7416,7 +7412,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7433,7 +7429,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7477,10 +7473,10 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Webproperty,
     _account_id: String,
     _web_property_id: String,
@@ -7489,9 +7485,9 @@ pub struct ManagementWebpropertyUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7631,7 +7627,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7641,7 +7637,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the web property belongs
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7651,7 +7647,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Web property ID
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -7662,7 +7658,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7683,7 +7679,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7700,7 +7696,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7744,10 +7740,10 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyUserLinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _web_property_id: String,
@@ -7757,9 +7753,9 @@ pub struct ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7900,7 +7896,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7910,7 +7906,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Account ID to update the account-user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7920,7 +7916,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to update the account-user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -7930,7 +7926,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Link ID to update the account-user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -7941,7 +7937,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7962,7 +7958,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7979,7 +7975,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8023,10 +8019,10 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUnsampledReportInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUnsampledReportInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: UnsampledReport,
     _account_id: String,
     _web_property_id: String,
@@ -8036,9 +8032,9 @@ pub struct ManagementUnsampledReportInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUnsampledReportInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUnsampledReportInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUnsampledReportInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8179,7 +8175,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UnsampledReport) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UnsampledReport) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8189,7 +8185,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the unsampled report for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8199,7 +8195,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to create the unsampled report for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -8209,7 +8205,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to create the unsampled report for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -8220,7 +8216,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8241,7 +8237,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8258,7 +8254,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8296,10 +8292,10 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomMetricGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomMetricGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _custom_metric_id: String,
@@ -8308,9 +8304,9 @@ pub struct ManagementCustomMetricGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomMetricGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomMetricGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomMetricGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8444,7 +8440,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom metric to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8454,7 +8450,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom metric to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -8464,7 +8460,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The ID of the custom metric to retrieve.
-    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
+    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
@@ -8475,7 +8471,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8496,7 +8492,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8513,7 +8509,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8551,10 +8547,10 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUploadGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUploadGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _custom_data_source_id: String,
@@ -8564,9 +8560,9 @@ pub struct ManagementUploadGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUploadGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUploadGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUploadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8701,7 +8697,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Account Id for the upload to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8711,7 +8707,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Web property Id for the upload to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -8721,7 +8717,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Custom data source Id for upload to retrieve.
-    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
@@ -8731,7 +8727,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Upload Id to retrieve.
-    pub fn upload_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn upload_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, A> {
         self._upload_id = new_value.to_string();
         self
     }
@@ -8742,7 +8738,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8763,7 +8759,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8780,7 +8776,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8818,10 +8814,10 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _web_property_ad_words_link_id: String,
@@ -8830,9 +8826,9 @@ pub struct ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8966,7 +8962,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// ID of the account which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8976,7 +8972,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the AdWords link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -8986,7 +8982,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Web property-AdWords link ID.
-    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
@@ -8997,7 +8993,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9018,7 +9014,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9035,7 +9031,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9075,10 +9071,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyUserLinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyUserLinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -9088,9 +9084,9 @@ pub struct ManagementWebpropertyUserLinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyUserLinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyUserLinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9229,7 +9225,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Account ID which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9239,7 +9235,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -9247,7 +9243,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     ///
     /// 
     /// An index of the first webProperty-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -9255,7 +9251,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     ///
     /// 
     /// The maximum number of webProperty-user Links to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9266,7 +9262,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9287,7 +9283,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9304,7 +9300,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9348,10 +9344,10 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: ProfileFilterLink,
     _account_id: String,
     _web_property_id: String,
@@ -9362,9 +9358,9 @@ pub struct ManagementProfileFilterLinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9506,7 +9502,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9516,7 +9512,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which profile filter link belongs.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9526,7 +9522,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Web property Id to which profile filter link belongs
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -9536,7 +9532,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to which filter link belongs
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -9546,7 +9542,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// ID of the profile filter link to be updated.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -9557,7 +9553,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9578,7 +9574,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9595,7 +9591,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9633,10 +9629,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -9646,9 +9642,9 @@ pub struct ManagementExperimentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9783,7 +9779,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve the experiment for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9793,7 +9789,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the experiment for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -9803,7 +9799,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve the experiment for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -9813,7 +9809,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Experiment ID to retrieve the experiment for.
-    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
@@ -9824,7 +9820,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9845,7 +9841,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9862,7 +9858,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9907,10 +9903,10 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDimensionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDimensionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomDimension,
     _account_id: String,
     _web_property_id: String,
@@ -9921,9 +9917,9 @@ pub struct ManagementCustomDimensionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDimensionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDimensionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDimensionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10067,7 +10063,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10077,7 +10073,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom dimension to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10087,7 +10083,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimension to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -10097,7 +10093,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Custom dimension ID for the custom dimension to update.
-    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
@@ -10105,7 +10101,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
-    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
@@ -10116,7 +10112,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10137,7 +10133,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10154,7 +10150,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10192,10 +10188,10 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUnsampledReportGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUnsampledReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -10205,9 +10201,9 @@ pub struct ManagementUnsampledReportGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUnsampledReportGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUnsampledReportGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUnsampledReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10342,7 +10338,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve unsampled report for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10352,7 +10348,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve unsampled reports for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -10362,7 +10358,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve unsampled report for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -10372,7 +10368,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// ID of the unsampled report to retrieve.
-    pub fn unsampled_report_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn unsampled_report_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._unsampled_report_id = new_value.to_string();
         self
     }
@@ -10383,7 +10379,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10404,7 +10400,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10421,7 +10417,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10465,10 +10461,10 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: ProfileFilterLink,
     _account_id: String,
     _web_property_id: String,
@@ -10478,9 +10474,9 @@ pub struct ManagementProfileFilterLinkInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10621,7 +10617,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ProfileFilterLink) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10631,7 +10627,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create profile filter link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10641,7 +10637,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Web property Id to create profile filter link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -10651,7 +10647,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to create filter link for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -10662,7 +10658,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10683,7 +10679,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10700,7 +10696,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10744,10 +10740,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Filter,
     _account_id: String,
     _filter_id: String,
@@ -10756,9 +10752,9 @@ pub struct ManagementFilterUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10898,7 +10894,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Filter) -> ManagementFilterUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Filter) -> ManagementFilterUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10908,7 +10904,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the filter belongs.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10918,7 +10914,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// ID of the filter to be updated.
-    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
+    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
@@ -10929,7 +10925,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10950,7 +10946,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10967,7 +10963,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11005,10 +11001,10 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -11018,9 +11014,9 @@ pub struct ManagementProfileFilterLinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11144,7 +11140,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the profile filter link belongs.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11154,7 +11150,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Web property Id to which the profile filter link belongs.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -11164,7 +11160,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to which the filter link belongs.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -11174,7 +11170,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// ID of the profile filter link to delete.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -11185,7 +11181,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11206,7 +11202,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11223,7 +11219,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11263,10 +11259,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementSegmentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementSegmentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -11274,9 +11270,9 @@ pub struct ManagementSegmentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementSegmentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementSegmentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementSegmentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11387,7 +11383,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// An index of the first segment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -11395,7 +11391,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of segments to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11406,7 +11402,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementSegmentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementSegmentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11427,7 +11423,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementSegmentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementSegmentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11444,7 +11440,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementSegmentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementSegmentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11482,10 +11478,10 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -11494,9 +11490,9 @@ pub struct ManagementProfileDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11619,7 +11615,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account ID to delete the view (profile) for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11629,7 +11625,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to delete the view (profile) for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -11639,7 +11635,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// ID of the view (profile) to be deleted.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -11650,7 +11646,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11671,7 +11667,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11688,7 +11684,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11732,10 +11728,10 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementGoalPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementGoalPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Goal,
     _account_id: String,
     _web_property_id: String,
@@ -11746,9 +11742,9 @@ pub struct ManagementGoalPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementGoalPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementGoalPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementGoalPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11890,7 +11886,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Goal) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Goal) -> ManagementGoalPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11900,7 +11896,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Account ID to update the goal.
-    pub fn account_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11910,7 +11906,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to update the goal.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -11920,7 +11916,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to update the goal.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -11930,7 +11926,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Index of the goal to be updated.
-    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
@@ -11941,7 +11937,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11962,7 +11958,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11979,7 +11975,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12024,10 +12020,10 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDimensionPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDimensionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomDimension,
     _account_id: String,
     _web_property_id: String,
@@ -12038,9 +12034,9 @@ pub struct ManagementCustomDimensionPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDimensionPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDimensionPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDimensionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12184,7 +12180,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12194,7 +12190,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom dimension to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12204,7 +12200,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimension to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -12214,7 +12210,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Custom dimension ID for the custom dimension to update.
-    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
@@ -12222,7 +12218,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
-    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
@@ -12233,7 +12229,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12254,7 +12250,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12271,7 +12267,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12315,10 +12311,10 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Experiment,
     _account_id: String,
     _web_property_id: String,
@@ -12329,9 +12325,9 @@ pub struct ManagementExperimentPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12473,7 +12469,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12483,7 +12479,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Account ID of the experiment to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12493,7 +12489,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Web property ID of the experiment to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -12503,7 +12499,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID of the experiment to update.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -12513,7 +12509,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Experiment ID of the experiment to update.
-    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
@@ -12524,7 +12520,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12545,7 +12541,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12562,7 +12558,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12602,10 +12598,10 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -12616,9 +12612,9 @@ pub struct ManagementExperimentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12758,7 +12754,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve experiments for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12768,7 +12764,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve experiments for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -12778,7 +12774,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve experiments for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -12786,7 +12782,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// An index of the first experiment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -12794,7 +12790,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The maximum number of experiments to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -12805,7 +12801,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12826,7 +12822,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12843,7 +12839,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12883,10 +12879,10 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -12896,9 +12892,9 @@ pub struct ManagementProfileListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13037,7 +13033,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13047,7 +13043,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -13055,7 +13051,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -13063,7 +13059,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of views (profiles) to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -13074,7 +13070,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13095,7 +13091,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13112,7 +13108,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13152,10 +13148,10 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementGoalListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementGoalListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -13166,9 +13162,9 @@ pub struct ManagementGoalListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementGoalListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementGoalListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementGoalListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13308,7 +13304,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13318,7 +13314,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -13328,7 +13324,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -13336,7 +13332,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// An index of the first goal to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -13344,7 +13340,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The maximum number of goals to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -13355,7 +13351,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13376,7 +13372,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13393,7 +13389,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13437,10 +13433,10 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementGoalInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementGoalInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Goal,
     _account_id: String,
     _web_property_id: String,
@@ -13450,9 +13446,9 @@ pub struct ManagementGoalInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementGoalInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementGoalInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementGoalInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13593,7 +13589,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Goal) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Goal) -> ManagementGoalInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13603,7 +13599,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the goal for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13613,7 +13609,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to create the goal for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -13623,7 +13619,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to create the goal for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -13634,7 +13630,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13655,7 +13651,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13672,7 +13668,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13717,10 +13713,10 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomMetricPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomMetricPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomMetric,
     _account_id: String,
     _web_property_id: String,
@@ -13731,9 +13727,9 @@ pub struct ManagementCustomMetricPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomMetricPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomMetricPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomMetricPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13877,7 +13873,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13887,7 +13883,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom metric to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13897,7 +13893,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom metric to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -13907,7 +13903,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Custom metric ID for the custom metric to update.
-    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
@@ -13915,7 +13911,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
-    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
@@ -13926,7 +13922,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13947,7 +13943,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13964,7 +13960,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14003,10 +13999,10 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ManagementUploadUploadDataCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUploadUploadDataCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _custom_data_source_id: String,
@@ -14015,9 +14011,9 @@ pub struct ManagementUploadUploadDataCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUploadUploadDataCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUploadUploadDataCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14260,7 +14256,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account Id associated with the upload.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14270,7 +14266,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property UA-string associated with the upload.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -14280,7 +14276,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Custom data source Id to which the data being uploaded belongs.
-    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
+    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
@@ -14291,7 +14287,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadUploadDataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14312,7 +14308,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadUploadDataCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadUploadDataCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14329,7 +14325,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadUploadDataCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadUploadDataCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14373,10 +14369,10 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountUserLinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountUserLinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14384,9 +14380,9 @@ pub struct ManagementAccountUserLinkInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountUserLinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountUserLinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountUserLinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14525,7 +14521,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14535,7 +14531,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14546,7 +14542,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14567,7 +14563,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14584,7 +14580,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14628,10 +14624,10 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyUserLinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _web_property_id: String,
@@ -14640,9 +14636,9 @@ pub struct ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyUserLinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyUserLinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14782,7 +14778,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14792,7 +14788,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14802,7 +14798,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID to create the user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -14813,7 +14809,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14834,7 +14830,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14851,7 +14847,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyUserLinkInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14889,10 +14885,10 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -14902,9 +14898,9 @@ pub struct ManagementExperimentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15028,7 +15024,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the experiment belongs
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15038,7 +15034,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to which the experiment belongs
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -15048,7 +15044,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to which the experiment belongs
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -15058,7 +15054,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// ID of the experiment to delete
-    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
@@ -15069,7 +15065,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15090,7 +15086,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15107,7 +15103,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15151,10 +15147,10 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfilePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfilePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Profile,
     _account_id: String,
     _web_property_id: String,
@@ -15164,9 +15160,9 @@ pub struct ManagementProfilePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfilePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfilePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15307,7 +15303,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Profile) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Profile) -> ManagementProfilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15317,7 +15313,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the view (profile) belongs
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15327,7 +15323,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to which the view (profile) belongs
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -15337,7 +15333,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// ID of the view (profile) to be updated.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -15348,7 +15344,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfilePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15369,7 +15365,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfilePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfilePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15386,7 +15382,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfilePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfilePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15424,10 +15420,10 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _filter_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15435,9 +15431,9 @@ pub struct ManagementFilterGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15570,7 +15566,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve filters for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15580,7 +15576,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Filter ID to retrieve filters for.
-    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
+    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
@@ -15591,7 +15587,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15612,7 +15608,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15629,7 +15625,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15669,10 +15665,10 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -15682,9 +15678,9 @@ pub struct ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15823,7 +15819,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// we provide this method for API completeness.
     /// 
     /// ID of the account which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15833,7 +15829,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the AdWords links for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -15841,7 +15837,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     ///
     /// 
     /// An index of the first webProperty-AdWords link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -15849,7 +15845,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     ///
     /// 
     /// The maximum number of webProperty-AdWords links to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -15860,7 +15856,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15881,7 +15877,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15898,7 +15894,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15938,10 +15934,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountSummaryListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountSummaryListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -15949,9 +15945,9 @@ pub struct ManagementAccountSummaryListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountSummaryListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountSummaryListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountSummaryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16062,7 +16058,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -16070,7 +16066,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The maximum number of account summaries to include in this response, where the largest acceptable value is 1000.
-    pub fn max_results(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16081,7 +16077,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountSummaryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16102,7 +16098,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountSummaryListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountSummaryListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16119,7 +16115,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountSummaryListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountSummaryListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16159,10 +16155,10 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDimensionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDimensionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -16172,9 +16168,9 @@ pub struct ManagementCustomDimensionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDimensionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDimensionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16313,7 +16309,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom dimensions to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -16323,7 +16319,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimensions to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -16331,7 +16327,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -16339,7 +16335,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// The maximum number of custom dimensions to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16350,7 +16346,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16371,7 +16367,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16388,7 +16384,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16428,10 +16424,10 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUploadListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUploadListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _custom_data_source_id: String,
@@ -16442,9 +16438,9 @@ pub struct ManagementUploadListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUploadListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUploadListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUploadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16584,7 +16580,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Account Id for the uploads to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -16594,7 +16590,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Web property Id for the uploads to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -16604,7 +16600,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Custom data source Id for uploads to retrieve.
-    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
@@ -16612,7 +16608,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// A 1-based index of the first upload to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -16620,7 +16616,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The maximum number of uploads to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16631,7 +16627,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16652,7 +16648,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16669,7 +16665,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16709,10 +16705,10 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileUserLinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileUserLinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -16723,9 +16719,9 @@ pub struct ManagementProfileUserLinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileUserLinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileUserLinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileUserLinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16865,7 +16861,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Account ID which the given view (profile) belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -16875,7 +16871,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -16885,7 +16881,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -16893,7 +16889,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// An index of the first profile-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -16901,7 +16897,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// The maximum number of profile-user links to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16912,7 +16908,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16933,7 +16929,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16950,7 +16946,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16990,10 +16986,10 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountUserLinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountUserLinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
@@ -17002,9 +16998,9 @@ pub struct ManagementAccountUserLinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountUserLinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountUserLinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountUserLinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17142,7 +17138,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve the user links for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17150,7 +17146,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// An index of the first account-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -17158,7 +17154,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// The maximum number of account-user links to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -17169,7 +17165,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17190,7 +17186,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17207,7 +17203,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17252,10 +17248,10 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomMetricUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomMetricUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomMetric,
     _account_id: String,
     _web_property_id: String,
@@ -17266,9 +17262,9 @@ pub struct ManagementCustomMetricUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomMetricUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomMetricUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomMetricUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17412,7 +17408,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17422,7 +17418,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom metric to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17432,7 +17428,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom metric to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -17442,7 +17438,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Custom metric ID for the custom metric to update.
-    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._custom_metric_id = new_value.to_string();
         self
     }
@@ -17450,7 +17446,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
-    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
     }
@@ -17461,7 +17457,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17482,7 +17478,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17499,7 +17495,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17543,10 +17539,10 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUploadDeleteUploadDataCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUploadDeleteUploadDataCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: AnalyticsDataimportDeleteUploadDataRequest,
     _account_id: String,
     _web_property_id: String,
@@ -17556,9 +17552,9 @@ pub struct ManagementUploadDeleteUploadDataCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUploadDeleteUploadDataCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUploadDeleteUploadDataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17688,7 +17684,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AnalyticsDataimportDeleteUploadDataRequest) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AnalyticsDataimportDeleteUploadDataRequest) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17698,7 +17694,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Account Id for the uploads to be deleted.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17708,7 +17704,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Web property Id for the uploads to be deleted.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -17718,7 +17714,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Custom data source Id for the uploads to be deleted.
-    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._custom_data_source_id = new_value.to_string();
         self
     }
@@ -17729,7 +17725,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUploadDeleteUploadDataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17750,7 +17746,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUploadDeleteUploadDataCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17767,7 +17763,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUploadDeleteUploadDataCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17811,10 +17807,10 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Experiment,
     _account_id: String,
     _web_property_id: String,
@@ -17825,9 +17821,9 @@ pub struct ManagementExperimentUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17969,7 +17965,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17979,7 +17975,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account ID of the experiment to update.
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17989,7 +17985,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID of the experiment to update.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -17999,7 +17995,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID of the experiment to update.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -18009,7 +18005,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Experiment ID of the experiment to update.
-    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._experiment_id = new_value.to_string();
         self
     }
@@ -18020,7 +18016,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18041,7 +18037,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18058,7 +18054,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18102,10 +18098,10 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementGoalUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementGoalUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Goal,
     _account_id: String,
     _web_property_id: String,
@@ -18116,9 +18112,9 @@ pub struct ManagementGoalUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementGoalUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementGoalUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementGoalUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18260,7 +18256,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Goal) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Goal) -> ManagementGoalUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -18270,7 +18266,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Account ID to update the goal.
-    pub fn account_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -18280,7 +18276,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to update the goal.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -18290,7 +18286,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to update the goal.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -18300,7 +18296,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Index of the goal to be updated.
-    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
@@ -18311,7 +18307,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18332,7 +18328,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18349,7 +18345,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18389,10 +18385,10 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDataSourceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDataSourceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -18402,9 +18398,9 @@ pub struct ManagementCustomDataSourceListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDataSourceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDataSourceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18543,7 +18539,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Account Id for the custom data sources to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -18553,7 +18549,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Web property Id for the custom data sources to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -18561,7 +18557,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// A 1-based index of the first custom data source to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -18569,7 +18565,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The maximum number of custom data sources to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -18580,7 +18576,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDataSourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18601,7 +18597,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDataSourceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDataSourceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18618,7 +18614,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDataSourceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDataSourceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18658,10 +18654,10 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomMetricListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomMetricListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _start_index: Option<i32>,
@@ -18671,9 +18667,9 @@ pub struct ManagementCustomMetricListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomMetricListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomMetricListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18812,7 +18808,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom metrics to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -18822,7 +18818,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom metrics to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -18830,7 +18826,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -18838,7 +18834,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The maximum number of custom metrics to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -18849,7 +18845,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18870,7 +18866,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18887,7 +18883,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18927,10 +18923,10 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementUnsampledReportListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementUnsampledReportListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -18941,9 +18937,9 @@ pub struct ManagementUnsampledReportListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementUnsampledReportListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementUnsampledReportListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementUnsampledReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19083,7 +19079,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
-    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19093,7 +19089,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -19103,7 +19099,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -19111,7 +19107,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// An index of the first unsampled report to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -19119,7 +19115,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// The maximum number of unsampled reports to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -19130,7 +19126,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementUnsampledReportListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19151,7 +19147,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementUnsampledReportListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19168,7 +19164,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementUnsampledReportListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19206,10 +19202,10 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -19217,9 +19213,9 @@ pub struct ManagementWebpropertyGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19352,7 +19348,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve the web property for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19362,7 +19358,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// ID to retrieve the web property for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -19373,7 +19369,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19394,7 +19390,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19411,7 +19407,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19455,10 +19451,10 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementExperimentInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementExperimentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Experiment,
     _account_id: String,
     _web_property_id: String,
@@ -19468,9 +19464,9 @@ pub struct ManagementExperimentInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementExperimentInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementExperimentInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementExperimentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19611,7 +19607,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Experiment) -> ManagementExperimentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19621,7 +19617,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the experiment for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19631,7 +19627,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to create the experiment for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -19641,7 +19637,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to create the experiment for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -19652,7 +19648,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementExperimentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19673,7 +19669,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementExperimentInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19690,7 +19686,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementExperimentInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19728,10 +19724,10 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDimensionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDimensionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _custom_dimension_id: String,
@@ -19740,9 +19736,9 @@ pub struct ManagementCustomDimensionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDimensionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDimensionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDimensionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19876,7 +19872,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom dimension to retrieve.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19886,7 +19882,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimension to retrieve.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -19896,7 +19892,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The ID of the custom dimension to retrieve.
-    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
+    pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._custom_dimension_id = new_value.to_string();
         self
     }
@@ -19907,7 +19903,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19928,7 +19924,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19945,7 +19941,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19985,10 +19981,10 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -19999,9 +19995,9 @@ pub struct ManagementProfileFilterLinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20141,7 +20137,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve profile filter links for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -20151,7 +20147,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -20161,7 +20157,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -20169,7 +20165,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -20177,7 +20173,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// The maximum number of profile filter links to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -20188,7 +20184,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20209,7 +20205,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20226,7 +20222,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20270,10 +20266,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Webproperty,
     _account_id: String,
     _web_property_id: String,
@@ -20282,9 +20278,9 @@ pub struct ManagementWebpropertyPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20424,7 +20420,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Webproperty) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -20434,7 +20430,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the web property belongs
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -20444,7 +20440,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Web property ID
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -20455,7 +20451,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20476,7 +20472,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20493,7 +20489,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20537,10 +20533,10 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomDimensionInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomDimensionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomDimension,
     _account_id: String,
     _web_property_id: String,
@@ -20549,9 +20545,9 @@ pub struct ManagementCustomDimensionInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomDimensionInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomDimensionInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomDimensionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20691,7 +20687,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomDimension) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -20701,7 +20697,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom dimension to create.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -20711,7 +20707,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimension to create.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -20722,7 +20718,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomDimensionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20743,7 +20739,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomDimensionInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20760,7 +20756,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomDimensionInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20804,10 +20800,10 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementCustomMetricInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementCustomMetricInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: CustomMetric,
     _account_id: String,
     _web_property_id: String,
@@ -20816,9 +20812,9 @@ pub struct ManagementCustomMetricInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementCustomMetricInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementCustomMetricInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementCustomMetricInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20958,7 +20954,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CustomMetric) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -20968,7 +20964,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Account ID for the custom metric to create.
-    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -20978,7 +20974,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Web property ID for the custom dimension to create.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -20989,7 +20985,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementCustomMetricInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21010,7 +21006,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementCustomMetricInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21027,7 +21023,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementCustomMetricInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21071,10 +21067,10 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileUserLinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileUserLinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityUserLink,
     _account_id: String,
     _web_property_id: String,
@@ -21084,9 +21080,9 @@ pub struct ManagementProfileUserLinkInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileUserLinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileUserLinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileUserLinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21227,7 +21223,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityUserLink) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -21237,7 +21233,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -21247,7 +21243,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Web Property ID to create the user link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -21257,7 +21253,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to create the user link for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -21268,7 +21264,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUserLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21289,7 +21285,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUserLinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21306,7 +21302,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUserLinkInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21346,10 +21342,10 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebpropertyListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebpropertyListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
@@ -21358,9 +21354,9 @@ pub struct ManagementWebpropertyListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebpropertyListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebpropertyListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebpropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21498,7 +21494,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -21506,7 +21502,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -21514,7 +21510,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The maximum number of web properties to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -21525,7 +21521,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebpropertyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21546,7 +21542,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebpropertyListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21563,7 +21559,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebpropertyListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21607,10 +21603,10 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityAdWordsLink,
     _account_id: String,
     _web_property_id: String,
@@ -21619,9 +21615,9 @@ pub struct ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21761,7 +21757,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -21771,7 +21767,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// ID of the Google Analytics account to create the link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -21781,7 +21777,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to create the link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -21792,7 +21788,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21813,7 +21809,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21830,7 +21826,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21874,10 +21870,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityAdWordsLink,
     _account_id: String,
     _web_property_id: String,
@@ -21887,9 +21883,9 @@ pub struct ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22030,7 +22026,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -22040,7 +22036,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// ID of the account which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -22050,7 +22046,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the AdWords link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -22060,7 +22056,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// Web property-AdWords link ID.
-    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
@@ -22071,7 +22067,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22092,7 +22088,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22109,7 +22105,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22147,10 +22143,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementGoalGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementGoalGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -22160,9 +22156,9 @@ pub struct ManagementGoalGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementGoalGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementGoalGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementGoalGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22297,7 +22293,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve the goal for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -22307,7 +22303,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the goal for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -22317,7 +22313,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// View (Profile) ID to retrieve the goal for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -22327,7 +22323,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Goal ID to retrieve the goal for.
-    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn goal_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, A> {
         self._goal_id = new_value.to_string();
         self
     }
@@ -22338,7 +22334,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementGoalGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22359,7 +22355,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementGoalGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22376,7 +22372,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementGoalGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22414,10 +22410,10 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _web_property_ad_words_link_id: String,
@@ -22426,9 +22422,9 @@ pub struct ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22551,7 +22547,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// ID of the account which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -22561,7 +22557,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to delete the AdWords link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -22571,7 +22567,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// Web property AdWords link ID.
-    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
@@ -22582,7 +22578,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22603,7 +22599,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22620,7 +22616,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22664,10 +22660,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: EntityAdWordsLink,
     _account_id: String,
     _web_property_id: String,
@@ -22677,9 +22673,9 @@ pub struct ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22820,7 +22816,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EntityAdWordsLink) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -22830,7 +22826,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// ID of the account which the given web property belongs to.
-    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -22840,7 +22836,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to retrieve the AdWords link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -22850,7 +22846,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// we provide this method for API completeness.
     /// 
     /// Web property-AdWords link ID.
-    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
     }
@@ -22861,7 +22857,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22882,7 +22878,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22899,7 +22895,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22943,10 +22939,10 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Filter,
     _account_id: String,
     _filter_id: String,
@@ -22955,9 +22951,9 @@ pub struct ManagementFilterPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23097,7 +23093,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Filter) -> ManagementFilterPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Filter) -> ManagementFilterPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -23107,7 +23103,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the filter belongs.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -23117,7 +23113,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// ID of the filter to be updated.
-    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
+    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
@@ -23128,7 +23124,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23149,7 +23145,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23166,7 +23162,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23206,10 +23202,10 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
@@ -23218,9 +23214,9 @@ pub struct ManagementFilterListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23358,7 +23354,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve filters for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -23366,7 +23362,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -23374,7 +23370,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The maximum number of filters to include in this response.
-    pub fn max_results(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -23385,7 +23381,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23406,7 +23402,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23423,7 +23419,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23461,10 +23457,10 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementFilterDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementFilterDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _filter_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -23472,9 +23468,9 @@ pub struct ManagementFilterDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementFilterDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementFilterDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementFilterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23607,7 +23603,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account ID to delete the filter for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -23617,7 +23613,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// ID of the filter to be deleted.
-    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
+    pub fn filter_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, A> {
         self._filter_id = new_value.to_string();
         self
     }
@@ -23628,7 +23624,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementFilterDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23649,7 +23645,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementFilterDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23666,7 +23662,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementFilterDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23710,10 +23706,10 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Profile,
     _account_id: String,
     _web_property_id: String,
@@ -23722,9 +23718,9 @@ pub struct ManagementProfileInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23864,7 +23860,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Profile) -> ManagementProfileInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Profile) -> ManagementProfileInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -23874,7 +23870,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account ID to create the view (profile) for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -23884,7 +23880,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to create the view (profile) for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -23895,7 +23891,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23916,7 +23912,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23933,7 +23929,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23971,10 +23967,10 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementAccountUserLinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementAccountUserLinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _link_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -23982,9 +23978,9 @@ pub struct ManagementAccountUserLinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementAccountUserLinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementAccountUserLinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -24106,7 +24102,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Account ID to delete the user link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -24116,7 +24112,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Link ID to delete the user link for.
-    pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -24127,7 +24123,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementAccountUserLinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24148,7 +24144,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementAccountUserLinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24165,7 +24161,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementAccountUserLinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -24209,10 +24205,10 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: Profile,
     _account_id: String,
     _web_property_id: String,
@@ -24222,9 +24218,9 @@ pub struct ManagementProfileUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -24365,7 +24361,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Profile) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Profile) -> ManagementProfileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -24375,7 +24371,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account ID to which the view (profile) belongs
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -24385,7 +24381,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Web property ID to which the view (profile) belongs
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -24395,7 +24391,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// ID of the view (profile) to be updated.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -24406,7 +24402,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24427,7 +24423,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24444,7 +24440,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -24482,10 +24478,10 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagementProfileFilterLinkGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagementProfileFilterLinkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _account_id: String,
     _web_property_id: String,
     _profile_id: String,
@@ -24495,9 +24491,9 @@ pub struct ManagementProfileFilterLinkGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagementProfileFilterLinkGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagementProfileFilterLinkGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagementProfileFilterLinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -24632,7 +24628,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Account ID to retrieve profile filter link for.
-    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -24642,7 +24638,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Web property Id to retrieve profile filter link for.
-    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._web_property_id = new_value.to_string();
         self
     }
@@ -24652,7 +24648,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Profile ID to retrieve filter link for.
-    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._profile_id = new_value.to_string();
         self
     }
@@ -24662,7 +24658,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// ID of the profile filter link.
-    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -24673,7 +24669,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagementProfileFilterLinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -24694,7 +24690,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagementProfileFilterLinkGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24711,7 +24707,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagementProfileFilterLinkGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -24755,10 +24751,10 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct DataMcfGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DataMcfGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _ids: String,
     _start_date: String,
     _end_date: String,
@@ -24774,9 +24770,9 @@ pub struct DataMcfGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DataMcfGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DataMcfGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DataMcfGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -24905,7 +24901,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
-    pub fn ids(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn ids(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
@@ -24915,7 +24911,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
-    pub fn start_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
@@ -24925,7 +24921,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
-    pub fn end_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
@@ -24935,7 +24931,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
-    pub fn metrics(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn metrics(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
@@ -24943,7 +24939,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> DataMcfGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -24951,7 +24947,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for the Analytics data.
-    pub fn sort(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn sort(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -24959,7 +24955,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The desired sampling level.
-    pub fn sampling_level(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn sampling_level(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._sampling_level = Some(new_value.to_string());
         self
     }
@@ -24967,7 +24963,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The maximum number of entries to include in this feed.
-    pub fn max_results(mut self, new_value: i32) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> DataMcfGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -24975,7 +24971,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A comma-separated list of dimension or metric filters to be applied to the Analytics data.
-    pub fn filters(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -24983,7 +24979,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A comma-separated list of Multi-Channel Funnels dimensions. E.g., 'mcf:source,mcf:medium'.
-    pub fn dimensions(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn dimensions(mut self, new_value: &str) -> DataMcfGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
@@ -24994,7 +24990,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataMcfGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataMcfGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25015,7 +25011,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DataMcfGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DataMcfGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25032,7 +25028,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DataMcfGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DataMcfGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -25078,10 +25074,10 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct DataGaGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DataGaGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _ids: String,
     _start_date: String,
     _end_date: String,
@@ -25099,9 +25095,9 @@ pub struct DataGaGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DataGaGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DataGaGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DataGaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -25236,7 +25232,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
-    pub fn ids(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn ids(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
@@ -25246,7 +25242,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
-    pub fn start_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
@@ -25256,7 +25252,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
-    pub fn end_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
@@ -25266,7 +25262,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
-    pub fn metrics(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn metrics(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
@@ -25274,7 +25270,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
-    pub fn start_index(mut self, new_value: i32) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> DataGaGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -25282,7 +25278,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for Analytics data.
-    pub fn sort(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn sort(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -25290,7 +25286,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An Analytics segment to be applied to data.
-    pub fn segment(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn segment(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._segment = Some(new_value.to_string());
         self
     }
@@ -25298,7 +25294,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The desired sampling level.
-    pub fn sampling_level(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn sampling_level(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._sampling_level = Some(new_value.to_string());
         self
     }
@@ -25306,7 +25302,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The selected format for the response. Default format is JSON.
-    pub fn output(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn output(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._output = Some(new_value.to_string());
         self
     }
@@ -25314,7 +25310,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of entries to include in this feed.
-    pub fn max_results(mut self, new_value: i32) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> DataGaGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -25322,7 +25318,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma-separated list of dimension or metric filters to be applied to Analytics data.
-    pub fn filters(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -25330,7 +25326,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma-separated list of Analytics dimensions. E.g., 'ga:browser,ga:city'.
-    pub fn dimensions(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn dimensions(mut self, new_value: &str) -> DataGaGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
@@ -25341,7 +25337,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataGaGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataGaGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25362,7 +25358,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DataGaGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DataGaGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25379,7 +25375,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DataGaGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DataGaGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -25421,10 +25417,10 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct DataRealtimeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DataRealtimeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _ids: String,
     _metrics: String,
     _sort: Option<String>,
@@ -25436,9 +25432,9 @@ pub struct DataRealtimeGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DataRealtimeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DataRealtimeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DataRealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -25559,7 +25555,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
-    pub fn ids(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn ids(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
@@ -25569,7 +25565,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
-    pub fn metrics(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn metrics(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
@@ -25577,7 +25573,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for real time data.
-    pub fn sort(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn sort(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -25585,7 +25581,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of entries to include in this feed.
-    pub fn max_results(mut self, new_value: i32) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> DataRealtimeGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -25593,7 +25589,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// A comma-separated list of dimension or metric filters to be applied to real time data.
-    pub fn filters(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -25601,7 +25597,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// A comma-separated list of real time dimensions. E.g., 'rt:medium,rt:city'.
-    pub fn dimensions(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn dimensions(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
@@ -25612,7 +25608,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataRealtimeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DataRealtimeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25633,7 +25629,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DataRealtimeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DataRealtimeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25650,7 +25646,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DataRealtimeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DataRealtimeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -25694,19 +25690,19 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ProvisioningCreateAccountTicketCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProvisioningCreateAccountTicketCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _request: AccountTicket,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProvisioningCreateAccountTicketCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProvisioningCreateAccountTicketCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProvisioningCreateAccountTicketCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -25820,7 +25816,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -25831,7 +25827,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProvisioningCreateAccountTicketCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -25852,7 +25848,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProvisioningCreateAccountTicketCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25869,7 +25865,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProvisioningCreateAccountTicketCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -25907,19 +25903,19 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct MetadataColumnListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetadataColumnListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Analytics<C, NC, A>,
+    hub: &'a Analytics<C, A>,
     _report_type: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetadataColumnListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetadataColumnListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetadataColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -26051,7 +26047,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
-    pub fn report_type(mut self, new_value: &str) -> MetadataColumnListCall<'a, C, NC, A> {
+    pub fn report_type(mut self, new_value: &str) -> MetadataColumnListCall<'a, C, A> {
         self._report_type = new_value.to_string();
         self
     }
@@ -26062,7 +26058,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataColumnListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataColumnListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -26083,7 +26079,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetadataColumnListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetadataColumnListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26100,7 +26096,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetadataColumnListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetadataColumnListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

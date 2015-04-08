@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-container1_beta1` library allows access to all features of the *Google container* service.
 
-This documentation was generated from *container* crate version *0.1.4+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+This documentation was generated from *container* crate version *0.1.5+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 
 Everything else about the *container* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).

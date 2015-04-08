@@ -4,12 +4,12 @@
 [package]
 
 name = "google-webfonts1"
-version = "0.1.4+20140210"
+version = "0.1.5+20140210"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with webfonts (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webfonts1"
 homepage = "https://developers.google.com/fonts/docs/developer_api"
-documentation = "http://byron.github.io/google-apis-rs/google-webfonts1"
+documentation = "http://byron.github.io/google-apis-rs/google_webfonts1"
 license = "MIT"
 keywords = ["webfonts", "google", "protocol", "web", "api"]
 

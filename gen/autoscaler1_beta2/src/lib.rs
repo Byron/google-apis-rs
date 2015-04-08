@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *autoscaler* crate version *0.1.4+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *autoscaler* crate version *0.1.5+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *autoscaler* *v1_beta2* API can be found at the
 //! [official documentation site](http://developers.google.com/compute/docs/autoscaler).
@@ -200,7 +200,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -298,40 +297,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AutoscalerHub<C, NC, A> {
+pub struct AutoscalerHub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for AutoscalerHub<C, NC, A> {}
+impl<'a, C, A> Hub for AutoscalerHub<C, A> {}
 
-impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerHub<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> AutoscalerHub<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> AutoscalerHub<C, A> {
         AutoscalerHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn autoscalers(&'a self) -> AutoscalerMethods<'a, C, NC, A> {
+    pub fn autoscalers(&'a self) -> AutoscalerMethods<'a, C, A> {
         AutoscalerMethods { hub: &self }
     }
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, NC, A> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, A> {
         ZoneOperationMethods { hub: &self }
     }
-    pub fn zones(&'a self) -> ZoneMethods<'a, C, NC, A> {
+    pub fn zones(&'a self) -> ZoneMethods<'a, C, A> {
         ZoneMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -799,15 +795,15 @@ impl ResponseResult for Autoscaler {}
 /// let rb = hub.zones();
 /// # }
 /// ```
-pub struct ZoneMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -816,7 +812,7 @@ impl<'a, C, NC, A> ZoneMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - No description provided.
-    pub fn list(&self, project: &str) -> ZoneListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> ZoneListCall<'a, C, A> {
         ZoneListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -860,15 +856,15 @@ impl<'a, C, NC, A> ZoneMethods<'a, C, NC, A> {
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneOperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -878,7 +874,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, A> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -901,7 +897,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
     /// * `operation` - No description provided.
-    pub fn delete(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         ZoneOperationDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -922,7 +918,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
     /// * `operation` - No description provided.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, A> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -965,15 +961,15 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 /// let rb = hub.autoscalers();
 /// # }
 /// ```
-pub struct AutoscalerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AutoscalerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AutoscalerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
+impl<'a, C, A> AutoscalerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -983,7 +979,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
-    pub fn list(&self, project: &str, zone: &str) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> AutoscalerListCall<'a, C, A> {
         AutoscalerListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1007,7 +1003,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn update(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerUpdateCall<'a, C, A> {
         AutoscalerUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1030,7 +1026,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn patch(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerPatchCall<'a, C, A> {
         AutoscalerPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1052,7 +1048,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn delete(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerDeleteCall<'a, C, A> {
         AutoscalerDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1073,7 +1069,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
-    pub fn insert(&self, request: &Autoscaler, project: &str, zone: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Autoscaler, project: &str, zone: &str) -> AutoscalerInsertCall<'a, C, A> {
         AutoscalerInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1094,7 +1090,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn get(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerGetCall<'a, C, A> {
         AutoscalerGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1148,10 +1144,10 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -1161,9 +1157,9 @@ pub struct ZoneListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1303,28 +1299,28 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ZoneListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> ZoneListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    pub fn max_results(mut self, new_value: u32) -> ZoneListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    pub fn filter(mut self, new_value: &str) -> ZoneListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> ZoneListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1335,7 +1331,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1356,7 +1352,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1373,7 +1369,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1414,10 +1410,10 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1428,9 +1424,9 @@ pub struct ZoneOperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1571,7 +1567,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1580,28 +1576,28 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1612,7 +1608,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1633,7 +1629,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1650,7 +1646,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1688,10 +1684,10 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -1700,9 +1696,9 @@ pub struct ZoneOperationDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1824,7 +1820,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1833,7 +1829,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1842,7 +1838,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -1853,7 +1849,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1874,7 +1870,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1891,7 +1887,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1929,10 +1925,10 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -1941,9 +1937,9 @@ pub struct ZoneOperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2076,7 +2072,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2085,7 +2081,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2094,7 +2090,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -2105,7 +2101,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2126,7 +2122,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2143,7 +2139,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2184,10 +2180,10 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -2198,9 +2194,9 @@ pub struct AutoscalerListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2342,7 +2338,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2352,28 +2348,28 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    pub fn max_results(mut self, new_value: u32) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> AutoscalerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    pub fn filter(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> AutoscalerListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2384,7 +2380,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2405,7 +2401,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2422,7 +2418,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2466,10 +2462,10 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -2479,9 +2475,9 @@ pub struct AutoscalerUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2622,7 +2618,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2632,7 +2628,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2642,7 +2638,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2652,7 +2648,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the Autoscaler resource.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -2663,7 +2659,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2684,7 +2680,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2701,7 +2697,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2745,10 +2741,10 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -2758,9 +2754,9 @@ pub struct AutoscalerPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2901,7 +2897,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2911,7 +2907,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2921,7 +2917,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2931,7 +2927,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Name of the Autoscaler resource.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -2942,7 +2938,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2963,7 +2959,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2980,7 +2976,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3018,10 +3014,10 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _autoscaler: String,
@@ -3030,9 +3026,9 @@ pub struct AutoscalerDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3166,7 +3162,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3176,7 +3172,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3186,7 +3182,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the Autoscaler resource.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -3197,7 +3193,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3218,7 +3214,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3235,7 +3231,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3279,10 +3275,10 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -3291,9 +3287,9 @@ pub struct AutoscalerInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3433,7 +3429,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Autoscaler) -> AutoscalerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3443,7 +3439,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3453,7 +3449,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3464,7 +3460,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3485,7 +3481,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3502,7 +3498,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3540,10 +3536,10 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AutoscalerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AutoscalerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AutoscalerHub<C, NC, A>,
+    hub: &'a AutoscalerHub<C, A>,
     _project: String,
     _zone: String,
     _autoscaler: String,
@@ -3552,9 +3548,9 @@ pub struct AutoscalerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AutoscalerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AutoscalerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AutoscalerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3688,7 +3684,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of Autoscaler resource.
-    pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3698,7 +3694,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Zone name of Autoscaler resource.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3708,7 +3704,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Name of the Autoscaler resource.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, A> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -3719,7 +3715,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AutoscalerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3740,7 +3736,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3757,7 +3753,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AutoscalerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-genomics1_beta2"
-version = "0.1.4+20150326"
+version = "0.1.5+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with genomics (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1_beta2"
 homepage = "https://developers.google.com/genomics/v1beta2/reference"
-documentation = "http://byron.github.io/google-apis-rs/google-genomics1_beta2"
+documentation = "http://byron.github.io/google-apis-rs/google_genomics1_beta2"
 license = "MIT"
 keywords = ["genomics", "google", "protocol", "web", "api"]
 

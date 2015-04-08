@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reseller* crate version *0.1.4+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *reseller* crate version *0.1.5+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *reseller* *v1_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/reseller/).
@@ -204,7 +204,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -304,37 +303,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Reseller<C, NC, A> {
+pub struct Reseller<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Reseller<C, NC, A> {}
+impl<'a, C, A> Hub for Reseller<C, A> {}
 
-impl<'a, C, NC, A> Reseller<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Reseller<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Reseller<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Reseller<C, A> {
         Reseller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a, C, NC, A> {
+    pub fn customers(&'a self) -> CustomerMethods<'a, C, A> {
         CustomerMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, C, NC, A> {
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, C, A> {
         SubscriptionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -697,15 +693,15 @@ impl ResponseResult for Subscription {}
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CustomerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CustomerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
+impl<'a, C, A> CustomerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -715,7 +711,7 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn update(&self, request: &Customer, customer_id: &str) -> CustomerUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Customer, customer_id: &str) -> CustomerUpdateCall<'a, C, A> {
         CustomerUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -733,7 +729,7 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &Customer) -> CustomerInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Customer) -> CustomerInsertCall<'a, C, A> {
         CustomerInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -752,7 +748,7 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn patch(&self, request: &Customer, customer_id: &str) -> CustomerPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Customer, customer_id: &str) -> CustomerPatchCall<'a, C, A> {
         CustomerPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -770,7 +766,7 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `customerId` - Id of the Customer
-    pub fn get(&self, customer_id: &str) -> CustomerGetCall<'a, C, NC, A> {
+    pub fn get(&self, customer_id: &str) -> CustomerGetCall<'a, C, A> {
         CustomerGetCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -811,15 +807,15 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SubscriptionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
+impl<'a, C, A> SubscriptionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -829,7 +825,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn insert(&self, request: &Subscription, customer_id: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Subscription, customer_id: &str) -> SubscriptionInsertCall<'a, C, A> {
         SubscriptionInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -850,7 +846,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     /// * `deletionType` - Whether the subscription is to be fully cancelled or downgraded
-    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a, C, A> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -870,7 +866,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn get(&self, customer_id: &str, subscription_id: &str) -> SubscriptionGetCall<'a, C, NC, A> {
+    pub fn get(&self, customer_id: &str, subscription_id: &str) -> SubscriptionGetCall<'a, C, A> {
         SubscriptionGetCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -884,7 +880,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists subscriptions of a reseller, optionally filtered by a customer name prefix.
-    pub fn list(&self) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn list(&self) -> SubscriptionListCall<'a, C, A> {
         SubscriptionListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -907,7 +903,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_renewal_settings(&self, request: &RenewalSettings, customer_id: &str, subscription_id: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
+    pub fn change_renewal_settings(&self, request: &RenewalSettings, customer_id: &str, subscription_id: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         SubscriptionChangeRenewalSettingCall {
             hub: self.hub,
             _request: request.clone(),
@@ -927,7 +923,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn start_paid_service(&self, customer_id: &str, subscription_id: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
+    pub fn start_paid_service(&self, customer_id: &str, subscription_id: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         SubscriptionStartPaidServiceCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -947,7 +943,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_seats(&self, request: &Seats, customer_id: &str, subscription_id: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
+    pub fn change_seats(&self, request: &Seats, customer_id: &str, subscription_id: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         SubscriptionChangeSeatCall {
             hub: self.hub,
             _request: request.clone(),
@@ -967,7 +963,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn suspend(&self, customer_id: &str, subscription_id: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
+    pub fn suspend(&self, customer_id: &str, subscription_id: &str) -> SubscriptionSuspendCall<'a, C, A> {
         SubscriptionSuspendCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -986,7 +982,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn activate(&self, customer_id: &str, subscription_id: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
+    pub fn activate(&self, customer_id: &str, subscription_id: &str) -> SubscriptionActivateCall<'a, C, A> {
         SubscriptionActivateCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -1006,7 +1002,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_plan(&self, request: &ChangePlanRequest, customer_id: &str, subscription_id: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
+    pub fn change_plan(&self, request: &ChangePlanRequest, customer_id: &str, subscription_id: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         SubscriptionChangePlanCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1063,10 +1059,10 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomerUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: Customer,
     _customer_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1074,9 +1070,9 @@ pub struct CustomerUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomerUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomerUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1215,7 +1211,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Customer) -> CustomerUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Customer) -> CustomerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1225,7 +1221,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1236,7 +1232,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1257,7 +1253,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1274,7 +1270,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1319,10 +1315,10 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomerInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: Customer,
     _customer_auth_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1330,9 +1326,9 @@ pub struct CustomerInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomerInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomerInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1449,7 +1445,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Customer) -> CustomerInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Customer) -> CustomerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1457,7 +1453,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://www.google.com/a/cpanel//TransferToken. Optional.
-    pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, C, NC, A> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -1468,7 +1464,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1489,7 +1485,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1506,7 +1502,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1550,10 +1546,10 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomerPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: Customer,
     _customer_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1561,9 +1557,9 @@ pub struct CustomerPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomerPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomerPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1702,7 +1698,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Customer) -> CustomerPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Customer) -> CustomerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1712,7 +1708,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1723,7 +1719,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1744,7 +1740,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1761,7 +1757,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1799,19 +1795,19 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1943,7 +1939,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1954,7 +1950,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1975,7 +1971,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1992,7 +1988,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2037,10 +2033,10 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: Subscription,
     _customer_id: String,
     _customer_auth_token: Option<String>,
@@ -2049,9 +2045,9 @@ pub struct SubscriptionInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2193,7 +2189,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2203,7 +2199,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2211,7 +2207,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// An auth token needed for transferring a subscription. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken. Optional.
-    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -2222,7 +2218,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2243,7 +2239,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2260,7 +2256,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2298,10 +2294,10 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _subscription_id: String,
     _deletion_type: String,
@@ -2310,9 +2306,9 @@ pub struct SubscriptionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2435,7 +2431,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2445,7 +2441,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2455,7 +2451,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Whether the subscription is to be fully cancelled or downgraded
-    pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, A> {
         self._deletion_type = new_value.to_string();
         self
     }
@@ -2466,7 +2462,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2487,7 +2483,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2504,7 +2500,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2542,10 +2538,10 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2553,9 +2549,9 @@ pub struct SubscriptionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2688,7 +2684,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2698,7 +2694,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2709,7 +2705,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2730,7 +2726,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2747,7 +2743,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2790,10 +2786,10 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _customer_name_prefix: Option<String>,
@@ -2804,9 +2800,9 @@ pub struct SubscriptionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2926,7 +2922,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Token to specify next page in the list
-    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2934,7 +2930,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2942,7 +2938,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Prefix of the customer's domain name by which the subscriptions should be filtered. Optional
-    pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_name_prefix = Some(new_value.to_string());
         self
     }
@@ -2950,7 +2946,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2958,7 +2954,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// An auth token needed if the customer is not a resold customer of this reseller. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.
-    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -2969,7 +2965,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2990,7 +2986,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3007,7 +3003,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3051,10 +3047,10 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionChangeRenewalSettingCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionChangeRenewalSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: RenewalSettings,
     _customer_id: String,
     _subscription_id: String,
@@ -3063,9 +3059,9 @@ pub struct SubscriptionChangeRenewalSettingCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionChangeRenewalSettingCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3205,7 +3201,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3215,7 +3211,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3225,7 +3221,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3236,7 +3232,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeRenewalSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3257,7 +3253,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeRenewalSettingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3274,7 +3270,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3312,10 +3308,10 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionStartPaidServiceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionStartPaidServiceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3323,9 +3319,9 @@ pub struct SubscriptionStartPaidServiceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionStartPaidServiceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionStartPaidServiceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3458,7 +3454,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3468,7 +3464,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3479,7 +3475,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionStartPaidServiceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3500,7 +3496,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionStartPaidServiceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionStartPaidServiceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3517,7 +3513,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3561,10 +3557,10 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionChangeSeatCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionChangeSeatCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: Seats,
     _customer_id: String,
     _subscription_id: String,
@@ -3573,9 +3569,9 @@ pub struct SubscriptionChangeSeatCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionChangeSeatCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionChangeSeatCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3715,7 +3711,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Seats) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Seats) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3725,7 +3721,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3735,7 +3731,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3746,7 +3742,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangeSeatCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3767,7 +3763,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeSeatCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeSeatCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3784,7 +3780,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3822,10 +3818,10 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionSuspendCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionSuspendCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3833,9 +3829,9 @@ pub struct SubscriptionSuspendCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionSuspendCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionSuspendCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3968,7 +3964,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3978,7 +3974,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3989,7 +3985,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionSuspendCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionSuspendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4010,7 +4006,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionSuspendCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionSuspendCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4027,7 +4023,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionSuspendCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionSuspendCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4065,10 +4061,10 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionActivateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionActivateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4076,9 +4072,9 @@ pub struct SubscriptionActivateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionActivateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionActivateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4211,7 +4207,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -4221,7 +4217,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -4232,7 +4228,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionActivateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionActivateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4253,7 +4249,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionActivateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionActivateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4270,7 +4266,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionActivateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionActivateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4314,10 +4310,10 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionChangePlanCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SubscriptionChangePlanCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Reseller<C, NC, A>,
+    hub: &'a Reseller<C, A>,
     _request: ChangePlanRequest,
     _customer_id: String,
     _subscription_id: String,
@@ -4326,9 +4322,9 @@ pub struct SubscriptionChangePlanCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionChangePlanCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SubscriptionChangePlanCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4468,7 +4464,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ChangePlanRequest) -> SubscriptionChangePlanCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ChangePlanRequest) -> SubscriptionChangePlanCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4478,7 +4474,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Id of the Customer
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -4488,7 +4484,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Id of the subscription, which is unique for a customer
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -4499,7 +4495,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangePlanCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionChangePlanCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4520,7 +4516,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangePlanCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangePlanCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4537,7 +4533,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangePlanCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionChangePlanCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

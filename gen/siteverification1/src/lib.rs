@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *siteVerification* crate version *0.1.4+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *siteVerification* crate version *0.1.5+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *siteVerification* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/site-verification/).
@@ -197,7 +197,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -298,34 +297,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SiteVerification<C, NC, A> {
+pub struct SiteVerification<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for SiteVerification<C, NC, A> {}
+impl<'a, C, A> Hub for SiteVerification<C, A> {}
 
-impl<'a, C, NC, A> SiteVerification<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SiteVerification<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> SiteVerification<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> SiteVerification<C, A> {
         SiteVerification {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn web_resource(&'a self) -> WebResourceMethods<'a, C, NC, A> {
+    pub fn web_resource(&'a self) -> WebResourceMethods<'a, C, A> {
         WebResourceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -491,15 +487,15 @@ impl ResponseResult for SiteVerificationWebResourceGettokenResponse {}
 /// let rb = hub.web_resource();
 /// # }
 /// ```
-pub struct WebResourceMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for WebResourceMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for WebResourceMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
+impl<'a, C, A> WebResourceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -508,7 +504,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn get(&self, id: &str) -> WebResourceGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> WebResourceGetCall<'a, C, A> {
         WebResourceGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -526,7 +522,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn patch(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a, C, A> {
         WebResourcePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -540,7 +536,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get the list of your verified websites and domains.
-    pub fn list(&self) -> WebResourceListCall<'a, C, NC, A> {
+    pub fn list(&self) -> WebResourceListCall<'a, C, A> {
         WebResourceListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -556,7 +552,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a, C, A> {
         WebResourceDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -573,7 +569,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_token(&self, request: &SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C, NC, A> {
+    pub fn get_token(&self, request: &SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C, A> {
         WebResourceGetTokenCall {
             hub: self.hub,
             _request: request.clone(),
@@ -591,7 +587,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn update(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a, C, A> {
         WebResourceUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -610,7 +606,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `verificationMethod` - The method to use for verifying a site or domain.
-    pub fn insert(&self, request: &SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a, C, A> {
         WebResourceInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -660,19 +656,19 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -804,7 +800,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The id of a verified site or domain.
-    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -815,7 +811,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -836,7 +832,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -853,7 +849,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -897,10 +893,10 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourcePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourcePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -908,9 +904,9 @@ pub struct WebResourcePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourcePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourcePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1049,7 +1045,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1059,7 +1055,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The id of a verified site or domain.
-    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -1070,7 +1066,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourcePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourcePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1091,7 +1087,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1108,7 +1104,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourcePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourcePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1146,18 +1142,18 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1265,7 +1261,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1286,7 +1282,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1303,7 +1299,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1341,19 +1337,19 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1474,7 +1470,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The id of a verified site or domain.
-    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -1485,7 +1481,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1506,7 +1502,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1523,7 +1519,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1567,19 +1563,19 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceGetTokenCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceGetTokenCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _request: SiteVerificationWebResourceGettokenRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceGetTokenCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceGetTokenCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceGetTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1693,7 +1689,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1704,7 +1700,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceGetTokenCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceGetTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1725,7 +1721,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1742,7 +1738,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceGetTokenCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceGetTokenCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1786,10 +1782,10 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1797,9 +1793,9 @@ pub struct WebResourceUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1938,7 +1934,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1948,7 +1944,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The id of a verified site or domain.
-    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -1959,7 +1955,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1980,7 +1976,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1997,7 +1993,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2041,10 +2037,10 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct WebResourceInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WebResourceInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SiteVerification<C, NC, A>,
+    hub: &'a SiteVerification<C, A>,
     _request: SiteVerificationWebResourceResource,
     _verification_method: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2052,9 +2048,9 @@ pub struct WebResourceInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WebResourceInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WebResourceInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WebResourceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2169,7 +2165,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2179,7 +2175,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The method to use for verifying a site or domain.
-    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a, C, NC, A> {
+    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a, C, A> {
         self._verification_method = new_value.to_string();
         self
     }
@@ -2190,7 +2186,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WebResourceInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2211,7 +2207,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2228,7 +2224,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WebResourceInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WebResourceInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

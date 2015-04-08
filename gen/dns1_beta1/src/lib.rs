@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *0.1.4+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *dns* crate version *0.1.5+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *dns* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -199,7 +199,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -300,43 +299,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Dns<C, NC, A> {
+pub struct Dns<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Dns<C, NC, A> {}
+impl<'a, C, A> Hub for Dns<C, A> {}
 
-impl<'a, C, NC, A> Dns<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Dns<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Dns<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Dns<C, A> {
         Dns {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn changes(&'a self) -> ChangeMethods<'a, C, NC, A> {
+    pub fn changes(&'a self) -> ChangeMethods<'a, C, A> {
         ChangeMethods { hub: &self }
     }
-    pub fn managed_zones(&'a self) -> ManagedZoneMethods<'a, C, NC, A> {
+    pub fn managed_zones(&'a self) -> ManagedZoneMethods<'a, C, A> {
         ManagedZoneMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
-    pub fn resource_record_sets(&'a self) -> ResourceRecordSetMethods<'a, C, NC, A> {
+    pub fn resource_record_sets(&'a self) -> ResourceRecordSetMethods<'a, C, A> {
         ResourceRecordSetMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -616,15 +612,15 @@ impl ResponseResult for ResourceRecordSetsListResponse {}
 /// let rb = hub.changes();
 /// # }
 /// ```
-pub struct ChangeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChangeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChangeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
+impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -635,7 +631,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn create(&self, request: &Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, A> {
         ChangeCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -655,7 +651,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     ///
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -679,7 +675,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, A> {
         ChangeGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -722,15 +718,15 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
 /// let rb = hub.managed_zones();
 /// # }
 /// ```
-pub struct ManagedZoneMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagedZoneMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ManagedZoneMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ManagedZoneMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
+impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -740,7 +736,7 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Identifies the project addressed by this request.
-    pub fn create(&self, request: &ManagedZone, project: &str) -> ManagedZoneCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &ManagedZone, project: &str) -> ManagedZoneCreateCall<'a, C, A> {
         ManagedZoneCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -759,7 +755,7 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     ///
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         ManagedZoneDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -778,7 +774,7 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     ///
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a, C, A> {
         ManagedZoneGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -796,7 +792,7 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - Identifies the project addressed by this request.
-    pub fn list(&self, project: &str) -> ManagedZoneListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> ManagedZoneListCall<'a, C, A> {
         ManagedZoneListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -839,15 +835,15 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
 /// let rb = hub.resource_record_sets();
 /// # }
 /// ```
-pub struct ResourceRecordSetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ResourceRecordSetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ResourceRecordSetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ResourceRecordSetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ResourceRecordSetMethods<'a, C, NC, A> {
+impl<'a, C, A> ResourceRecordSetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -857,7 +853,7 @@ impl<'a, C, NC, A> ResourceRecordSetMethods<'a, C, NC, A> {
     ///
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a, C, A> {
         ResourceRecordSetListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -903,15 +899,15 @@ impl<'a, C, NC, A> ResourceRecordSetMethods<'a, C, NC, A> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -920,7 +916,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - Identifies the project addressed by this request.
-    pub fn get(&self, project: &str) -> ProjectGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str) -> ProjectGetCall<'a, C, A> {
         ProjectGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -975,10 +971,10 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _request: Change,
     _project: String,
     _managed_zone: String,
@@ -987,9 +983,9 @@ pub struct ChangeCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1129,7 +1125,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Change) -> ChangeCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Change) -> ChangeCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1139,7 +1135,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1149,7 +1145,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -1160,7 +1156,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1181,7 +1177,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1198,7 +1194,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1240,10 +1236,10 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
     _sort_order: Option<String>,
@@ -1255,9 +1251,9 @@ pub struct ChangeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1402,7 +1398,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1412,7 +1408,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -1420,7 +1416,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Sorting order direction: 'ascending' or 'descending'.
-    pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_order = Some(new_value.to_string());
         self
     }
@@ -1428,7 +1424,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Sorting criterion. The only supported value is change sequence.
-    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._sort_by = Some(new_value.to_string());
         self
     }
@@ -1436,7 +1432,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1444,7 +1440,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
-    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1455,7 +1451,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1476,7 +1472,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1493,7 +1489,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1531,10 +1527,10 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
     _change_id: String,
@@ -1543,9 +1539,9 @@ pub struct ChangeGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1679,7 +1675,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1689,7 +1685,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -1699,7 +1695,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._change_id = new_value.to_string();
         self
     }
@@ -1710,7 +1706,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1731,7 +1727,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1748,7 +1744,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1792,10 +1788,10 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagedZoneCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagedZoneCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _request: ManagedZone,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1803,9 +1799,9 @@ pub struct ManagedZoneCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagedZoneCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagedZoneCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1944,7 +1940,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ManagedZone) -> ManagedZoneCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ManagedZone) -> ManagedZoneCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1954,7 +1950,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1986,7 +1982,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2003,7 +1999,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2041,10 +2037,10 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagedZoneDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagedZoneDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2052,9 +2048,9 @@ pub struct ManagedZoneDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagedZoneDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagedZoneDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2176,7 +2172,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2186,7 +2182,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -2197,7 +2193,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2218,7 +2214,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2235,7 +2231,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2273,10 +2269,10 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagedZoneGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagedZoneGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2284,9 +2280,9 @@ pub struct ManagedZoneGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagedZoneGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagedZoneGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2419,7 +2415,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2429,7 +2425,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -2440,7 +2436,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2461,7 +2457,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2478,7 +2474,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2518,10 +2514,10 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ManagedZoneListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManagedZoneListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2530,9 +2526,9 @@ pub struct ManagedZoneListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManagedZoneListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManagedZoneListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2670,7 +2666,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2678,7 +2674,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2686,7 +2682,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
-    pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2697,7 +2693,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2718,7 +2714,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2735,7 +2731,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManagedZoneListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2777,10 +2773,10 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ResourceRecordSetListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ResourceRecordSetListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
     _type_: Option<String>,
@@ -2792,9 +2788,9 @@ pub struct ResourceRecordSetListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ResourceRecordSetListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ResourceRecordSetListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2939,7 +2935,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2949,7 +2945,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn managed_zone(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
@@ -2957,7 +2953,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
-    pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
@@ -2965,7 +2961,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2973,7 +2969,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Restricts the list to return only records with this fully qualified domain name.
-    pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -2981,7 +2977,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
-    pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2992,7 +2988,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceRecordSetListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceRecordSetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3013,7 +3009,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceRecordSetListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ResourceRecordSetListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3030,7 +3026,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ResourceRecordSetListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ResourceRecordSetListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3068,19 +3064,19 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Dns<C, NC, A>,
+    hub: &'a Dns<C, A>,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3212,7 +3208,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Identifies the project addressed by this request.
-    pub fn project(mut self, new_value: &str) -> ProjectGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ProjectGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3223,7 +3219,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3244,7 +3240,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3261,7 +3257,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *0.1.4+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *fitness* crate version *0.1.5+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -197,7 +197,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -314,34 +313,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Fitness<C, NC, A> {
+pub struct Fitness<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Fitness<C, NC, A> {}
+impl<'a, C, A> Hub for Fitness<C, A> {}
 
-impl<'a, C, NC, A> Fitness<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Fitness<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Fitness<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Fitness<C, A> {
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a, C, NC, A> {
+    pub fn users(&'a self) -> UserMethods<'a, C, A> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -698,15 +694,15 @@ impl ResponseResult for DataSource {}
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
+impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -717,7 +713,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `userId` - Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         UserDataSourceDatasetGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -739,7 +735,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_create(&self, request: &DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, C, NC, A> {
+    pub fn data_sources_create(&self, request: &DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, C, A> {
         UserDataSourceCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -759,7 +755,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `userId` - Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         UserDataSourceDatasetDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -783,7 +779,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `userId` - Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_patch(&self, request: &Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn data_sources_datasets_patch(&self, request: &Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         UserDataSourceDatasetPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -805,7 +801,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be deleted.
-    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
+    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, C, A> {
         UserSessionDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -825,7 +821,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to retrieve.
-    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
+    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, C, A> {
         UserDataSourceGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -847,7 +843,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to update.
-    pub fn data_sources_update(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
+    pub fn data_sources_update(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         UserDataSourceUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -866,7 +862,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, C, A> {
         UserSessionListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -889,7 +885,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be created.
-    pub fn sessions_update(&self, request: &Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn sessions_update(&self, request: &Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, C, A> {
         UserSessionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -913,7 +909,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to update.
-    pub fn data_sources_patch(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
+    pub fn data_sources_patch(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourcePatchCall<'a, C, A> {
         UserDataSourcePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -932,7 +928,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, C, NC, A> {
+    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, C, A> {
         UserDataSourceListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -984,10 +980,10 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceDatasetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceDatasetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -998,9 +994,9 @@ pub struct UserDataSourceDatasetGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceDatasetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceDatasetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1140,7 +1136,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1150,7 +1146,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source that created the dataset.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1160,7 +1156,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1168,7 +1164,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
-    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1176,7 +1172,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.
-    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
@@ -1187,7 +1183,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1208,7 +1204,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1225,7 +1221,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1269,10 +1265,10 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _request: DataSource,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1280,9 +1276,9 @@ pub struct UserDataSourceCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1421,7 +1417,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DataSource) -> UserDataSourceCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DataSource) -> UserDataSourceCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1431,7 +1427,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1442,7 +1438,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1463,7 +1459,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1480,7 +1476,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1520,10 +1516,10 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceDatasetDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceDatasetDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -1534,9 +1530,9 @@ pub struct UserDataSourceDatasetDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceDatasetDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceDatasetDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceDatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1665,7 +1661,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1675,7 +1671,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source that created the dataset.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1685,7 +1681,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1693,7 +1689,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// When the operation was performed on the client.
-    pub fn modified_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn modified_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._modified_time_millis = Some(new_value.to_string());
         self
     }
@@ -1701,7 +1697,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// The client's current time in milliseconds since epoch.
-    pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
@@ -1712,7 +1708,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1733,7 +1729,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1750,7 +1746,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1795,10 +1791,10 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceDatasetPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceDatasetPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _request: Dataset,
     _user_id: String,
     _data_source_id: String,
@@ -1809,9 +1805,9 @@ pub struct UserDataSourceDatasetPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceDatasetPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceDatasetPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceDatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1955,7 +1951,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Dataset) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Dataset) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1975,7 +1971,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source that created the dataset.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1985,7 +1981,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1993,7 +1989,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The client's current time in milliseconds since epoch. Note that the minStartTimeNs and maxEndTimeNs properties in the request body are in nanoseconds instead of milliseconds.
-    pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
@@ -2004,7 +2000,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceDatasetPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2025,7 +2021,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2042,7 +2038,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2081,10 +2077,10 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct UserSessionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserSessionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _session_id: String,
     _current_time_millis: Option<String>,
@@ -2093,9 +2089,9 @@ pub struct UserSessionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserSessionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserSessionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserSessionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2220,7 +2216,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2230,7 +2226,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the session to be deleted.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._session_id = new_value.to_string();
         self
     }
@@ -2238,7 +2234,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The client's current time in milliseconds since epoch.
-    pub fn current_time_millis(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
+    pub fn current_time_millis(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
@@ -2249,7 +2245,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2270,7 +2266,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2287,7 +2283,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserSessionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserSessionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2325,10 +2321,10 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _data_source_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2336,9 +2332,9 @@ pub struct UserDataSourceGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2471,7 +2467,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2481,7 +2477,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source to retrieve.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2492,7 +2488,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2513,7 +2509,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2530,7 +2526,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2576,10 +2572,10 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _request: DataSource,
     _user_id: String,
     _data_source_id: String,
@@ -2588,9 +2584,9 @@ pub struct UserDataSourceUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2730,7 +2726,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DataSource) -> UserDataSourceUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DataSource) -> UserDataSourceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2740,7 +2736,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2750,7 +2746,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source to update.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2761,7 +2757,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2782,7 +2778,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2799,7 +2795,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2841,10 +2837,10 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct UserSessionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserSessionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
@@ -2855,9 +2851,9 @@ pub struct UserSessionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserSessionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserSessionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3001,7 +2997,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3009,7 +3005,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
-    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -3017,7 +3013,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3025,7 +3021,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// If true, deleted sessions will be returned. When set to true, sessions returned in this response will only have an ID and will not have any other fields.
-    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -3033,7 +3029,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
-    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -3044,7 +3040,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3065,7 +3061,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3082,7 +3078,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserSessionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserSessionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3127,10 +3123,10 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserSessionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserSessionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _request: Session,
     _user_id: String,
     _session_id: String,
@@ -3140,9 +3136,9 @@ pub struct UserSessionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserSessionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserSessionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3285,7 +3281,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Session) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Session) -> UserSessionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3295,7 +3291,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3305,7 +3301,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the session to be created.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._session_id = new_value.to_string();
         self
     }
@@ -3313,7 +3309,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The client's current time in milliseconds since epoch.
-    pub fn current_time_millis(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn current_time_millis(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
     }
@@ -3324,7 +3320,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSessionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3345,7 +3341,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3362,7 +3358,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserSessionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserSessionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3408,10 +3404,10 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourcePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourcePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _request: DataSource,
     _user_id: String,
     _data_source_id: String,
@@ -3420,9 +3416,9 @@ pub struct UserDataSourcePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourcePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourcePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3562,7 +3558,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DataSource) -> UserDataSourcePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DataSource) -> UserDataSourcePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3572,7 +3568,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3582,7 +3578,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The data stream ID of the data source to update.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, A> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -3593,7 +3589,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourcePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourcePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3614,7 +3610,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourcePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourcePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3631,7 +3627,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourcePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourcePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3670,10 +3666,10 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDataSourceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDataSourceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fitness<C, NC, A>,
+    hub: &'a Fitness<C, A>,
     _user_id: String,
     _data_type_name: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -3681,9 +3677,9 @@ pub struct UserDataSourceListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDataSourceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDataSourceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3822,7 +3818,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3831,7 +3827,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The names of data types to include in the list. If not specified, all data sources will be returned.
-    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, NC, A> {
+    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, A> {
         self._data_type_name.push(new_value.to_string());
         self
     }
@@ -3842,7 +3838,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDataSourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3863,7 +3859,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3880,7 +3876,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDataSourceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

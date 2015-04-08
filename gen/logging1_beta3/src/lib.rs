@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *logging* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3).
 //! # Features
 //! 
@@ -196,7 +196,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -293,34 +292,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Logging<C, NC, A> {
+pub struct Logging<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Logging<C, NC, A> {}
+impl<'a, C, A> Hub for Logging<C, A> {}
 
-impl<'a, C, NC, A> Logging<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Logging<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Logging<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Logging<C, A> {
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -676,15 +672,15 @@ impl ResponseResult for ListLogServiceSinksResponse {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -693,7 +689,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectsId` - Part of `projectName`. The project resource whose services are to be listed.
-    pub fn log_services_list(&self, projects_id: &str) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn log_services_list(&self, projects_id: &str) -> ProjectLogServiceListCall<'a, C, A> {
         ProjectLogServiceListCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -713,7 +709,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectsId` - Part of `projectName`. The project name for which to list the log resources.
-    pub fn logs_list(&self, projects_id: &str) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn logs_list(&self, projects_id: &str) -> ProjectLogListCall<'a, C, A> {
         ProjectLogListCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -736,7 +732,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink resource to return.
     /// * `logsId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_sinks_get(&self, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkGetCall<'a, C, NC, A> {
+    pub fn logs_sinks_get(&self, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         ProjectLogSinkGetCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -758,7 +754,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to update.
     /// * `logServicesId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_update(&self, request: &LogSink, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn log_services_sinks_update(&self, request: &LogSink, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         ProjectLogServiceSinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -780,7 +776,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `logName`. The name of the log resource into which to insert the log entries.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_entries_write(&self, request: &WriteLogEntriesRequest, projects_id: &str, logs_id: &str) -> ProjectLogEntryWriteCall<'a, C, NC, A> {
+    pub fn logs_entries_write(&self, request: &WriteLogEntriesRequest, projects_id: &str, logs_id: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         ProjectLogEntryWriteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -801,7 +797,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to delete.
     /// * `logServicesId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_delete(&self, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {
+    pub fn log_services_sinks_delete(&self, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         ProjectLogServiceSinkDeleteCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -821,7 +817,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectsId` - Part of `serviceName`. A log service resource of the form `/projects/*/logServices/*`. The service indexes of the log service are returned. Example: `"/projects/myProj/logServices/appengine.googleapis.com"`.
     /// * `logServicesId` - Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_indexes_list(&self, projects_id: &str, log_services_id: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn log_services_indexes_list(&self, projects_id: &str, log_services_id: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         ProjectLogServiceIndexeListCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -845,7 +841,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectsId` - Part of `logName`. The log for which to list sinks.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_sinks_list(&self, projects_id: &str, logs_id: &str) -> ProjectLogSinkListCall<'a, C, NC, A> {
+    pub fn logs_sinks_list(&self, projects_id: &str, logs_id: &str) -> ProjectLogSinkListCall<'a, C, A> {
         ProjectLogSinkListCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -866,7 +862,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to update.
     /// * `logsId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_sinks_update(&self, request: &LogSink, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn logs_sinks_update(&self, request: &LogSink, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         ProjectLogSinkUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -888,7 +884,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `serviceName`. The name of the service in which to create a sink.
     /// * `logServicesId` - Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_create(&self, request: &LogSink, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> {
+    pub fn log_services_sinks_create(&self, request: &LogSink, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         ProjectLogServiceSinkCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -909,7 +905,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to delete.
     /// * `logsId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_sinks_delete(&self, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkDeleteCall<'a, C, NC, A> {
+    pub fn logs_sinks_delete(&self, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         ProjectLogSinkDeleteCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -930,7 +926,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `logName`. The log in which to create a sink resource.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_sinks_create(&self, request: &LogSink, projects_id: &str, logs_id: &str) -> ProjectLogSinkCreateCall<'a, C, NC, A> {
+    pub fn logs_sinks_create(&self, request: &LogSink, projects_id: &str, logs_id: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         ProjectLogSinkCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -951,7 +947,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to return.
     /// * `logServicesId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_get(&self, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> {
+    pub fn log_services_sinks_get(&self, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         ProjectLogServiceSinkGetCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -971,7 +967,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectsId` - Part of `serviceName`. The name of the service for which to list sinks.
     /// * `logServicesId` - Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_list(&self, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkListCall<'a, C, NC, A> {
+    pub fn log_services_sinks_list(&self, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkListCall<'a, C, A> {
         ProjectLogServiceSinkListCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -990,7 +986,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectsId` - Part of `logName`. The log resource to delete.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_delete(&self, projects_id: &str, logs_id: &str) -> ProjectLogDeleteCall<'a, C, NC, A> {
+    pub fn logs_delete(&self, projects_id: &str, logs_id: &str) -> ProjectLogDeleteCall<'a, C, A> {
         ProjectLogDeleteCall {
             hub: self.hub,
             _projects_id: projects_id.to_string(),
@@ -1043,10 +1039,10 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1056,9 +1052,9 @@ pub struct ProjectLogServiceListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1199,7 +1195,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Part of `projectName`. The project resource whose services are to be listed.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -1207,7 +1203,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogServices` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogServices` operation is continued.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1215,7 +1211,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of `LogService` objects to return in one operation.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -1223,7 +1219,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The name of the log resource whose services are to be listed. log for which to list services. When empty, all services are listed.
-    pub fn log(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn log(mut self, new_value: &str) -> ProjectLogServiceListCall<'a, C, A> {
         self._log = Some(new_value.to_string());
         self
     }
@@ -1234,7 +1230,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1259,7 +1255,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1276,7 +1272,7 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1318,10 +1314,10 @@ impl<'a, C, NC, A> ProjectLogServiceListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _service_name: Option<String>,
     _service_index_prefix: Option<String>,
@@ -1332,9 +1328,9 @@ pub struct ProjectLogListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1478,7 +1474,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Part of `projectName`. The project name for which to list the log resources.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -1486,7 +1482,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// A service name for which to list logs. Only logs containing entries whose metadata includes this service name are returned. If `serviceName` and `serviceIndexPrefix` are both empty, then all log names are returned. To list all log names, regardless of service, leave both the `serviceName` and `serviceIndexPrefix` empty. To list log names containing entries with a particular service name (or explicitly empty service name) set `serviceName` to the desired value and `serviceIndexPrefix` to `"/"`.
-    pub fn service_name(mut self, new_value: &str) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn service_name(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._service_name = Some(new_value.to_string());
         self
     }
@@ -1494,7 +1490,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// A log service index prefix for which to list logs. Only logs containing entries whose metadata that includes these label values (associated with index keys) are returned. The prefix is a slash separated list of values, and need not specify all index labels. An empty index (or a single slash) matches all log service indexes.
-    pub fn service_index_prefix(mut self, new_value: &str) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn service_index_prefix(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._service_index_prefix = Some(new_value.to_string());
         self
     }
@@ -1502,7 +1498,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogs` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogs` operation is continued.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLogListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1510,7 +1506,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The maximum number of results to return.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLogListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -1521,7 +1517,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1546,7 +1542,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1563,7 +1559,7 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1601,10 +1597,10 @@ impl<'a, C, NC, A> ProjectLogListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogSinkGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogSinkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _logs_id: String,
     _sinks_id: String,
@@ -1613,9 +1609,9 @@ pub struct ProjectLogSinkGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogSinkGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogSinkGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1749,7 +1745,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink resource to return.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -1759,7 +1755,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -1769,7 +1765,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkGetCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -1780,7 +1776,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1805,7 +1801,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1822,7 +1818,7 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1866,10 +1862,10 @@ impl<'a, C, NC, A> ProjectLogSinkGetCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceSinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceSinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _request: LogSink,
     _projects_id: String,
     _log_services_id: String,
@@ -1879,9 +1875,9 @@ pub struct ProjectLogServiceSinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceSinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2022,7 +2018,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2032,7 +2028,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink to update.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -2042,7 +2038,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -2052,7 +2048,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -2063,7 +2059,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2088,7 +2084,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2105,7 +2101,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2149,10 +2145,10 @@ impl<'a, C, NC, A> ProjectLogServiceSinkUpdateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogEntryWriteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogEntryWriteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _request: WriteLogEntriesRequest,
     _projects_id: String,
     _logs_id: String,
@@ -2161,9 +2157,9 @@ pub struct ProjectLogEntryWriteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogEntryWriteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogEntryWriteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2303,7 +2299,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &WriteLogEntriesRequest) -> ProjectLogEntryWriteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &WriteLogEntriesRequest) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2313,7 +2309,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. The name of the log resource into which to insert the log entries.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -2323,7 +2319,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -2334,7 +2330,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogEntryWriteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogEntryWriteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2359,7 +2355,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogEntryWriteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogEntryWriteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2376,7 +2372,7 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogEntryWriteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogEntryWriteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2414,10 +2410,10 @@ impl<'a, C, NC, A> ProjectLogEntryWriteCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceSinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceSinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _log_services_id: String,
     _sinks_id: String,
@@ -2426,9 +2422,9 @@ pub struct ProjectLogServiceSinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceSinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2562,7 +2558,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink to delete.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -2572,7 +2568,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -2582,7 +2578,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -2593,7 +2589,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2618,7 +2614,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2635,7 +2631,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2678,10 +2674,10 @@ impl<'a, C, NC, A> ProjectLogServiceSinkDeleteCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceIndexeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceIndexeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _log_services_id: String,
     _page_token: Option<String>,
@@ -2694,9 +2690,9 @@ pub struct ProjectLogServiceIndexeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceIndexeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceIndexeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2844,7 +2840,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. A log service resource of the form `/projects/*/logServices/*`. The service indexes of the log service are returned. Example: `"/projects/myProj/logServices/appengine.googleapis.com"`.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -2854,7 +2850,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -2862,7 +2858,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// An opaque token, returned as `nextPageToken` by a prior `ListLogServiceIndexes` operation. If `pageToken` is supplied, then the other fields of this request are ignored, and instead the previous `ListLogServiceIndexes` operation is continued.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2870,7 +2866,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// The maximum number of log service index resources to return in one operation.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -2878,7 +2874,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// A log resource like `/projects/project_id/logs/log_name`, identifying the log for which to list service indexes.
-    pub fn log(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn log(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._log = Some(new_value.to_string());
         self
     }
@@ -2886,7 +2882,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// Restricts the indexes returned to be those with a specified prefix. The prefix has the form `"/label_value/label_value/..."`, in order corresponding to the [`LogService indexKeys`][google.logging.v1.LogService.index_keys]. Non-empty prefixes must begin with `/` . Example prefixes: + `"/myModule/"` retrieves App Engine versions associated with `myModule`. The trailing slash terminates the value. + `"/myModule"` retrieves App Engine modules with names beginning with `myModule`. + `""` retrieves all indexes.
-    pub fn index_prefix(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn index_prefix(mut self, new_value: &str) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._index_prefix = Some(new_value.to_string());
         self
     }
@@ -2894,7 +2890,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// A limit to the number of levels of the index hierarchy that are expanded. If `depth` is 0, it defaults to the level specified by the prefix field (the number of slash separators). The default empty prefix implies a `depth` of 1. It is an error for `depth` to be any non-zero value less than the number of components in `indexPrefix`.
-    pub fn depth(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn depth(mut self, new_value: i32) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._depth = Some(new_value);
         self
     }
@@ -2905,7 +2901,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceIndexeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2930,7 +2926,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceIndexeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceIndexeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2947,7 +2943,7 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceIndexeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceIndexeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2985,10 +2981,10 @@ impl<'a, C, NC, A> ProjectLogServiceIndexeListCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogSinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogSinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _logs_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2996,9 +2992,9 @@ pub struct ProjectLogSinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogSinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogSinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3131,7 +3127,7 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. The log for which to list sinks.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -3141,7 +3137,7 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkListCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -3152,7 +3148,7 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3177,7 +3173,7 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3194,7 +3190,7 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3238,10 +3234,10 @@ impl<'a, C, NC, A> ProjectLogSinkListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogSinkUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogSinkUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _request: LogSink,
     _projects_id: String,
     _logs_id: String,
@@ -3251,9 +3247,9 @@ pub struct ProjectLogSinkUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogSinkUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogSinkUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3394,7 +3390,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3404,7 +3400,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink to update.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -3414,7 +3410,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -3424,7 +3420,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -3435,7 +3431,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3460,7 +3456,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3477,7 +3473,7 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3521,10 +3517,10 @@ impl<'a, C, NC, A> ProjectLogSinkUpdateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceSinkCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceSinkCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _request: LogSink,
     _projects_id: String,
     _log_services_id: String,
@@ -3533,9 +3529,9 @@ pub struct ProjectLogServiceSinkCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceSinkCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceSinkCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3675,7 +3671,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3685,7 +3681,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. The name of the service in which to create a sink.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -3695,7 +3691,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -3706,7 +3702,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3731,7 +3727,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3748,7 +3744,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3786,10 +3782,10 @@ impl<'a, C, NC, A> ProjectLogServiceSinkCreateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogSinkDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogSinkDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _logs_id: String,
     _sinks_id: String,
@@ -3798,9 +3794,9 @@ pub struct ProjectLogSinkDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogSinkDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogSinkDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3934,7 +3930,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink to delete.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -3944,7 +3940,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -3954,7 +3950,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -3965,7 +3961,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3990,7 +3986,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4007,7 +4003,7 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4051,10 +4047,10 @@ impl<'a, C, NC, A> ProjectLogSinkDeleteCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogSinkCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogSinkCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _request: LogSink,
     _projects_id: String,
     _logs_id: String,
@@ -4063,9 +4059,9 @@ pub struct ProjectLogSinkCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogSinkCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogSinkCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4205,7 +4201,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4215,7 +4211,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. The log in which to create a sink resource.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -4225,7 +4221,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -4236,7 +4232,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogSinkCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4261,7 +4257,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogSinkCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4278,7 +4274,7 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogSinkCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4316,10 +4312,10 @@ impl<'a, C, NC, A> ProjectLogSinkCreateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceSinkGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceSinkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _log_services_id: String,
     _sinks_id: String,
@@ -4328,9 +4324,9 @@ pub struct ProjectLogServiceSinkGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceSinkGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceSinkGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4464,7 +4460,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. The name of the sink to return.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -4474,7 +4470,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -4484,7 +4480,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Part of `sinkName`. See documentation of `projectsId`.
-    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> {
+    pub fn sinks_id(mut self, new_value: &str) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._sinks_id = new_value.to_string();
         self
     }
@@ -4495,7 +4491,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4520,7 +4516,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4537,7 +4533,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4575,10 +4571,10 @@ impl<'a, C, NC, A> ProjectLogServiceSinkGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogServiceSinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogServiceSinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _log_services_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4586,9 +4582,9 @@ pub struct ProjectLogServiceSinkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogServiceSinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogServiceSinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4721,7 +4717,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. The name of the service for which to list sinks.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -4731,7 +4727,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, NC, A> {
+    pub fn log_services_id(mut self, new_value: &str) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._log_services_id = new_value.to_string();
         self
     }
@@ -4742,7 +4738,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogServiceSinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4767,7 +4763,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogServiceSinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4784,7 +4780,7 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogServiceSinkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4822,10 +4818,10 @@ impl<'a, C, NC, A> ProjectLogServiceSinkListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLogDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectLogDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Logging<C, NC, A>,
+    hub: &'a Logging<C, A>,
     _projects_id: String,
     _logs_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4833,9 +4829,9 @@ pub struct ProjectLogDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectLogDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectLogDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4968,7 +4964,7 @@ impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. The log resource to delete.
-    pub fn projects_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, NC, A> {
+    pub fn projects_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, A> {
         self._projects_id = new_value.to_string();
         self
     }
@@ -4978,7 +4974,7 @@ impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, NC, A> {
+    pub fn logs_id(mut self, new_value: &str) -> ProjectLogDeleteCall<'a, C, A> {
         self._logs_id = new_value.to_string();
         self
     }
@@ -4989,7 +4985,7 @@ impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLogDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5014,7 +5010,7 @@ impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLogDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5031,7 +5027,7 @@ impl<'a, C, NC, A> ProjectLogDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectLogDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

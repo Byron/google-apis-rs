@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapool* crate version *0.1.4+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *replicapool* crate version *0.1.5+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *replicapool* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
@@ -202,7 +202,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -304,37 +303,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Replicapool<C, NC, A> {
+pub struct Replicapool<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Replicapool<C, NC, A> {}
+impl<'a, C, A> Hub for Replicapool<C, A> {}
 
-impl<'a, C, NC, A> Replicapool<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Replicapool<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Replicapool<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Replicapool<C, A> {
         Replicapool {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn instance_group_managers(&'a self) -> InstanceGroupManagerMethods<'a, C, NC, A> {
+    pub fn instance_group_managers(&'a self) -> InstanceGroupManagerMethods<'a, C, A> {
         InstanceGroupManagerMethods { hub: &self }
     }
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, NC, A> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, A> {
         ZoneOperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -741,15 +737,15 @@ impl ResponseResult for Operation {}
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneOperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -759,7 +755,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, A> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -782,7 +778,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
     /// * `operation` - Name of the operation resource to return.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, A> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -825,15 +821,15 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 /// let rb = hub.instance_group_managers();
 /// # }
 /// ```
-pub struct InstanceGroupManagerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for InstanceGroupManagerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for InstanceGroupManagerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
+impl<'a, C, A> InstanceGroupManagerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -845,7 +841,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
-    pub fn set_target_pools(&self, request: &InstanceGroupManagersSetTargetPoolsRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn set_target_pools(&self, request: &InstanceGroupManagersSetTargetPoolsRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         InstanceGroupManagerSetTargetPoolCall {
             hub: self.hub,
             _request: request.clone(),
@@ -866,7 +862,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     ///
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
-    pub fn list(&self, project: &str, zone: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         InstanceGroupManagerListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -890,7 +886,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `size` - Number of instances that should exist.
-    pub fn insert(&self, request: &InstanceGroupManager, project: &str, zone: &str, size: i32) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &InstanceGroupManager, project: &str, zone: &str, size: i32) -> InstanceGroupManagerInsertCall<'a, C, A> {
         InstanceGroupManagerInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -912,7 +908,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - Name of the instance resource to return.
-    pub fn get(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         InstanceGroupManagerGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -934,7 +930,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
-    pub fn abandon_instances(&self, request: &InstanceGroupManagersAbandonInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn abandon_instances(&self, request: &InstanceGroupManagersAbandonInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         InstanceGroupManagerAbandonInstanceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -957,7 +953,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
-    pub fn recreate_instances(&self, request: &InstanceGroupManagersRecreateInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn recreate_instances(&self, request: &InstanceGroupManagersRecreateInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         InstanceGroupManagerRecreateInstanceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -979,7 +975,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - Name of the Instance Group Manager resource to delete.
-    pub fn delete(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         InstanceGroupManagerDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1001,7 +997,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
-    pub fn set_instance_template(&self, request: &InstanceGroupManagersSetInstanceTemplateRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn set_instance_template(&self, request: &InstanceGroupManagersSetInstanceTemplateRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         InstanceGroupManagerSetInstanceTemplateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1024,7 +1020,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
     /// * `size` - Number of instances that should exist in this Instance Group Manager.
-    pub fn resize(&self, project: &str, zone: &str, instance_group_manager: &str, size: i32) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn resize(&self, project: &str, zone: &str, instance_group_manager: &str, size: i32) -> InstanceGroupManagerResizeCall<'a, C, A> {
         InstanceGroupManagerResizeCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1047,7 +1043,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the instance group manager resides.
     /// * `instanceGroupManager` - The name of the instance group manager.
-    pub fn delete_instances(&self, request: &InstanceGroupManagersDeleteInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn delete_instances(&self, request: &InstanceGroupManagersDeleteInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         InstanceGroupManagerDeleteInstanceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1102,10 +1098,10 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1116,9 +1112,9 @@ pub struct ZoneOperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1260,7 +1256,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Name of the project scoping this request.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1270,7 +1266,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Name of the zone scoping this request.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1278,7 +1274,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1286,7 +1282,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1294,7 +1290,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Filter expression for filtering listed resources.
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1305,7 +1301,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1326,7 +1322,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1343,7 +1339,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1381,10 +1377,10 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -1393,9 +1389,9 @@ pub struct ZoneOperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1529,7 +1525,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the project scoping this request.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1539,7 +1535,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the zone scoping this request.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1549,7 +1545,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the operation resource to return.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -1560,7 +1556,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1581,7 +1577,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1598,7 +1594,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1642,10 +1638,10 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerSetTargetPoolCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManagersSetTargetPoolsRequest,
     _project: String,
     _zone: String,
@@ -1655,9 +1651,9 @@ pub struct InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerSetTargetPoolCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerSetTargetPoolCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1798,7 +1794,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManagersSetTargetPoolsRequest) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManagersSetTargetPoolsRequest) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1808,7 +1804,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1818,7 +1814,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1828,7 +1824,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -1839,7 +1835,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1860,7 +1856,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1877,7 +1873,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1918,10 +1914,10 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1932,9 +1928,9 @@ pub struct InstanceGroupManagerListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2076,7 +2072,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2086,7 +2082,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2094,7 +2090,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2102,7 +2098,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
-    pub fn max_results(mut self, new_value: u32) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> InstanceGroupManagerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2110,7 +2106,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Optional. Filter expression for filtering listed resources.
-    pub fn filter(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2121,7 +2117,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2142,7 +2138,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2159,7 +2155,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2203,10 +2199,10 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManager,
     _project: String,
     _zone: String,
@@ -2216,9 +2212,9 @@ pub struct InstanceGroupManagerInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2359,7 +2355,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManager) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManager) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2369,7 +2365,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2379,7 +2375,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2389,7 +2385,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Number of instances that should exist.
-    pub fn size(mut self, new_value: i32) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn size(mut self, new_value: i32) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._size = new_value;
         self
     }
@@ -2400,7 +2396,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2421,7 +2417,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2438,7 +2434,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2476,10 +2472,10 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _instance_group_manager: String,
@@ -2488,9 +2484,9 @@ pub struct InstanceGroupManagerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2624,7 +2620,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2634,7 +2630,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2644,7 +2640,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name of the instance resource to return.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -2655,7 +2651,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2676,7 +2672,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2693,7 +2689,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2737,10 +2733,10 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerAbandonInstanceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManagersAbandonInstancesRequest,
     _project: String,
     _zone: String,
@@ -2750,9 +2746,9 @@ pub struct InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerAbandonInstanceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerAbandonInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2893,7 +2889,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManagersAbandonInstancesRequest) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManagersAbandonInstancesRequest) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2903,7 +2899,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2913,7 +2909,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2923,7 +2919,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -2934,7 +2930,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2955,7 +2951,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2972,7 +2968,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3016,10 +3012,10 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerRecreateInstanceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManagersRecreateInstancesRequest,
     _project: String,
     _zone: String,
@@ -3029,9 +3025,9 @@ pub struct InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerRecreateInstanceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerRecreateInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3172,7 +3168,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManagersRecreateInstancesRequest) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManagersRecreateInstancesRequest) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3182,7 +3178,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3192,7 +3188,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3202,7 +3198,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -3213,7 +3209,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3234,7 +3230,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3251,7 +3247,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3289,10 +3285,10 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _instance_group_manager: String,
@@ -3301,9 +3297,9 @@ pub struct InstanceGroupManagerDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3437,7 +3433,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3447,7 +3443,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3457,7 +3453,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Name of the Instance Group Manager resource to delete.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -3468,7 +3464,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3489,7 +3485,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3506,7 +3502,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3550,10 +3546,10 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerSetInstanceTemplateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManagersSetInstanceTemplateRequest,
     _project: String,
     _zone: String,
@@ -3563,9 +3559,9 @@ pub struct InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3706,7 +3702,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManagersSetInstanceTemplateRequest) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManagersSetInstanceTemplateRequest) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3716,7 +3712,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3726,7 +3722,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3736,7 +3732,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -3747,7 +3743,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3768,7 +3764,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3785,7 +3781,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3823,10 +3819,10 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerResizeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerResizeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _project: String,
     _zone: String,
     _instance_group_manager: String,
@@ -3836,9 +3832,9 @@ pub struct InstanceGroupManagerResizeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerResizeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerResizeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerResizeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3973,7 +3969,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3983,7 +3979,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3993,7 +3989,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -4003,7 +3999,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Number of instances that should exist in this Instance Group Manager.
-    pub fn size(mut self, new_value: i32) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn size(mut self, new_value: i32) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._size = new_value;
         self
     }
@@ -4014,7 +4010,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerResizeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4035,7 +4031,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerResizeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerResizeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4052,7 +4048,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerResizeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerResizeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4096,10 +4092,10 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGroupManagerDeleteInstanceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Replicapool<C, NC, A>,
+    hub: &'a Replicapool<C, A>,
     _request: InstanceGroupManagersDeleteInstancesRequest,
     _project: String,
     _zone: String,
@@ -4109,9 +4105,9 @@ pub struct InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGroupManagerDeleteInstanceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGroupManagerDeleteInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4252,7 +4248,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstanceGroupManagersDeleteInstancesRequest) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstanceGroupManagersDeleteInstancesRequest) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4262,7 +4258,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// we provide this method for API completeness.
     /// 
     /// The Google Developers Console project name.
-    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4272,7 +4268,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// we provide this method for API completeness.
     /// 
     /// The name of the zone in which the instance group manager resides.
-    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -4282,7 +4278,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// we provide this method for API completeness.
     /// 
     /// The name of the instance group manager.
-    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._instance_group_manager = new_value.to_string();
         self
     }
@@ -4293,7 +4289,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4314,7 +4310,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4331,7 +4327,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

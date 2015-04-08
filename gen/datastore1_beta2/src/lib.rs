@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *0.1.4+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *datastore* crate version *0.1.5+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *datastore* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/datastore/).
@@ -194,7 +194,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -299,34 +298,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Datastore<C, NC, A> {
+pub struct Datastore<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Datastore<C, NC, A> {}
+impl<'a, C, A> Hub for Datastore<C, A> {}
 
-impl<'a, C, NC, A> Datastore<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Datastore<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Datastore<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Datastore<C, A> {
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn datasets(&'a self) -> DatasetMethods<'a, C, NC, A> {
+    pub fn datasets(&'a self) -> DatasetMethods<'a, C, A> {
         DatasetMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1075,15 +1071,15 @@ impl Part for Query {}
 /// let rb = hub.datasets();
 /// # }
 /// ```
-pub struct DatasetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DatasetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DatasetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
+impl<'a, C, A> DatasetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1093,7 +1089,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn commit(&self, request: &CommitRequest, dataset_id: &str) -> DatasetCommitCall<'a, C, NC, A> {
+    pub fn commit(&self, request: &CommitRequest, dataset_id: &str) -> DatasetCommitCall<'a, C, A> {
         DatasetCommitCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1112,7 +1108,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn allocate_ids(&self, request: &AllocateIdsRequest, dataset_id: &str) -> DatasetAllocateIdCall<'a, C, NC, A> {
+    pub fn allocate_ids(&self, request: &AllocateIdsRequest, dataset_id: &str) -> DatasetAllocateIdCall<'a, C, A> {
         DatasetAllocateIdCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1131,7 +1127,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn rollback(&self, request: &RollbackRequest, dataset_id: &str) -> DatasetRollbackCall<'a, C, NC, A> {
+    pub fn rollback(&self, request: &RollbackRequest, dataset_id: &str) -> DatasetRollbackCall<'a, C, A> {
         DatasetRollbackCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1150,7 +1146,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn lookup(&self, request: &LookupRequest, dataset_id: &str) -> DatasetLookupCall<'a, C, NC, A> {
+    pub fn lookup(&self, request: &LookupRequest, dataset_id: &str) -> DatasetLookupCall<'a, C, A> {
         DatasetLookupCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1169,7 +1165,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn run_query(&self, request: &RunQueryRequest, dataset_id: &str) -> DatasetRunQueryCall<'a, C, NC, A> {
+    pub fn run_query(&self, request: &RunQueryRequest, dataset_id: &str) -> DatasetRunQueryCall<'a, C, A> {
         DatasetRunQueryCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1188,7 +1184,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `datasetId` - Identifies the dataset.
-    pub fn begin_transaction(&self, request: &BeginTransactionRequest, dataset_id: &str) -> DatasetBeginTransactionCall<'a, C, NC, A> {
+    pub fn begin_transaction(&self, request: &BeginTransactionRequest, dataset_id: &str) -> DatasetBeginTransactionCall<'a, C, A> {
         DatasetBeginTransactionCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1244,10 +1240,10 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetCommitCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetCommitCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: CommitRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1255,9 +1251,9 @@ pub struct DatasetCommitCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetCommitCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetCommitCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1396,7 +1392,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CommitRequest) -> DatasetCommitCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CommitRequest) -> DatasetCommitCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1406,7 +1402,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetCommitCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetCommitCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1417,7 +1413,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCommitCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetCommitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1438,7 +1434,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetCommitCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetCommitCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1455,7 +1451,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetCommitCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetCommitCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1499,10 +1495,10 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetAllocateIdCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetAllocateIdCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: AllocateIdsRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1510,9 +1506,9 @@ pub struct DatasetAllocateIdCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetAllocateIdCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetAllocateIdCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1651,7 +1647,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AllocateIdsRequest) -> DatasetAllocateIdCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AllocateIdsRequest) -> DatasetAllocateIdCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1661,7 +1657,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetAllocateIdCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetAllocateIdCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1672,7 +1668,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetAllocateIdCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetAllocateIdCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1693,7 +1689,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetAllocateIdCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetAllocateIdCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1710,7 +1706,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetAllocateIdCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetAllocateIdCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1754,10 +1750,10 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetRollbackCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetRollbackCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: RollbackRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1765,9 +1761,9 @@ pub struct DatasetRollbackCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetRollbackCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetRollbackCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1906,7 +1902,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RollbackRequest) -> DatasetRollbackCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RollbackRequest) -> DatasetRollbackCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1916,7 +1912,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetRollbackCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetRollbackCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1927,7 +1923,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRollbackCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRollbackCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1948,7 +1944,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetRollbackCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetRollbackCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetRollbackCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetRollbackCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2009,10 +2005,10 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetLookupCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetLookupCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: LookupRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2020,9 +2016,9 @@ pub struct DatasetLookupCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetLookupCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetLookupCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2161,7 +2157,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LookupRequest) -> DatasetLookupCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LookupRequest) -> DatasetLookupCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2171,7 +2167,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetLookupCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetLookupCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -2182,7 +2178,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetLookupCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetLookupCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2203,7 +2199,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetLookupCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetLookupCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2220,7 +2216,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetLookupCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetLookupCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2264,10 +2260,10 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetRunQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetRunQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: RunQueryRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2275,9 +2271,9 @@ pub struct DatasetRunQueryCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetRunQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetRunQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2416,7 +2412,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RunQueryRequest) -> DatasetRunQueryCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RunQueryRequest) -> DatasetRunQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2426,7 +2422,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetRunQueryCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetRunQueryCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -2437,7 +2433,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRunQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetRunQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2458,7 +2454,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetRunQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetRunQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2475,7 +2471,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetRunQueryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetRunQueryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2519,10 +2515,10 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct DatasetBeginTransactionCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatasetBeginTransactionCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Datastore<C, NC, A>,
+    hub: &'a Datastore<C, A>,
     _request: BeginTransactionRequest,
     _dataset_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2530,9 +2526,9 @@ pub struct DatasetBeginTransactionCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatasetBeginTransactionCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatasetBeginTransactionCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2671,7 +2667,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BeginTransactionRequest) -> DatasetBeginTransactionCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BeginTransactionRequest) -> DatasetBeginTransactionCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2681,7 +2677,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Identifies the dataset.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetBeginTransactionCall<'a, C, NC, A> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetBeginTransactionCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -2692,7 +2688,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetBeginTransactionCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatasetBeginTransactionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2713,7 +2709,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetBeginTransactionCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetBeginTransactionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2730,7 +2726,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatasetBeginTransactionCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatasetBeginTransactionCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

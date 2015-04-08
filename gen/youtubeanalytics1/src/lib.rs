@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *0.1.4+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *YouTube Analytics* crate version *0.1.5+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -202,7 +202,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -312,46 +311,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct YouTubeAnalytics<C, NC, A> {
+pub struct YouTubeAnalytics<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for YouTubeAnalytics<C, NC, A> {}
+impl<'a, C, A> Hub for YouTubeAnalytics<C, A> {}
 
-impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> YouTubeAnalytics<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> YouTubeAnalytics<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> YouTubeAnalytics<C, A> {
         YouTubeAnalytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn batch_report_definitions(&'a self) -> BatchReportDefinitionMethods<'a, C, NC, A> {
+    pub fn batch_report_definitions(&'a self) -> BatchReportDefinitionMethods<'a, C, A> {
         BatchReportDefinitionMethods { hub: &self }
     }
-    pub fn batch_reports(&'a self) -> BatchReportMethods<'a, C, NC, A> {
+    pub fn batch_reports(&'a self) -> BatchReportMethods<'a, C, A> {
         BatchReportMethods { hub: &self }
     }
-    pub fn group_items(&'a self) -> GroupItemMethods<'a, C, NC, A> {
+    pub fn group_items(&'a self) -> GroupItemMethods<'a, C, A> {
         GroupItemMethods { hub: &self }
     }
-    pub fn groups(&'a self) -> GroupMethods<'a, C, NC, A> {
+    pub fn groups(&'a self) -> GroupMethods<'a, C, A> {
         GroupMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a, C, NC, A> {
+    pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -735,15 +731,15 @@ impl ResponseResult for BatchReportList {}
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
+impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -757,7 +753,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// * `start-date` - The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     /// * `end-date` - The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     /// * `metrics` - A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
-    pub fn query(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn query(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> ReportQueryCall<'a, C, A> {
         ReportQueryCall {
             hub: self.hub,
             _ids: ids.to_string(),
@@ -807,15 +803,15 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 /// let rb = hub.batch_report_definitions();
 /// # }
 /// ```
-pub struct BatchReportDefinitionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BatchReportDefinitionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BatchReportDefinitionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BatchReportDefinitionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BatchReportDefinitionMethods<'a, C, NC, A> {
+impl<'a, C, A> BatchReportDefinitionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -824,7 +820,7 @@ impl<'a, C, NC, A> BatchReportDefinitionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn list(&self, on_behalf_of_content_owner: &str) -> BatchReportDefinitionListCall<'a, C, NC, A> {
+    pub fn list(&self, on_behalf_of_content_owner: &str) -> BatchReportDefinitionListCall<'a, C, A> {
         BatchReportDefinitionListCall {
             hub: self.hub,
             _on_behalf_of_content_owner: on_behalf_of_content_owner.to_string(),
@@ -865,15 +861,15 @@ impl<'a, C, NC, A> BatchReportDefinitionMethods<'a, C, NC, A> {
 /// let rb = hub.group_items();
 /// # }
 /// ```
-pub struct GroupItemMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupItemMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for GroupItemMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for GroupItemMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
+impl<'a, C, A> GroupItemMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -882,7 +878,7 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &GroupItem) -> GroupItemInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &GroupItem) -> GroupItemInsertCall<'a, C, A> {
         GroupItemInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -900,7 +896,7 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `groupId` - The id parameter specifies the unique ID of the group for which you want to retrieve group items.
-    pub fn list(&self, group_id: &str) -> GroupItemListCall<'a, C, NC, A> {
+    pub fn list(&self, group_id: &str) -> GroupItemListCall<'a, C, A> {
         GroupItemListCall {
             hub: self.hub,
             _group_id: group_id.to_string(),
@@ -918,7 +914,7 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The id parameter specifies the YouTube group item ID for the group that is being deleted.
-    pub fn delete(&self, id: &str) -> GroupItemDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> GroupItemDeleteCall<'a, C, A> {
         GroupItemDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -960,15 +956,15 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
 /// let rb = hub.groups();
 /// # }
 /// ```
-pub struct GroupMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for GroupMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for GroupMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
+impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -977,7 +973,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The id parameter specifies the YouTube group ID for the group that is being deleted.
-    pub fn delete(&self, id: &str) -> GroupDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> GroupDeleteCall<'a, C, A> {
         GroupDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -995,7 +991,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &Group) -> GroupInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Group) -> GroupInsertCall<'a, C, A> {
         GroupInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1009,7 +1005,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of groups that match the API request parameters. For example, you can retrieve all groups that the authenticated user owns, or you can retrieve one or more groups by their unique IDs.
-    pub fn list(&self) -> GroupListCall<'a, C, NC, A> {
+    pub fn list(&self) -> GroupListCall<'a, C, A> {
         GroupListCall {
             hub: self.hub,
             _on_behalf_of_content_owner: Default::default(),
@@ -1028,7 +1024,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: &Group) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Group) -> GroupUpdateCall<'a, C, A> {
         GroupUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1070,15 +1066,15 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
 /// let rb = hub.batch_reports();
 /// # }
 /// ```
-pub struct BatchReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BatchReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BatchReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BatchReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
+impl<'a, C, A> BatchReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1088,7 +1084,7 @@ impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
     ///
     /// * `batchReportDefinitionId` - The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
     /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn list(&self, batch_report_definition_id: &str, on_behalf_of_content_owner: &str) -> BatchReportListCall<'a, C, NC, A> {
+    pub fn list(&self, batch_report_definition_id: &str, on_behalf_of_content_owner: &str) -> BatchReportListCall<'a, C, A> {
         BatchReportListCall {
             hub: self.hub,
             _batch_report_definition_id: batch_report_definition_id.to_string(),
@@ -1144,10 +1140,10 @@ impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _ids: String,
     _start_date: String,
     _end_date: String,
@@ -1163,9 +1159,9 @@ pub struct ReportQueryCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1296,7 +1292,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Identifies the YouTube channel or content owner for which you are retrieving YouTube Analytics data.
     /// - To request data for a YouTube user, set the ids parameter value to channel==CHANNEL_ID, where CHANNEL_ID specifies the unique YouTube channel ID.
     /// - To request data for a YouTube CMS content owner, set the ids parameter value to contentOwner==OWNER_NAME, where OWNER_NAME is the CMS name of the content owner.
-    pub fn ids(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn ids(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._ids = new_value.to_string();
         self
     }
@@ -1306,7 +1302,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
-    pub fn start_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
@@ -1316,7 +1312,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
-    pub fn end_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
@@ -1326,7 +1322,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
-    pub fn metrics(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn metrics(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._metrics = new_value.to_string();
         self
     }
@@ -1334,7 +1330,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter (one-based, inclusive).
-    pub fn start_index(mut self, new_value: i32) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ReportQueryCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -1342,7 +1338,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// A comma-separated list of dimensions or metrics that determine the sort order for YouTube Analytics data. By default the sort order is ascending. The '-' prefix causes descending sort order.
-    pub fn sort(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn sort(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -1350,7 +1346,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of rows to include in the response.
-    pub fn max_results(mut self, new_value: i32) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ReportQueryCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1358,7 +1354,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// A list of filters that should be applied when retrieving YouTube Analytics data. The Available Reports document identifies the dimensions that can be used to filter each report, and the Dimensions document defines those dimensions. If a request uses multiple filters, join them together with a semicolon (;), and the returned result table will satisfy both filters. For example, a filters parameter value of video==dMH0bHeiRNg;country==IT restricts the result set to include data for the given video in Italy.
-    pub fn filters(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn filters(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
@@ -1366,7 +1362,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// A comma-separated list of YouTube Analytics dimensions, such as views or ageGroup,gender. See the Available Reports document for a list of the reports that you can retrieve and the dimensions used for those reports. Also see the Dimensions document for definitions of those dimensions.
-    pub fn dimensions(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn dimensions(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._dimensions = Some(new_value.to_string());
         self
     }
@@ -1374,7 +1370,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The currency to which financial metrics should be converted. The default is US Dollar (USD). If the result contains no financial metrics, this flag will be ignored. Responds with an error if the specified currency is not recognized.
-    pub fn currency(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn currency(mut self, new_value: &str) -> ReportQueryCall<'a, C, A> {
         self._currency = Some(new_value.to_string());
         self
     }
@@ -1385,7 +1381,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1406,7 +1402,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1423,7 +1419,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportQueryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportQueryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1461,19 +1457,19 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct BatchReportDefinitionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BatchReportDefinitionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _on_behalf_of_content_owner: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BatchReportDefinitionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BatchReportDefinitionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BatchReportDefinitionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1581,7 +1577,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportDefinitionListCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportDefinitionListCall<'a, C, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self
     }
@@ -1592,7 +1588,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportDefinitionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportDefinitionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1613,7 +1609,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BatchReportDefinitionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BatchReportDefinitionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1630,7 +1626,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BatchReportDefinitionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BatchReportDefinitionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1675,10 +1671,10 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupItemInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupItemInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _request: GroupItem,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1686,9 +1682,9 @@ pub struct GroupItemInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupItemInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupItemInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1805,7 +1801,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &GroupItem) -> GroupItemInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &GroupItem) -> GroupItemInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1815,7 +1811,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemInsertCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -1826,7 +1822,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1847,7 +1843,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupItemInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupItemInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1864,7 +1860,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupItemInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupItemInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1903,10 +1899,10 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupItemListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupItemListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _group_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1914,9 +1910,9 @@ pub struct GroupItemListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupItemListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupItemListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2027,7 +2023,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the unique ID of the group for which you want to retrieve group items.
-    pub fn group_id(mut self, new_value: &str) -> GroupItemListCall<'a, C, NC, A> {
+    pub fn group_id(mut self, new_value: &str) -> GroupItemListCall<'a, C, A> {
         self._group_id = new_value.to_string();
         self
     }
@@ -2037,7 +2033,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemListCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2048,7 +2044,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2069,7 +2065,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupItemListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupItemListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2086,7 +2082,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupItemListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupItemListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2125,10 +2121,10 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupItemDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupItemDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -2136,9 +2132,9 @@ pub struct GroupItemDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupItemDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupItemDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2238,7 +2234,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube group item ID for the group that is being deleted.
-    pub fn id(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -2248,7 +2244,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2259,7 +2255,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupItemDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2280,7 +2276,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupItemDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupItemDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2297,7 +2293,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupItemDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupItemDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2336,10 +2332,10 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -2347,9 +2343,9 @@ pub struct GroupDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2449,7 +2445,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube group ID for the group that is being deleted.
-    pub fn id(mut self, new_value: &str) -> GroupDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -2459,7 +2455,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupDeleteCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2470,7 +2466,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2491,7 +2487,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2508,7 +2504,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2553,10 +2549,10 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _request: Group,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -2564,9 +2560,9 @@ pub struct GroupInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2683,7 +2679,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Group) -> GroupInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Group) -> GroupInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2693,7 +2689,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupInsertCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupInsertCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2704,7 +2700,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2725,7 +2721,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2742,7 +2738,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2783,10 +2779,10 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
     _id: Option<String>,
@@ -2795,9 +2791,9 @@ pub struct GroupListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2913,7 +2909,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupListCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2921,7 +2917,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Set this parameter's value to true to instruct the API to only return groups owned by the authenticated user.
-    pub fn mine(mut self, new_value: bool) -> GroupListCall<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> GroupListCall<'a, C, A> {
         self._mine = Some(new_value);
         self
     }
@@ -2929,7 +2925,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube group ID(s) for the resource(s) that are being retrieved. In a group resource, the id property specifies the group's YouTube group ID.
-    pub fn id(mut self, new_value: &str) -> GroupListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -2940,7 +2936,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2961,7 +2957,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2978,7 +2974,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3023,10 +3019,10 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _request: Group,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -3034,9 +3030,9 @@ pub struct GroupUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3153,7 +3149,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Group) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Group) -> GroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3163,7 +3159,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -3174,7 +3170,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3195,7 +3191,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3212,7 +3208,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3250,10 +3246,10 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct BatchReportListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BatchReportListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a YouTubeAnalytics<C, NC, A>,
+    hub: &'a YouTubeAnalytics<C, A>,
     _batch_report_definition_id: String,
     _on_behalf_of_content_owner: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3261,9 +3257,9 @@ pub struct BatchReportListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BatchReportListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BatchReportListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BatchReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3372,7 +3368,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
-    pub fn batch_report_definition_id(mut self, new_value: &str) -> BatchReportListCall<'a, C, NC, A> {
+    pub fn batch_report_definition_id(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
         self._batch_report_definition_id = new_value.to_string();
         self
     }
@@ -3382,7 +3378,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportListCall<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportListCall<'a, C, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self
     }
@@ -3393,7 +3389,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BatchReportListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3414,7 +3410,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BatchReportListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BatchReportListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3431,7 +3427,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BatchReportListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BatchReportListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

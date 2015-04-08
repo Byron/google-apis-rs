@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *urlshortener* crate version *0.1.4+20150319*, where *20150319* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *urlshortener* crate version *0.1.5+20150319*, where *20150319* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *urlshortener* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
@@ -190,7 +190,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -282,34 +281,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Urlshortener<C, NC, A> {
+pub struct Urlshortener<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Urlshortener<C, NC, A> {}
+impl<'a, C, A> Hub for Urlshortener<C, A> {}
 
-impl<'a, C, NC, A> Urlshortener<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Urlshortener<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Urlshortener<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Urlshortener<C, A> {
         Urlshortener {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn url(&'a self) -> UrlMethods<'a, C, NC, A> {
+    pub fn url(&'a self) -> UrlMethods<'a, C, A> {
         UrlMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -479,15 +475,15 @@ impl Part for StringCount {}
 /// let rb = hub.url();
 /// # }
 /// ```
-pub struct UrlMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Urlshortener<C, NC, A>,
+    hub: &'a Urlshortener<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UrlMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UrlMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
+impl<'a, C, A> UrlMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -496,7 +492,7 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &Url) -> UrlInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Url) -> UrlInsertCall<'a, C, A> {
         UrlInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -513,7 +509,7 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `shortUrl` - The short URL, including the protocol.
-    pub fn get(&self, short_url: &str) -> UrlGetCall<'a, C, NC, A> {
+    pub fn get(&self, short_url: &str) -> UrlGetCall<'a, C, A> {
         UrlGetCall {
             hub: self.hub,
             _short_url: short_url.to_string(),
@@ -527,7 +523,7 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of URLs shortened by a user.
-    pub fn list(&self) -> UrlListCall<'a, C, NC, A> {
+    pub fn list(&self) -> UrlListCall<'a, C, A> {
         UrlListCall {
             hub: self.hub,
             _start_token: Default::default(),
@@ -583,19 +579,19 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Urlshortener<C, NC, A>,
+    hub: &'a Urlshortener<C, A>,
     _request: Url,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -709,7 +705,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Url) -> UrlInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Url) -> UrlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -720,7 +716,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -741,7 +737,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -758,7 +754,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -797,10 +793,10 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Urlshortener<C, NC, A>,
+    hub: &'a Urlshortener<C, A>,
     _short_url: String,
     _projection: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -808,9 +804,9 @@ pub struct UrlGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -921,7 +917,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// The short URL, including the protocol.
-    pub fn short_url(mut self, new_value: &str) -> UrlGetCall<'a, C, NC, A> {
+    pub fn short_url(mut self, new_value: &str) -> UrlGetCall<'a, C, A> {
         self._short_url = new_value.to_string();
         self
     }
@@ -929,7 +925,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     ///
     /// 
     /// Additional information to return.
-    pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -940,7 +936,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -961,7 +957,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -978,7 +974,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1018,10 +1014,10 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Urlshortener<C, NC, A>,
+    hub: &'a Urlshortener<C, A>,
     _start_token: Option<String>,
     _projection: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1029,9 +1025,9 @@ pub struct UrlListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1142,7 +1138,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Token for requesting successive pages of results.
-    pub fn start_token(mut self, new_value: &str) -> UrlListCall<'a, C, NC, A> {
+    pub fn start_token(mut self, new_value: &str) -> UrlListCall<'a, C, A> {
         self._start_token = Some(new_value.to_string());
         self
     }
@@ -1150,7 +1146,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Additional information to return.
-    pub fn projection(mut self, new_value: &str) -> UrlListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> UrlListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -1161,7 +1157,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1182,7 +1178,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1199,7 +1195,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

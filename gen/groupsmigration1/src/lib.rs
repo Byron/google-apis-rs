@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *0.1.4+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Groups Migration* crate version *0.1.5+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Groups Migration* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
@@ -193,7 +193,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -285,34 +284,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GroupsMigration<C, NC, A> {
+pub struct GroupsMigration<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for GroupsMigration<C, NC, A> {}
+impl<'a, C, A> Hub for GroupsMigration<C, A> {}
 
-impl<'a, C, NC, A> GroupsMigration<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupsMigration<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> GroupsMigration<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> GroupsMigration<C, A> {
         GroupsMigration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn archive(&'a self) -> ArchiveMethods<'a, C, NC, A> {
+    pub fn archive(&'a self) -> ArchiveMethods<'a, C, A> {
         ArchiveMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -380,15 +376,15 @@ impl ResponseResult for Groups {}
 /// let rb = hub.archive();
 /// # }
 /// ```
-pub struct ArchiveMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ArchiveMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GroupsMigration<C, NC, A>,
+    hub: &'a GroupsMigration<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ArchiveMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ArchiveMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ArchiveMethods<'a, C, NC, A> {
+impl<'a, C, A> ArchiveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -397,7 +393,7 @@ impl<'a, C, NC, A> ArchiveMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `groupId` - The group ID
-    pub fn insert(&self, group_id: &str) -> ArchiveInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, group_id: &str) -> ArchiveInsertCall<'a, C, A> {
         ArchiveInsertCall {
             hub: self.hub,
             _group_id: group_id.to_string(),
@@ -447,19 +443,19 @@ impl<'a, C, NC, A> ArchiveMethods<'a, C, NC, A> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ArchiveInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ArchiveInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GroupsMigration<C, NC, A>,
+    hub: &'a GroupsMigration<C, A>,
     _group_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ArchiveInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ArchiveInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -700,7 +696,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The group ID
-    pub fn group_id(mut self, new_value: &str) -> ArchiveInsertCall<'a, C, NC, A> {
+    pub fn group_id(mut self, new_value: &str) -> ArchiveInsertCall<'a, C, A> {
         self._group_id = new_value.to_string();
         self
     }
@@ -711,7 +707,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ArchiveInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ArchiveInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -732,7 +728,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -749,7 +745,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ArchiveInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ArchiveInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

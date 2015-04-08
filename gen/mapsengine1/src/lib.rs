@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Maps Engine* crate version *0.1.4+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Maps Engine* crate version *0.1.5+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Maps Engine* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/maps-engine/).
@@ -239,7 +239,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -347,52 +346,49 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct MapsEngine<C, NC, A> {
+pub struct MapsEngine<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for MapsEngine<C, NC, A> {}
+impl<'a, C, A> Hub for MapsEngine<C, A> {}
 
-impl<'a, C, NC, A> MapsEngine<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapsEngine<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> MapsEngine<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> MapsEngine<C, A> {
         MapsEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn assets(&'a self) -> AssetMethods<'a, C, NC, A> {
+    pub fn assets(&'a self) -> AssetMethods<'a, C, A> {
         AssetMethods { hub: &self }
     }
-    pub fn layers(&'a self) -> LayerMethods<'a, C, NC, A> {
+    pub fn layers(&'a self) -> LayerMethods<'a, C, A> {
         LayerMethods { hub: &self }
     }
-    pub fn maps(&'a self) -> MapMethods<'a, C, NC, A> {
+    pub fn maps(&'a self) -> MapMethods<'a, C, A> {
         MapMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
-    pub fn raster_collections(&'a self) -> RasterCollectionMethods<'a, C, NC, A> {
+    pub fn raster_collections(&'a self) -> RasterCollectionMethods<'a, C, A> {
         RasterCollectionMethods { hub: &self }
     }
-    pub fn rasters(&'a self) -> RasterMethods<'a, C, NC, A> {
+    pub fn rasters(&'a self) -> RasterMethods<'a, C, A> {
         RasterMethods { hub: &self }
     }
-    pub fn tables(&'a self) -> TableMethods<'a, C, NC, A> {
+    pub fn tables(&'a self) -> TableMethods<'a, C, A> {
         TableMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2346,15 +2342,15 @@ impl Part for Datasource {}
 /// let rb = hub.layers();
 /// # }
 /// ```
-pub struct LayerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LayerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LayerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
+impl<'a, C, A> LayerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2363,7 +2359,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn unpublish(&self, id: &str) -> LayerUnpublishCall<'a, C, NC, A> {
+    pub fn unpublish(&self, id: &str) -> LayerUnpublishCall<'a, C, A> {
         LayerUnpublishCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2380,7 +2376,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn publish(&self, id: &str) -> LayerPublishCall<'a, C, NC, A> {
+    pub fn publish(&self, id: &str) -> LayerPublishCall<'a, C, A> {
         LayerPublishCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2394,7 +2390,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all published layers readable by the current user.
-    pub fn list_published(&self) -> LayerListPublishedCall<'a, C, NC, A> {
+    pub fn list_published(&self) -> LayerListPublishedCall<'a, C, A> {
         LayerListPublishedCall {
             hub: self.hub,
             _project_id: Default::default(),
@@ -2413,7 +2409,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Layer) -> LayerCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Layer) -> LayerCreateCall<'a, C, A> {
         LayerCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2431,7 +2427,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn get_published(&self, id: &str) -> LayerGetPublishedCall<'a, C, NC, A> {
+    pub fn get_published(&self, id: &str) -> LayerGetPublishedCall<'a, C, A> {
         LayerGetPublishedCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2448,7 +2444,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.
-    pub fn delete(&self, id: &str) -> LayerDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> LayerDeleteCall<'a, C, A> {
         LayerDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2465,7 +2461,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn get(&self, id: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> LayerGetCall<'a, C, A> {
         LayerGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2484,7 +2480,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> LayerPermissionBatchDeleteCall<'a, C, A> {
         LayerPermissionBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2505,7 +2501,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> LayerPermissionBatchUpdateCall<'a, C, A> {
         LayerPermissionBatchUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2519,7 +2515,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all layers readable by the current user.
-    pub fn list(&self) -> LayerListCall<'a, C, NC, A> {
+    pub fn list(&self) -> LayerListCall<'a, C, A> {
         LayerListCall {
             hub: self.hub,
             _tags: Default::default(),
@@ -2548,7 +2544,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer whose parents will be listed.
-    pub fn parents_list(&self, id: &str) -> LayerParentListCall<'a, C, NC, A> {
+    pub fn parents_list(&self, id: &str) -> LayerParentListCall<'a, C, A> {
         LayerParentListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2567,7 +2563,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn cancel_processing(&self, id: &str) -> LayerCancelProcessingCall<'a, C, NC, A> {
+    pub fn cancel_processing(&self, id: &str) -> LayerCancelProcessingCall<'a, C, A> {
         LayerCancelProcessingCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2585,7 +2581,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the layer.
-    pub fn patch(&self, request: &Layer, id: &str) -> LayerPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Layer, id: &str) -> LayerPatchCall<'a, C, A> {
         LayerPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2603,7 +2599,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> LayerPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> LayerPermissionListCall<'a, C, A> {
         LayerPermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2620,7 +2616,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the layer.
-    pub fn process(&self, id: &str) -> LayerProcesCall<'a, C, NC, A> {
+    pub fn process(&self, id: &str) -> LayerProcesCall<'a, C, A> {
         LayerProcesCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2661,15 +2657,15 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
 /// let rb = hub.rasters();
 /// # }
 /// ```
-pub struct RasterMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RasterMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RasterMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
+impl<'a, C, A> RasterMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2681,7 +2677,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterPermissionBatchUpdateCall<'a, C, A> {
         RasterPermissionBatchUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2700,7 +2696,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster.
-    pub fn patch(&self, request: &Raster, id: &str) -> RasterPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Raster, id: &str) -> RasterPatchCall<'a, C, A> {
         RasterPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2718,7 +2714,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> RasterPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> RasterPermissionListCall<'a, C, A> {
         RasterPermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2735,7 +2731,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.
-    pub fn delete(&self, id: &str) -> RasterDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> RasterDeleteCall<'a, C, A> {
         RasterDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2753,7 +2749,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterPermissionBatchDeleteCall<'a, C, A> {
         RasterPermissionBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2772,7 +2768,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     ///
     /// * `id` - The ID of the raster asset.
     /// * `filename` - The file name of this uploaded file.
-    pub fn files_insert(&self, id: &str, filename: &str) -> RasterFileInsertCall<'a, C, NC, A> {
+    pub fn files_insert(&self, id: &str, filename: &str) -> RasterFileInsertCall<'a, C, A> {
         RasterFileInsertCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2790,7 +2786,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster.
-    pub fn process(&self, id: &str) -> RasterProcesCall<'a, C, NC, A> {
+    pub fn process(&self, id: &str) -> RasterProcesCall<'a, C, A> {
         RasterProcesCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2807,7 +2803,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster.
-    pub fn get(&self, id: &str) -> RasterGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> RasterGetCall<'a, C, A> {
         RasterGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2824,7 +2820,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectId` - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn list(&self, project_id: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn list(&self, project_id: &str) -> RasterListCall<'a, C, A> {
         RasterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -2853,7 +2849,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload(&self, request: &Raster) -> RasterUploadCall<'a, C, NC, A> {
+    pub fn upload(&self, request: &Raster) -> RasterUploadCall<'a, C, A> {
         RasterUploadCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2870,7 +2866,7 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the rasters whose parents will be listed.
-    pub fn parents_list(&self, id: &str) -> RasterParentListCall<'a, C, NC, A> {
+    pub fn parents_list(&self, id: &str) -> RasterParentListCall<'a, C, A> {
         RasterParentListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2913,15 +2909,15 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
 /// let rb = hub.assets();
 /// # }
 /// ```
-pub struct AssetMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AssetMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AssetMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AssetMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
+impl<'a, C, A> AssetMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2930,7 +2926,7 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> AssetPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> AssetPermissionListCall<'a, C, A> {
         AssetPermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2943,7 +2939,7 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all assets readable by the current user.
-    pub fn list(&self) -> AssetListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AssetListCall<'a, C, A> {
         AssetListCall {
             hub: self.hub,
             _type_: Default::default(),
@@ -2972,7 +2968,7 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset.
-    pub fn get(&self, id: &str) -> AssetGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> AssetGetCall<'a, C, A> {
         AssetGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2989,7 +2985,7 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose parents will be listed.
-    pub fn parents_list(&self, id: &str) -> AssetParentListCall<'a, C, NC, A> {
+    pub fn parents_list(&self, id: &str) -> AssetParentListCall<'a, C, A> {
         AssetParentListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3032,15 +3028,15 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
 /// let rb = hub.tables();
 /// # }
 /// ```
-pub struct TableMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TableMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TableMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
+impl<'a, C, A> TableMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3049,7 +3045,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.
-    pub fn delete(&self, id: &str) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> TableDeleteCall<'a, C, A> {
         TableDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3068,7 +3064,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `id` - The ID of the table asset.
     /// * `filename` - The file name of this uploaded file.
-    pub fn files_insert(&self, id: &str, filename: &str) -> TableFileInsertCall<'a, C, NC, A> {
+    pub fn files_insert(&self, id: &str, filename: &str) -> TableFileInsertCall<'a, C, A> {
         TableFileInsertCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3095,7 +3091,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table to append the features to.
-    pub fn features_batch_insert(&self, request: &FeaturesBatchInsertRequest, id: &str) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
+    pub fn features_batch_insert(&self, request: &FeaturesBatchInsertRequest, id: &str) -> TableFeatureBatchInsertCall<'a, C, A> {
         TableFeatureBatchInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3109,7 +3105,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all tables readable by the current user.
-    pub fn list(&self) -> TableListCall<'a, C, NC, A> {
+    pub fn list(&self) -> TableListCall<'a, C, A> {
         TableListCall {
             hub: self.hub,
             _tags: Default::default(),
@@ -3138,7 +3134,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the table.
-    pub fn get(&self, id: &str) -> TableGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> TableGetCall<'a, C, A> {
         TableGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3157,7 +3153,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table that contains the features to be deleted.
-    pub fn features_batch_delete(&self, request: &FeaturesBatchDeleteRequest, id: &str) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
+    pub fn features_batch_delete(&self, request: &FeaturesBatchDeleteRequest, id: &str) -> TableFeatureBatchDeleteCall<'a, C, A> {
         TableFeatureBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3175,7 +3171,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the table to which these features belong.
-    pub fn features_list(&self, id: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn features_list(&self, id: &str) -> TableFeatureListCall<'a, C, A> {
         TableFeatureListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3201,7 +3197,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the table.
-    pub fn process(&self, id: &str) -> TableProcesCall<'a, C, NC, A> {
+    pub fn process(&self, id: &str) -> TableProcesCall<'a, C, A> {
         TableProcesCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3218,7 +3214,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the table whose parents will be listed.
-    pub fn parents_list(&self, id: &str) -> TableParentListCall<'a, C, NC, A> {
+    pub fn parents_list(&self, id: &str) -> TableParentListCall<'a, C, A> {
         TableParentListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3240,7 +3236,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> TablePermissionBatchUpdateCall<'a, C, A> {
         TablePermissionBatchUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3260,7 +3256,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload(&self, request: &Table) -> TableUploadCall<'a, C, NC, A> {
+    pub fn upload(&self, request: &Table) -> TableUploadCall<'a, C, A> {
         TableUploadCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3292,7 +3288,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table containing the features to be patched.
-    pub fn features_batch_patch(&self, request: &FeaturesBatchPatchRequest, id: &str) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
+    pub fn features_batch_patch(&self, request: &FeaturesBatchPatchRequest, id: &str) -> TableFeatureBatchPatchCall<'a, C, A> {
         TableFeatureBatchPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3311,7 +3307,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table.
-    pub fn patch(&self, request: &Table, id: &str) -> TablePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Table, id: &str) -> TablePatchCall<'a, C, A> {
         TablePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3330,7 +3326,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> TablePermissionBatchDeleteCall<'a, C, A> {
         TablePermissionBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3348,7 +3344,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Table) -> TableCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Table) -> TableCreateCall<'a, C, A> {
         TableCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3365,7 +3361,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> TablePermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> TablePermissionListCall<'a, C, A> {
         TablePermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3383,7 +3379,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - The ID of the table.
     /// * `id` - The ID of the feature to get.
-    pub fn features_get(&self, table_id: &str, id: &str) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn features_get(&self, table_id: &str, id: &str) -> TableFeatureGetCall<'a, C, A> {
         TableFeatureGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -3427,20 +3423,20 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
 /// let rb = hub.maps();
 /// # }
 /// ```
-pub struct MapMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MapMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MapMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
+impl<'a, C, A> MapMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Return all maps readable by the current user.
-    pub fn list(&self) -> MapListCall<'a, C, NC, A> {
+    pub fn list(&self) -> MapListCall<'a, C, A> {
         MapListCall {
             hub: self.hub,
             _tags: Default::default(),
@@ -3465,7 +3461,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all published maps readable by the current user.
-    pub fn list_published(&self) -> MapListPublishedCall<'a, C, NC, A> {
+    pub fn list_published(&self) -> MapListPublishedCall<'a, C, A> {
         MapListPublishedCall {
             hub: self.hub,
             _project_id: Default::default(),
@@ -3485,7 +3481,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the map.
-    pub fn patch(&self, request: &Map, id: &str) -> MapPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Map, id: &str) -> MapPatchCall<'a, C, A> {
         MapPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3506,7 +3502,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> MapPermissionBatchUpdateCall<'a, C, A> {
         MapPermissionBatchUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3524,7 +3520,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.
-    pub fn delete(&self, id: &str) -> MapDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> MapDeleteCall<'a, C, A> {
         MapDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3541,7 +3537,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the map.
-    pub fn unpublish(&self, id: &str) -> MapUnpublishCall<'a, C, NC, A> {
+    pub fn unpublish(&self, id: &str) -> MapUnpublishCall<'a, C, A> {
         MapUnpublishCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3558,7 +3554,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the map.
-    pub fn publish(&self, id: &str) -> MapPublishCall<'a, C, NC, A> {
+    pub fn publish(&self, id: &str) -> MapPublishCall<'a, C, A> {
         MapPublishCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3576,7 +3572,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> MapPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> MapPermissionListCall<'a, C, A> {
         MapPermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3593,7 +3589,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Map) -> MapCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &Map) -> MapCreateCall<'a, C, A> {
         MapCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3610,7 +3606,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the map.
-    pub fn get_published(&self, id: &str) -> MapGetPublishedCall<'a, C, NC, A> {
+    pub fn get_published(&self, id: &str) -> MapGetPublishedCall<'a, C, A> {
         MapGetPublishedCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3627,7 +3623,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the map.
-    pub fn get(&self, id: &str) -> MapGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> MapGetCall<'a, C, A> {
         MapGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3646,7 +3642,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> MapPermissionBatchDeleteCall<'a, C, A> {
         MapPermissionBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3688,15 +3684,15 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
 /// let rb = hub.raster_collections();
 /// # }
 /// ```
-pub struct RasterCollectionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RasterCollectionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RasterCollectionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
+impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3705,7 +3701,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &RasterCollection) -> RasterCollectionCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
         RasterCollectionCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3723,7 +3719,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
         RasterCollectionPermissionBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3742,7 +3738,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection.
-    pub fn patch(&self, request: &RasterCollection, id: &str) -> RasterCollectionPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &RasterCollection, id: &str) -> RasterCollectionPatchCall<'a, C, A> {
         RasterCollectionPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3760,7 +3756,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection.
-    pub fn cancel_processing(&self, id: &str) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> {
+    pub fn cancel_processing(&self, id: &str) -> RasterCollectionCancelProcessingCall<'a, C, A> {
         RasterCollectionCancelProcessingCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3777,7 +3773,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection.
-    pub fn process(&self, id: &str) -> RasterCollectionProcesCall<'a, C, NC, A> {
+    pub fn process(&self, id: &str) -> RasterCollectionProcesCall<'a, C, A> {
         RasterCollectionProcesCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3797,7 +3793,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
         RasterCollectionPermissionBatchUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3815,7 +3811,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.
-    pub fn delete(&self, id: &str) -> RasterCollectionDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> RasterCollectionDeleteCall<'a, C, A> {
         RasterCollectionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3832,7 +3828,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection whose parents will be listed.
-    pub fn parents_list(&self, id: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
+    pub fn parents_list(&self, id: &str) -> RasterCollectionParentListCall<'a, C, A> {
         RasterCollectionParentListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3847,7 +3843,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all raster collections readable by the current user.
-    pub fn list(&self) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn list(&self) -> RasterCollectionListCall<'a, C, A> {
         RasterCollectionListCall {
             hub: self.hub,
             _tags: Default::default(),
@@ -3879,7 +3875,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection to which these rasters belong.
-    pub fn rasters_batch_insert(&self, request: &RasterCollectionsRastersBatchInsertRequest, id: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
+    pub fn rasters_batch_insert(&self, request: &RasterCollectionsRastersBatchInsertRequest, id: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
         RasterCollectionRasterBatchInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3900,7 +3896,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection to which these rasters belong.
-    pub fn rasters_batch_delete(&self, request: &RasterCollectionsRasterBatchDeleteRequest, id: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
+    pub fn rasters_batch_delete(&self, request: &RasterCollectionsRasterBatchDeleteRequest, id: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
         RasterCollectionRasterBatchDeleteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3918,7 +3914,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the asset whose permissions will be listed.
-    pub fn permissions_list(&self, id: &str) -> RasterCollectionPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, id: &str) -> RasterCollectionPermissionListCall<'a, C, A> {
         RasterCollectionPermissionListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3935,7 +3931,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection.
-    pub fn get(&self, id: &str) -> RasterCollectionGetCall<'a, C, NC, A> {
+    pub fn get(&self, id: &str) -> RasterCollectionGetCall<'a, C, A> {
         RasterCollectionGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -3952,7 +3948,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `id` - The ID of the raster collection to which these rasters belong.
-    pub fn rasters_list(&self, id: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn rasters_list(&self, id: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         RasterCollectionRasterListCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -4004,15 +4000,15 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4022,7 +4018,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `projectId` - The ID of the project.
     /// * `id` - The ID of the icon.
-    pub fn icons_get(&self, project_id: &str, id: &str) -> ProjectIconGetCall<'a, C, NC, A> {
+    pub fn icons_get(&self, project_id: &str, id: &str) -> ProjectIconGetCall<'a, C, A> {
         ProjectIconGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4041,7 +4037,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - The ID of the project.
-    pub fn icons_create(&self, request: &Icon, project_id: &str) -> ProjectIconCreateCall<'a, C, NC, A> {
+    pub fn icons_create(&self, request: &Icon, project_id: &str) -> ProjectIconCreateCall<'a, C, A> {
         ProjectIconCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -4055,7 +4051,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return all projects readable by the current user.
-    pub fn list(&self) -> ProjectListCall<'a, C, NC, A> {
+    pub fn list(&self) -> ProjectListCall<'a, C, A> {
         ProjectListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -4071,7 +4067,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `projectId` - The ID of the project.
-    pub fn icons_list(&self, project_id: &str) -> ProjectIconListCall<'a, C, NC, A> {
+    pub fn icons_list(&self, project_id: &str) -> ProjectIconListCall<'a, C, A> {
         ProjectIconListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4122,19 +4118,19 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerUnpublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerUnpublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerUnpublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerUnpublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4266,7 +4262,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerUnpublishCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerUnpublishCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -4277,7 +4273,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerUnpublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerUnpublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4298,7 +4294,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerUnpublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerUnpublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4315,7 +4311,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerUnpublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerUnpublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4354,10 +4350,10 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerPublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerPublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -4365,9 +4361,9 @@ pub struct LayerPublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerPublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerPublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4502,7 +4498,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerPublishCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerPublishCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -4510,7 +4506,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If set to true, the API will allow publication of the layer even if it's out of date. If not true, you'll need to reprocess any out-of-date layer before publishing.
-    pub fn force(mut self, new_value: bool) -> LayerPublishCall<'a, C, NC, A> {
+    pub fn force(mut self, new_value: bool) -> LayerPublishCall<'a, C, A> {
         self._force = Some(new_value);
         self
     }
@@ -4521,7 +4517,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4542,7 +4538,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerPublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4559,7 +4555,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerPublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerPublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4600,10 +4596,10 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerListPublishedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerListPublishedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _project_id: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -4612,9 +4608,9 @@ pub struct LayerListPublishedCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerListPublishedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerListPublishedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4728,7 +4724,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4736,7 +4732,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4744,7 +4740,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> LayerListPublishedCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerListPublishedCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4755,7 +4751,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListPublishedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListPublishedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4776,7 +4772,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerListPublishedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerListPublishedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4793,7 +4789,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerListPublishedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerListPublishedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4838,10 +4834,10 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Layer,
     _process: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -4849,9 +4845,9 @@ pub struct LayerCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4968,7 +4964,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Layer) -> LayerCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Layer) -> LayerCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4976,7 +4972,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to queue the created layer for processing.
-    pub fn process(mut self, new_value: bool) -> LayerCreateCall<'a, C, NC, A> {
+    pub fn process(mut self, new_value: bool) -> LayerCreateCall<'a, C, A> {
         self._process = Some(new_value);
         self
     }
@@ -4987,7 +4983,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5008,7 +5004,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5025,7 +5021,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5063,19 +5059,19 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerGetPublishedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerGetPublishedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerGetPublishedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerGetPublishedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5207,7 +5203,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerGetPublishedCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerGetPublishedCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5218,7 +5214,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetPublishedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetPublishedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5239,7 +5235,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerGetPublishedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerGetPublishedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5256,7 +5252,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerGetPublishedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerGetPublishedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5294,19 +5290,19 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5427,7 +5423,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.
-    pub fn id(mut self, new_value: &str) -> LayerDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5438,7 +5434,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5459,7 +5455,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5476,7 +5472,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5515,10 +5511,10 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -5526,9 +5522,9 @@ pub struct LayerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5663,7 +5659,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5671,7 +5667,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Deprecated: The version parameter indicates which version of the layer should be returned. When version is set to published, the published version of the layer will be returned. Please use the layers.getPublished endpoint instead.
-    pub fn version(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._version = Some(new_value.to_string());
         self
     }
@@ -5682,7 +5678,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5703,7 +5699,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5720,7 +5716,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5764,10 +5760,10 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerPermissionBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerPermissionBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5775,9 +5771,9 @@ pub struct LayerPermissionBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerPermissionBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerPermissionBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5916,7 +5912,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> LayerPermissionBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5926,7 +5922,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset from which permissions will be removed.
-    pub fn id(mut self, new_value: &str) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerPermissionBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5937,7 +5933,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5958,7 +5954,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5975,7 +5971,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6021,10 +6017,10 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerPermissionBatchUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerPermissionBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchUpdateRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6032,9 +6028,9 @@ pub struct LayerPermissionBatchUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerPermissionBatchUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerPermissionBatchUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6173,7 +6169,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> LayerPermissionBatchUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6183,7 +6179,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset to which permissions will be added.
-    pub fn id(mut self, new_value: &str) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerPermissionBatchUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -6194,7 +6190,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6215,7 +6211,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6232,7 +6228,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6283,10 +6279,10 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _tags: Option<String>,
     _search: Option<String>,
     _role: Option<String>,
@@ -6305,9 +6301,9 @@ pub struct LayerListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6451,7 +6447,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -6459,7 +6455,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -6467,7 +6463,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -6475,14 +6471,14 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Sets the *processing status* query property to the given value.
     ///
     /// 
-    pub fn processing_status(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn processing_status(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._processing_status = Some(new_value.to_string());
         self
     }
@@ -6490,7 +6486,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6498,7 +6494,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -6506,7 +6502,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -6514,7 +6510,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6522,7 +6518,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -6530,7 +6526,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -6538,7 +6534,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -6546,7 +6542,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -6557,7 +6553,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6578,7 +6574,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6595,7 +6591,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6635,10 +6631,10 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -6647,9 +6643,9 @@ pub struct LayerParentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6787,7 +6783,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer whose parents will be listed.
-    pub fn id(mut self, new_value: &str) -> LayerParentListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerParentListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -6795,7 +6791,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> LayerParentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerParentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6803,7 +6799,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> LayerParentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerParentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6814,7 +6810,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6835,7 +6831,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6852,7 +6848,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6890,19 +6886,19 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerCancelProcessingCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerCancelProcessingCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerCancelProcessingCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerCancelProcessingCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerCancelProcessingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7034,7 +7030,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerCancelProcessingCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerCancelProcessingCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7045,7 +7041,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerCancelProcessingCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerCancelProcessingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7066,7 +7062,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerCancelProcessingCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerCancelProcessingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7083,7 +7079,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerCancelProcessingCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerCancelProcessingCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7127,10 +7123,10 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Layer,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7138,9 +7134,9 @@ pub struct LayerPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7268,7 +7264,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Layer) -> LayerPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Layer) -> LayerPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7278,7 +7274,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7289,7 +7285,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7310,7 +7306,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7327,7 +7323,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7365,19 +7361,19 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7509,7 +7505,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> LayerPermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerPermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7520,7 +7516,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7541,7 +7537,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7558,7 +7554,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7596,19 +7592,19 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerProcesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerProcesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerProcesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerProcesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7740,7 +7736,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the layer.
-    pub fn id(mut self, new_value: &str) -> LayerProcesCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LayerProcesCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7751,7 +7747,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerProcesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerProcesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7772,7 +7768,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerProcesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerProcesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7789,7 +7785,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerProcesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerProcesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7835,10 +7831,10 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterPermissionBatchUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterPermissionBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchUpdateRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7846,9 +7842,9 @@ pub struct RasterPermissionBatchUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterPermissionBatchUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterPermissionBatchUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7987,7 +7983,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterPermissionBatchUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7997,7 +7993,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset to which permissions will be added.
-    pub fn id(mut self, new_value: &str) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterPermissionBatchUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8008,7 +8004,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8029,7 +8025,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8046,7 +8042,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8090,10 +8086,10 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Raster,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8101,9 +8097,9 @@ pub struct RasterPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8231,7 +8227,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Raster) -> RasterPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Raster) -> RasterPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8241,7 +8237,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster.
-    pub fn id(mut self, new_value: &str) -> RasterPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8252,7 +8248,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8273,7 +8269,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8290,7 +8286,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8328,19 +8324,19 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8472,7 +8468,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> RasterPermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterPermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8483,7 +8479,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8504,7 +8500,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8521,7 +8517,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8559,19 +8555,19 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8692,7 +8688,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.
-    pub fn id(mut self, new_value: &str) -> RasterDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8703,7 +8699,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8724,7 +8720,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8741,7 +8737,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8785,10 +8781,10 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterPermissionBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterPermissionBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8796,9 +8792,9 @@ pub struct RasterPermissionBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterPermissionBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterPermissionBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8937,7 +8933,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterPermissionBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8947,7 +8943,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset from which permissions will be removed.
-    pub fn id(mut self, new_value: &str) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterPermissionBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8958,7 +8954,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterPermissionBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8979,7 +8975,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8996,7 +8992,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9035,10 +9031,10 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct RasterFileInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterFileInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _filename: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9046,9 +9042,9 @@ pub struct RasterFileInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterFileInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterFileInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9279,7 +9275,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster asset.
-    pub fn id(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9289,7 +9285,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The file name of this uploaded file.
-    pub fn filename(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, NC, A> {
+    pub fn filename(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, A> {
         self._filename = new_value.to_string();
         self
     }
@@ -9300,7 +9296,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterFileInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterFileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9321,7 +9317,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterFileInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterFileInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9338,7 +9334,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterFileInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterFileInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9376,19 +9372,19 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterProcesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterProcesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterProcesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterProcesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9520,7 +9516,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster.
-    pub fn id(mut self, new_value: &str) -> RasterProcesCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterProcesCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9531,7 +9527,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterProcesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterProcesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9552,7 +9548,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterProcesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterProcesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9569,7 +9565,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterProcesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterProcesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9607,19 +9603,19 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9751,7 +9747,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster.
-    pub fn id(mut self, new_value: &str) -> RasterGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9762,7 +9758,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9783,7 +9779,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9800,7 +9796,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9850,10 +9846,10 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _project_id: String,
     _tags: Option<String>,
     _search: Option<String>,
@@ -9872,9 +9868,9 @@ pub struct RasterListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10018,7 +10014,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -10026,7 +10022,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -10034,7 +10030,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -10042,14 +10038,14 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
     /// Sets the *processing status* query property to the given value.
     ///
     /// 
-    pub fn processing_status(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn processing_status(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._processing_status = Some(new_value.to_string());
         self
     }
@@ -10057,7 +10053,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10065,7 +10061,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -10073,7 +10069,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -10081,7 +10077,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> RasterListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RasterListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10089,7 +10085,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -10097,7 +10093,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -10105,7 +10101,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -10113,7 +10109,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> RasterListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -10124,7 +10120,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10145,7 +10141,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10162,7 +10158,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10206,19 +10202,19 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Raster,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10332,7 +10328,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Raster) -> RasterUploadCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Raster) -> RasterUploadCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10343,7 +10339,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10364,7 +10360,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10381,7 +10377,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10421,10 +10417,10 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -10433,9 +10429,9 @@ pub struct RasterParentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10573,7 +10569,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the rasters whose parents will be listed.
-    pub fn id(mut self, new_value: &str) -> RasterParentListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterParentListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -10581,7 +10577,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> RasterParentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RasterParentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10589,7 +10585,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> RasterParentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RasterParentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10600,7 +10596,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10621,7 +10617,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10638,7 +10634,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10676,19 +10672,19 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AssetPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AssetPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AssetPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AssetPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AssetPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10820,7 +10816,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> AssetPermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> AssetPermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -10831,7 +10827,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10852,7 +10848,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AssetPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AssetPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10869,7 +10865,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AssetPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AssetPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10920,10 +10916,10 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AssetListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AssetListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _type_: Option<String>,
     _tags: Option<String>,
     _search: Option<String>,
@@ -10942,9 +10938,9 @@ pub struct AssetListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AssetListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AssetListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AssetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11088,7 +11084,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma separated list of asset types. Returned assets will have one of the types from the provided list. Supported values are 'map', 'layer', 'rasterCollection' and 'table'.
-    pub fn type_(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn type_(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
@@ -11096,7 +11092,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -11104,7 +11100,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -11112,7 +11108,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -11120,7 +11116,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -11128,7 +11124,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11136,7 +11132,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -11144,7 +11140,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -11152,7 +11148,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> AssetListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> AssetListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11160,7 +11156,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -11168,7 +11164,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -11176,7 +11172,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -11184,7 +11180,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> AssetListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -11195,7 +11191,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11216,7 +11212,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AssetListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AssetListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11233,7 +11229,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AssetListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AssetListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11271,19 +11267,19 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct AssetGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AssetGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AssetGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AssetGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AssetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11415,7 +11411,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset.
-    pub fn id(mut self, new_value: &str) -> AssetGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> AssetGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -11426,7 +11422,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11447,7 +11443,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AssetGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AssetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11464,7 +11460,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AssetGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AssetGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11504,10 +11500,10 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct AssetParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AssetParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -11516,9 +11512,9 @@ pub struct AssetParentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AssetParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AssetParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AssetParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11656,7 +11652,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose parents will be listed.
-    pub fn id(mut self, new_value: &str) -> AssetParentListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> AssetParentListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -11664,7 +11660,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AssetParentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AssetParentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11672,7 +11668,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> AssetParentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> AssetParentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11683,7 +11679,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AssetParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11704,7 +11700,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AssetParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AssetParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11721,7 +11717,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AssetParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AssetParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11759,19 +11755,19 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11892,7 +11888,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.
-    pub fn id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -11903,7 +11899,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11924,7 +11920,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11941,7 +11937,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11981,10 +11977,10 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct TableFileInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFileInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _filename: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11992,9 +11988,9 @@ pub struct TableFileInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFileInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFileInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12225,7 +12221,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table asset.
-    pub fn id(mut self, new_value: &str) -> TableFileInsertCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFileInsertCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -12235,7 +12231,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The file name of this uploaded file.
-    pub fn filename(mut self, new_value: &str) -> TableFileInsertCall<'a, C, NC, A> {
+    pub fn filename(mut self, new_value: &str) -> TableFileInsertCall<'a, C, A> {
         self._filename = new_value.to_string();
         self
     }
@@ -12246,7 +12242,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFileInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12267,7 +12263,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFileInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFileInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12284,7 +12280,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFileInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFileInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12336,10 +12332,10 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableFeatureBatchInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFeatureBatchInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: FeaturesBatchInsertRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12347,9 +12343,9 @@ pub struct TableFeatureBatchInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFeatureBatchInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFeatureBatchInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFeatureBatchInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12477,7 +12473,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &FeaturesBatchInsertRequest) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &FeaturesBatchInsertRequest) -> TableFeatureBatchInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12487,7 +12483,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table to append the features to.
-    pub fn id(mut self, new_value: &str) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFeatureBatchInsertCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -12498,7 +12494,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12519,7 +12515,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12536,7 +12532,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12587,10 +12583,10 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct TableListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _tags: Option<String>,
     _search: Option<String>,
     _role: Option<String>,
@@ -12609,9 +12605,9 @@ pub struct TableListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12755,7 +12751,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -12763,7 +12759,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -12771,7 +12767,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -12779,14 +12775,14 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Sets the *processing status* query property to the given value.
     ///
     /// 
-    pub fn processing_status(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn processing_status(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._processing_status = Some(new_value.to_string());
         self
     }
@@ -12794,7 +12790,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -12802,7 +12798,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -12810,7 +12806,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -12818,7 +12814,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -12826,7 +12822,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -12834,7 +12830,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -12842,7 +12838,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -12850,7 +12846,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -12861,7 +12857,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12882,7 +12878,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12899,7 +12895,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12938,10 +12934,10 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct TableGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -12949,9 +12945,9 @@ pub struct TableGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13086,14 +13082,14 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table.
-    pub fn id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
     /// Sets the *version* query property to the given value.
     ///
     /// 
-    pub fn version(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._version = Some(new_value.to_string());
         self
     }
@@ -13104,7 +13100,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13125,7 +13121,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13142,7 +13138,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13186,10 +13182,10 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TableFeatureBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFeatureBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: FeaturesBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -13197,9 +13193,9 @@ pub struct TableFeatureBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFeatureBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFeatureBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFeatureBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13327,7 +13323,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &FeaturesBatchDeleteRequest) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &FeaturesBatchDeleteRequest) -> TableFeatureBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13337,7 +13333,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table that contains the features to be deleted.
-    pub fn id(mut self, new_value: &str) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFeatureBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -13348,7 +13344,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13369,7 +13365,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13386,7 +13382,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13433,10 +13429,10 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct TableFeatureListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFeatureListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _where_: Option<String>,
     _version: Option<String>,
@@ -13452,9 +13448,9 @@ pub struct TableFeatureListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFeatureListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFeatureListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFeatureListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13613,7 +13609,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table to which these features belong.
-    pub fn id(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -13621,7 +13617,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// An SQL-like predicate used to filter results.
-    pub fn where_(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn where_(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._where_ = Some(new_value.to_string());
         self
     }
@@ -13629,7 +13625,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The table version to access. See Accessing Public Data for information.
-    pub fn version(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._version = Some(new_value.to_string());
         self
     }
@@ -13637,7 +13633,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.
-    pub fn select(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn select(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._select = Some(new_value.to_string());
         self
     }
@@ -13645,7 +13641,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13653,7 +13649,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// An SQL-like order by clause used to sort results. If this parameter is not included, the order of features is undefined.
-    pub fn order_by(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -13661,7 +13657,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The maximum number of items to include in the response, used for paging. The maximum supported value is 1000.
-    pub fn max_results(mut self, new_value: u32) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TableFeatureListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -13669,7 +13665,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The total number of features to return from the query, irrespective of the number of pages.
-    pub fn limit(mut self, new_value: u32) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn limit(mut self, new_value: u32) -> TableFeatureListCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
@@ -13677,7 +13673,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// A geometry literal that specifies the spatial restriction of the query.
-    pub fn intersects(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn intersects(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._intersects = Some(new_value.to_string());
         self
     }
@@ -13685,7 +13681,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// A comma separated list of optional data to include. Optional data available: schema.
-    pub fn include(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn include(mut self, new_value: &str) -> TableFeatureListCall<'a, C, A> {
         self._include = Some(new_value.to_string());
         self
     }
@@ -13696,7 +13692,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13717,7 +13713,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13734,7 +13730,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13772,19 +13768,19 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct TableProcesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableProcesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableProcesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableProcesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13916,7 +13912,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table.
-    pub fn id(mut self, new_value: &str) -> TableProcesCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableProcesCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -13927,7 +13923,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableProcesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableProcesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13948,7 +13944,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableProcesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableProcesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13965,7 +13961,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableProcesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableProcesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14005,10 +14001,10 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -14017,9 +14013,9 @@ pub struct TableParentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14157,7 +14153,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table whose parents will be listed.
-    pub fn id(mut self, new_value: &str) -> TableParentListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableParentListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -14165,7 +14161,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> TableParentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TableParentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -14173,7 +14169,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> TableParentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TableParentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -14184,7 +14180,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14205,7 +14201,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14222,7 +14218,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14268,10 +14264,10 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct TablePermissionBatchUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TablePermissionBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchUpdateRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14279,9 +14275,9 @@ pub struct TablePermissionBatchUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TablePermissionBatchUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TablePermissionBatchUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TablePermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14420,7 +14416,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> TablePermissionBatchUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14430,7 +14426,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset to which permissions will be added.
-    pub fn id(mut self, new_value: &str) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TablePermissionBatchUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -14441,7 +14437,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14462,7 +14458,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14479,7 +14475,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14525,19 +14521,19 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct TableUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Table,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14651,7 +14647,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TableUploadCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TableUploadCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14662,7 +14658,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14683,7 +14679,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14700,7 +14696,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14758,10 +14754,10 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableFeatureBatchPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFeatureBatchPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: FeaturesBatchPatchRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14769,9 +14765,9 @@ pub struct TableFeatureBatchPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFeatureBatchPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFeatureBatchPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFeatureBatchPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14899,7 +14895,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &FeaturesBatchPatchRequest) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &FeaturesBatchPatchRequest) -> TableFeatureBatchPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14909,7 +14905,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table containing the features to be patched.
-    pub fn id(mut self, new_value: &str) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFeatureBatchPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -14920,7 +14916,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureBatchPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14941,7 +14937,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14958,7 +14954,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15002,10 +14998,10 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct TablePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TablePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Table,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15013,9 +15009,9 @@ pub struct TablePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TablePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TablePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15143,7 +15139,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15153,7 +15149,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table.
-    pub fn id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TablePatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -15164,7 +15160,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15185,7 +15181,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15202,7 +15198,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15246,10 +15242,10 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TablePermissionBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TablePermissionBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15257,9 +15253,9 @@ pub struct TablePermissionBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TablePermissionBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TablePermissionBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TablePermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15398,7 +15394,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> TablePermissionBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15408,7 +15404,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset from which permissions will be removed.
-    pub fn id(mut self, new_value: &str) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TablePermissionBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -15419,7 +15415,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15440,7 +15436,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15457,7 +15453,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15501,19 +15497,19 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct TableCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Table,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15627,7 +15623,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TableCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TableCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15638,7 +15634,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15659,7 +15655,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15676,7 +15672,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15714,19 +15710,19 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TablePermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TablePermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TablePermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TablePermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TablePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15858,7 +15854,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> TablePermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TablePermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -15869,7 +15865,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15890,7 +15886,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15907,7 +15903,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TablePermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15947,10 +15943,10 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct TableFeatureGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableFeatureGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _table_id: String,
     _id: String,
     _version: Option<String>,
@@ -15960,9 +15956,9 @@ pub struct TableFeatureGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableFeatureGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableFeatureGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableFeatureGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16101,7 +16097,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the table.
-    pub fn table_id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -16111,7 +16107,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the feature to get.
-    pub fn id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -16119,7 +16115,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The table version to access. See Accessing Public Data for information.
-    pub fn version(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, A> {
         self._version = Some(new_value.to_string());
         self
     }
@@ -16127,7 +16123,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.
-    pub fn select(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn select(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, A> {
         self._select = Some(new_value.to_string());
         self
     }
@@ -16138,7 +16134,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableFeatureGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16159,7 +16155,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableFeatureGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16176,7 +16172,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableFeatureGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16227,10 +16223,10 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct MapListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _tags: Option<String>,
     _search: Option<String>,
     _role: Option<String>,
@@ -16249,9 +16245,9 @@ pub struct MapListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16395,7 +16391,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -16403,7 +16399,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -16411,7 +16407,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -16419,14 +16415,14 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Sets the *processing status* query property to the given value.
     ///
     /// 
-    pub fn processing_status(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn processing_status(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._processing_status = Some(new_value.to_string());
         self
     }
@@ -16434,7 +16430,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -16442,7 +16438,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -16450,7 +16446,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -16458,7 +16454,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> MapListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> MapListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16466,7 +16462,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -16474,7 +16470,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -16482,7 +16478,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -16490,7 +16486,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> MapListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -16501,7 +16497,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16522,7 +16518,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16539,7 +16535,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16580,10 +16576,10 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct MapListPublishedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapListPublishedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _project_id: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -16592,9 +16588,9 @@ pub struct MapListPublishedCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapListPublishedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapListPublishedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16708,7 +16704,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> MapListPublishedCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> MapListPublishedCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -16716,7 +16712,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> MapListPublishedCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> MapListPublishedCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -16724,7 +16720,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> MapListPublishedCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> MapListPublishedCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16735,7 +16731,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapListPublishedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapListPublishedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16756,7 +16752,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapListPublishedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapListPublishedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16773,7 +16769,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapListPublishedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapListPublishedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16817,10 +16813,10 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct MapPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Map,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -16828,9 +16824,9 @@ pub struct MapPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16958,7 +16954,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Map) -> MapPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Map) -> MapPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16968,7 +16964,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map.
-    pub fn id(mut self, new_value: &str) -> MapPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -16979,7 +16975,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17000,7 +16996,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17017,7 +17013,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17063,10 +17059,10 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct MapPermissionBatchUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapPermissionBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchUpdateRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -17074,9 +17070,9 @@ pub struct MapPermissionBatchUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapPermissionBatchUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapPermissionBatchUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17215,7 +17211,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> MapPermissionBatchUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17225,7 +17221,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset to which permissions will be added.
-    pub fn id(mut self, new_value: &str) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapPermissionBatchUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17236,7 +17232,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17257,7 +17253,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17274,7 +17270,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17312,19 +17308,19 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct MapDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17445,7 +17441,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.
-    pub fn id(mut self, new_value: &str) -> MapDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17456,7 +17452,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17477,7 +17473,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17494,7 +17490,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17532,19 +17528,19 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct MapUnpublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapUnpublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapUnpublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapUnpublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17676,7 +17672,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map.
-    pub fn id(mut self, new_value: &str) -> MapUnpublishCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapUnpublishCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17687,7 +17683,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapUnpublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapUnpublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17708,7 +17704,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapUnpublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapUnpublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17725,7 +17721,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapUnpublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapUnpublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17764,10 +17760,10 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct MapPublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapPublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -17775,9 +17771,9 @@ pub struct MapPublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapPublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapPublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17912,7 +17908,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map.
-    pub fn id(mut self, new_value: &str) -> MapPublishCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapPublishCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17920,7 +17916,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If set to true, the API will allow publication of the map even if it's out of date. If false, the map must have a processingStatus of complete before publishing.
-    pub fn force(mut self, new_value: bool) -> MapPublishCall<'a, C, NC, A> {
+    pub fn force(mut self, new_value: bool) -> MapPublishCall<'a, C, A> {
         self._force = Some(new_value);
         self
     }
@@ -17931,7 +17927,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17952,7 +17948,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapPublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17969,7 +17965,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapPublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapPublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18007,19 +18003,19 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct MapPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18151,7 +18147,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> MapPermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapPermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -18162,7 +18158,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18183,7 +18179,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18200,7 +18196,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18244,19 +18240,19 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct MapCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Map,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18370,7 +18366,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Map) -> MapCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Map) -> MapCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -18381,7 +18377,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18402,7 +18398,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18419,7 +18415,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18457,19 +18453,19 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct MapGetPublishedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapGetPublishedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapGetPublishedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapGetPublishedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18601,7 +18597,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map.
-    pub fn id(mut self, new_value: &str) -> MapGetPublishedCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapGetPublishedCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -18612,7 +18608,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapGetPublishedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapGetPublishedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18633,7 +18629,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapGetPublishedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapGetPublishedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18650,7 +18646,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapGetPublishedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapGetPublishedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18689,10 +18685,10 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct MapGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -18700,9 +18696,9 @@ pub struct MapGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18837,7 +18833,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// The ID of the map.
-    pub fn id(mut self, new_value: &str) -> MapGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -18845,7 +18841,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     ///
     /// 
     /// Deprecated: The version parameter indicates which version of the map should be returned. When version is set to published, the published version of the map will be returned. Please use the maps.getPublished endpoint instead.
-    pub fn version(mut self, new_value: &str) -> MapGetCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> MapGetCall<'a, C, A> {
         self._version = Some(new_value.to_string());
         self
     }
@@ -18856,7 +18852,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18877,7 +18873,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18894,7 +18890,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18938,10 +18934,10 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct MapPermissionBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MapPermissionBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -18949,9 +18945,9 @@ pub struct MapPermissionBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MapPermissionBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MapPermissionBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MapPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19090,7 +19086,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> MapPermissionBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19100,7 +19096,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset from which permissions will be removed.
-    pub fn id(mut self, new_value: &str) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> MapPermissionBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -19111,7 +19107,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MapPermissionBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19132,7 +19128,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19149,7 +19145,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19193,19 +19189,19 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: RasterCollection,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19319,7 +19315,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19330,7 +19326,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19351,7 +19347,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19368,7 +19364,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19412,10 +19408,10 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionPermissionBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -19423,9 +19419,9 @@ pub struct RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionPermissionBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19564,7 +19560,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19574,7 +19570,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset from which permissions will be removed.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -19585,7 +19581,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19606,7 +19602,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19623,7 +19619,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19667,10 +19663,10 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: RasterCollection,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -19678,9 +19674,9 @@ pub struct RasterCollectionPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19808,7 +19804,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19818,7 +19814,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -19829,7 +19825,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19850,7 +19846,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19867,7 +19863,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19905,19 +19901,19 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionCancelProcessingCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionCancelProcessingCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionCancelProcessingCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionCancelProcessingCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionCancelProcessingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20049,7 +20045,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionCancelProcessingCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -20060,7 +20056,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionCancelProcessingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20081,7 +20077,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCancelProcessingCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCancelProcessingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20098,7 +20094,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCancelProcessingCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20136,19 +20132,19 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionProcesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionProcesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionProcesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionProcesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20280,7 +20276,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionProcesCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionProcesCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -20291,7 +20287,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionProcesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionProcesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20312,7 +20308,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionProcesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionProcesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20329,7 +20325,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionProcesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionProcesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20375,10 +20371,10 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionPermissionBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: PermissionsBatchUpdateRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -20386,9 +20382,9 @@ pub struct RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionPermissionBatchUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20527,7 +20523,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -20537,7 +20533,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset to which permissions will be added.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -20548,7 +20544,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20569,7 +20565,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20586,7 +20582,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20624,19 +20620,19 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20757,7 +20753,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -20768,7 +20764,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20789,7 +20785,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20806,7 +20802,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -20846,10 +20842,10 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -20858,9 +20854,9 @@ pub struct RasterCollectionParentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -20998,7 +20994,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection whose parents will be listed.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -21006,7 +21002,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -21014,7 +21010,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> RasterCollectionParentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RasterCollectionParentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -21025,7 +21021,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21046,7 +21042,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21063,7 +21059,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21114,10 +21110,10 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _tags: Option<String>,
     _search: Option<String>,
     _role: Option<String>,
@@ -21136,9 +21132,9 @@ pub struct RasterCollectionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21282,7 +21278,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -21290,7 +21286,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -21298,7 +21294,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -21306,14 +21302,14 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
-    pub fn project_id(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Sets the *processing status* query property to the given value.
     ///
     /// 
-    pub fn processing_status(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn processing_status(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._processing_status = Some(new_value.to_string());
         self
     }
@@ -21321,7 +21317,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -21329,7 +21325,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -21337,7 +21333,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -21345,7 +21341,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RasterCollectionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -21353,7 +21349,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -21361,7 +21357,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -21369,7 +21365,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -21377,7 +21373,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -21388,7 +21384,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21409,7 +21405,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21426,7 +21422,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21472,10 +21468,10 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionRasterBatchInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionRasterBatchInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: RasterCollectionsRastersBatchInsertRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -21483,9 +21479,9 @@ pub struct RasterCollectionRasterBatchInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionRasterBatchInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionRasterBatchInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21624,7 +21620,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RasterCollectionsRastersBatchInsertRequest) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RasterCollectionsRastersBatchInsertRequest) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -21634,7 +21630,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection to which these rasters belong.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -21645,7 +21641,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21666,7 +21662,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21683,7 +21679,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21729,10 +21725,10 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionRasterBatchDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionRasterBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: RasterCollectionsRasterBatchDeleteRequest,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -21740,9 +21736,9 @@ pub struct RasterCollectionRasterBatchDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionRasterBatchDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionRasterBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -21881,7 +21877,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RasterCollectionsRasterBatchDeleteRequest) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RasterCollectionsRasterBatchDeleteRequest) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -21891,7 +21887,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection to which these rasters belong.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -21902,7 +21898,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -21923,7 +21919,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21940,7 +21936,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -21978,19 +21974,19 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22122,7 +22118,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The ID of the asset whose permissions will be listed.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -22133,7 +22129,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22154,7 +22150,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22171,7 +22167,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22209,19 +22205,19 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22353,7 +22349,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -22364,7 +22360,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22385,7 +22381,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22402,7 +22398,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22451,10 +22447,10 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct RasterCollectionRasterListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RasterCollectionRasterListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _id: String,
     _tags: Option<String>,
     _search: Option<String>,
@@ -22472,9 +22468,9 @@ pub struct RasterCollectionRasterListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RasterCollectionRasterListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RasterCollectionRasterListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RasterCollectionRasterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22639,7 +22635,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The ID of the raster collection to which these rasters belong.
-    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -22647,7 +22643,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// A comma separated list of tags. Returned assets will contain all the tags from the list.
-    pub fn tags(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn tags(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._tags = Some(new_value.to_string());
         self
     }
@@ -22655,7 +22651,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An unstructured search string used to filter the set of results based on asset metadata.
-    pub fn search(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn search(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._search = Some(new_value.to_string());
         self
     }
@@ -22663,7 +22659,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
-    pub fn role(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._role = Some(new_value.to_string());
         self
     }
@@ -22671,7 +22667,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -22679,7 +22675,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
-    pub fn modified_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn modified_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._modified_before = Some(new_value.to_string());
         self
     }
@@ -22687,7 +22683,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
-    pub fn modified_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn modified_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._modified_after = Some(new_value.to_string());
         self
     }
@@ -22695,7 +22691,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 100.
-    pub fn max_results(mut self, new_value: u32) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> RasterCollectionRasterListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -22703,7 +22699,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
-    pub fn creator_email(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn creator_email(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._creator_email = Some(new_value.to_string());
         self
     }
@@ -22711,7 +22707,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
-    pub fn created_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn created_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._created_before = Some(new_value.to_string());
         self
     }
@@ -22719,7 +22715,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
-    pub fn created_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn created_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -22727,7 +22723,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
-    pub fn bbox(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn bbox(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, A> {
         self._bbox = Some(new_value.to_string());
         self
     }
@@ -22738,7 +22734,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RasterCollectionRasterListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -22759,7 +22755,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22776,7 +22772,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -22819,10 +22815,10 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIconGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIconGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _project_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -22830,9 +22826,9 @@ pub struct ProjectIconGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIconGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIconGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -22981,7 +22977,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the project.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -22991,7 +22987,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the icon.
-    pub fn id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -23002,7 +22998,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23023,7 +23019,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23040,7 +23036,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23085,10 +23081,10 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ProjectIconCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIconCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _request: Icon,
     _project_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -23096,9 +23092,9 @@ pub struct ProjectIconCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIconCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIconCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23351,7 +23347,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Icon) -> ProjectIconCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Icon) -> ProjectIconCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -23361,7 +23357,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the project.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIconCreateCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIconCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -23372,7 +23368,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23393,7 +23389,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23410,7 +23406,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23448,18 +23444,18 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23567,7 +23563,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23588,7 +23584,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23605,7 +23601,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -23645,10 +23641,10 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectIconListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectIconListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a MapsEngine<C, NC, A>,
+    hub: &'a MapsEngine<C, A>,
     _project_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -23657,9 +23653,9 @@ pub struct ProjectIconListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectIconListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectIconListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -23797,7 +23793,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the project.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIconListCall<'a, C, NC, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIconListCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -23805,7 +23801,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIconListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIconListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -23813,7 +23809,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of items to include in a single response page. The maximum supported value is 50.
-    pub fn max_results(mut self, new_value: u32) -> ProjectIconListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ProjectIconListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -23824,7 +23820,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectIconListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23845,7 +23841,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIconListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23862,7 +23858,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectIconListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

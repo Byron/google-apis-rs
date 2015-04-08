@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *0.1.4+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *customsearch* crate version *0.1.5+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
@@ -219,7 +219,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -319,34 +318,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Customsearch<C, NC, A> {
+pub struct Customsearch<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Customsearch<C, NC, A> {}
+impl<'a, C, A> Hub for Customsearch<C, A> {}
 
-impl<'a, C, NC, A> Customsearch<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Customsearch<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Customsearch<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Customsearch<C, A> {
         Customsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn cse(&'a self) -> CseMethods<'a, C, NC, A> {
+    pub fn cse(&'a self) -> CseMethods<'a, C, A> {
         CseMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -790,15 +786,15 @@ impl Part for ResultLabels {}
 /// let rb = hub.cse();
 /// # }
 /// ```
-pub struct CseMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CseMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Customsearch<C, NC, A>,
+    hub: &'a Customsearch<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CseMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CseMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CseMethods<'a, C, NC, A> {
+impl<'a, C, A> CseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -807,7 +803,7 @@ impl<'a, C, NC, A> CseMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `q` - Query
-    pub fn list(&self, q: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn list(&self, q: &str) -> CseListCall<'a, C, A> {
         CseListCall {
             hub: self.hub,
             _q: q.to_string(),
@@ -917,10 +913,10 @@ impl<'a, C, NC, A> CseMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct CseListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CseListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Customsearch<C, NC, A>,
+    hub: &'a Customsearch<C, A>,
     _q: String,
     _start: Option<u32>,
     _sort: Option<String>,
@@ -957,9 +953,9 @@ pub struct CseListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for CseListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CseListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1158,7 +1154,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Query
-    pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
@@ -1166,7 +1162,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The index of the first result to return
-    pub fn start(mut self, new_value: u32) -> CseListCall<'a, C, NC, A> {
+    pub fn start(mut self, new_value: u32) -> CseListCall<'a, C, A> {
         self._start = Some(new_value);
         self
     }
@@ -1174,7 +1170,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The sort expression to apply to the results
-    pub fn sort(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn sort(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -1182,7 +1178,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter
-    pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search_filter = Some(new_value.to_string());
         self
     }
@@ -1190,7 +1186,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies all search results should be pages from a given site
-    pub fn site_search(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn site_search(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._site_search = Some(new_value.to_string());
         self
     }
@@ -1198,7 +1194,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies the search type: image.
-    pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._search_type = Some(new_value.to_string());
         self
     }
@@ -1206,7 +1202,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Search safety level
-    pub fn safe(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn safe(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._safe = Some(new_value.to_string());
         self
     }
@@ -1214,7 +1210,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.
-    pub fn rights(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn rights(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._rights = Some(new_value.to_string());
         self
     }
@@ -1222,7 +1218,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies that all search results should be pages that are related to the specified URL
-    pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._related_site = Some(new_value.to_string());
         self
     }
@@ -1230,7 +1226,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms
-    pub fn or_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn or_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._or_terms = Some(new_value.to_string());
         self
     }
@@ -1238,7 +1234,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Number of search results to return
-    pub fn num(mut self, new_value: u32) -> CseListCall<'a, C, NC, A> {
+    pub fn num(mut self, new_value: u32) -> CseListCall<'a, C, A> {
         self._num = Some(new_value);
         self
     }
@@ -1246,7 +1242,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The language restriction for the search results
-    pub fn lr(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn lr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._lr = Some(new_value.to_string());
         self
     }
@@ -1254,7 +1250,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
-    pub fn low_range(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn low_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._low_range = Some(new_value.to_string());
         self
     }
@@ -1262,7 +1258,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies that all search results should contain a link to a particular URL
-    pub fn link_site(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn link_site(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._link_site = Some(new_value.to_string());
         self
     }
@@ -1270,7 +1266,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.
-    pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_type = Some(new_value.to_string());
         self
     }
@@ -1278,7 +1274,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.
-    pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_size = Some(new_value.to_string());
         self
     }
@@ -1286,7 +1282,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Returns images of a specific dominant color: yellow, green, teal, blue, purple, pink, white, gray, black and brown.
-    pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_dominant_color = Some(new_value.to_string());
         self
     }
@@ -1294,7 +1290,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Returns black and white, grayscale, or color images: mono, gray, and color.
-    pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._img_color_type = Some(new_value.to_string());
         self
     }
@@ -1302,7 +1298,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Appends the extra query terms to the query.
-    pub fn hq(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn hq(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._hq = Some(new_value.to_string());
         self
     }
@@ -1310,7 +1306,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Sets the user interface language.
-    pub fn hl(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -1318,7 +1314,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
-    pub fn high_range(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn high_range(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._high_range = Some(new_value.to_string());
         self
     }
@@ -1326,7 +1322,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The local Google domain to use to perform the search.
-    pub fn googlehost(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn googlehost(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._googlehost = Some(new_value.to_string());
         self
     }
@@ -1334,7 +1330,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Geolocation of end user.
-    pub fn gl(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn gl(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._gl = Some(new_value.to_string());
         self
     }
@@ -1342,7 +1338,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Controls turning on or off the duplicate content filter.
-    pub fn filter(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1350,7 +1346,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...
-    pub fn file_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn file_type(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._file_type = Some(new_value.to_string());
         self
     }
@@ -1358,7 +1354,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Identifies a word or phrase that should not appear in any documents in the search results
-    pub fn exclude_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn exclude_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exclude_terms = Some(new_value.to_string());
         self
     }
@@ -1366,7 +1362,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Identifies a phrase that all documents in the search results must contain
-    pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._exact_terms = Some(new_value.to_string());
         self
     }
@@ -1374,7 +1370,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies all search results are from a time period
-    pub fn date_restrict(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn date_restrict(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._date_restrict = Some(new_value.to_string());
         self
     }
@@ -1382,7 +1378,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The custom search engine ID to scope this search query
-    pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cx = Some(new_value.to_string());
         self
     }
@@ -1390,7 +1386,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// The URL of a linked custom search engine
-    pub fn cref(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn cref(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cref = Some(new_value.to_string());
         self
     }
@@ -1398,7 +1394,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Country restrict(s).
-    pub fn cr(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn cr(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._cr = Some(new_value.to_string());
         self
     }
@@ -1406,7 +1402,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Turns off the translation between zh-CN and zh-TW.
-    pub fn c2coff(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
+    pub fn c2coff(mut self, new_value: &str) -> CseListCall<'a, C, A> {
         self._c2coff = Some(new_value.to_string());
         self
     }
@@ -1417,7 +1413,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CseListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1438,7 +1434,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CseListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

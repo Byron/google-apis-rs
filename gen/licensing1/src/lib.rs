@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *0.1.4+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *licensing* crate version *0.1.5+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -196,7 +196,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -289,34 +288,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Licensing<C, NC, A> {
+pub struct Licensing<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Licensing<C, NC, A> {}
+impl<'a, C, A> Hub for Licensing<C, A> {}
 
-impl<'a, C, NC, A> Licensing<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Licensing<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Licensing<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Licensing<C, A> {
         Licensing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a, C, NC, A> {
+    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a, C, A> {
         LicenseAssignmentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -448,15 +444,15 @@ impl ResponseResult for LicenseAssignmentList {}
 /// let rb = hub.license_assignments();
 /// # }
 /// ```
-pub struct LicenseAssignmentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LicenseAssignmentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LicenseAssignmentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
+impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -467,7 +463,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku
     /// * `userId` - email id or unique Id of the user
-    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         LicenseAssignmentDeleteCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -487,7 +483,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     ///
     /// * `productId` - Name for product
     /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
-    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         LicenseAssignmentListForProductCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -509,7 +505,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku
     /// * `userId` - email id or unique Id of the user
-    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
+    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         LicenseAssignmentGetCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -530,7 +526,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku
     /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
-    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         LicenseAssignmentListForProductAndSkuCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -554,7 +550,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku for which license would be revoked
     /// * `userId` - email id or unique Id of the user
-    pub fn update(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -577,7 +573,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku for which license would be revoked
     /// * `userId` - email id or unique Id of the user
-    pub fn patch(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -599,7 +595,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku
-    pub fn insert(&self, request: &LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -650,10 +646,10 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -662,9 +658,9 @@ pub struct LicenseAssignmentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -787,7 +783,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -797,7 +793,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for sku
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -807,7 +803,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// email id or unique Id of the user
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -818,7 +814,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -839,7 +835,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -856,7 +852,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -896,10 +892,10 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentListForProductCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _product_id: String,
     _customer_id: String,
     _page_token: Option<String>,
@@ -909,9 +905,9 @@ pub struct LicenseAssignmentListForProductCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentListForProductCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentListForProductCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1050,7 +1046,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1060,7 +1056,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// CustomerId represents the customer for whom licenseassignments are queried
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1068,7 +1064,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Token to fetch the next page.Optional. By default server will return first page
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1076,7 +1072,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1087,7 +1083,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1108,7 +1104,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1125,7 +1121,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1163,10 +1159,10 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -1175,9 +1171,9 @@ pub struct LicenseAssignmentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1311,7 +1307,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1321,7 +1317,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Name for sku
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1331,7 +1327,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// email id or unique Id of the user
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1342,7 +1338,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1363,7 +1359,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1380,7 +1376,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1420,10 +1416,10 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentListForProductAndSkuCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _product_id: String,
     _sku_id: String,
     _customer_id: String,
@@ -1434,9 +1430,9 @@ pub struct LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1576,7 +1572,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1586,7 +1582,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// Name for sku
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1596,7 +1592,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// we provide this method for API completeness.
     /// 
     /// CustomerId represents the customer for whom licenseassignments are queried
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1604,7 +1600,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     ///
     /// 
     /// Token to fetch the next page.Optional. By default server will return first page
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1612,7 +1608,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     ///
     /// 
     /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1623,7 +1619,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1644,7 +1640,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1661,7 +1657,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1705,10 +1701,10 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -1718,9 +1714,9 @@ pub struct LicenseAssignmentUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1861,7 +1857,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1871,7 +1867,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1881,7 +1877,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for sku for which license would be revoked
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1891,7 +1887,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// email id or unique Id of the user
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1902,7 +1898,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1923,7 +1919,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1940,7 +1936,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1984,10 +1980,10 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -1997,9 +1993,9 @@ pub struct LicenseAssignmentPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2140,7 +2136,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2150,7 +2146,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2160,7 +2156,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name for sku for which license would be revoked
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2170,7 +2166,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// email id or unique Id of the user
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2181,7 +2177,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2202,7 +2198,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2219,7 +2215,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2263,10 +2259,10 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct LicenseAssignmentInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LicenseAssignmentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Licensing<C, NC, A>,
+    hub: &'a Licensing<C, A>,
     _request: LicenseAssignmentInsert,
     _product_id: String,
     _sku_id: String,
@@ -2275,9 +2271,9 @@ pub struct LicenseAssignmentInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LicenseAssignmentInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LicenseAssignmentInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2417,7 +2413,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2427,7 +2423,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for product
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2437,7 +2433,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name for sku
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2448,7 +2444,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LicenseAssignmentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2469,7 +2465,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2486,7 +2482,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appsactivity* crate version *0.1.4+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *appsactivity* crate version *0.1.5+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *appsactivity* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/activity/).
@@ -195,7 +195,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -305,34 +304,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Appsactivity<C, NC, A> {
+pub struct Appsactivity<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Appsactivity<C, NC, A> {}
+impl<'a, C, A> Hub for Appsactivity<C, A> {}
 
-impl<'a, C, NC, A> Appsactivity<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Appsactivity<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Appsactivity<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Appsactivity<C, A> {
         Appsactivity {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a, C, NC, A> {
+    pub fn activities(&'a self) -> ActivityMethods<'a, C, A> {
         ActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -593,20 +589,20 @@ impl Part for Event {}
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Appsactivity<C, NC, A>,
+    hub: &'a Appsactivity<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ActivityMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
+impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visiblity settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.
-    pub fn list(&self) -> ActivityListCall<'a, C, NC, A> {
+    pub fn list(&self) -> ActivityListCall<'a, C, A> {
         ActivityListCall {
             hub: self.hub,
             _user_id: Default::default(),
@@ -668,10 +664,10 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Appsactivity<C, NC, A>,
+    hub: &'a Appsactivity<C, A>,
     _user_id: Option<String>,
     _source: Option<String>,
     _page_token: Option<String>,
@@ -684,9 +680,9 @@ pub struct ActivityListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ActivityListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -812,7 +808,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Indicates the user to return activity for. Use the special value me to indicate the currently authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._user_id = Some(new_value.to_string());
         self
     }
@@ -821,7 +817,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// 
     /// The Google service from which to return activities. Possible values of source are: 
     /// - drive.google.com
-    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -829,7 +825,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A token to retrieve a specific page of results.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -837,7 +833,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.
-    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -845,7 +841,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
-    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._grouping_strategy = Some(new_value.to_string());
         self
     }
@@ -853,7 +849,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Identifies the Drive item to return activities for.
-    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._drive_file_id = Some(new_value.to_string());
         self
     }
@@ -861,7 +857,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Identifies the Drive folder containing the items for which to return activities.
-    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._drive_ancestor_id = Some(new_value.to_string());
         self
     }
@@ -872,7 +868,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -893,7 +889,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -910,7 +906,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

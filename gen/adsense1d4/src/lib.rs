@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *AdSense* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *AdSense* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/management/).
@@ -238,7 +238,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -342,61 +341,58 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AdSense<C, NC, A> {
+pub struct AdSense<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for AdSense<C, NC, A> {}
+impl<'a, C, A> Hub for AdSense<C, A> {}
 
-impl<'a, C, NC, A> AdSense<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdSense<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> AdSense<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> AdSense<C, A> {
         AdSense {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a, C, NC, A> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, C, A> {
         AccountMethods { hub: &self }
     }
-    pub fn adclients(&'a self) -> AdclientMethods<'a, C, NC, A> {
+    pub fn adclients(&'a self) -> AdclientMethods<'a, C, A> {
         AdclientMethods { hub: &self }
     }
-    pub fn adunits(&'a self) -> AdunitMethods<'a, C, NC, A> {
+    pub fn adunits(&'a self) -> AdunitMethods<'a, C, A> {
         AdunitMethods { hub: &self }
     }
-    pub fn alerts(&'a self) -> AlertMethods<'a, C, NC, A> {
+    pub fn alerts(&'a self) -> AlertMethods<'a, C, A> {
         AlertMethods { hub: &self }
     }
-    pub fn customchannels(&'a self) -> CustomchannelMethods<'a, C, NC, A> {
+    pub fn customchannels(&'a self) -> CustomchannelMethods<'a, C, A> {
         CustomchannelMethods { hub: &self }
     }
-    pub fn metadata(&'a self) -> MetadataMethods<'a, C, NC, A> {
+    pub fn metadata(&'a self) -> MetadataMethods<'a, C, A> {
         MetadataMethods { hub: &self }
     }
-    pub fn payments(&'a self) -> PaymentMethods<'a, C, NC, A> {
+    pub fn payments(&'a self) -> PaymentMethods<'a, C, A> {
         PaymentMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a, C, NC, A> {
+    pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
-    pub fn savedadstyles(&'a self) -> SavedadstyleMethods<'a, C, NC, A> {
+    pub fn savedadstyles(&'a self) -> SavedadstyleMethods<'a, C, A> {
         SavedadstyleMethods { hub: &self }
     }
-    pub fn urlchannels(&'a self) -> UrlchannelMethods<'a, C, NC, A> {
+    pub fn urlchannels(&'a self) -> UrlchannelMethods<'a, C, A> {
         UrlchannelMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1240,15 +1236,15 @@ impl Resource for Payment {}
 /// let rb = hub.urlchannels();
 /// # }
 /// ```
-pub struct UrlchannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlchannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UrlchannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UrlchannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
+impl<'a, C, A> UrlchannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1257,7 +1253,7 @@ impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client for which to list URL channels.
-    pub fn list(&self, ad_client_id: &str) -> UrlchannelListCall<'a, C, NC, A> {
+    pub fn list(&self, ad_client_id: &str) -> UrlchannelListCall<'a, C, A> {
         UrlchannelListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1300,15 +1296,15 @@ impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
 /// let rb = hub.adunits();
 /// # }
 /// ```
-pub struct AdunitMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdunitMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AdunitMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AdunitMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
+impl<'a, C, A> AdunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1318,7 +1314,7 @@ impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
     ///
     /// * `adClientId` - Ad client which contains the ad unit.
     /// * `adUnitId` - Ad unit for which to list custom channels.
-    pub fn customchannels_list(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn customchannels_list(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         AdunitCustomchannelListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1339,7 +1335,7 @@ impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
     ///
     /// * `adClientId` - Ad client for which to get the ad unit.
     /// * `adUnitId` - Ad unit to retrieve.
-    pub fn get(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitGetCall<'a, C, NC, A> {
+    pub fn get(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitGetCall<'a, C, A> {
         AdunitGetCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1357,7 +1353,7 @@ impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client for which to list ad units.
-    pub fn list(&self, ad_client_id: &str) -> AdunitListCall<'a, C, NC, A> {
+    pub fn list(&self, ad_client_id: &str) -> AdunitListCall<'a, C, A> {
         AdunitListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1378,7 +1374,7 @@ impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
     ///
     /// * `adClientId` - Ad client with contains the ad unit.
     /// * `adUnitId` - Ad unit to get the code for.
-    pub fn get_ad_code(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn get_ad_code(&self, ad_client_id: &str, ad_unit_id: &str) -> AdunitGetAdCodeCall<'a, C, A> {
         AdunitGetAdCodeCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1420,20 +1416,20 @@ impl<'a, C, NC, A> AdunitMethods<'a, C, NC, A> {
 /// let rb = hub.adclients();
 /// # }
 /// ```
-pub struct AdclientMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdclientMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AdclientMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AdclientMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AdclientMethods<'a, C, NC, A> {
+impl<'a, C, A> AdclientMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List all ad clients in this AdSense account.
-    pub fn list(&self) -> AdclientListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AdclientListCall<'a, C, A> {
         AdclientListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1475,15 +1471,15 @@ impl<'a, C, NC, A> AdclientMethods<'a, C, NC, A> {
 /// let rb = hub.alerts();
 /// # }
 /// ```
-pub struct AlertMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AlertMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AlertMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AlertMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AlertMethods<'a, C, NC, A> {
+impl<'a, C, A> AlertMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1492,7 +1488,7 @@ impl<'a, C, NC, A> AlertMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `alertId` - Alert to delete.
-    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, C, A> {
         AlertDeleteCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -1505,7 +1501,7 @@ impl<'a, C, NC, A> AlertMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// List the alerts for this AdSense account.
-    pub fn list(&self) -> AlertListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AlertListCall<'a, C, A> {
         AlertListCall {
             hub: self.hub,
             _locale: Default::default(),
@@ -1546,20 +1542,20 @@ impl<'a, C, NC, A> AlertMethods<'a, C, NC, A> {
 /// let rb = hub.savedadstyles();
 /// # }
 /// ```
-pub struct SavedadstyleMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SavedadstyleMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SavedadstyleMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SavedadstyleMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SavedadstyleMethods<'a, C, NC, A> {
+impl<'a, C, A> SavedadstyleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List all saved ad styles in the user's account.
-    pub fn list(&self) -> SavedadstyleListCall<'a, C, NC, A> {
+    pub fn list(&self) -> SavedadstyleListCall<'a, C, A> {
         SavedadstyleListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1577,7 +1573,7 @@ impl<'a, C, NC, A> SavedadstyleMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `savedAdStyleId` - Saved ad style to retrieve.
-    pub fn get(&self, saved_ad_style_id: &str) -> SavedadstyleGetCall<'a, C, NC, A> {
+    pub fn get(&self, saved_ad_style_id: &str) -> SavedadstyleGetCall<'a, C, A> {
         SavedadstyleGetCall {
             hub: self.hub,
             _saved_ad_style_id: saved_ad_style_id.to_string(),
@@ -1618,20 +1614,20 @@ impl<'a, C, NC, A> SavedadstyleMethods<'a, C, NC, A> {
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
+impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List all saved reports in this AdSense account.
-    pub fn saved_list(&self) -> ReportSavedListCall<'a, C, NC, A> {
+    pub fn saved_list(&self) -> ReportSavedListCall<'a, C, A> {
         ReportSavedListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1650,7 +1646,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     ///
     /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn generate(&self, start_date: &str, end_date: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn generate(&self, start_date: &str, end_date: &str) -> ReportGenerateCall<'a, C, A> {
         ReportGenerateCall {
             hub: self.hub,
             _start_date: start_date.to_string(),
@@ -1678,7 +1674,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `savedReportId` - The saved report to retrieve.
-    pub fn saved_generate(&self, saved_report_id: &str) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn saved_generate(&self, saved_report_id: &str) -> ReportSavedGenerateCall<'a, C, A> {
         ReportSavedGenerateCall {
             hub: self.hub,
             _saved_report_id: saved_report_id.to_string(),
@@ -1722,15 +1718,15 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AccountMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
+impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1740,7 +1736,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account which contains the ad unit.
     /// * `alertId` - Alert to delete.
-    pub fn alerts_delete(&self, account_id: &str, alert_id: &str) -> AccountAlertDeleteCall<'a, C, NC, A> {
+    pub fn alerts_delete(&self, account_id: &str, alert_id: &str) -> AccountAlertDeleteCall<'a, C, A> {
         AccountAlertDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1758,7 +1754,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account for which to retrieve the alerts.
-    pub fn alerts_list(&self, account_id: &str) -> AccountAlertListCall<'a, C, NC, A> {
+    pub fn alerts_list(&self, account_id: &str) -> AccountAlertListCall<'a, C, A> {
         AccountAlertListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1777,7 +1773,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account to which the saved reports belong.
     /// * `savedReportId` - The saved report to retrieve.
-    pub fn reports_saved_generate(&self, account_id: &str, saved_report_id: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn reports_saved_generate(&self, account_id: &str, saved_report_id: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         AccountReportSavedGenerateCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1794,7 +1790,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all accounts available to this AdSense account.
-    pub fn list(&self) -> AccountListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AccountListCall<'a, C, A> {
         AccountListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1812,7 +1808,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account for which to retrieve the payments.
-    pub fn payments_list(&self, account_id: &str) -> AccountPaymentListCall<'a, C, NC, A> {
+    pub fn payments_list(&self, account_id: &str) -> AccountPaymentListCall<'a, C, A> {
         AccountPaymentListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1830,7 +1826,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account for which to get the saved ad style.
     /// * `savedAdStyleId` - Saved ad style to retrieve.
-    pub fn savedadstyles_get(&self, account_id: &str, saved_ad_style_id: &str) -> AccountSavedadstyleGetCall<'a, C, NC, A> {
+    pub fn savedadstyles_get(&self, account_id: &str, saved_ad_style_id: &str) -> AccountSavedadstyleGetCall<'a, C, A> {
         AccountSavedadstyleGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1850,7 +1846,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client for which to get the ad unit.
     /// * `adUnitId` - Ad unit to retrieve.
-    pub fn adunits_get(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
+    pub fn adunits_get(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetCall<'a, C, A> {
         AccountAdunitGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1871,7 +1867,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client which contains the custom channel.
     /// * `customChannelId` - Custom channel to retrieve.
-    pub fn customchannels_get(&self, account_id: &str, ad_client_id: &str, custom_channel_id: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
+    pub fn customchannels_get(&self, account_id: &str, ad_client_id: &str, custom_channel_id: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         AccountCustomchannelGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1892,7 +1888,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client which contains the custom channel.
     /// * `customChannelId` - Custom channel for which to list ad units.
-    pub fn customchannels_adunits_list(&self, account_id: &str, ad_client_id: &str, custom_channel_id: &str) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn customchannels_adunits_list(&self, account_id: &str, ad_client_id: &str, custom_channel_id: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         AccountCustomchannelAdunitListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1914,7 +1910,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account to which the saved reports belong.
-    pub fn reports_saved_list(&self, account_id: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
+    pub fn reports_saved_list(&self, account_id: &str) -> AccountReportSavedListCall<'a, C, A> {
         AccountReportSavedListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1934,7 +1930,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client for which to list URL channels.
-    pub fn urlchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn urlchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountUrlchannelListCall<'a, C, A> {
         AccountUrlchannelListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1955,7 +1951,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client for which to list ad units.
-    pub fn adunits_list(&self, account_id: &str, ad_client_id: &str) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn adunits_list(&self, account_id: &str, ad_client_id: &str) -> AccountAdunitListCall<'a, C, A> {
         AccountAdunitListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1978,7 +1974,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account upon which to report.
     /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a, C, A> {
         AccountReportGenerateCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2006,7 +2002,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account for which to list ad clients.
-    pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a, C, NC, A> {
+    pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a, C, A> {
         AccountAdclientListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2026,7 +2022,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client for which to list custom channels.
-    pub fn customchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn customchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountCustomchannelListCall<'a, C, A> {
         AccountCustomchannelListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2046,7 +2042,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account for which to list saved ad styles.
-    pub fn savedadstyles_list(&self, account_id: &str) -> AccountSavedadstyleListCall<'a, C, NC, A> {
+    pub fn savedadstyles_list(&self, account_id: &str) -> AccountSavedadstyleListCall<'a, C, A> {
         AccountSavedadstyleListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2067,7 +2063,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client with contains the ad unit.
     /// * `adUnitId` - Ad unit to get the code for.
-    pub fn adunits_get_ad_code(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn adunits_get_ad_code(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         AccountAdunitGetAdCodeCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2088,7 +2084,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - Account to which the ad client belongs.
     /// * `adClientId` - Ad client which contains the ad unit.
     /// * `adUnitId` - Ad unit for which to list custom channels.
-    pub fn adunits_customchannels_list(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn adunits_customchannels_list(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         AccountAdunitCustomchannelListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2109,7 +2105,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - Account to get information about.
-    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
+    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, A> {
         AccountGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2151,20 +2147,20 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
 /// let rb = hub.payments();
 /// # }
 /// ```
-pub struct PaymentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PaymentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PaymentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PaymentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PaymentMethods<'a, C, NC, A> {
+impl<'a, C, A> PaymentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List the payments for this AdSense account.
-    pub fn list(&self) -> PaymentListCall<'a, C, NC, A> {
+    pub fn list(&self) -> PaymentListCall<'a, C, A> {
         PaymentListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2204,20 +2200,20 @@ impl<'a, C, NC, A> PaymentMethods<'a, C, NC, A> {
 /// let rb = hub.metadata();
 /// # }
 /// ```
-pub struct MetadataMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetadataMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MetadataMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MetadataMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
+impl<'a, C, A> MetadataMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List the metadata for the dimensions available to this AdSense account.
-    pub fn dimensions_list(&self) -> MetadataDimensionListCall<'a, C, NC, A> {
+    pub fn dimensions_list(&self) -> MetadataDimensionListCall<'a, C, A> {
         MetadataDimensionListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2229,7 +2225,7 @@ impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// List the metadata for the metrics available to this AdSense account.
-    pub fn metrics_list(&self) -> MetadataMetricListCall<'a, C, NC, A> {
+    pub fn metrics_list(&self) -> MetadataMetricListCall<'a, C, A> {
         MetadataMetricListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2269,15 +2265,15 @@ impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
 /// let rb = hub.customchannels();
 /// # }
 /// ```
-pub struct CustomchannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomchannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CustomchannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CustomchannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
+impl<'a, C, A> CustomchannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2287,7 +2283,7 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     ///
     /// * `adClientId` - Ad client which contains the custom channel.
     /// * `customChannelId` - Custom channel to retrieve.
-    pub fn get(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelGetCall<'a, C, NC, A> {
+    pub fn get(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelGetCall<'a, C, A> {
         CustomchannelGetCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -2305,7 +2301,7 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client for which to list custom channels.
-    pub fn list(&self, ad_client_id: &str) -> CustomchannelListCall<'a, C, NC, A> {
+    pub fn list(&self, ad_client_id: &str) -> CustomchannelListCall<'a, C, A> {
         CustomchannelListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -2325,7 +2321,7 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     ///
     /// * `adClientId` - Ad client which contains the custom channel.
     /// * `customChannelId` - Custom channel for which to list ad units.
-    pub fn adunits_list(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn adunits_list(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         CustomchannelAdunitListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -2380,10 +2376,10 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct UrlchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UrlchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2392,9 +2388,9 @@ pub struct UrlchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UrlchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UrlchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2532,7 +2528,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list URL channels.
-    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -2540,7 +2536,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> UrlchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UrlchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2548,7 +2544,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The maximum number of URL channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> UrlchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> UrlchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2559,7 +2555,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UrlchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2580,7 +2576,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2597,7 +2593,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UrlchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UrlchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2637,10 +2633,10 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct AdunitCustomchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdunitCustomchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _ad_unit_id: String,
     _page_token: Option<String>,
@@ -2650,9 +2646,9 @@ pub struct AdunitCustomchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AdunitCustomchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdunitCustomchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2791,7 +2787,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -2801,7 +2797,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Ad unit for which to list custom channels.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -2809,7 +2805,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AdunitCustomchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2817,7 +2813,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maximum number of custom channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AdunitCustomchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2828,7 +2824,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitCustomchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2849,7 +2845,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdunitCustomchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdunitCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2866,7 +2862,7 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitCustomchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitCustomchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2904,10 +2900,10 @@ impl<'a, C, NC, A> AdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AdunitGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdunitGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _ad_unit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2915,9 +2911,9 @@ pub struct AdunitGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AdunitGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdunitGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3050,7 +3046,7 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to get the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3060,7 +3056,7 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Ad unit to retrieve.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -3071,7 +3067,7 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3092,7 +3088,7 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdunitGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdunitGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3109,7 +3105,7 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3150,10 +3146,10 @@ impl<'a, C, NC, A> AdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct AdunitListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdunitListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -3163,9 +3159,9 @@ pub struct AdunitListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AdunitListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdunitListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3306,7 +3302,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list ad units.
-    pub fn ad_client_id(mut self, new_value: &str) -> AdunitListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3314,7 +3310,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AdunitListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AdunitListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3322,7 +3318,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The maximum number of ad units to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AdunitListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AdunitListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3330,7 +3326,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to include inactive ad units. Default: true.
-    pub fn include_inactive(mut self, new_value: bool) -> AdunitListCall<'a, C, NC, A> {
+    pub fn include_inactive(mut self, new_value: bool) -> AdunitListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
@@ -3341,7 +3337,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3362,7 +3358,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdunitListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3379,7 +3375,7 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3417,10 +3413,10 @@ impl<'a, C, NC, A> AdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct AdunitGetAdCodeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdunitGetAdCodeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _ad_unit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3428,9 +3424,9 @@ pub struct AdunitGetAdCodeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AdunitGetAdCodeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdunitGetAdCodeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3563,7 +3559,7 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Ad client with contains the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3573,7 +3569,7 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Ad unit to get the code for.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AdunitGetAdCodeCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -3584,7 +3580,7 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdunitGetAdCodeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3605,7 +3601,7 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdunitGetAdCodeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdunitGetAdCodeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3622,7 +3618,7 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetAdCodeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdunitGetAdCodeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3662,10 +3658,10 @@ impl<'a, C, NC, A> AdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct AdclientListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdclientListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -3673,9 +3669,9 @@ pub struct AdclientListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AdclientListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdclientListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3786,7 +3782,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AdclientListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AdclientListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3794,7 +3790,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The maximum number of ad clients to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AdclientListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AdclientListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3805,7 +3801,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdclientListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdclientListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3826,7 +3822,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdclientListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdclientListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3843,7 +3839,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AdclientListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AdclientListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3881,19 +3877,19 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct AlertDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AlertDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _alert_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AlertDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AlertDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4014,7 +4010,7 @@ impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Alert to delete.
-    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C, NC, A> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C, A> {
         self._alert_id = new_value.to_string();
         self
     }
@@ -4025,7 +4021,7 @@ impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlertDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlertDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4046,7 +4042,7 @@ impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4063,7 +4059,7 @@ impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AlertDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AlertDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4102,19 +4098,19 @@ impl<'a, C, NC, A> AlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct AlertListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AlertListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AlertListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AlertListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4222,7 +4218,7 @@ impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The locale to use for translating alert messages. The account locale will be used if this is not supplied. The AdSense default (English) will be used if the supplied locale is invalid or unsupported.
-    pub fn locale(mut self, new_value: &str) -> AlertListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> AlertListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -4233,7 +4229,7 @@ impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlertListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AlertListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4254,7 +4250,7 @@ impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4271,7 +4267,7 @@ impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AlertListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AlertListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4311,10 +4307,10 @@ impl<'a, C, NC, A> AlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct SavedadstyleListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SavedadstyleListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -4322,9 +4318,9 @@ pub struct SavedadstyleListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SavedadstyleListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SavedadstyleListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4435,7 +4431,7 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// A continuation token, used to page through saved ad styles. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> SavedadstyleListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SavedadstyleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4443,7 +4439,7 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The maximum number of saved ad styles to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> SavedadstyleListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> SavedadstyleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4454,7 +4450,7 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedadstyleListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedadstyleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4475,7 +4471,7 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SavedadstyleListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SavedadstyleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4492,7 +4488,7 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4530,19 +4526,19 @@ impl<'a, C, NC, A> SavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct SavedadstyleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SavedadstyleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _saved_ad_style_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SavedadstyleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SavedadstyleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4674,7 +4670,7 @@ impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Saved ad style to retrieve.
-    pub fn saved_ad_style_id(mut self, new_value: &str) -> SavedadstyleGetCall<'a, C, NC, A> {
+    pub fn saved_ad_style_id(mut self, new_value: &str) -> SavedadstyleGetCall<'a, C, A> {
         self._saved_ad_style_id = new_value.to_string();
         self
     }
@@ -4685,7 +4681,7 @@ impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedadstyleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedadstyleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4706,7 +4702,7 @@ impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SavedadstyleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SavedadstyleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4723,7 +4719,7 @@ impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SavedadstyleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4763,10 +4759,10 @@ impl<'a, C, NC, A> SavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportSavedListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportSavedListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -4774,9 +4770,9 @@ pub struct ReportSavedListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportSavedListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportSavedListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4887,7 +4883,7 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// A continuation token, used to page through saved reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> ReportSavedListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ReportSavedListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4895,7 +4891,7 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of saved reports to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> ReportSavedListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ReportSavedListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4906,7 +4902,7 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportSavedListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportSavedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4927,7 +4923,7 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportSavedListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportSavedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4944,7 +4940,7 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4997,10 +4993,10 @@ impl<'a, C, NC, A> ReportSavedListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportGenerateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportGenerateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _start_date: String,
     _end_date: String,
     _use_timezone_reporting: Option<bool>,
@@ -5018,9 +5014,9 @@ pub struct ReportGenerateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportGenerateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportGenerateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5195,7 +5191,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
@@ -5205,7 +5201,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
@@ -5213,7 +5209,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Whether the report should be generated in the AdSense account's local timezone. If false default PST/PDT timezone will be used.
-    pub fn use_timezone_reporting(mut self, new_value: bool) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn use_timezone_reporting(mut self, new_value: bool) -> ReportGenerateCall<'a, C, A> {
         self._use_timezone_reporting = Some(new_value);
         self
     }
@@ -5221,7 +5217,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Index of the first row of report data to return.
-    pub fn start_index(mut self, new_value: i32) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ReportGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -5230,7 +5226,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
-    pub fn add_sort(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn add_sort(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._sort.push(new_value.to_string());
         self
     }
@@ -5239,7 +5235,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Numeric columns to include in the report.
-    pub fn add_metric(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn add_metric(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._metric.push(new_value.to_string());
         self
     }
@@ -5247,7 +5243,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The maximum number of rows of report data to return.
-    pub fn max_results(mut self, new_value: i32) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ReportGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5255,7 +5251,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
-    pub fn locale(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -5264,7 +5260,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Filters to be run on the report.
-    pub fn add_filter(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn add_filter(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._filter.push(new_value.to_string());
         self
     }
@@ -5273,7 +5269,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Dimensions to base the report on.
-    pub fn add_dimension(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn add_dimension(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._dimension.push(new_value.to_string());
         self
     }
@@ -5281,7 +5277,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Optional currency to use when reporting on monetary metrics. Defaults to the account's currency if not set.
-    pub fn currency(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn currency(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._currency = Some(new_value.to_string());
         self
     }
@@ -5290,7 +5286,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Accounts upon which to report.
-    pub fn add_account_id(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn add_account_id(mut self, new_value: &str) -> ReportGenerateCall<'a, C, A> {
         self._account_id.push(new_value.to_string());
         self
     }
@@ -5301,7 +5297,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5322,7 +5318,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5339,7 +5335,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5380,10 +5376,10 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportSavedGenerateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportSavedGenerateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _saved_report_id: String,
     _start_index: Option<i32>,
     _max_results: Option<i32>,
@@ -5393,9 +5389,9 @@ pub struct ReportSavedGenerateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportSavedGenerateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportSavedGenerateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5536,7 +5532,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The saved report to retrieve.
-    pub fn saved_report_id(mut self, new_value: &str) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn saved_report_id(mut self, new_value: &str) -> ReportSavedGenerateCall<'a, C, A> {
         self._saved_report_id = new_value.to_string();
         self
     }
@@ -5544,7 +5540,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// Index of the first row of report data to return.
-    pub fn start_index(mut self, new_value: i32) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> ReportSavedGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -5552,7 +5548,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The maximum number of rows of report data to return.
-    pub fn max_results(mut self, new_value: i32) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ReportSavedGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5560,7 +5556,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
-    pub fn locale(mut self, new_value: &str) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> ReportSavedGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -5571,7 +5567,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportSavedGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5592,7 +5588,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportSavedGenerateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportSavedGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5609,7 +5605,7 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedGenerateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportSavedGenerateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5647,10 +5643,10 @@ impl<'a, C, NC, A> ReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAlertDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAlertDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _alert_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5658,9 +5654,9 @@ pub struct AccountAlertDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAlertDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAlertDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5782,7 +5778,7 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Account which contains the ad unit.
-    pub fn account_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5792,7 +5788,7 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Alert to delete.
-    pub fn alert_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, NC, A> {
+    pub fn alert_id(mut self, new_value: &str) -> AccountAlertDeleteCall<'a, C, A> {
         self._alert_id = new_value.to_string();
         self
     }
@@ -5803,7 +5799,7 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAlertDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAlertDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5824,7 +5820,7 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAlertDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAlertDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5841,7 +5837,7 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5880,10 +5876,10 @@ impl<'a, C, NC, A> AccountAlertDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAlertListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAlertListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -5891,9 +5887,9 @@ pub struct AccountAlertListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAlertListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAlertListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6028,7 +6024,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Account for which to retrieve the alerts.
-    pub fn account_id(mut self, new_value: &str) -> AccountAlertListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAlertListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6036,7 +6032,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The locale to use for translating alert messages. The account locale will be used if this is not supplied. The AdSense default (English) will be used if the supplied locale is invalid or unsupported.
-    pub fn locale(mut self, new_value: &str) -> AccountAlertListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> AccountAlertListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -6047,7 +6043,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAlertListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAlertListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6068,7 +6064,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAlertListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAlertListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6085,7 +6081,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAlertListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6126,10 +6122,10 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountReportSavedGenerateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountReportSavedGenerateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _saved_report_id: String,
     _start_index: Option<i32>,
@@ -6140,9 +6136,9 @@ pub struct AccountReportSavedGenerateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountReportSavedGenerateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountReportSavedGenerateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6284,7 +6280,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Account to which the saved reports belong.
-    pub fn account_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6294,7 +6290,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The saved report to retrieve.
-    pub fn saved_report_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn saved_report_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._saved_report_id = new_value.to_string();
         self
     }
@@ -6302,7 +6298,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// Index of the first row of report data to return.
-    pub fn start_index(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -6310,7 +6306,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The maximum number of rows of report data to return.
-    pub fn max_results(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6318,7 +6314,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
-    pub fn locale(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -6329,7 +6325,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6350,7 +6346,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSavedGenerateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSavedGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6367,7 +6363,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedGenerateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedGenerateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6407,10 +6403,10 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -6418,9 +6414,9 @@ pub struct AccountListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6531,7 +6527,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// A continuation token, used to page through accounts. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6539,7 +6535,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of accounts to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6550,7 +6546,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6571,7 +6567,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6588,7 +6584,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6626,19 +6622,19 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPaymentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPaymentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPaymentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPaymentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6770,7 +6766,7 @@ impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Account for which to retrieve the payments.
-    pub fn account_id(mut self, new_value: &str) -> AccountPaymentListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPaymentListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6781,7 +6777,7 @@ impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPaymentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPaymentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6802,7 +6798,7 @@ impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPaymentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPaymentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6819,7 +6815,7 @@ impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPaymentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPaymentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6857,10 +6853,10 @@ impl<'a, C, NC, A> AccountPaymentListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountSavedadstyleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountSavedadstyleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _saved_ad_style_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6868,9 +6864,9 @@ pub struct AccountSavedadstyleGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountSavedadstyleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountSavedadstyleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7003,7 +6999,7 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account for which to get the saved ad style.
-    pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7013,7 +7009,7 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Saved ad style to retrieve.
-    pub fn saved_ad_style_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, NC, A> {
+    pub fn saved_ad_style_id(mut self, new_value: &str) -> AccountSavedadstyleGetCall<'a, C, A> {
         self._saved_ad_style_id = new_value.to_string();
         self
     }
@@ -7024,7 +7020,7 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountSavedadstyleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountSavedadstyleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7045,7 +7041,7 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSavedadstyleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSavedadstyleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7062,7 +7058,7 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7100,10 +7096,10 @@ impl<'a, C, NC, A> AccountSavedadstyleGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAdunitGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAdunitGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -7112,9 +7108,9 @@ pub struct AccountAdunitGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAdunitGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAdunitGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7248,7 +7244,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7258,7 +7254,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to get the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -7268,7 +7264,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Ad unit to retrieve.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -7279,7 +7275,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7300,7 +7296,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7317,7 +7313,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7355,10 +7351,10 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountCustomchannelGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountCustomchannelGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _custom_channel_id: String,
@@ -7367,9 +7363,9 @@ pub struct AccountCustomchannelGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountCustomchannelGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountCustomchannelGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7503,7 +7499,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7513,7 +7509,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the custom channel.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -7523,7 +7519,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Custom channel to retrieve.
-    pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -7534,7 +7530,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7555,7 +7551,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7572,7 +7568,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7613,10 +7609,10 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountCustomchannelAdunitListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountCustomchannelAdunitListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _custom_channel_id: String,
@@ -7628,9 +7624,9 @@ pub struct AccountCustomchannelAdunitListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountCustomchannelAdunitListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountCustomchannelAdunitListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7773,7 +7769,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7783,7 +7779,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the custom channel.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -7793,7 +7789,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Custom channel for which to list ad units.
-    pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -7801,7 +7797,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7809,7 +7805,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The maximum number of ad units to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7817,7 +7813,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// Whether to include inactive ad units. Default: true.
-    pub fn include_inactive(mut self, new_value: bool) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn include_inactive(mut self, new_value: bool) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
@@ -7828,7 +7824,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelAdunitListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7849,7 +7845,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelAdunitListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7866,7 +7862,7 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelAdunitListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelAdunitListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7906,10 +7902,10 @@ impl<'a, C, NC, A> AccountCustomchannelAdunitListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountReportSavedListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountReportSavedListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -7918,9 +7914,9 @@ pub struct AccountReportSavedListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountReportSavedListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountReportSavedListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8058,7 +8054,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account to which the saved reports belong.
-    pub fn account_id(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8066,7 +8062,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// A continuation token, used to page through saved reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8074,7 +8070,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The maximum number of saved reports to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountReportSavedListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountReportSavedListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8085,7 +8081,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportSavedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8106,7 +8102,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSavedListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSavedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8123,7 +8119,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportSavedListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8163,10 +8159,10 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountUrlchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountUrlchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _page_token: Option<String>,
@@ -8176,9 +8172,9 @@ pub struct AccountUrlchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountUrlchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountUrlchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8317,7 +8313,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8327,7 +8323,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list URL channels.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -8335,7 +8331,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8343,7 +8339,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of URL channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountUrlchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8354,7 +8350,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUrlchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUrlchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8375,7 +8371,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUrlchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUrlchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8392,7 +8388,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountUrlchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountUrlchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8433,10 +8429,10 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAdunitListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAdunitListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _page_token: Option<String>,
@@ -8447,9 +8443,9 @@ pub struct AccountAdunitListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAdunitListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAdunitListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8591,7 +8587,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8601,7 +8597,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list ad units.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -8609,7 +8605,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8617,7 +8613,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The maximum number of ad units to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountAdunitListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8625,7 +8621,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Whether to include inactive ad units. Default: true.
-    pub fn include_inactive(mut self, new_value: bool) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn include_inactive(mut self, new_value: bool) -> AccountAdunitListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
@@ -8636,7 +8632,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8657,7 +8653,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8674,7 +8670,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8726,10 +8722,10 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountReportGenerateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountReportGenerateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _start_date: String,
     _end_date: String,
@@ -8747,9 +8743,9 @@ pub struct AccountReportGenerateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountReportGenerateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountReportGenerateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8942,7 +8938,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Account upon which to report.
-    pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8952,7 +8948,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._start_date = new_value.to_string();
         self
     }
@@ -8962,7 +8958,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._end_date = new_value.to_string();
         self
     }
@@ -8970,7 +8966,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Whether the report should be generated in the AdSense account's local timezone. If false default PST/PDT timezone will be used.
-    pub fn use_timezone_reporting(mut self, new_value: bool) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn use_timezone_reporting(mut self, new_value: bool) -> AccountReportGenerateCall<'a, C, A> {
         self._use_timezone_reporting = Some(new_value);
         self
     }
@@ -8978,7 +8974,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Index of the first row of report data to return.
-    pub fn start_index(mut self, new_value: i32) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: i32) -> AccountReportGenerateCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -8987,7 +8983,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
-    pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._sort.push(new_value.to_string());
         self
     }
@@ -8996,7 +8992,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Numeric columns to include in the report.
-    pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._metric.push(new_value.to_string());
         self
     }
@@ -9004,7 +9000,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of rows of report data to return.
-    pub fn max_results(mut self, new_value: i32) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountReportGenerateCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9012,7 +9008,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
-    pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9021,7 +9017,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Filters to be run on the report.
-    pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._filter.push(new_value.to_string());
         self
     }
@@ -9030,7 +9026,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Dimensions to base the report on.
-    pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._dimension.push(new_value.to_string());
         self
     }
@@ -9038,7 +9034,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// Optional currency to use when reporting on monetary metrics. Defaults to the account's currency if not set.
-    pub fn currency(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn currency(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, A> {
         self._currency = Some(new_value.to_string());
         self
     }
@@ -9049,7 +9045,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportGenerateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountReportGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9070,7 +9066,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountReportGenerateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountReportGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9087,7 +9083,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountReportGenerateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountReportGenerateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9127,10 +9123,10 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAdclientListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAdclientListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -9139,9 +9135,9 @@ pub struct AccountAdclientListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAdclientListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAdclientListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9279,7 +9275,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Account for which to list ad clients.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9287,7 +9283,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9295,7 +9291,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The maximum number of ad clients to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountAdclientListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountAdclientListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9306,7 +9302,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdclientListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdclientListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9327,7 +9323,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9344,7 +9340,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdclientListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdclientListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9384,10 +9380,10 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountCustomchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountCustomchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _page_token: Option<String>,
@@ -9397,9 +9393,9 @@ pub struct AccountCustomchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountCustomchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountCustomchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9538,7 +9534,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9548,7 +9544,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list custom channels.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -9556,7 +9552,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9564,7 +9560,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The maximum number of custom channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountCustomchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9575,7 +9571,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountCustomchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9596,7 +9592,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9613,7 +9609,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountCustomchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9653,10 +9649,10 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountSavedadstyleListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountSavedadstyleListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -9665,9 +9661,9 @@ pub struct AccountSavedadstyleListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountSavedadstyleListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountSavedadstyleListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9805,7 +9801,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Account for which to list saved ad styles.
-    pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountSavedadstyleListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9813,7 +9809,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// A continuation token, used to page through saved ad styles. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountSavedadstyleListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountSavedadstyleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9821,7 +9817,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maximum number of saved ad styles to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountSavedadstyleListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountSavedadstyleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9832,7 +9828,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountSavedadstyleListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountSavedadstyleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9853,7 +9849,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSavedadstyleListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSavedadstyleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9870,7 +9866,7 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountSavedadstyleListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9908,10 +9904,10 @@ impl<'a, C, NC, A> AccountSavedadstyleListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAdunitGetAdCodeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAdunitGetAdCodeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -9920,9 +9916,9 @@ pub struct AccountAdunitGetAdCodeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAdunitGetAdCodeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAdunitGetAdCodeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10056,7 +10052,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Account which contains the ad client.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10066,7 +10062,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Ad client with contains the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -10076,7 +10072,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Ad unit to get the code for.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -10087,7 +10083,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitGetAdCodeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10108,7 +10104,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetAdCodeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetAdCodeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10125,7 +10121,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10165,10 +10161,10 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountAdunitCustomchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountAdunitCustomchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -10179,9 +10175,9 @@ pub struct AccountAdunitCustomchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountAdunitCustomchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountAdunitCustomchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10321,7 +10317,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Account to which the ad client belongs.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10331,7 +10327,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the ad unit.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -10341,7 +10337,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Ad unit for which to list custom channels.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -10349,7 +10345,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10357,7 +10353,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// The maximum number of custom channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10368,7 +10364,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountAdunitCustomchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10389,7 +10385,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitCustomchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitCustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10406,7 +10402,7 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitCustomchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountAdunitCustomchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10445,10 +10441,10 @@ impl<'a, C, NC, A> AccountAdunitCustomchannelListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _account_id: String,
     _tree: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -10456,9 +10452,9 @@ pub struct AccountGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10593,7 +10589,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Account to get information about.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10601,7 +10597,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether the tree of sub accounts should be returned.
-    pub fn tree(mut self, new_value: bool) -> AccountGetCall<'a, C, NC, A> {
+    pub fn tree(mut self, new_value: bool) -> AccountGetCall<'a, C, A> {
         self._tree = Some(new_value);
         self
     }
@@ -10612,7 +10608,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10633,7 +10629,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10650,7 +10646,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10688,18 +10684,18 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PaymentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PaymentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PaymentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PaymentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10807,7 +10803,7 @@ impl<'a, C, NC, A> PaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PaymentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PaymentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10828,7 +10824,7 @@ impl<'a, C, NC, A> PaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PaymentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PaymentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10845,7 +10841,7 @@ impl<'a, C, NC, A> PaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PaymentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PaymentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10883,18 +10879,18 @@ impl<'a, C, NC, A> PaymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct MetadataDimensionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetadataDimensionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetadataDimensionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetadataDimensionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetadataDimensionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11002,7 +10998,7 @@ impl<'a, C, NC, A> MetadataDimensionListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataDimensionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataDimensionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11023,7 +11019,7 @@ impl<'a, C, NC, A> MetadataDimensionListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetadataDimensionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetadataDimensionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11040,7 +11036,7 @@ impl<'a, C, NC, A> MetadataDimensionListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetadataDimensionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetadataDimensionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11078,18 +11074,18 @@ impl<'a, C, NC, A> MetadataDimensionListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct MetadataMetricListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetadataMetricListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetadataMetricListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetadataMetricListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetadataMetricListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11197,7 +11193,7 @@ impl<'a, C, NC, A> MetadataMetricListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataMetricListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetadataMetricListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11218,7 +11214,7 @@ impl<'a, C, NC, A> MetadataMetricListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetadataMetricListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetadataMetricListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11235,7 +11231,7 @@ impl<'a, C, NC, A> MetadataMetricListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetadataMetricListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetadataMetricListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11273,10 +11269,10 @@ impl<'a, C, NC, A> MetadataMetricListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomchannelGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomchannelGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _custom_channel_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11284,9 +11280,9 @@ pub struct CustomchannelGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomchannelGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomchannelGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11419,7 +11415,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the custom channel.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -11429,7 +11425,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Custom channel to retrieve.
-    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, NC, A> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -11440,7 +11436,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11461,7 +11457,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11478,7 +11474,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11518,10 +11514,10 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomchannelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomchannelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -11530,9 +11526,9 @@ pub struct CustomchannelListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomchannelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomchannelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11670,7 +11666,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Ad client for which to list custom channels.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -11678,7 +11674,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> CustomchannelListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CustomchannelListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11686,7 +11682,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The maximum number of custom channels to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> CustomchannelListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> CustomchannelListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11697,7 +11693,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11718,7 +11714,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11735,7 +11731,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11776,10 +11772,10 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomchannelAdunitListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomchannelAdunitListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AdSense<C, NC, A>,
+    hub: &'a AdSense<C, A>,
     _ad_client_id: String,
     _custom_channel_id: String,
     _page_token: Option<String>,
@@ -11790,9 +11786,9 @@ pub struct CustomchannelAdunitListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomchannelAdunitListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomchannelAdunitListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11934,7 +11930,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Ad client which contains the custom channel.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -11944,7 +11940,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Custom channel for which to list ad units.
-    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -11952,7 +11948,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CustomchannelAdunitListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11960,7 +11956,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maximum number of ad units to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> CustomchannelAdunitListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11968,7 +11964,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Whether to include inactive ad units. Default: true.
-    pub fn include_inactive(mut self, new_value: bool) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn include_inactive(mut self, new_value: bool) -> CustomchannelAdunitListCall<'a, C, A> {
         self._include_inactive = Some(new_value);
         self
     }
@@ -11979,7 +11975,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelAdunitListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomchannelAdunitListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12000,7 +11996,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelAdunitListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelAdunitListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12017,7 +12013,7 @@ impl<'a, C, NC, A> CustomchannelAdunitListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelAdunitListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomchannelAdunitListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

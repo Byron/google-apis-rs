@@ -4,12 +4,12 @@
 [package]
 
 name = "google-content2"
-version = "0.1.4+20150317"
+version = "0.1.5+20150317"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2"
 homepage = "https://developers.google.com/shopping-content/v2/"
-documentation = "http://byron.github.io/google-apis-rs/google-content2"
+documentation = "http://byron.github.io/google-apis-rs/google_content2"
 license = "MIT"
 keywords = ["content", "google", "protocol", "web", "api"]
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *pubsub* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
@@ -195,7 +195,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -296,34 +295,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Pubsub<C, NC, A> {
+pub struct Pubsub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Pubsub<C, NC, A> {}
+impl<'a, C, A> Hub for Pubsub<C, A> {}
 
-impl<'a, C, NC, A> Pubsub<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Pubsub<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Pubsub<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Pubsub<C, A> {
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C, NC, A> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -688,15 +684,15 @@ impl ResponseResult for Subscription {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -705,7 +701,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - No description provided.
-    pub fn topics_list(&self, project: &str) -> ProjectTopicListCall<'a, C, NC, A> {
+    pub fn topics_list(&self, project: &str) -> ProjectTopicListCall<'a, C, A> {
         ProjectTopicListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -725,7 +721,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `subscription` - No description provided.
-    pub fn subscriptions_pull(&self, request: &PullRequest, subscription: &str) -> ProjectSubscriptionPullCall<'a, C, NC, A> {
+    pub fn subscriptions_pull(&self, request: &PullRequest, subscription: &str) -> ProjectSubscriptionPullCall<'a, C, A> {
         ProjectSubscriptionPullCall {
             hub: self.hub,
             _request: request.clone(),
@@ -744,7 +740,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - No description provided.
-    pub fn topics_create(&self, request: &Topic, name: &str) -> ProjectTopicCreateCall<'a, C, NC, A> {
+    pub fn topics_create(&self, request: &Topic, name: &str) -> ProjectTopicCreateCall<'a, C, A> {
         ProjectTopicCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -762,7 +758,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `topic` - No description provided.
-    pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, NC, A> {
+    pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, A> {
         ProjectTopicDeleteCall {
             hub: self.hub,
             _topic: topic.to_string(),
@@ -780,7 +776,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `subscription` - No description provided.
-    pub fn subscriptions_modify_push_config(&self, request: &ModifyPushConfigRequest, subscription: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {
+    pub fn subscriptions_modify_push_config(&self, request: &ModifyPushConfigRequest, subscription: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> {
         ProjectSubscriptionModifyPushConfigCall {
             hub: self.hub,
             _request: request.clone(),
@@ -799,7 +795,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `topic` - No description provided.
-    pub fn topics_publish(&self, request: &PublishRequest, topic: &str) -> ProjectTopicPublishCall<'a, C, NC, A> {
+    pub fn topics_publish(&self, request: &PublishRequest, topic: &str) -> ProjectTopicPublishCall<'a, C, A> {
         ProjectTopicPublishCall {
             hub: self.hub,
             _request: request.clone(),
@@ -817,7 +813,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `topic` - No description provided.
-    pub fn topics_get(&self, topic: &str) -> ProjectTopicGetCall<'a, C, NC, A> {
+    pub fn topics_get(&self, topic: &str) -> ProjectTopicGetCall<'a, C, A> {
         ProjectTopicGetCall {
             hub: self.hub,
             _topic: topic.to_string(),
@@ -835,7 +831,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `subscription` - No description provided.
-    pub fn subscriptions_modify_ack_deadline(&self, request: &ModifyAckDeadlineRequest, subscription: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {
+    pub fn subscriptions_modify_ack_deadline(&self, request: &ModifyAckDeadlineRequest, subscription: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {
         ProjectSubscriptionModifyAckDeadlineCall {
             hub: self.hub,
             _request: request.clone(),
@@ -854,7 +850,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `subscription` - No description provided.
-    pub fn subscriptions_acknowledge(&self, request: &AcknowledgeRequest, subscription: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {
+    pub fn subscriptions_acknowledge(&self, request: &AcknowledgeRequest, subscription: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> {
         ProjectSubscriptionAcknowledgeCall {
             hub: self.hub,
             _request: request.clone(),
@@ -872,7 +868,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `subscription` - No description provided.
-    pub fn subscriptions_delete(&self, subscription: &str) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn subscriptions_delete(&self, subscription: &str) -> ProjectSubscriptionDeleteCall<'a, C, A> {
         ProjectSubscriptionDeleteCall {
             hub: self.hub,
             _subscription: subscription.to_string(),
@@ -890,7 +886,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - No description provided.
-    pub fn subscriptions_create(&self, request: &Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, NC, A> {
+    pub fn subscriptions_create(&self, request: &Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, A> {
         ProjectSubscriptionCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -908,7 +904,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `subscription` - No description provided.
-    pub fn subscriptions_get(&self, subscription: &str) -> ProjectSubscriptionGetCall<'a, C, NC, A> {
+    pub fn subscriptions_get(&self, subscription: &str) -> ProjectSubscriptionGetCall<'a, C, A> {
         ProjectSubscriptionGetCall {
             hub: self.hub,
             _subscription: subscription.to_string(),
@@ -925,7 +921,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `topic` - No description provided.
-    pub fn topics_subscriptions_list(&self, topic: &str) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
+    pub fn topics_subscriptions_list(&self, topic: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         ProjectTopicSubscriptionListCall {
             hub: self.hub,
             _topic: topic.to_string(),
@@ -944,7 +940,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - No description provided.
-    pub fn subscriptions_list(&self, project: &str) -> ProjectSubscriptionListCall<'a, C, NC, A> {
+    pub fn subscriptions_list(&self, project: &str) -> ProjectSubscriptionListCall<'a, C, A> {
         ProjectSubscriptionListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -997,10 +993,10 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _project: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1009,9 +1005,9 @@ pub struct ProjectTopicListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1152,21 +1148,21 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ProjectTopicListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ProjectTopicListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> ProjectTopicListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectTopicListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    pub fn page_size(mut self, new_value: i32) -> ProjectTopicListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectTopicListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -1177,7 +1173,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1198,7 +1194,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1215,7 +1211,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1259,10 +1255,10 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionPullCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionPullCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: PullRequest,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1270,9 +1266,9 @@ pub struct ProjectSubscriptionPullCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionPullCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionPullCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1415,7 +1411,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PullRequest) -> ProjectSubscriptionPullCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PullRequest) -> ProjectSubscriptionPullCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1424,7 +1420,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionPullCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionPullCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -1435,7 +1431,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionPullCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionPullCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1456,7 +1452,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPullCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPullCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1473,7 +1469,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionPullCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionPullCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1517,10 +1513,10 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: Topic,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1528,9 +1524,9 @@ pub struct ProjectTopicCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1673,7 +1669,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Topic) -> ProjectTopicCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Topic) -> ProjectTopicCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1682,7 +1678,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn name(mut self, new_value: &str) -> ProjectTopicCreateCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectTopicCreateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -1693,7 +1689,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1714,7 +1710,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1731,7 +1727,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1769,19 +1765,19 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _topic: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1916,7 +1912,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn topic(mut self, new_value: &str) -> ProjectTopicDeleteCall<'a, C, NC, A> {
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicDeleteCall<'a, C, A> {
         self._topic = new_value.to_string();
         self
     }
@@ -1927,7 +1923,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1948,7 +1944,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2009,10 +2005,10 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionModifyPushConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: ModifyPushConfigRequest,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2020,9 +2016,9 @@ pub struct ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionModifyPushConfigCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2165,7 +2161,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ModifyPushConfigRequest) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ModifyPushConfigRequest) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2174,7 +2170,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -2185,7 +2181,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2206,7 +2202,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2223,7 +2219,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2267,10 +2263,10 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicPublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicPublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: PublishRequest,
     _topic: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2278,9 +2274,9 @@ pub struct ProjectTopicPublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicPublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicPublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2423,7 +2419,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &PublishRequest) -> ProjectTopicPublishCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PublishRequest) -> ProjectTopicPublishCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2432,7 +2428,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn topic(mut self, new_value: &str) -> ProjectTopicPublishCall<'a, C, NC, A> {
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicPublishCall<'a, C, A> {
         self._topic = new_value.to_string();
         self
     }
@@ -2443,7 +2439,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicPublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2464,7 +2460,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicPublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2481,7 +2477,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicPublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicPublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2519,19 +2515,19 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _topic: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2666,7 +2662,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn topic(mut self, new_value: &str) -> ProjectTopicGetCall<'a, C, NC, A> {
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicGetCall<'a, C, A> {
         self._topic = new_value.to_string();
         self
     }
@@ -2677,7 +2673,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2698,7 +2694,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2715,7 +2711,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2759,10 +2755,10 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionModifyAckDeadlineCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: ModifyAckDeadlineRequest,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2770,9 +2766,9 @@ pub struct ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2915,7 +2911,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ModifyAckDeadlineRequest) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ModifyAckDeadlineRequest) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2924,7 +2920,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -2935,7 +2931,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2956,7 +2952,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2973,7 +2969,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3017,10 +3013,10 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionAcknowledgeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionAcknowledgeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: AcknowledgeRequest,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3028,9 +3024,9 @@ pub struct ProjectSubscriptionAcknowledgeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionAcknowledgeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3173,7 +3169,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AcknowledgeRequest) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AcknowledgeRequest) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3182,7 +3178,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -3193,7 +3189,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3214,7 +3210,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3231,7 +3227,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3269,19 +3265,19 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3416,7 +3412,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionDeleteCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -3427,7 +3423,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3448,7 +3444,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3465,7 +3461,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3509,10 +3505,10 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _request: Subscription,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3520,9 +3516,9 @@ pub struct ProjectSubscriptionCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3665,7 +3661,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Subscription) -> ProjectSubscriptionCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Subscription) -> ProjectSubscriptionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3674,7 +3670,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn name(mut self, new_value: &str) -> ProjectSubscriptionCreateCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectSubscriptionCreateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -3685,7 +3681,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3706,7 +3702,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3723,7 +3719,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3761,19 +3757,19 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _subscription: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3908,7 +3904,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionGetCall<'a, C, NC, A> {
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionGetCall<'a, C, A> {
         self._subscription = new_value.to_string();
         self
     }
@@ -3919,7 +3915,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3940,7 +3936,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3957,7 +3953,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3997,10 +3993,10 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTopicSubscriptionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectTopicSubscriptionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _topic: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4009,9 +4005,9 @@ pub struct ProjectTopicSubscriptionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectTopicSubscriptionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicSubscriptionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4152,21 +4148,21 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn topic(mut self, new_value: &str) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         self._topic = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    pub fn page_size(mut self, new_value: i32) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -4177,7 +4173,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4198,7 +4194,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSubscriptionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSubscriptionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4215,7 +4211,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicSubscriptionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4255,10 +4251,10 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ProjectSubscriptionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pubsub<C, NC, A>,
+    hub: &'a Pubsub<C, A>,
     _project: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4267,9 +4263,9 @@ pub struct ProjectSubscriptionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ProjectSubscriptionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ProjectSubscriptionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4410,21 +4406,21 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn project(mut self, new_value: &str) -> ProjectSubscriptionListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ProjectSubscriptionListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    pub fn page_token(mut self, new_value: &str) -> ProjectSubscriptionListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSubscriptionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    pub fn page_size(mut self, new_value: i32) -> ProjectSubscriptionListCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSubscriptionListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -4435,7 +4431,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4456,7 +4452,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4473,7 +4469,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

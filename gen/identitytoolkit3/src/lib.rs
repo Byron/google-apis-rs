@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *0.1.4+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Identity Toolkit* crate version *0.1.5+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -194,7 +194,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -269,34 +268,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct IdentityToolkit<C, NC, A> {
+pub struct IdentityToolkit<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for IdentityToolkit<C, NC, A> {}
+impl<'a, C, A> Hub for IdentityToolkit<C, A> {}
 
-impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> IdentityToolkit<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> IdentityToolkit<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> IdentityToolkit<C, A> {
         IdentityToolkit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn relyingparty(&'a self) -> RelyingpartyMethods<'a, C, NC, A> {
+    pub fn relyingparty(&'a self) -> RelyingpartyMethods<'a, C, A> {
         RelyingpartyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1065,15 +1061,15 @@ impl Part for UserInfo {}
 /// let rb = hub.relyingparty();
 /// # }
 /// ```
-pub struct RelyingpartyMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RelyingpartyMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RelyingpartyMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
+impl<'a, C, A> RelyingpartyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1082,7 +1078,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_oob_confirmation_code(&self, request: &Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> {
+    pub fn get_oob_confirmation_code(&self, request: &Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
         RelyingpartyGetOobConfirmationCodeCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1094,7 +1090,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get token signing public key.
-    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, C, NC, A> {
+    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
         RelyingpartyGetPublicKeyCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1109,7 +1105,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create_auth_uri(&self, request: &IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A> {
+    pub fn create_auth_uri(&self, request: &IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
         RelyingpartyCreateAuthUriCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1125,7 +1121,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_assertion(&self, request: &IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A> {
+    pub fn verify_assertion(&self, request: &IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
         RelyingpartyVerifyAssertionCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1141,7 +1137,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload_account(&self, request: &IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, NC, A> {
+    pub fn upload_account(&self, request: &IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, A> {
         RelyingpartyUploadAccountCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1157,7 +1153,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_account_info(&self, request: &IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A> {
+    pub fn get_account_info(&self, request: &IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         RelyingpartyGetAccountInfoCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1173,7 +1169,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_password(&self, request: &IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, NC, A> {
+    pub fn reset_password(&self, request: &IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, A> {
         RelyingpartyResetPasswordCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1189,7 +1185,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn download_account(&self, request: &IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, NC, A> {
+    pub fn download_account(&self, request: &IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, A> {
         RelyingpartyDownloadAccountCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1205,7 +1201,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn set_account_info(&self, request: &IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, NC, A> {
+    pub fn set_account_info(&self, request: &IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, A> {
         RelyingpartySetAccountInfoCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1221,7 +1217,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn delete_account(&self, request: &IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, NC, A> {
+    pub fn delete_account(&self, request: &IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, A> {
         RelyingpartyDeleteAccountCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1237,7 +1233,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_password(&self, request: &IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A> {
+    pub fn verify_password(&self, request: &IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
         RelyingpartyVerifyPasswordCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1291,18 +1287,18 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyGetOobConfirmationCodeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: Relyingparty,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1414,7 +1410,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1425,7 +1421,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1446,7 +1442,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1485,17 +1481,17 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyGetPublicKeyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyGetPublicKeyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyGetPublicKeyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyGetPublicKeyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyGetPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1601,7 +1597,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetPublicKeyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1622,7 +1618,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1667,18 +1663,18 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyCreateAuthUriCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyCreateAuthUriCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyCreateAuthUriRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyCreateAuthUriCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyCreateAuthUriCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyCreateAuthUriCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1790,7 +1786,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1801,7 +1797,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyCreateAuthUriCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1822,7 +1818,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1867,18 +1863,18 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyVerifyAssertionCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyVerifyAssertionCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyAssertionRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyVerifyAssertionCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyVerifyAssertionCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyVerifyAssertionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1990,7 +1986,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2001,7 +1997,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyAssertionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2022,7 +2018,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyAssertionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2067,18 +2063,18 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyUploadAccountCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyUploadAccountCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyUploadAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyUploadAccountCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyUploadAccountCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyUploadAccountCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2190,7 +2186,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2201,7 +2197,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyUploadAccountCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyUploadAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2222,7 +2218,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyUploadAccountCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyUploadAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2267,18 +2263,18 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyGetAccountInfoCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyGetAccountInfoCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyGetAccountInfoRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyGetAccountInfoCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyGetAccountInfoCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyGetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2390,7 +2386,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2401,7 +2397,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyGetAccountInfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2422,7 +2418,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2467,18 +2463,18 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyResetPasswordCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyResetPasswordCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyResetPasswordRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyResetPasswordCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyResetPasswordCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyResetPasswordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2590,7 +2586,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2601,7 +2597,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyResetPasswordCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyResetPasswordCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2622,7 +2618,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyResetPasswordCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyResetPasswordCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2667,18 +2663,18 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyDownloadAccountCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyDownloadAccountCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyDownloadAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyDownloadAccountCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyDownloadAccountCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyDownloadAccountCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2790,7 +2786,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2801,7 +2797,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDownloadAccountCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDownloadAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2822,7 +2818,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDownloadAccountCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDownloadAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2867,18 +2863,18 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartySetAccountInfoCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartySetAccountInfoCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartySetAccountInfoRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartySetAccountInfoCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartySetAccountInfoCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartySetAccountInfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2990,7 +2986,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3001,7 +2997,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySetAccountInfoCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartySetAccountInfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3022,7 +3018,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetAccountInfoCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetAccountInfoCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3067,18 +3063,18 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyDeleteAccountCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyDeleteAccountCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyDeleteAccountRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyDeleteAccountCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyDeleteAccountCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyDeleteAccountCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3190,7 +3186,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3201,7 +3197,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDeleteAccountCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyDeleteAccountCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3222,7 +3218,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDeleteAccountCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDeleteAccountCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3267,18 +3263,18 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct RelyingpartyVerifyPasswordCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RelyingpartyVerifyPasswordCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a IdentityToolkit<C, NC, A>,
+    hub: &'a IdentityToolkit<C, A>,
     _request: IdentitytoolkitRelyingpartyVerifyPasswordRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for RelyingpartyVerifyPasswordCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RelyingpartyVerifyPasswordCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RelyingpartyVerifyPasswordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3390,7 +3386,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3401,7 +3397,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RelyingpartyVerifyPasswordCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3422,7 +3418,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dataflow* crate version *0.1.4+20150401*, where *20150401* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *dataflow* crate version *0.1.5+20150401*, where *20150401* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/dataflow1_b4).
 //! # Features
 //! 
@@ -160,7 +160,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -211,31 +210,28 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// # }
 /// ```
 /// 
-pub struct Dataflow<C, NC, A> {
+pub struct Dataflow<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Dataflow<C, NC, A> {}
+impl<'a, C, A> Hub for Dataflow<C, A> {}
 
-impl<'a, C, NC, A> Dataflow<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Dataflow<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Dataflow<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Dataflow<C, A> {
         Dataflow {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

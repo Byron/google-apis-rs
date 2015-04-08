@@ -4,12 +4,12 @@
 [package]
 
 name = "google-oauth2_v2"
-version = "0.1.4+20150319"
+version = "0.1.5+20150319"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with oauth2 (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oauth2_v2"
 homepage = "https://developers.google.com/accounts/docs/OAuth2"
-documentation = "http://byron.github.io/google-apis-rs/google-oauth2_v2"
+documentation = "http://byron.github.io/google-apis-rs/google_oauth2_v2"
 license = "MIT"
 keywords = ["oauth2", "google", "protocol", "web", "api"]
 

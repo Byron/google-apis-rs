@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *coordinate* crate version *0.1.4+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *coordinate* crate version *0.1.5+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *coordinate* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/coordinate/).
@@ -218,7 +218,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -329,49 +328,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Coordinate<C, NC, A> {
+pub struct Coordinate<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Coordinate<C, NC, A> {}
+impl<'a, C, A> Hub for Coordinate<C, A> {}
 
-impl<'a, C, NC, A> Coordinate<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Coordinate<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Coordinate<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Coordinate<C, A> {
         Coordinate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn custom_field_def(&'a self) -> CustomFieldDefMethods<'a, C, NC, A> {
+    pub fn custom_field_def(&'a self) -> CustomFieldDefMethods<'a, C, A> {
         CustomFieldDefMethods { hub: &self }
     }
-    pub fn jobs(&'a self) -> JobMethods<'a, C, NC, A> {
+    pub fn jobs(&'a self) -> JobMethods<'a, C, A> {
         JobMethods { hub: &self }
     }
-    pub fn location(&'a self) -> LocationMethods<'a, C, NC, A> {
+    pub fn location(&'a self) -> LocationMethods<'a, C, A> {
         LocationMethods { hub: &self }
     }
-    pub fn schedule(&'a self) -> ScheduleMethods<'a, C, NC, A> {
+    pub fn schedule(&'a self) -> ScheduleMethods<'a, C, A> {
         ScheduleMethods { hub: &self }
     }
-    pub fn team(&'a self) -> TeamMethods<'a, C, NC, A> {
+    pub fn team(&'a self) -> TeamMethods<'a, C, A> {
         TeamMethods { hub: &self }
     }
-    pub fn worker(&'a self) -> WorkerMethods<'a, C, NC, A> {
+    pub fn worker(&'a self) -> WorkerMethods<'a, C, A> {
         WorkerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -811,15 +807,15 @@ impl Part for CustomField {}
 /// let rb = hub.jobs();
 /// # }
 /// ```
-pub struct JobMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for JobMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for JobMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
+impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -829,7 +825,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     ///
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn get(&self, team_id: &str, job_id: &str) -> JobGetCall<'a, C, NC, A> {
+    pub fn get(&self, team_id: &str, job_id: &str) -> JobGetCall<'a, C, A> {
         JobGetCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -849,7 +845,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: &Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, C, A> {
         JobUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -880,7 +876,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: &Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, C, A> {
         JobPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -909,7 +905,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `teamId` - Team ID
-    pub fn list(&self, team_id: &str) -> JobListCall<'a, C, NC, A> {
+    pub fn list(&self, team_id: &str) -> JobListCall<'a, C, A> {
         JobListCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -934,7 +930,7 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     /// * `lat` - The latitude coordinate of this job's location.
     /// * `lng` - The longitude coordinate of this job's location.
     /// * `title` - Job title
-    pub fn insert(&self, request: &Job, team_id: &str, address: &str, lat: f64, lng: f64, title: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Job, team_id: &str, address: &str, lat: f64, lng: f64, title: &str) -> JobInsertCall<'a, C, A> {
         JobInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -985,15 +981,15 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
 /// let rb = hub.schedule();
 /// # }
 /// ```
-pub struct ScheduleMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScheduleMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ScheduleMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ScheduleMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
+impl<'a, C, A> ScheduleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1004,7 +1000,7 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: &Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, C, A> {
         ScheduleUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1029,7 +1025,7 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: &Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, C, A> {
         SchedulePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1053,7 +1049,7 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     ///
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn get(&self, team_id: &str, job_id: &str) -> ScheduleGetCall<'a, C, NC, A> {
+    pub fn get(&self, team_id: &str, job_id: &str) -> ScheduleGetCall<'a, C, A> {
         ScheduleGetCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -1095,15 +1091,15 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
 /// let rb = hub.worker();
 /// # }
 /// ```
-pub struct WorkerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WorkerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for WorkerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for WorkerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> WorkerMethods<'a, C, NC, A> {
+impl<'a, C, A> WorkerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1112,7 +1108,7 @@ impl<'a, C, NC, A> WorkerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `teamId` - Team ID
-    pub fn list(&self, team_id: &str) -> WorkerListCall<'a, C, NC, A> {
+    pub fn list(&self, team_id: &str) -> WorkerListCall<'a, C, A> {
         WorkerListCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -1153,15 +1149,15 @@ impl<'a, C, NC, A> WorkerMethods<'a, C, NC, A> {
 /// let rb = hub.location();
 /// # }
 /// ```
-pub struct LocationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LocationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LocationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LocationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
+impl<'a, C, A> LocationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1172,7 +1168,7 @@ impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
     /// * `teamId` - Team ID
     /// * `workerEmail` - Worker email address.
     /// * `startTimestampMs` - Start timestamp in milliseconds since the epoch.
-    pub fn list(&self, team_id: &str, worker_email: &str, start_timestamp_ms: &str) -> LocationListCall<'a, C, NC, A> {
+    pub fn list(&self, team_id: &str, worker_email: &str, start_timestamp_ms: &str) -> LocationListCall<'a, C, A> {
         LocationListCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -1217,20 +1213,20 @@ impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
 /// let rb = hub.team();
 /// # }
 /// ```
-pub struct TeamMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TeamMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TeamMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TeamMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TeamMethods<'a, C, NC, A> {
+impl<'a, C, A> TeamMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of teams for a user.
-    pub fn list(&self) -> TeamListCall<'a, C, NC, A> {
+    pub fn list(&self) -> TeamListCall<'a, C, A> {
         TeamListCall {
             hub: self.hub,
             _worker: Default::default(),
@@ -1273,15 +1269,15 @@ impl<'a, C, NC, A> TeamMethods<'a, C, NC, A> {
 /// let rb = hub.custom_field_def();
 /// # }
 /// ```
-pub struct CustomFieldDefMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomFieldDefMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CustomFieldDefMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CustomFieldDefMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomFieldDefMethods<'a, C, NC, A> {
+impl<'a, C, A> CustomFieldDefMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1290,7 +1286,7 @@ impl<'a, C, NC, A> CustomFieldDefMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `teamId` - Team ID
-    pub fn list(&self, team_id: &str) -> CustomFieldDefListCall<'a, C, NC, A> {
+    pub fn list(&self, team_id: &str) -> CustomFieldDefListCall<'a, C, A> {
         CustomFieldDefListCall {
             hub: self.hub,
             _team_id: team_id.to_string(),
@@ -1339,10 +1335,10 @@ impl<'a, C, NC, A> CustomFieldDefMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct JobGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _job_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1350,9 +1346,9 @@ pub struct JobGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1485,7 +1481,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -1495,7 +1491,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -1506,7 +1502,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1527,7 +1523,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1544,7 +1540,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1598,10 +1594,10 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct JobUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _request: Job,
     _team_id: String,
     _job_id: String,
@@ -1620,9 +1616,9 @@ pub struct JobUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1796,7 +1792,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Job) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Job) -> JobUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1806,7 +1802,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -1816,7 +1812,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -1824,7 +1820,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Job title
-    pub fn title(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn title(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._title = Some(new_value.to_string());
         self
     }
@@ -1832,7 +1828,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Job progress
-    pub fn progress(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn progress(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._progress = Some(new_value.to_string());
         self
     }
@@ -1840,7 +1836,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Job note as newline (Unix) separated string
-    pub fn note(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn note(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
@@ -1848,7 +1844,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The longitude coordinate of this job's location.
-    pub fn lng(mut self, new_value: f64) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn lng(mut self, new_value: f64) -> JobUpdateCall<'a, C, A> {
         self._lng = Some(new_value);
         self
     }
@@ -1856,7 +1852,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The latitude coordinate of this job's location.
-    pub fn lat(mut self, new_value: f64) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn lat(mut self, new_value: f64) -> JobUpdateCall<'a, C, A> {
         self._lat = Some(new_value);
         self
     }
@@ -1864,7 +1860,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Customer phone number
-    pub fn customer_phone_number(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn customer_phone_number(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
@@ -1872,7 +1868,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Customer name
-    pub fn customer_name(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn customer_name(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
@@ -1881,7 +1877,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
-    pub fn add_custom_field(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn add_custom_field(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
@@ -1889,7 +1885,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Assignee email address, or empty string to unassign.
-    pub fn assignee(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn assignee(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
@@ -1897,7 +1893,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Job address as newline (Unix) separated string
-    pub fn address(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn address(mut self, new_value: &str) -> JobUpdateCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
@@ -1908,7 +1904,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1929,7 +1925,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1946,7 +1942,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2000,10 +1996,10 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct JobPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _request: Job,
     _team_id: String,
     _job_id: String,
@@ -2022,9 +2018,9 @@ pub struct JobPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2198,7 +2194,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Job) -> JobPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Job) -> JobPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2208,7 +2204,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -2218,7 +2214,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -2226,7 +2222,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Job title
-    pub fn title(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn title(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._title = Some(new_value.to_string());
         self
     }
@@ -2234,7 +2230,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Job progress
-    pub fn progress(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn progress(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._progress = Some(new_value.to_string());
         self
     }
@@ -2242,7 +2238,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Job note as newline (Unix) separated string
-    pub fn note(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn note(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
@@ -2250,7 +2246,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The longitude coordinate of this job's location.
-    pub fn lng(mut self, new_value: f64) -> JobPatchCall<'a, C, NC, A> {
+    pub fn lng(mut self, new_value: f64) -> JobPatchCall<'a, C, A> {
         self._lng = Some(new_value);
         self
     }
@@ -2258,7 +2254,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The latitude coordinate of this job's location.
-    pub fn lat(mut self, new_value: f64) -> JobPatchCall<'a, C, NC, A> {
+    pub fn lat(mut self, new_value: f64) -> JobPatchCall<'a, C, A> {
         self._lat = Some(new_value);
         self
     }
@@ -2266,7 +2262,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Customer phone number
-    pub fn customer_phone_number(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn customer_phone_number(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
@@ -2274,7 +2270,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Customer name
-    pub fn customer_name(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn customer_name(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
@@ -2283,7 +2279,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
-    pub fn add_custom_field(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn add_custom_field(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
@@ -2291,7 +2287,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Assignee email address, or empty string to unassign.
-    pub fn assignee(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn assignee(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
@@ -2299,7 +2295,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Job address as newline (Unix) separated string
-    pub fn address(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
+    pub fn address(mut self, new_value: &str) -> JobPatchCall<'a, C, A> {
         self._address = Some(new_value.to_string());
         self
     }
@@ -2310,7 +2306,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2331,7 +2327,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2348,7 +2344,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2389,10 +2385,10 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct JobListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _page_token: Option<String>,
     _min_modified_timestamp_ms: Option<String>,
@@ -2402,9 +2398,9 @@ pub struct JobListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2545,7 +2541,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -2553,7 +2549,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Continuation token
-    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2561,7 +2557,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Minimum time a job was modified in milliseconds since epoch.
-    pub fn min_modified_timestamp_ms(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
+    pub fn min_modified_timestamp_ms(mut self, new_value: &str) -> JobListCall<'a, C, A> {
         self._min_modified_timestamp_ms = Some(new_value.to_string());
         self
     }
@@ -2569,7 +2565,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Maximum number of results to return in one page.
-    pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2580,7 +2576,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2601,7 +2597,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2618,7 +2614,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2667,10 +2663,10 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct JobInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct JobInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _request: Job,
     _team_id: String,
     _address: String,
@@ -2687,9 +2683,9 @@ pub struct JobInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for JobInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for JobInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2851,7 +2847,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Job) -> JobInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Job) -> JobInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2861,7 +2857,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -2871,7 +2867,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Job address as newline (Unix) separated string
-    pub fn address(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn address(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._address = new_value.to_string();
         self
     }
@@ -2881,7 +2877,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The latitude coordinate of this job's location.
-    pub fn lat(mut self, new_value: f64) -> JobInsertCall<'a, C, NC, A> {
+    pub fn lat(mut self, new_value: f64) -> JobInsertCall<'a, C, A> {
         self._lat = new_value;
         self
     }
@@ -2891,7 +2887,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The longitude coordinate of this job's location.
-    pub fn lng(mut self, new_value: f64) -> JobInsertCall<'a, C, NC, A> {
+    pub fn lng(mut self, new_value: f64) -> JobInsertCall<'a, C, A> {
         self._lng = new_value;
         self
     }
@@ -2901,7 +2897,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Job title
-    pub fn title(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn title(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._title = new_value.to_string();
         self
     }
@@ -2909,7 +2905,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Job note as newline (Unix) separated string
-    pub fn note(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn note(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._note = Some(new_value.to_string());
         self
     }
@@ -2917,7 +2913,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Customer phone number
-    pub fn customer_phone_number(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn customer_phone_number(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
     }
@@ -2925,7 +2921,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Customer name
-    pub fn customer_name(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn customer_name(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._customer_name = Some(new_value.to_string());
         self
     }
@@ -2934,7 +2930,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
-    pub fn add_custom_field(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn add_custom_field(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._custom_field.push(new_value.to_string());
         self
     }
@@ -2942,7 +2938,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Assignee email address, or empty string to unassign.
-    pub fn assignee(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
+    pub fn assignee(mut self, new_value: &str) -> JobInsertCall<'a, C, A> {
         self._assignee = Some(new_value.to_string());
         self
     }
@@ -2953,7 +2949,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> JobInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2974,7 +2970,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2991,7 +2987,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> JobInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> JobInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3039,10 +3035,10 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ScheduleUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScheduleUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _request: Schedule,
     _team_id: String,
     _job_id: String,
@@ -3055,9 +3051,9 @@ pub struct ScheduleUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScheduleUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScheduleUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3209,7 +3205,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Schedule) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Schedule) -> ScheduleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3219,7 +3215,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -3229,7 +3225,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -3237,7 +3233,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Scheduled start time in milliseconds since epoch.
-    pub fn start_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -3245,7 +3241,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Scheduled end time in milliseconds since epoch.
-    pub fn end_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -3253,7 +3249,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Job duration in milliseconds.
-    pub fn duration(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn duration(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, A> {
         self._duration = Some(new_value.to_string());
         self
     }
@@ -3261,7 +3257,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
-    pub fn all_day(mut self, new_value: bool) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn all_day(mut self, new_value: bool) -> ScheduleUpdateCall<'a, C, A> {
         self._all_day = Some(new_value);
         self
     }
@@ -3272,7 +3268,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3293,7 +3289,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScheduleUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScheduleUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3310,7 +3306,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScheduleUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScheduleUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3358,10 +3354,10 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct SchedulePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SchedulePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _request: Schedule,
     _team_id: String,
     _job_id: String,
@@ -3374,9 +3370,9 @@ pub struct SchedulePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SchedulePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SchedulePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3528,7 +3524,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Schedule) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Schedule) -> SchedulePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3538,7 +3534,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -3548,7 +3544,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -3556,7 +3552,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Scheduled start time in milliseconds since epoch.
-    pub fn start_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -3564,7 +3560,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Scheduled end time in milliseconds since epoch.
-    pub fn end_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -3572,7 +3568,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Job duration in milliseconds.
-    pub fn duration(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn duration(mut self, new_value: &str) -> SchedulePatchCall<'a, C, A> {
         self._duration = Some(new_value.to_string());
         self
     }
@@ -3580,7 +3576,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
-    pub fn all_day(mut self, new_value: bool) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn all_day(mut self, new_value: bool) -> SchedulePatchCall<'a, C, A> {
         self._all_day = Some(new_value);
         self
     }
@@ -3591,7 +3587,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchedulePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchedulePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3612,7 +3608,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SchedulePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SchedulePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3629,7 +3625,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SchedulePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SchedulePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3667,10 +3663,10 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ScheduleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScheduleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _job_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3678,9 +3674,9 @@ pub struct ScheduleGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScheduleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScheduleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3813,7 +3809,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -3823,7 +3819,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Job number
-    pub fn job_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, NC, A> {
+    pub fn job_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, A> {
         self._job_id = new_value.to_string();
         self
     }
@@ -3834,7 +3830,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScheduleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3855,7 +3851,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScheduleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScheduleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3872,7 +3868,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScheduleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScheduleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3910,19 +3906,19 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct WorkerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct WorkerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WorkerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for WorkerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4054,7 +4050,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> WorkerListCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> WorkerListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -4065,7 +4061,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WorkerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WorkerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4086,7 +4082,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WorkerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WorkerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4103,7 +4099,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WorkerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WorkerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4143,10 +4139,10 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct LocationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LocationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _worker_email: String,
     _start_timestamp_ms: String,
@@ -4157,9 +4153,9 @@ pub struct LocationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LocationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LocationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4299,7 +4295,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -4309,7 +4305,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Worker email address.
-    pub fn worker_email(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
+    pub fn worker_email(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._worker_email = new_value.to_string();
         self
     }
@@ -4319,7 +4315,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Start timestamp in milliseconds since the epoch.
-    pub fn start_timestamp_ms(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
+    pub fn start_timestamp_ms(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._start_timestamp_ms = new_value.to_string();
         self
     }
@@ -4327,7 +4323,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Continuation token
-    pub fn page_token(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LocationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4335,7 +4331,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of results to return in one page.
-    pub fn max_results(mut self, new_value: u32) -> LocationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LocationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4346,7 +4342,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4367,7 +4363,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LocationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4384,7 +4380,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LocationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LocationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4425,10 +4421,10 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct TeamListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TeamListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _worker: Option<bool>,
     _dispatcher: Option<bool>,
     _admin: Option<bool>,
@@ -4437,9 +4433,9 @@ pub struct TeamListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TeamListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TeamListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4553,7 +4549,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to include teams for which the user has the Worker role.
-    pub fn worker(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
+    pub fn worker(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._worker = Some(new_value);
         self
     }
@@ -4561,7 +4557,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to include teams for which the user has the Dispatcher role.
-    pub fn dispatcher(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
+    pub fn dispatcher(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._dispatcher = Some(new_value);
         self
     }
@@ -4569,7 +4565,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to include teams for which the user has the Admin role.
-    pub fn admin(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
+    pub fn admin(mut self, new_value: bool) -> TeamListCall<'a, C, A> {
         self._admin = Some(new_value);
         self
     }
@@ -4580,7 +4576,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TeamListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TeamListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4601,7 +4597,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4618,7 +4614,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TeamListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TeamListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4656,19 +4652,19 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct CustomFieldDefListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CustomFieldDefListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Coordinate<C, NC, A>,
+    hub: &'a Coordinate<C, A>,
     _team_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CustomFieldDefListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CustomFieldDefListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4800,7 +4796,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Team ID
-    pub fn team_id(mut self, new_value: &str) -> CustomFieldDefListCall<'a, C, NC, A> {
+    pub fn team_id(mut self, new_value: &str) -> CustomFieldDefListCall<'a, C, A> {
         self._team_id = new_value.to_string();
         self
     }
@@ -4811,7 +4807,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomFieldDefListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CustomFieldDefListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4832,7 +4828,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomFieldDefListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomFieldDefListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4849,7 +4845,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CustomFieldDefListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CustomFieldDefListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

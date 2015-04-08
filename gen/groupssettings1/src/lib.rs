@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *0.1.4+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *groupssettings* crate version *0.1.5+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -196,7 +196,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -293,34 +292,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Groupssettings<C, NC, A> {
+pub struct Groupssettings<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Groupssettings<C, NC, A> {}
+impl<'a, C, A> Hub for Groupssettings<C, A> {}
 
-impl<'a, C, NC, A> Groupssettings<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Groupssettings<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Groupssettings<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Groupssettings<C, A> {
         Groupssettings {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn groups(&'a self) -> GroupMethods<'a, C, NC, A> {
+    pub fn groups(&'a self) -> GroupMethods<'a, C, A> {
         GroupMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -466,15 +462,15 @@ impl ResponseResult for Groups {}
 /// let rb = hub.groups();
 /// # }
 /// ```
-pub struct GroupMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Groupssettings<C, NC, A>,
+    hub: &'a Groupssettings<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for GroupMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for GroupMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
+impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -484,7 +480,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `groupUniqueId` - The resource ID
-    pub fn update(&self, request: &Groups, group_unique_id: &str) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Groups, group_unique_id: &str) -> GroupUpdateCall<'a, C, A> {
         GroupUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -503,7 +499,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `groupUniqueId` - The resource ID
-    pub fn patch(&self, request: &Groups, group_unique_id: &str) -> GroupPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Groups, group_unique_id: &str) -> GroupPatchCall<'a, C, A> {
         GroupPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -521,7 +517,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `groupUniqueId` - The resource ID
-    pub fn get(&self, group_unique_id: &str) -> GroupGetCall<'a, C, NC, A> {
+    pub fn get(&self, group_unique_id: &str) -> GroupGetCall<'a, C, A> {
         GroupGetCall {
             hub: self.hub,
             _group_unique_id: group_unique_id.to_string(),
@@ -576,10 +572,10 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Groupssettings<C, NC, A>,
+    hub: &'a Groupssettings<C, A>,
     _request: Groups,
     _group_unique_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -587,9 +583,9 @@ pub struct GroupUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -728,7 +724,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Groups) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Groups) -> GroupUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -738,7 +734,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The resource ID
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -749,7 +745,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -770,7 +766,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -787,7 +783,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -831,10 +827,10 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Groupssettings<C, NC, A>,
+    hub: &'a Groupssettings<C, A>,
     _request: Groups,
     _group_unique_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -842,9 +838,9 @@ pub struct GroupPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -983,7 +979,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Groups) -> GroupPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Groups) -> GroupPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -993,7 +989,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The resource ID
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupPatchCall<'a, C, NC, A> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupPatchCall<'a, C, A> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -1004,7 +1000,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1025,7 +1021,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1042,7 +1038,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1080,19 +1076,19 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct GroupGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Groupssettings<C, NC, A>,
+    hub: &'a Groupssettings<C, A>,
     _group_unique_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GroupGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for GroupGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1224,7 +1220,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The resource ID
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupGetCall<'a, C, NC, A> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupGetCall<'a, C, A> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -1235,7 +1231,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1256,7 +1252,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1273,7 +1269,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GroupGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GroupGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

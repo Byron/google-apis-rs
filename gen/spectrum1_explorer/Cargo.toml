@@ -4,12 +4,12 @@
 [package]
 
 name = "google-spectrum1_explorer"
-version = "0.1.4+20150112"
+version = "0.1.5+20150112"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer"
 homepage = "http://developers.google.com/spectrum"
-documentation = "http://byron.github.io/google-apis-rs/google-spectrum1_explorer"
+documentation = "http://byron.github.io/google-apis-rs/google_spectrum1_explorer"
 license = "MIT"
 keywords = ["spectrum", "google", "protocol", "web", "api"]
 

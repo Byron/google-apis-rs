@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *0.1.4+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *pagespeedonline* crate version *0.1.5+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *pagespeedonline* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
@@ -193,7 +193,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -267,34 +266,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Pagespeedonline<C, NC, A> {
+pub struct Pagespeedonline<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Pagespeedonline<C, NC, A> {}
+impl<'a, C, A> Hub for Pagespeedonline<C, A> {}
 
-impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Pagespeedonline<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Pagespeedonline<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Pagespeedonline<C, A> {
         Pagespeedonline {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a, C, NC, A> {
+    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a, C, A> {
         PagespeedapiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -658,15 +654,15 @@ impl Part for ResultRuleGroups {}
 /// let rb = hub.pagespeedapi();
 /// # }
 /// ```
-pub struct PagespeedapiMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PagespeedapiMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pagespeedonline<C, NC, A>,
+    hub: &'a Pagespeedonline<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PagespeedapiMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PagespeedapiMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PagespeedapiMethods<'a, C, NC, A> {
+impl<'a, C, A> PagespeedapiMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -675,7 +671,7 @@ impl<'a, C, NC, A> PagespeedapiMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `url` - The URL to fetch and analyze
-    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         PagespeedapiRunpagespeedCall {
             hub: self.hub,
             _url: url.to_string(),
@@ -733,10 +729,10 @@ impl<'a, C, NC, A> PagespeedapiMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct PagespeedapiRunpagespeedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PagespeedapiRunpagespeedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Pagespeedonline<C, NC, A>,
+    hub: &'a Pagespeedonline<C, A>,
     _url: String,
     _strategy: Option<String>,
     _screenshot: Option<bool>,
@@ -747,9 +743,9 @@ pub struct PagespeedapiRunpagespeedCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PagespeedapiRunpagespeedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PagespeedapiRunpagespeedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PagespeedapiRunpagespeedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -874,7 +870,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The URL to fetch and analyze
-    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._url = new_value.to_string();
         self
     }
@@ -882,7 +878,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The analysis strategy to use
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._strategy = Some(new_value.to_string());
         self
     }
@@ -890,7 +886,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Indicates if binary data containing a screenshot should be included
-    pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._screenshot = Some(new_value);
         self
     }
@@ -899,7 +895,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// A PageSpeed rule to run; if none are given, all rules are run
-    pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._rule.push(new_value.to_string());
         self
     }
@@ -907,7 +903,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The locale used to localize formatted results
-    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -915,7 +911,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Indicates if third party resources should be filtered out before PageSpeed analysis.
-    pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._filter_third_party_resources = Some(new_value);
         self
     }
@@ -926,7 +922,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PagespeedapiRunpagespeedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -947,7 +943,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

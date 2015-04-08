@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.4+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.5+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
@@ -230,7 +230,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -331,55 +330,52 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SQLAdmin<C, NC, A> {
+pub struct SQLAdmin<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for SQLAdmin<C, NC, A> {}
+impl<'a, C, A> Hub for SQLAdmin<C, A> {}
 
-impl<'a, C, NC, A> SQLAdmin<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SQLAdmin<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> SQLAdmin<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> SQLAdmin<C, A> {
         SQLAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn backup_runs(&'a self) -> BackupRunMethods<'a, C, NC, A> {
+    pub fn backup_runs(&'a self) -> BackupRunMethods<'a, C, A> {
         BackupRunMethods { hub: &self }
     }
-    pub fn databases(&'a self) -> DatabaseMethods<'a, C, NC, A> {
+    pub fn databases(&'a self) -> DatabaseMethods<'a, C, A> {
         DatabaseMethods { hub: &self }
     }
-    pub fn flags(&'a self) -> FlagMethods<'a, C, NC, A> {
+    pub fn flags(&'a self) -> FlagMethods<'a, C, A> {
         FlagMethods { hub: &self }
     }
-    pub fn instances(&'a self) -> InstanceMethods<'a, C, NC, A> {
+    pub fn instances(&'a self) -> InstanceMethods<'a, C, A> {
         InstanceMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C, NC, A> {
+    pub fn operations(&'a self) -> OperationMethods<'a, C, A> {
         OperationMethods { hub: &self }
     }
-    pub fn ssl_certs(&'a self) -> SslCertMethods<'a, C, NC, A> {
+    pub fn ssl_certs(&'a self) -> SslCertMethods<'a, C, A> {
         SslCertMethods { hub: &self }
     }
-    pub fn tiers(&'a self) -> TierMethods<'a, C, NC, A> {
+    pub fn tiers(&'a self) -> TierMethods<'a, C, A> {
         TierMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a, C, NC, A> {
+    pub fn users(&'a self) -> UserMethods<'a, C, A> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1536,15 +1532,15 @@ impl Part for OnPremisesConfiguration {}
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for OperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for OperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
+impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1554,7 +1550,7 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn list(&self, project: &str, instance: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, instance: &str) -> OperationListCall<'a, C, A> {
         OperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1575,7 +1571,7 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `operation` - Instance operation ID.
-    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, A> {
         OperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1617,15 +1613,15 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
 /// let rb = hub.tiers();
 /// # }
 /// ```
-pub struct TierMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TierMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TierMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TierMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TierMethods<'a, C, NC, A> {
+impl<'a, C, A> TierMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1634,7 +1630,7 @@ impl<'a, C, NC, A> TierMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - Project ID of the project for which to list tiers.
-    pub fn list(&self, project: &str) -> TierListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> TierListCall<'a, C, A> {
         TierListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1675,15 +1671,15 @@ impl<'a, C, NC, A> TierMethods<'a, C, NC, A> {
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
+impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1693,7 +1689,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
-    pub fn list(&self, project: &str, instance: &str) -> UserListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, instance: &str) -> UserListCall<'a, C, A> {
         UserListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1714,7 +1710,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `host` - Host of the user in the instance.
     /// * `name` - Name of the user in the instance.
-    pub fn delete(&self, project: &str, instance: &str, host: &str, name: &str) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, instance: &str, host: &str, name: &str) -> UserDeleteCall<'a, C, A> {
         UserDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1738,7 +1734,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `host` - Host of the user in the instance.
     /// * `name` - Name of the user in the instance.
-    pub fn update(&self, request: &User, project: &str, instance: &str, host: &str, name: &str) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &User, project: &str, instance: &str, host: &str, name: &str) -> UserUpdateCall<'a, C, A> {
         UserUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1761,7 +1757,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
-    pub fn insert(&self, request: &User, project: &str, instance: &str) -> UserInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &User, project: &str, instance: &str) -> UserInsertCall<'a, C, A> {
         UserInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1804,15 +1800,15 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 /// let rb = hub.instances();
 /// # }
 /// ```
-pub struct InstanceMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for InstanceMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for InstanceMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
+impl<'a, C, A> InstanceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1822,7 +1818,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn reset_ssl_config(&self, project: &str, instance: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
+    pub fn reset_ssl_config(&self, project: &str, instance: &str) -> InstanceResetSslConfigCall<'a, C, A> {
         InstanceResetSslConfigCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1841,7 +1837,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - ID of the project that contains the read replica.
     /// * `instance` - Cloud SQL read replica instance name.
-    pub fn promote_replica(&self, project: &str, instance: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
+    pub fn promote_replica(&self, project: &str, instance: &str) -> InstancePromoteReplicaCall<'a, C, A> {
         InstancePromoteReplicaCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1860,7 +1856,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
-    pub fn get(&self, project: &str, instance: &str) -> InstanceGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, instance: &str) -> InstanceGetCall<'a, C, A> {
         InstanceGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1880,7 +1876,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn patch(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstancePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstancePatchCall<'a, C, A> {
         InstancePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1900,7 +1896,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance to be restarted.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn restart(&self, project: &str, instance: &str) -> InstanceRestartCall<'a, C, NC, A> {
+    pub fn restart(&self, project: &str, instance: &str) -> InstanceRestartCall<'a, C, A> {
         InstanceRestartCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1919,7 +1915,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance to be deleted.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn delete(&self, project: &str, instance: &str) -> InstanceDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, instance: &str) -> InstanceDeleteCall<'a, C, A> {
         InstanceDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1938,7 +1934,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - ID of the project that contains the read replica.
     /// * `instance` - Cloud SQL read replica instance name.
-    pub fn stop_replica(&self, project: &str, instance: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
+    pub fn stop_replica(&self, project: &str, instance: &str) -> InstanceStopReplicaCall<'a, C, A> {
         InstanceStopReplicaCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1957,7 +1953,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `project` - ID of the project that contains the read replica.
     /// * `instance` - Cloud SQL read replica instance name.
-    pub fn start_replica(&self, project: &str, instance: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
+    pub fn start_replica(&self, project: &str, instance: &str) -> InstanceStartReplicaCall<'a, C, A> {
         InstanceStartReplicaCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1976,7 +1972,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project to which the newly created Cloud SQL instances should belong.
-    pub fn insert(&self, request: &DatabaseInstance, project: &str) -> InstanceInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &DatabaseInstance, project: &str) -> InstanceInsertCall<'a, C, A> {
         InstanceInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1994,7 +1990,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - Project ID of the project for which to list Cloud SQL instances.
-    pub fn list(&self, project: &str) -> InstanceListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> InstanceListCall<'a, C, A> {
         InstanceListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2015,7 +2011,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn import(&self, request: &InstancesImportRequest, project: &str, instance: &str) -> InstanceImportCall<'a, C, NC, A> {
+    pub fn import(&self, request: &InstancesImportRequest, project: &str, instance: &str) -> InstanceImportCall<'a, C, A> {
         InstanceImportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2036,7 +2032,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn update(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstanceUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstanceUpdateCall<'a, C, A> {
         InstanceUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2057,7 +2053,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the source as well as the clone Cloud SQL instance.
     /// * `instance` - The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
-    pub fn clone(&self, request: &InstancesCloneRequest, project: &str, instance: &str) -> InstanceCloneCall<'a, C, NC, A> {
+    pub fn clone(&self, request: &InstancesCloneRequest, project: &str, instance: &str) -> InstanceCloneCall<'a, C, A> {
         InstanceCloneCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2078,7 +2074,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance to be exported.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn export(&self, request: &InstancesExportRequest, project: &str, instance: &str) -> InstanceExportCall<'a, C, NC, A> {
+    pub fn export(&self, request: &InstancesExportRequest, project: &str, instance: &str) -> InstanceExportCall<'a, C, A> {
         InstanceExportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2099,7 +2095,7 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn restore_backup(&self, request: &InstancesRestoreBackupRequest, project: &str, instance: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
+    pub fn restore_backup(&self, request: &InstancesRestoreBackupRequest, project: &str, instance: &str) -> InstanceRestoreBackupCall<'a, C, A> {
         InstanceRestoreBackupCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2142,20 +2138,20 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
 /// let rb = hub.flags();
 /// # }
 /// ```
-pub struct FlagMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FlagMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for FlagMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for FlagMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> FlagMethods<'a, C, NC, A> {
+impl<'a, C, A> FlagMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List all available database flags for Google Cloud SQL instances.
-    pub fn list(&self) -> FlagListCall<'a, C, NC, A> {
+    pub fn list(&self) -> FlagListCall<'a, C, A> {
         FlagListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2195,15 +2191,15 @@ impl<'a, C, NC, A> FlagMethods<'a, C, NC, A> {
 /// let rb = hub.databases();
 /// # }
 /// ```
-pub struct DatabaseMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DatabaseMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DatabaseMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
+impl<'a, C, A> DatabaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2214,7 +2210,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `database` - Name of the database to be deleted in the instance.
-    pub fn delete(&self, project: &str, instance: &str, database: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, instance: &str, database: &str) -> DatabaseDeleteCall<'a, C, A> {
         DatabaseDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2236,7 +2232,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `database` - Name of the database to be updated in the instance.
-    pub fn patch(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabasePatchCall<'a, C, A> {
         DatabasePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2257,7 +2253,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project for which to list Cloud SQL instances.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn list(&self, project: &str, instance: &str) -> DatabaseListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, instance: &str) -> DatabaseListCall<'a, C, A> {
         DatabaseListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2277,7 +2273,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
-    pub fn insert(&self, request: &Database, project: &str, instance: &str) -> DatabaseInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Database, project: &str, instance: &str) -> DatabaseInsertCall<'a, C, A> {
         DatabaseInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2298,7 +2294,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `database` - Name of the database in the instance.
-    pub fn get(&self, project: &str, instance: &str, database: &str) -> DatabaseGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, instance: &str, database: &str) -> DatabaseGetCall<'a, C, A> {
         DatabaseGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2320,7 +2316,7 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Database instance ID. This does not include the project ID.
     /// * `database` - Name of the database to be updated in the instance.
-    pub fn update(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabaseUpdateCall<'a, C, A> {
         DatabaseUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2364,15 +2360,15 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
 /// let rb = hub.ssl_certs();
 /// # }
 /// ```
-pub struct SslCertMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SslCertMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SslCertMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SslCertMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
+impl<'a, C, A> SslCertMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2383,7 +2379,7 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of the project to which the newly created Cloud SQL instances should belong.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn insert(&self, request: &SslCertsInsertRequest, project: &str, instance: &str) -> SslCertInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &SslCertsInsertRequest, project: &str, instance: &str) -> SslCertInsertCall<'a, C, A> {
         SslCertInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2404,7 +2400,7 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance to be deleted.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     /// * `sha1Fingerprint` - Sha1 FingerPrint.
-    pub fn delete(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertDeleteCall<'a, C, A> {
         SslCertDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2425,7 +2421,7 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     /// * `sha1Fingerprint` - Sha1 FingerPrint.
-    pub fn get(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertGetCall<'a, C, A> {
         SslCertGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2445,7 +2441,7 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project for which to list Cloud SQL instances.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn list(&self, project: &str, instance: &str) -> SslCertListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, instance: &str) -> SslCertListCall<'a, C, A> {
         SslCertListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2487,15 +2483,15 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
 /// let rb = hub.backup_runs();
 /// # }
 /// ```
-pub struct BackupRunMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BackupRunMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BackupRunMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BackupRunMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
+impl<'a, C, A> BackupRunMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2505,7 +2501,7 @@ impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
     ///
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn list(&self, project: &str, instance: &str) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, instance: &str) -> BackupRunListCall<'a, C, A> {
         BackupRunListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2527,7 +2523,7 @@ impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
     /// * `project` - Project ID of the project that contains the instance.
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     /// * `id` - The ID of this Backup Run.
-    pub fn get(&self, project: &str, instance: &str, id: &str) -> BackupRunGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, instance: &str, id: &str) -> BackupRunGetCall<'a, C, A> {
         BackupRunGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2580,10 +2576,10 @@ impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct OperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _page_token: Option<String>,
@@ -2593,9 +2589,9 @@ pub struct OperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2734,7 +2730,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2744,7 +2740,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -2752,7 +2748,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2760,7 +2756,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Maximum number of operations per response.
-    pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2771,7 +2767,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2792,7 +2788,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2809,7 +2805,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2847,10 +2843,10 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _operation: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2858,9 +2854,9 @@ pub struct OperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2993,7 +2989,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3003,7 +2999,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Instance operation ID.
-    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -3014,7 +3010,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3035,7 +3031,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3052,7 +3048,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3090,19 +3086,19 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct TierListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TierListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TierListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TierListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TierListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3234,7 +3230,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project for which to list tiers.
-    pub fn project(mut self, new_value: &str) -> TierListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TierListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3245,7 +3241,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TierListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TierListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3266,7 +3262,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TierListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TierListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3283,7 +3279,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TierListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TierListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3321,10 +3317,10 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct UserListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3332,9 +3328,9 @@ pub struct UserListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3467,7 +3463,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3477,7 +3473,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> UserListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -3488,7 +3484,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3509,7 +3505,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3526,7 +3522,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3564,10 +3560,10 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _host: String,
@@ -3577,9 +3573,9 @@ pub struct UserDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3714,7 +3710,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3724,7 +3720,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -3734,7 +3730,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Host of the user in the instance.
-    pub fn host(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn host(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._host = new_value.to_string();
         self
     }
@@ -3744,7 +3740,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the user in the instance.
-    pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -3755,7 +3751,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3776,7 +3772,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3793,7 +3789,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3837,10 +3833,10 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct UserUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: User,
     _project: String,
     _instance: String,
@@ -3851,9 +3847,9 @@ pub struct UserUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3995,7 +3991,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &User) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &User) -> UserUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4005,7 +4001,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4015,7 +4011,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -4025,7 +4021,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Host of the user in the instance.
-    pub fn host(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn host(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._host = new_value.to_string();
         self
     }
@@ -4035,7 +4031,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the user in the instance.
-    pub fn name(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> UserUpdateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -4046,7 +4042,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4067,7 +4063,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4084,7 +4080,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4128,10 +4124,10 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct UserInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: User,
     _project: String,
     _instance: String,
@@ -4140,9 +4136,9 @@ pub struct UserInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4282,7 +4278,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &User) -> UserInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &User) -> UserInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4292,7 +4288,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> UserInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> UserInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4302,7 +4298,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> UserInsertCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> UserInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -4313,7 +4309,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4334,7 +4330,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4351,7 +4347,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4389,10 +4385,10 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceResetSslConfigCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceResetSslConfigCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4400,9 +4396,9 @@ pub struct InstanceResetSslConfigCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceResetSslConfigCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceResetSslConfigCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceResetSslConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4535,7 +4531,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4545,7 +4541,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -4556,7 +4552,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceResetSslConfigCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceResetSslConfigCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4577,7 +4573,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceResetSslConfigCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceResetSslConfigCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4594,7 +4590,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceResetSslConfigCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceResetSslConfigCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4632,10 +4628,10 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct InstancePromoteReplicaCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstancePromoteReplicaCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4643,9 +4639,9 @@ pub struct InstancePromoteReplicaCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstancePromoteReplicaCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstancePromoteReplicaCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstancePromoteReplicaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4778,7 +4774,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// ID of the project that contains the read replica.
-    pub fn project(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4788,7 +4784,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL read replica instance name.
-    pub fn instance(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -4799,7 +4795,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePromoteReplicaCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePromoteReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4820,7 +4816,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstancePromoteReplicaCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstancePromoteReplicaCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4837,7 +4833,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstancePromoteReplicaCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstancePromoteReplicaCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4875,10 +4871,10 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4886,9 +4882,9 @@ pub struct InstanceGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5021,7 +5017,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstanceGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -5031,7 +5027,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceGetCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -5042,7 +5038,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5063,7 +5059,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5080,7 +5076,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5124,10 +5120,10 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct InstancePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstancePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: DatabaseInstance,
     _project: String,
     _instance: String,
@@ -5136,9 +5132,9 @@ pub struct InstancePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstancePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstancePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5278,7 +5274,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DatabaseInstance) -> InstancePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DatabaseInstance) -> InstancePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5288,7 +5284,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstancePatchCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstancePatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -5298,7 +5294,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstancePatchCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstancePatchCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -5309,7 +5305,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstancePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5330,7 +5326,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstancePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstancePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5347,7 +5343,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstancePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstancePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5385,10 +5381,10 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceRestartCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceRestartCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5396,9 +5392,9 @@ pub struct InstanceRestartCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceRestartCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceRestartCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5531,7 +5527,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance to be restarted.
-    pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -5541,7 +5537,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -5552,7 +5548,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestartCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestartCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5573,7 +5569,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestartCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestartCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5590,7 +5586,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestartCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestartCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5628,10 +5624,10 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5639,9 +5635,9 @@ pub struct InstanceDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5774,7 +5770,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance to be deleted.
-    pub fn project(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -5784,7 +5780,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -5795,7 +5791,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5816,7 +5812,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5833,7 +5829,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5871,10 +5867,10 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceStopReplicaCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceStopReplicaCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5882,9 +5878,9 @@ pub struct InstanceStopReplicaCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceStopReplicaCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceStopReplicaCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceStopReplicaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6017,7 +6013,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// ID of the project that contains the read replica.
-    pub fn project(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -6027,7 +6023,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL read replica instance name.
-    pub fn instance(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -6038,7 +6034,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStopReplicaCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStopReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6059,7 +6055,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceStopReplicaCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceStopReplicaCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6076,7 +6072,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceStopReplicaCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceStopReplicaCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6114,10 +6110,10 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceStartReplicaCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceStartReplicaCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6125,9 +6121,9 @@ pub struct InstanceStartReplicaCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceStartReplicaCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceStartReplicaCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceStartReplicaCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6260,7 +6256,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// ID of the project that contains the read replica.
-    pub fn project(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -6270,7 +6266,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL read replica instance name.
-    pub fn instance(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -6281,7 +6277,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStartReplicaCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceStartReplicaCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6302,7 +6298,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceStartReplicaCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceStartReplicaCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6319,7 +6315,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceStartReplicaCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceStartReplicaCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6363,10 +6359,10 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: DatabaseInstance,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6374,9 +6370,9 @@ pub struct InstanceInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6515,7 +6511,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6525,7 +6521,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project to which the newly created Cloud SQL instances should belong.
-    pub fn project(mut self, new_value: &str) -> InstanceInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -6536,7 +6532,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6557,7 +6553,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6574,7 +6570,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6614,10 +6610,10 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -6626,9 +6622,9 @@ pub struct InstanceListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6766,7 +6762,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project for which to list Cloud SQL instances.
-    pub fn project(mut self, new_value: &str) -> InstanceListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -6774,7 +6770,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> InstanceListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> InstanceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6782,7 +6778,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The maximum number of results to return per response.
-    pub fn max_results(mut self, new_value: u32) -> InstanceListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> InstanceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6793,7 +6789,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6814,7 +6810,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6831,7 +6827,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6875,10 +6871,10 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceImportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceImportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: InstancesImportRequest,
     _project: String,
     _instance: String,
@@ -6887,9 +6883,9 @@ pub struct InstanceImportCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceImportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceImportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7029,7 +7025,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstancesImportRequest) -> InstanceImportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstancesImportRequest) -> InstanceImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7039,7 +7035,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstanceImportCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceImportCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -7049,7 +7045,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceImportCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceImportCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -7060,7 +7056,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceImportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7081,7 +7077,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceImportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceImportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7098,7 +7094,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceImportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceImportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7142,10 +7138,10 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: DatabaseInstance,
     _project: String,
     _instance: String,
@@ -7154,9 +7150,9 @@ pub struct InstanceUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7296,7 +7292,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DatabaseInstance) -> InstanceUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7306,7 +7302,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -7316,7 +7312,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -7327,7 +7323,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7348,7 +7344,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7365,7 +7361,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7409,10 +7405,10 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceCloneCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceCloneCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: InstancesCloneRequest,
     _project: String,
     _instance: String,
@@ -7421,9 +7417,9 @@ pub struct InstanceCloneCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceCloneCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceCloneCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7563,7 +7559,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstancesCloneRequest) -> InstanceCloneCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstancesCloneRequest) -> InstanceCloneCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7573,7 +7569,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the source as well as the clone Cloud SQL instance.
-    pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -7583,7 +7579,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -7594,7 +7590,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceCloneCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceCloneCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7615,7 +7611,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceCloneCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceCloneCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7632,7 +7628,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceCloneCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceCloneCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7676,10 +7672,10 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceExportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceExportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: InstancesExportRequest,
     _project: String,
     _instance: String,
@@ -7688,9 +7684,9 @@ pub struct InstanceExportCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceExportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceExportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7830,7 +7826,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstancesExportRequest) -> InstanceExportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstancesExportRequest) -> InstanceExportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7840,7 +7836,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance to be exported.
-    pub fn project(mut self, new_value: &str) -> InstanceExportCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceExportCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -7850,7 +7846,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceExportCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceExportCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -7861,7 +7857,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceExportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceExportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7882,7 +7878,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceExportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceExportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7899,7 +7895,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceExportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceExportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7943,10 +7939,10 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceRestoreBackupCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InstanceRestoreBackupCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: InstancesRestoreBackupRequest,
     _project: String,
     _instance: String,
@@ -7955,9 +7951,9 @@ pub struct InstanceRestoreBackupCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InstanceRestoreBackupCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InstanceRestoreBackupCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8097,7 +8093,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InstancesRestoreBackupRequest) -> InstanceRestoreBackupCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InstancesRestoreBackupRequest) -> InstanceRestoreBackupCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8107,7 +8103,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -8117,7 +8113,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -8128,7 +8124,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestoreBackupCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestoreBackupCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8149,7 +8145,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestoreBackupCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestoreBackupCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8166,7 +8162,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestoreBackupCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestoreBackupCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8204,18 +8200,18 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct FlagListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FlagListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FlagListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FlagListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FlagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8323,7 +8319,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FlagListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FlagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8344,7 +8340,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FlagListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FlagListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8361,7 +8357,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FlagListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FlagListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8399,10 +8395,10 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabaseDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _database: String,
@@ -8411,9 +8407,9 @@ pub struct DatabaseDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabaseDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabaseDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8547,7 +8543,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -8557,7 +8553,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -8567,7 +8563,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Name of the database to be deleted in the instance.
-    pub fn database(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
+    pub fn database(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
@@ -8578,7 +8574,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8599,7 +8595,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabaseDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabaseDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8616,7 +8612,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabaseDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabaseDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8660,10 +8656,10 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabasePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabasePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: Database,
     _project: String,
     _instance: String,
@@ -8673,9 +8669,9 @@ pub struct DatabasePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabasePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabasePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabasePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8816,7 +8812,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Database) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Database) -> DatabasePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8826,7 +8822,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -8836,7 +8832,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -8846,7 +8842,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Name of the database to be updated in the instance.
-    pub fn database(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn database(mut self, new_value: &str) -> DatabasePatchCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
@@ -8857,7 +8853,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabasePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabasePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8878,7 +8874,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabasePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabasePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8895,7 +8891,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabasePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabasePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8933,10 +8929,10 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabaseListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8944,9 +8940,9 @@ pub struct DatabaseListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabaseListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabaseListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9079,7 +9075,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project for which to list Cloud SQL instances.
-    pub fn project(mut self, new_value: &str) -> DatabaseListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabaseListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -9089,7 +9085,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabaseListCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabaseListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -9100,7 +9096,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9121,7 +9117,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabaseListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabaseListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9138,7 +9134,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabaseListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabaseListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9182,10 +9178,10 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabaseInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: Database,
     _project: String,
     _instance: String,
@@ -9194,9 +9190,9 @@ pub struct DatabaseInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabaseInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabaseInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9336,7 +9332,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Database) -> DatabaseInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Database) -> DatabaseInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9346,7 +9342,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -9356,7 +9352,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -9367,7 +9363,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9388,7 +9384,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabaseInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabaseInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9405,7 +9401,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabaseInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabaseInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9443,10 +9439,10 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabaseGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _database: String,
@@ -9455,9 +9451,9 @@ pub struct DatabaseGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabaseGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabaseGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9591,7 +9587,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -9601,7 +9597,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -9611,7 +9607,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Name of the database in the instance.
-    pub fn database(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
+    pub fn database(mut self, new_value: &str) -> DatabaseGetCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
@@ -9622,7 +9618,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9643,7 +9639,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabaseGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabaseGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9660,7 +9656,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabaseGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabaseGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9704,10 +9700,10 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct DatabaseUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DatabaseUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: Database,
     _project: String,
     _instance: String,
@@ -9717,9 +9713,9 @@ pub struct DatabaseUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DatabaseUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DatabaseUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DatabaseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9860,7 +9856,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Database) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Database) -> DatabaseUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9870,7 +9866,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -9880,7 +9876,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Database instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -9890,7 +9886,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Name of the database to be updated in the instance.
-    pub fn database(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn database(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, A> {
         self._database = new_value.to_string();
         self
     }
@@ -9901,7 +9897,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DatabaseUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9922,7 +9918,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatabaseUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatabaseUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9939,7 +9935,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DatabaseUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DatabaseUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9983,10 +9979,10 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct SslCertInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SslCertInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _request: SslCertsInsertRequest,
     _project: String,
     _instance: String,
@@ -9995,9 +9991,9 @@ pub struct SslCertInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SslCertInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SslCertInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SslCertInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10137,7 +10133,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SslCertsInsertRequest) -> SslCertInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SslCertsInsertRequest) -> SslCertInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10147,7 +10143,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project to which the newly created Cloud SQL instances should belong.
-    pub fn project(mut self, new_value: &str) -> SslCertInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> SslCertInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -10157,7 +10153,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> SslCertInsertCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> SslCertInsertCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -10168,7 +10164,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10189,7 +10185,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SslCertInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SslCertInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10206,7 +10202,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SslCertInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SslCertInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10244,10 +10240,10 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct SslCertDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SslCertDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _sha1_fingerprint: String,
@@ -10256,9 +10252,9 @@ pub struct SslCertDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SslCertDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SslCertDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SslCertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10392,7 +10388,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance to be deleted.
-    pub fn project(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -10402,7 +10398,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -10412,7 +10408,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Sha1 FingerPrint.
-    pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
+    pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
     }
@@ -10423,7 +10419,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10444,7 +10440,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SslCertDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SslCertDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10461,7 +10457,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SslCertDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SslCertDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10499,10 +10495,10 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct SslCertGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SslCertGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _sha1_fingerprint: String,
@@ -10511,9 +10507,9 @@ pub struct SslCertGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SslCertGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SslCertGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10647,7 +10643,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -10657,7 +10653,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -10667,7 +10663,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Sha1 FingerPrint.
-    pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
+    pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertGetCall<'a, C, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
     }
@@ -10678,7 +10674,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10699,7 +10695,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SslCertGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SslCertGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10716,7 +10712,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SslCertGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SslCertGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10754,10 +10750,10 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct SslCertListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SslCertListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10765,9 +10761,9 @@ pub struct SslCertListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SslCertListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SslCertListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10900,7 +10896,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project for which to list Cloud SQL instances.
-    pub fn project(mut self, new_value: &str) -> SslCertListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> SslCertListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -10910,7 +10906,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> SslCertListCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> SslCertListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -10921,7 +10917,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10942,7 +10938,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SslCertListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SslCertListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10959,7 +10955,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SslCertListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SslCertListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10999,10 +10995,10 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct BackupRunListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BackupRunListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _page_token: Option<String>,
@@ -11012,9 +11008,9 @@ pub struct BackupRunListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BackupRunListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BackupRunListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BackupRunListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11153,7 +11149,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -11163,7 +11159,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -11171,7 +11167,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> BackupRunListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11179,7 +11175,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Maximum number of backup runs per response.
-    pub fn max_results(mut self, new_value: i32) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> BackupRunListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11190,7 +11186,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11211,7 +11207,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BackupRunListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BackupRunListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11228,7 +11224,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BackupRunListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BackupRunListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11266,10 +11262,10 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct BackupRunGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BackupRunGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a SQLAdmin<C, NC, A>,
+    hub: &'a SQLAdmin<C, A>,
     _project: String,
     _instance: String,
     _id: String,
@@ -11278,9 +11274,9 @@ pub struct BackupRunGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BackupRunGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BackupRunGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11414,7 +11410,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Project ID of the project that contains the instance.
-    pub fn project(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -11424,7 +11420,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Cloud SQL instance ID. This does not include the project ID.
-    pub fn instance(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
+    pub fn instance(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -11434,7 +11430,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of this Backup Run.
-    pub fn id(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> BackupRunGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -11445,7 +11441,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11466,7 +11462,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BackupRunGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BackupRunGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11483,7 +11479,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BackupRunGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BackupRunGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).
@@ -193,7 +193,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -262,40 +261,37 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct DoubleClickBidManager<C, NC, A> {
+pub struct DoubleClickBidManager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for DoubleClickBidManager<C, NC, A> {}
+impl<'a, C, A> Hub for DoubleClickBidManager<C, A> {}
 
-impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DoubleClickBidManager<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> DoubleClickBidManager<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> DoubleClickBidManager<C, A> {
         DoubleClickBidManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn lineitems(&'a self) -> LineitemMethods<'a, C, NC, A> {
+    pub fn lineitems(&'a self) -> LineitemMethods<'a, C, A> {
         LineitemMethods { hub: &self }
     }
-    pub fn queries(&'a self) -> QueryMethods<'a, C, NC, A> {
+    pub fn queries(&'a self) -> QueryMethods<'a, C, A> {
         QueryMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a, C, NC, A> {
+    pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -775,15 +771,15 @@ impl Part for UploadStatus {}
 /// let rb = hub.lineitems();
 /// # }
 /// ```
-pub struct LineitemMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LineitemMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LineitemMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LineitemMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
+impl<'a, C, A> LineitemMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -792,7 +788,7 @@ impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn uploadlineitems(&self, request: &UploadLineItemsRequest) -> LineitemUploadlineitemCall<'a, C, NC, A> {
+    pub fn uploadlineitems(&self, request: &UploadLineItemsRequest) -> LineitemUploadlineitemCall<'a, C, A> {
         LineitemUploadlineitemCall {
             hub: self.hub,
             _request: request.clone(),
@@ -808,7 +804,7 @@ impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn downloadlineitems(&self, request: &DownloadLineItemsRequest) -> LineitemDownloadlineitemCall<'a, C, NC, A> {
+    pub fn downloadlineitems(&self, request: &DownloadLineItemsRequest) -> LineitemDownloadlineitemCall<'a, C, A> {
         LineitemDownloadlineitemCall {
             hub: self.hub,
             _request: request.clone(),
@@ -848,15 +844,15 @@ impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
+impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -865,7 +861,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID with which the reports are associated.
-    pub fn listreports(&self, query_id: &str) -> ReportListreportCall<'a, C, NC, A> {
+    pub fn listreports(&self, query_id: &str) -> ReportListreportCall<'a, C, A> {
         ReportListreportCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -905,20 +901,20 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 /// let rb = hub.queries();
 /// # }
 /// ```
-pub struct QueryMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for QueryMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for QueryMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
+impl<'a, C, A> QueryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves stored queries.
-    pub fn listqueries(&self) -> QueryListqueryCall<'a, C, NC, A> {
+    pub fn listqueries(&self) -> QueryListqueryCall<'a, C, A> {
         QueryListqueryCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -933,7 +929,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID to retrieve.
-    pub fn getquery(&self, query_id: &str) -> QueryGetqueryCall<'a, C, NC, A> {
+    pub fn getquery(&self, query_id: &str) -> QueryGetqueryCall<'a, C, A> {
         QueryGetqueryCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -949,7 +945,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn createquery(&self, request: &Query) -> QueryCreatequeryCall<'a, C, NC, A> {
+    pub fn createquery(&self, request: &Query) -> QueryCreatequeryCall<'a, C, A> {
         QueryCreatequeryCall {
             hub: self.hub,
             _request: request.clone(),
@@ -965,7 +961,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID to delete.
-    pub fn deletequery(&self, query_id: &str) -> QueryDeletequeryCall<'a, C, NC, A> {
+    pub fn deletequery(&self, query_id: &str) -> QueryDeletequeryCall<'a, C, A> {
         QueryDeletequeryCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -982,7 +978,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `queryId` - Query ID to run.
-    pub fn runquery(&self, request: &RunQueryRequest, query_id: &str) -> QueryRunqueryCall<'a, C, NC, A> {
+    pub fn runquery(&self, request: &RunQueryRequest, query_id: &str) -> QueryRunqueryCall<'a, C, A> {
         QueryRunqueryCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1037,18 +1033,18 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct LineitemUploadlineitemCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LineitemUploadlineitemCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _request: UploadLineItemsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LineitemUploadlineitemCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LineitemUploadlineitemCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LineitemUploadlineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1160,7 +1156,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UploadLineItemsRequest) -> LineitemUploadlineitemCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UploadLineItemsRequest) -> LineitemUploadlineitemCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1171,7 +1167,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LineitemUploadlineitemCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LineitemUploadlineitemCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1192,7 +1188,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LineitemUploadlineitemCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LineitemUploadlineitemCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1237,18 +1233,18 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct LineitemDownloadlineitemCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LineitemDownloadlineitemCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _request: DownloadLineItemsRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LineitemDownloadlineitemCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LineitemDownloadlineitemCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LineitemDownloadlineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1360,7 +1356,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &DownloadLineItemsRequest) -> LineitemDownloadlineitemCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &DownloadLineItemsRequest) -> LineitemDownloadlineitemCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1371,7 +1367,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LineitemDownloadlineitemCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LineitemDownloadlineitemCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1392,7 +1388,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LineitemDownloadlineitemCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LineitemDownloadlineitemCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1431,18 +1427,18 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportListreportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportListreportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _query_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportListreportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportListreportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportListreportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1572,7 +1568,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Query ID with which the reports are associated.
-    pub fn query_id(mut self, new_value: &str) -> ReportListreportCall<'a, C, NC, A> {
+    pub fn query_id(mut self, new_value: &str) -> ReportListreportCall<'a, C, A> {
         self._query_id = new_value.to_string();
         self
     }
@@ -1583,7 +1579,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportListreportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportListreportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1604,7 +1600,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportListreportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportListreportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1643,17 +1639,17 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct QueryListqueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryListqueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for QueryListqueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QueryListqueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QueryListqueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1759,7 +1755,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryListqueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryListqueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1780,7 +1776,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QueryListqueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryListqueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1819,18 +1815,18 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct QueryGetqueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryGetqueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _query_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for QueryGetqueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QueryGetqueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QueryGetqueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1960,7 +1956,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Query ID to retrieve.
-    pub fn query_id(mut self, new_value: &str) -> QueryGetqueryCall<'a, C, NC, A> {
+    pub fn query_id(mut self, new_value: &str) -> QueryGetqueryCall<'a, C, A> {
         self._query_id = new_value.to_string();
         self
     }
@@ -1971,7 +1967,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryGetqueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryGetqueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1992,7 +1988,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QueryGetqueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryGetqueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2037,18 +2033,18 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct QueryCreatequeryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryCreatequeryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _request: Query,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for QueryCreatequeryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QueryCreatequeryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QueryCreatequeryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2160,7 +2156,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Query) -> QueryCreatequeryCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Query) -> QueryCreatequeryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2171,7 +2167,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryCreatequeryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryCreatequeryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2192,7 +2188,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QueryCreatequeryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryCreatequeryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2231,18 +2227,18 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct QueryDeletequeryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryDeletequeryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _query_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for QueryDeletequeryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QueryDeletequeryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QueryDeletequeryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2361,7 +2357,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Query ID to delete.
-    pub fn query_id(mut self, new_value: &str) -> QueryDeletequeryCall<'a, C, NC, A> {
+    pub fn query_id(mut self, new_value: &str) -> QueryDeletequeryCall<'a, C, A> {
         self._query_id = new_value.to_string();
         self
     }
@@ -2372,7 +2368,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryDeletequeryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryDeletequeryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2393,7 +2389,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QueryDeletequeryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryDeletequeryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2438,19 +2434,19 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct QueryRunqueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryRunqueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a DoubleClickBidManager<C, NC, A>,
+    hub: &'a DoubleClickBidManager<C, A>,
     _request: RunQueryRequest,
     _query_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for QueryRunqueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QueryRunqueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QueryRunqueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2576,7 +2572,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &RunQueryRequest) -> QueryRunqueryCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &RunQueryRequest) -> QueryRunqueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2586,7 +2582,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Query ID to run.
-    pub fn query_id(mut self, new_value: &str) -> QueryRunqueryCall<'a, C, NC, A> {
+    pub fn query_id(mut self, new_value: &str) -> QueryRunqueryCall<'a, C, A> {
         self._query_id = new_value.to_string();
         self
     }
@@ -2597,7 +2593,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryRunqueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QueryRunqueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2618,7 +2614,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QueryRunqueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryRunqueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

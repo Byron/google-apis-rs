@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *0.1.4+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *QPX Express* crate version *0.1.5+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
@@ -194,7 +194,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -269,34 +268,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct QPXExpress<C, NC, A> {
+pub struct QPXExpress<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for QPXExpress<C, NC, A> {}
+impl<'a, C, A> Hub for QPXExpress<C, A> {}
 
-impl<'a, C, NC, A> QPXExpress<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QPXExpress<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> QPXExpress<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> QPXExpress<C, A> {
         QPXExpress {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn trips(&'a self) -> TripMethods<'a, C, NC, A> {
+    pub fn trips(&'a self) -> TripMethods<'a, C, A> {
         TripMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -936,15 +932,15 @@ impl Part for FreeBaggageAllowance {}
 /// let rb = hub.trips();
 /// # }
 /// ```
-pub struct TripMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TripMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a QPXExpress<C, NC, A>,
+    hub: &'a QPXExpress<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TripMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TripMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TripMethods<'a, C, NC, A> {
+impl<'a, C, A> TripMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -953,7 +949,7 @@ impl<'a, C, NC, A> TripMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: &TripsSearchRequest) -> TripSearchCall<'a, C, NC, A> {
+    pub fn search(&self, request: &TripsSearchRequest) -> TripSearchCall<'a, C, A> {
         TripSearchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1007,18 +1003,18 @@ impl<'a, C, NC, A> TripMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct TripSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TripSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a QPXExpress<C, NC, A>,
+    hub: &'a QPXExpress<C, A>,
     _request: TripsSearchRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for TripSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TripSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TripSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1130,7 +1126,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &TripsSearchRequest) -> TripSearchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &TripsSearchRequest) -> TripSearchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1141,7 +1137,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TripSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TripSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1162,7 +1158,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TripSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TripSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

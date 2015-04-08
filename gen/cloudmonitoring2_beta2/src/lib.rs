@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -203,7 +203,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -303,40 +302,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudMonitoring<C, NC, A> {
+pub struct CloudMonitoring<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for CloudMonitoring<C, NC, A> {}
+impl<'a, C, A> Hub for CloudMonitoring<C, A> {}
 
-impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CloudMonitoring<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> CloudMonitoring<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> CloudMonitoring<C, A> {
         CloudMonitoring {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a, C, NC, A> {
+    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a, C, A> {
         MetricDescriptorMethods { hub: &self }
     }
-    pub fn timeseries(&'a self) -> TimeseryMethods<'a, C, NC, A> {
+    pub fn timeseries(&'a self) -> TimeseryMethods<'a, C, A> {
         TimeseryMethods { hub: &self }
     }
-    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a, C, NC, A> {
+    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a, C, A> {
         TimeseriesDescriptorMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -788,15 +784,15 @@ impl ResponseResult for ListTimeseriesResponse {}
 /// let rb = hub.timeseries_descriptors();
 /// # }
 /// ```
-pub struct TimeseriesDescriptorMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TimeseriesDescriptorMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TimeseriesDescriptorMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TimeseriesDescriptorMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TimeseriesDescriptorMethods<'a, C, NC, A> {
+impl<'a, C, A> TimeseriesDescriptorMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -808,7 +804,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorMethods<'a, C, NC, A> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: &ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn list(&self, request: &ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         TimeseriesDescriptorListCall {
             hub: self.hub,
             _request: request.clone(),
@@ -859,15 +855,15 @@ impl<'a, C, NC, A> TimeseriesDescriptorMethods<'a, C, NC, A> {
 /// let rb = hub.timeseries();
 /// # }
 /// ```
-pub struct TimeseryMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TimeseryMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TimeseryMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TimeseryMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
+impl<'a, C, A> TimeseryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -877,7 +873,7 @@ impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project ID. The value can be the numeric project ID or string-based project name.
-    pub fn write(&self, request: &WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C, NC, A> {
+    pub fn write(&self, request: &WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C, A> {
         TimeseryWriteCall {
             hub: self.hub,
             _request: request.clone(),
@@ -898,7 +894,7 @@ impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: &ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn list(&self, request: &ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C, A> {
         TimeseryListCall {
             hub: self.hub,
             _request: request.clone(),
@@ -949,15 +945,15 @@ impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
 /// let rb = hub.metric_descriptors();
 /// # }
 /// ```
-pub struct MetricDescriptorMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetricDescriptorMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MetricDescriptorMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MetricDescriptorMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
+impl<'a, C, A> MetricDescriptorMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -967,7 +963,7 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn list(&self, request: &ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn list(&self, request: &ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C, A> {
         MetricDescriptorListCall {
             hub: self.hub,
             _request: request.clone(),
@@ -989,7 +985,7 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     ///
     /// * `project` - The project ID to which the metric belongs.
     /// * `metric` - Name of the metric.
-    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a, C, A> {
         MetricDescriptorDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1008,7 +1004,7 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn create(&self, request: &MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C, NC, A> {
+    pub fn create(&self, request: &MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C, A> {
         MetricDescriptorCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1071,10 +1067,10 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct TimeseriesDescriptorListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TimeseriesDescriptorListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _request: ListTimeseriesDescriptorsRequest,
     _project: String,
     _metric: String,
@@ -1091,9 +1087,9 @@ pub struct TimeseriesDescriptorListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TimeseriesDescriptorListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TimeseriesDescriptorListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1259,7 +1255,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1269,7 +1265,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
-    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1279,7 +1275,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
-    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
@@ -1289,7 +1285,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._youngest = new_value.to_string();
         self
     }
@@ -1301,7 +1297,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// - h: hour 
     /// - d: day 
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
-    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -1316,7 +1312,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// - w: week  Examples: 2s, 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     /// 
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
-    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._timespan = Some(new_value.to_string());
         self
     }
@@ -1324,7 +1320,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
-    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1332,7 +1328,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
-    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -1346,7 +1342,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// - key!=value: key does not equal the value 
     /// - key!~value: key regex does not match the value  For example, to list all of the time series descriptors for the region us-central1, you could specify:
     /// label=cloud.googleapis.com%2Flocation=~us-central1.*
-    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._labels.push(new_value.to_string());
         self
     }
@@ -1354,7 +1350,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.
-    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
@@ -1362,7 +1358,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -1373,7 +1369,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseriesDescriptorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1394,7 +1390,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1411,7 +1407,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1455,10 +1451,10 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct TimeseryWriteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TimeseryWriteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _request: WriteTimeseriesRequest,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1466,9 +1462,9 @@ pub struct TimeseryWriteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TimeseryWriteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TimeseryWriteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1607,7 +1603,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1617,7 +1613,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The project ID. The value can be the numeric project ID or string-based project name.
-    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1628,7 +1624,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryWriteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryWriteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1649,7 +1645,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1666,7 +1662,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TimeseryWriteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TimeseryWriteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1717,10 +1713,10 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct TimeseryListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TimeseryListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _request: ListTimeseriesRequest,
     _project: String,
     _metric: String,
@@ -1737,9 +1733,9 @@ pub struct TimeseryListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TimeseryListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TimeseryListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1905,7 +1901,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ListTimeseriesRequest) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ListTimeseriesRequest) -> TimeseryListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1915,7 +1911,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
-    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1925,7 +1921,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
-    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
@@ -1935,7 +1931,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._youngest = new_value.to_string();
         self
     }
@@ -1947,7 +1943,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// - h: hour 
     /// - d: day 
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
-    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -1962,7 +1958,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// - w: week  Examples: 2s, 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     /// 
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
-    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._timespan = Some(new_value.to_string());
         self
     }
@@ -1970,7 +1966,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
-    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1978,7 +1974,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
-    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -1992,7 +1988,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// - key!=value: key does not equal the value 
     /// - key!~value: key regex does not match the value  For example, to list all of the time series descriptors for the region us-central1, you could specify:
     /// label=cloud.googleapis.com%2Flocation=~us-central1.*
-    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._labels.push(new_value.to_string());
         self
     }
@@ -2000,7 +1996,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of data points per page, which is used for pagination of results.
-    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
@@ -2008,7 +2004,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C, A> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -2019,7 +2015,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TimeseryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2040,7 +2036,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2057,7 +2053,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TimeseryListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TimeseryListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2104,10 +2100,10 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct MetricDescriptorListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetricDescriptorListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _request: ListMetricDescriptorsRequest,
     _project: String,
     _query: Option<String>,
@@ -2118,9 +2114,9 @@ pub struct MetricDescriptorListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetricDescriptorListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetricDescriptorListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2268,7 +2264,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2278,7 +2274,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The project id. The value can be the numeric project ID or string-based project name.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2286,7 +2282,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.
-    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2294,7 +2290,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
-    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2302,7 +2298,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.
-    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, C, A> {
         self._count = Some(new_value);
         self
     }
@@ -2313,7 +2309,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2334,7 +2330,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2351,7 +2347,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2389,10 +2385,10 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct MetricDescriptorDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetricDescriptorDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _project: String,
     _metric: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2400,9 +2396,9 @@ pub struct MetricDescriptorDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetricDescriptorDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetricDescriptorDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2535,7 +2531,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The project ID to which the metric belongs.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2545,7 +2541,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name of the metric.
-    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
+    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._metric = new_value.to_string();
         self
     }
@@ -2556,7 +2552,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2577,7 +2573,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2594,7 +2590,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2638,10 +2634,10 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct MetricDescriptorCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MetricDescriptorCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CloudMonitoring<C, NC, A>,
+    hub: &'a CloudMonitoring<C, A>,
     _request: MetricDescriptor,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2649,9 +2645,9 @@ pub struct MetricDescriptorCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MetricDescriptorCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MetricDescriptorCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2790,7 +2786,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &MetricDescriptor) -> MetricDescriptorCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &MetricDescriptor) -> MetricDescriptorCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2800,7 +2796,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The project id. The value can be the numeric project ID or string-based project name.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2811,7 +2807,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MetricDescriptorCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2832,7 +2828,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2849,7 +2845,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *calendar* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -247,7 +247,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -365,55 +364,52 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CalendarHub<C, NC, A> {
+pub struct CalendarHub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for CalendarHub<C, NC, A> {}
+impl<'a, C, A> Hub for CalendarHub<C, A> {}
 
-impl<'a, C, NC, A> CalendarHub<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarHub<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> CalendarHub<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> CalendarHub<C, A> {
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn acl(&'a self) -> AclMethods<'a, C, NC, A> {
+    pub fn acl(&'a self) -> AclMethods<'a, C, A> {
         AclMethods { hub: &self }
     }
-    pub fn calendar_list(&'a self) -> CalendarListMethods<'a, C, NC, A> {
+    pub fn calendar_list(&'a self) -> CalendarListMethods<'a, C, A> {
         CalendarListMethods { hub: &self }
     }
-    pub fn calendars(&'a self) -> CalendarMethods<'a, C, NC, A> {
+    pub fn calendars(&'a self) -> CalendarMethods<'a, C, A> {
         CalendarMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C, NC, A> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, C, A> {
         ChannelMethods { hub: &self }
     }
-    pub fn colors(&'a self) -> ColorMethods<'a, C, NC, A> {
+    pub fn colors(&'a self) -> ColorMethods<'a, C, A> {
         ColorMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C, NC, A> {
+    pub fn events(&'a self) -> EventMethods<'a, C, A> {
         EventMethods { hub: &self }
     }
-    pub fn freebusy(&'a self) -> FreebusyMethods<'a, C, NC, A> {
+    pub fn freebusy(&'a self) -> FreebusyMethods<'a, C, A> {
         FreebusyMethods { hub: &self }
     }
-    pub fn settings(&'a self) -> SettingMethods<'a, C, NC, A> {
+    pub fn settings(&'a self) -> SettingMethods<'a, C, A> {
         SettingMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1368,15 +1364,15 @@ impl ResponseResult for Event {}
 /// let rb = hub.freebusy();
 /// # }
 /// ```
-pub struct FreebusyMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FreebusyMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for FreebusyMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for FreebusyMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> FreebusyMethods<'a, C, NC, A> {
+impl<'a, C, A> FreebusyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1385,7 +1381,7 @@ impl<'a, C, NC, A> FreebusyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query(&self, request: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, NC, A> {
+    pub fn query(&self, request: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, A> {
         FreebusyQueryCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1426,20 +1422,20 @@ impl<'a, C, NC, A> FreebusyMethods<'a, C, NC, A> {
 /// let rb = hub.settings();
 /// # }
 /// ```
-pub struct SettingMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SettingMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SettingMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SettingMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
+impl<'a, C, A> SettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all user settings for the authenticated user.
-    pub fn list(&self) -> SettingListCall<'a, C, NC, A> {
+    pub fn list(&self) -> SettingListCall<'a, C, A> {
         SettingListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1458,7 +1454,7 @@ impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: &Channel) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel) -> SettingWatchCall<'a, C, A> {
         SettingWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1478,7 +1474,7 @@ impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `setting` - The id of the user setting.
-    pub fn get(&self, setting: &str) -> SettingGetCall<'a, C, NC, A> {
+    pub fn get(&self, setting: &str) -> SettingGetCall<'a, C, A> {
         SettingGetCall {
             hub: self.hub,
             _setting: setting.to_string(),
@@ -1519,15 +1515,15 @@ impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
 /// let rb = hub.calendar_list();
 /// # }
 /// ```
-pub struct CalendarListMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CalendarListMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CalendarListMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
+impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1537,7 +1533,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn update(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, C, A> {
         CalendarListUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1556,7 +1552,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, C, A> {
         CalendarListDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1573,7 +1569,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, C, NC, A> {
+    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, C, A> {
         CalendarListGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1586,7 +1582,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns entries on the user's calendar list.
-    pub fn list(&self) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn list(&self) -> CalendarListListCall<'a, C, A> {
         CalendarListListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1608,7 +1604,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &CalendarListEntry) -> CalendarListInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &CalendarListEntry) -> CalendarListInsertCall<'a, C, A> {
         CalendarListInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1627,7 +1623,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn patch(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, C, A> {
         CalendarListPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1646,7 +1642,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: &Channel) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel) -> CalendarListWatchCall<'a, C, A> {
         CalendarListWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1693,15 +1689,15 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
 /// let rb = hub.calendars();
 /// # }
 /// ```
-pub struct CalendarMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CalendarMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CalendarMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
+impl<'a, C, A> CalendarMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1711,7 +1707,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn patch(&self, request: &Calendar, calendar_id: &str) -> CalendarPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Calendar, calendar_id: &str) -> CalendarPatchCall<'a, C, A> {
         CalendarPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1729,7 +1725,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, C, A> {
         CalendarDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1746,7 +1742,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, C, NC, A> {
+    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, C, A> {
         CalendarGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1763,7 +1759,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, C, NC, A> {
+    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, C, A> {
         CalendarClearCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1780,7 +1776,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &Calendar) -> CalendarInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Calendar) -> CalendarInsertCall<'a, C, A> {
         CalendarInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1798,7 +1794,7 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn update(&self, request: &Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, C, A> {
         CalendarUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1840,15 +1836,15 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
 /// let rb = hub.acl();
 /// # }
 /// ```
-pub struct AclMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AclMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AclMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
+impl<'a, C, A> AclMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1858,7 +1854,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn watch(&self, request: &Channel, calendar_id: &str) -> AclWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel, calendar_id: &str) -> AclWatchCall<'a, C, A> {
         AclWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1881,7 +1877,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn insert(&self, request: &AclRule, calendar_id: &str) -> AclInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &AclRule, calendar_id: &str) -> AclInsertCall<'a, C, A> {
         AclInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1901,7 +1897,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
     /// * `ruleId` - ACL rule identifier.
-    pub fn update(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, C, A> {
         AclUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1922,7 +1918,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
     /// * `ruleId` - ACL rule identifier.
-    pub fn patch(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, C, A> {
         AclPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1941,7 +1937,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn list(&self, calendar_id: &str) -> AclListCall<'a, C, NC, A> {
+    pub fn list(&self, calendar_id: &str) -> AclListCall<'a, C, A> {
         AclListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1963,7 +1959,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `ruleId` - ACL rule identifier.
-    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, C, A> {
         AclDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1982,7 +1978,7 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `ruleId` - ACL rule identifier.
-    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, C, NC, A> {
+    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, C, A> {
         AclGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2024,15 +2020,15 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
+impl<'a, C, A> ChannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2041,7 +2037,7 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, A> {
         ChannelStopCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2082,20 +2078,20 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 /// let rb = hub.colors();
 /// # }
 /// ```
-pub struct ColorMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColorMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ColorMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ColorMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ColorMethods<'a, C, NC, A> {
+impl<'a, C, A> ColorMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the color definitions for calendars and events.
-    pub fn get(&self) -> ColorGetCall<'a, C, NC, A> {
+    pub fn get(&self) -> ColorGetCall<'a, C, A> {
         ColorGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2135,15 +2131,15 @@ impl<'a, C, NC, A> ColorMethods<'a, C, NC, A> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for EventMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
+impl<'a, C, A> EventMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2153,7 +2149,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `eventId` - Event identifier.
-    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, C, A> {
         EventDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2173,7 +2169,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn insert(&self, request: &Event, calendar_id: &str) -> EventInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Event, calendar_id: &str) -> EventInsertCall<'a, C, A> {
         EventInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2194,7 +2190,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn import(&self, request: &Event, calendar_id: &str) -> EventImportCall<'a, C, NC, A> {
+    pub fn import(&self, request: &Event, calendar_id: &str) -> EventImportCall<'a, C, A> {
         EventImportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2213,7 +2209,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `eventId` - Recurring event identifier.
-    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, C, A> {
         EventInstanceCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2241,7 +2237,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `eventId` - Event identifier.
-    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, C, NC, A> {
+    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, C, A> {
         EventGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2262,7 +2258,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier.
-    pub fn list(&self, calendar_id: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn list(&self, calendar_id: &str) -> EventListCall<'a, C, A> {
         EventListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2298,7 +2294,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
     /// * `eventId` - Event identifier.
-    pub fn patch(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, C, A> {
         EventPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2322,7 +2318,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// * `calendarId` - Calendar identifier of the source calendar where the event currently is on.
     /// * `eventId` - Event identifier.
     /// * `destination` - Calendar identifier of the target calendar where the event is to be moved to.
-    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a, C, NC, A> {
+    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a, C, A> {
         EventMoveCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2344,7 +2340,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
     /// * `eventId` - Event identifier.
-    pub fn update(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, C, A> {
         EventUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2367,7 +2363,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier.
-    pub fn watch(&self, request: &Channel, calendar_id: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel, calendar_id: &str) -> EventWatchCall<'a, C, A> {
         EventWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2403,7 +2399,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `calendarId` - Calendar identifier.
     /// * `text` - The text describing the event to be created.
-    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, C, NC, A> {
+    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, C, A> {
         EventQuickAddCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2460,19 +2456,19 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct FreebusyQueryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FreebusyQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: FreeBusyRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FreebusyQueryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FreebusyQueryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2586,7 +2582,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2597,7 +2593,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FreebusyQueryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FreebusyQueryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2618,7 +2614,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2635,7 +2631,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FreebusyQueryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FreebusyQueryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2676,10 +2672,10 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct SettingListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SettingListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _sync_token: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2688,9 +2684,9 @@ pub struct SettingListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SettingListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SettingListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2807,7 +2803,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -2815,7 +2811,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2823,7 +2819,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2834,7 +2830,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2855,7 +2851,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2872,7 +2868,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2919,10 +2915,10 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct SettingWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SettingWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Channel,
     _sync_token: Option<String>,
     _page_token: Option<String>,
@@ -2932,9 +2928,9 @@ pub struct SettingWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SettingWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SettingWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3057,7 +3053,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> SettingWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3068,7 +3064,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -3076,7 +3072,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3084,7 +3080,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3095,7 +3091,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3116,7 +3112,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3133,7 +3129,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3171,19 +3167,19 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct SettingGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SettingGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _setting: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SettingGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SettingGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3315,7 +3311,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The id of the user setting.
-    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C, NC, A> {
+    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C, A> {
         self._setting = new_value.to_string();
         self
     }
@@ -3326,7 +3322,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SettingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3347,7 +3343,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3364,7 +3360,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SettingGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SettingGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3409,10 +3405,10 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -3421,9 +3417,9 @@ pub struct CalendarListUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3565,7 +3561,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3575,7 +3571,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3583,7 +3579,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, C, NC, A> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -3594,7 +3590,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3615,7 +3611,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3632,7 +3628,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3670,19 +3666,19 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3803,7 +3799,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3814,7 +3810,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3835,7 +3831,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3852,7 +3848,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3890,19 +3886,19 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4034,7 +4030,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4045,7 +4041,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4066,7 +4062,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4083,7 +4079,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4127,10 +4123,10 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
     _show_deleted: Option<bool>,
@@ -4142,9 +4138,9 @@ pub struct CalendarListListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4271,7 +4267,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -4279,7 +4275,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Whether to show hidden entries. Optional. The default is False.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
@@ -4287,7 +4283,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -4295,7 +4291,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4303,7 +4299,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, C, A> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
@@ -4311,7 +4307,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4322,7 +4318,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4343,7 +4339,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4360,7 +4356,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4405,10 +4401,10 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: CalendarListEntry,
     _color_rgb_format: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -4416,9 +4412,9 @@ pub struct CalendarListInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4535,7 +4531,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4543,7 +4539,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, C, NC, A> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -4554,7 +4550,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4575,7 +4571,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4592,7 +4588,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4637,10 +4633,10 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -4649,9 +4645,9 @@ pub struct CalendarListPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4793,7 +4789,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CalendarListEntry) -> CalendarListPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4803,7 +4799,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4811,7 +4807,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, C, NC, A> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, C, A> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -4822,7 +4818,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4843,7 +4839,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4860,7 +4856,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4910,10 +4906,10 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarListWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarListWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Channel,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
@@ -4926,9 +4922,9 @@ pub struct CalendarListWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarListWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarListWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5060,7 +5056,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> CalendarListWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5072,7 +5068,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -5080,7 +5076,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Whether to show hidden entries. Optional. The default is False.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
@@ -5088,7 +5084,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -5096,7 +5092,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5104,7 +5100,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, A> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
@@ -5112,7 +5108,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5123,7 +5119,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarListWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5144,7 +5140,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5161,7 +5157,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarListWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarListWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5205,10 +5201,10 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5216,9 +5212,9 @@ pub struct CalendarPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5357,7 +5353,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Calendar) -> CalendarPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Calendar) -> CalendarPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5367,7 +5363,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -5378,7 +5374,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5399,7 +5395,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5416,7 +5412,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5454,19 +5450,19 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5587,7 +5583,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -5598,7 +5594,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5619,7 +5615,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5636,7 +5632,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5674,19 +5670,19 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5818,7 +5814,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -5829,7 +5825,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5850,7 +5846,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5867,7 +5863,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5905,19 +5901,19 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarClearCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarClearCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarClearCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarClearCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6038,7 +6034,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6049,7 +6045,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarClearCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6070,7 +6066,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6087,7 +6083,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarClearCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarClearCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6131,19 +6127,19 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Calendar,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6257,7 +6253,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Calendar) -> CalendarInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Calendar) -> CalendarInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6268,7 +6264,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6289,7 +6285,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6306,7 +6302,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6350,10 +6346,10 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct CalendarUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CalendarUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6361,9 +6357,9 @@ pub struct CalendarUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CalendarUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CalendarUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6502,7 +6498,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Calendar) -> CalendarUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Calendar) -> CalendarUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6512,7 +6508,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6523,7 +6519,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CalendarUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6544,7 +6540,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6561,7 +6557,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CalendarUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CalendarUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6609,10 +6605,10 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct AclWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Channel,
     _calendar_id: String,
     _sync_token: Option<String>,
@@ -6624,9 +6620,9 @@ pub struct AclWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6777,7 +6773,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> AclWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> AclWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6787,7 +6783,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6798,7 +6794,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -6806,7 +6802,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -6814,7 +6810,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6822,7 +6818,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6833,7 +6829,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6854,7 +6850,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6871,7 +6867,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6915,10 +6911,10 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct AclInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: AclRule,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6926,9 +6922,9 @@ pub struct AclInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7067,7 +7063,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AclRule) -> AclInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AclRule) -> AclInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7077,7 +7073,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7088,7 +7084,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7109,7 +7105,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7126,7 +7122,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7170,10 +7166,10 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct AclUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -7182,9 +7178,9 @@ pub struct AclUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7324,7 +7320,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AclRule) -> AclUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AclRule) -> AclUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7334,7 +7330,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7344,7 +7340,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// ACL rule identifier.
-    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -7355,7 +7351,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7376,7 +7372,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7393,7 +7389,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7437,10 +7433,10 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct AclPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -7449,9 +7445,9 @@ pub struct AclPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7591,7 +7587,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AclRule) -> AclPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AclRule) -> AclPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7601,7 +7597,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7611,7 +7607,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// ACL rule identifier.
-    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -7622,7 +7618,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7643,7 +7639,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7660,7 +7656,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7702,10 +7698,10 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct AclListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _sync_token: Option<String>,
     _show_deleted: Option<bool>,
@@ -7716,9 +7712,9 @@ pub struct AclListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7862,7 +7858,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7873,7 +7869,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -7881,7 +7877,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -7889,7 +7885,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7897,7 +7893,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
-    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7908,7 +7904,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7929,7 +7925,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7946,7 +7942,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7984,10 +7980,10 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct AclDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7995,9 +7991,9 @@ pub struct AclDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8119,7 +8115,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8129,7 +8125,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// ACL rule identifier.
-    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -8140,7 +8136,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8161,7 +8157,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8178,7 +8174,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8216,10 +8212,10 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct AclGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AclGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8227,9 +8223,9 @@ pub struct AclGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AclGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AclGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8362,7 +8358,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8372,7 +8368,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// ACL rule identifier.
-    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -8383,7 +8379,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AclGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8404,7 +8400,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8421,7 +8417,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AclGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AclGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8465,19 +8461,19 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelStopCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelStopCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8580,7 +8576,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8591,7 +8587,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8612,7 +8608,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8629,7 +8625,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8667,18 +8663,18 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ColorGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColorGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColorGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColorGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8786,7 +8782,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColorGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColorGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8807,7 +8803,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8824,7 +8820,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColorGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColorGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8863,10 +8859,10 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct EventDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _event_id: String,
     _send_notifications: Option<bool>,
@@ -8875,9 +8871,9 @@ pub struct EventDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9002,7 +8998,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9012,7 +9008,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -9020,7 +9016,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to send notifications about the deletion of the event. Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -9031,7 +9027,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9052,7 +9048,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9069,7 +9065,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9115,10 +9111,10 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct EventInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
     _send_notifications: Option<bool>,
@@ -9128,9 +9124,9 @@ pub struct EventInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9275,7 +9271,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Event) -> EventInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Event) -> EventInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9285,7 +9281,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9293,7 +9289,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to send notifications about the creation of the new event. Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -9301,7 +9297,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -9312,7 +9308,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9333,7 +9329,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9350,7 +9346,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9394,10 +9390,10 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct EventImportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventImportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9405,9 +9401,9 @@ pub struct EventImportCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventImportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventImportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9546,7 +9542,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Event) -> EventImportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Event) -> EventImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9556,7 +9552,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9567,7 +9563,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventImportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9588,7 +9584,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9605,7 +9601,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventImportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventImportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9652,10 +9648,10 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct EventInstanceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventInstanceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -9672,9 +9668,9 @@ pub struct EventInstanceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventInstanceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventInstanceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9834,7 +9830,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9844,7 +9840,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Recurring event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -9852,7 +9848,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
-    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
@@ -9860,7 +9856,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
-    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
@@ -9868,7 +9864,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
-    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -9876,7 +9872,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -9884,7 +9880,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9892,7 +9888,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The original start time of the instance in the result. Optional.
-    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._original_start = Some(new_value.to_string());
         self
     }
@@ -9900,7 +9896,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
-    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9908,7 +9904,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -9916,7 +9912,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -9927,7 +9923,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInstanceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventInstanceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9948,7 +9944,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9965,7 +9961,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventInstanceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventInstanceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10006,10 +10002,10 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EventGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -10020,9 +10016,9 @@ pub struct EventGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10164,7 +10160,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10174,7 +10170,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -10182,7 +10178,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
-    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
+    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
@@ -10190,7 +10186,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -10198,7 +10194,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10209,7 +10205,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10230,7 +10226,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10247,7 +10243,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10302,10 +10298,10 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct EventListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _updated_min: Option<String>,
     _time_zone: Option<String>,
@@ -10329,9 +10325,9 @@ pub struct EventListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10522,7 +10518,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10530,7 +10526,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
-    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -10538,7 +10534,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
-    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
@@ -10546,7 +10542,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
-    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
@@ -10554,7 +10550,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
-    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -10575,7 +10571,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -10583,7 +10579,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
-    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
+    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._single_events = Some(new_value);
         self
     }
@@ -10591,7 +10587,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to include hidden invitations in the result. Optional. The default is False.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
@@ -10599,7 +10595,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -10608,7 +10604,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
@@ -10616,7 +10612,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
-    pub fn q(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -10625,7 +10621,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
@@ -10633,7 +10629,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10641,7 +10637,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
-    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -10649,7 +10645,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
-    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10657,7 +10653,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -10665,7 +10661,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
@@ -10673,7 +10669,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10684,7 +10680,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10705,7 +10701,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10722,7 +10718,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10769,10 +10765,10 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct EventPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -10784,9 +10780,9 @@ pub struct EventPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10935,7 +10931,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Event) -> EventPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Event) -> EventPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10945,7 +10941,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10955,7 +10951,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -10963,7 +10959,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -10971,7 +10967,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -10979,7 +10975,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10990,7 +10986,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11011,7 +11007,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11028,7 +11024,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11067,10 +11063,10 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EventMoveCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventMoveCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _event_id: String,
     _destination: String,
@@ -11080,9 +11076,9 @@ pub struct EventMoveCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventMoveCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventMoveCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11219,7 +11215,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier of the source calendar where the event currently is on.
-    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11229,7 +11225,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -11239,7 +11235,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier of the target calendar where the event is to be moved to.
-    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
+    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
         self._destination = new_value.to_string();
         self
     }
@@ -11247,7 +11243,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to send notifications about the change of the event's organizer. Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -11258,7 +11254,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventMoveCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventMoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11279,7 +11275,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11296,7 +11292,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventMoveCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventMoveCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11343,10 +11339,10 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct EventUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -11358,9 +11354,9 @@ pub struct EventUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11509,7 +11505,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Event) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Event) -> EventUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11519,7 +11515,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11529,7 +11525,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Event identifier.
-    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -11537,7 +11533,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -11545,7 +11541,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -11553,7 +11549,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -11564,7 +11560,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11585,7 +11581,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11602,7 +11598,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11663,10 +11659,10 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct EventWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _request: Channel,
     _calendar_id: String,
     _updated_min: Option<String>,
@@ -11691,9 +11687,9 @@ pub struct EventWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11891,7 +11887,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> EventWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> EventWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11901,7 +11897,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11909,7 +11905,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
-    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -11917,7 +11913,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
-    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_zone = Some(new_value.to_string());
         self
     }
@@ -11925,7 +11921,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
-    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
@@ -11933,7 +11929,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
-    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -11954,7 +11950,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
-    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -11962,7 +11958,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
-    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
+    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._single_events = Some(new_value);
         self
     }
@@ -11970,7 +11966,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to include hidden invitations in the result. Optional. The default is False.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
@@ -11978,7 +11974,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -11987,7 +11983,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
@@ -11995,7 +11991,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
-    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -12004,7 +12000,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
@@ -12012,7 +12008,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -12020,7 +12016,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
-    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -12028,7 +12024,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
-    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -12036,7 +12032,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
-    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, C, NC, A> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, C, A> {
         self._max_attendees = Some(new_value);
         self
     }
@@ -12044,7 +12040,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
@@ -12052,7 +12048,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
-    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -12063,7 +12059,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12084,7 +12080,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12101,7 +12097,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12140,10 +12136,10 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EventQuickAddCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventQuickAddCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a CalendarHub<C, NC, A>,
+    hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _text: String,
     _send_notifications: Option<bool>,
@@ -12152,9 +12148,9 @@ pub struct EventQuickAddCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventQuickAddCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventQuickAddCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12290,7 +12286,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Calendar identifier.
-    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C, NC, A> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -12300,7 +12296,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The text describing the event to be created.
-    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C, NC, A> {
+    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
         self._text = new_value.to_string();
         self
     }
@@ -12308,7 +12304,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Whether to send notifications about the creation of the event. Optional. The default is False.
-    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C, NC, A> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C, A> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -12319,7 +12315,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventQuickAddCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventQuickAddCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12340,7 +12336,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12357,7 +12353,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventQuickAddCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventQuickAddCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

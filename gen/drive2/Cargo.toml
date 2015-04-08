@@ -4,12 +4,12 @@
 [package]
 
 name = "google-drive2"
-version = "0.1.4+20150326"
+version = "0.1.5+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2"
 homepage = "https://developers.google.com/drive/"
-documentation = "http://byron.github.io/google-apis-rs/google-drive2"
+documentation = "http://byron.github.io/google-apis-rs/google_drive2"
 license = "MIT"
 keywords = ["drive", "google", "protocol", "web", "api"]
 

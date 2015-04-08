@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *0.1.4+20150323*, where *20150323* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Android Publisher* crate version *0.1.5+20150323*, where *20150323* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -208,7 +208,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -306,40 +305,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AndroidPublisher<C, NC, A> {
+pub struct AndroidPublisher<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for AndroidPublisher<C, NC, A> {}
+impl<'a, C, A> Hub for AndroidPublisher<C, A> {}
 
-impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AndroidPublisher<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> AndroidPublisher<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> AndroidPublisher<C, A> {
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn edits(&'a self) -> EditMethods<'a, C, NC, A> {
+    pub fn edits(&'a self) -> EditMethods<'a, C, A> {
         EditMethods { hub: &self }
     }
-    pub fn inappproducts(&'a self) -> InappproductMethods<'a, C, NC, A> {
+    pub fn inappproducts(&'a self) -> InappproductMethods<'a, C, A> {
         InappproductMethods { hub: &self }
     }
-    pub fn purchases(&'a self) -> PurchaseMethods<'a, C, NC, A> {
+    pub fn purchases(&'a self) -> PurchaseMethods<'a, C, A> {
         PurchaseMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1306,15 +1302,15 @@ impl ResponseResult for ListingsListResponse {}
 /// let rb = hub.purchases();
 /// # }
 /// ```
-pub struct PurchaseMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PurchaseMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PurchaseMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
+impl<'a, C, A> PurchaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1325,7 +1321,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
+    pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         PurchaseSubscriptionRevokeCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1346,7 +1342,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
     /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
     /// * `token` - The token provided to the user's device when the inapp product was purchased.
-    pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
+    pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a, C, A> {
         PurchaseProductGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1367,7 +1363,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
+    pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         PurchaseSubscriptionGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1388,7 +1384,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
+    pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         PurchaseSubscriptionCancelCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1409,7 +1405,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
+    pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         PurchaseSubscriptionRefundCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1431,7 +1427,7 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_defer(&self, request: &SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn subscriptions_defer(&self, request: &SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         PurchaseSubscriptionDeferCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1475,15 +1471,15 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
 /// let rb = hub.edits();
 /// # }
 /// ```
-pub struct EditMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for EditMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for EditMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
+impl<'a, C, A> EditMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1495,7 +1491,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, C, A> {
         EditImageUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1519,7 +1515,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_update(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn expansionfiles_update(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         EditExpansionfileUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1541,7 +1537,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a, C, NC, A> {
+    pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a, C, A> {
         EditDetailGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1562,7 +1558,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn apklistings_delete(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn apklistings_delete(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingDeleteCall<'a, C, A> {
         EditApklistingDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1583,7 +1579,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
+    pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a, C, A> {
         EditListingDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1603,7 +1599,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn apks_addexternallyhosted(&self, request: &ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
+    pub fn apks_addexternallyhosted(&self, request: &ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         EditApkAddexternallyhostedCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1624,7 +1620,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
-    pub fn apklistings_deleteall(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingDeleteallCall<'a, C, NC, A> {
+    pub fn apklistings_deleteall(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingDeleteallCall<'a, C, A> {
         EditApklistingDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1645,7 +1641,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn details_update(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
+    pub fn details_update(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a, C, A> {
         EditDetailUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1666,7 +1662,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - The track type to read or modify.
-    pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, C, NC, A> {
+    pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, C, A> {
         EditTrackGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1689,7 +1685,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_patch(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn expansionfiles_patch(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         EditExpansionfilePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1713,7 +1709,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, C, NC, A> {
+    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, C, A> {
         EditImageListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1736,7 +1732,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - The track type to read or modify.
-    pub fn tracks_update(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn tracks_update(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, C, A> {
         EditTrackUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1759,7 +1755,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn listings_patch(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn listings_patch(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a, C, A> {
         EditListingPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1780,7 +1776,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a, C, NC, A> {
+    pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a, C, A> {
         EditGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1802,7 +1798,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
     /// * `imageId` - Unique identifier an image within the set of images attached to this edit.
-    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, C, A> {
         EditImageDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1821,7 +1817,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a, C, NC, A> {
+    pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a, C, A> {
         EditApkUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1843,7 +1839,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn apklistings_update(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn apklistings_update(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingUpdateCall<'a, C, A> {
         EditApklistingUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1862,7 +1858,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a, C, NC, A> {
+    pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a, C, A> {
         EditApkListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1884,7 +1880,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn apklistings_patch(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn apklistings_patch(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingPatchCall<'a, C, A> {
         EditApklistingPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1907,7 +1903,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a, C, NC, A> {
+    pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a, C, A> {
         EditListingGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1925,7 +1921,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - No description provided.
-    pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, C, NC, A> {
+    pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, C, A> {
         EditTesterGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1945,7 +1941,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a, C, A> {
         EditDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1966,7 +1962,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         EditExpansionfileUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -1987,7 +1983,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn insert(&self, request: &AppEdit, package_name: &str) -> EditInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &AppEdit, package_name: &str) -> EditInsertCall<'a, C, A> {
         EditInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2006,7 +2002,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a, C, NC, A> {
+    pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a, C, A> {
         EditListingListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2024,7 +2020,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - No description provided.
-    pub fn testers_patch(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn testers_patch(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, C, A> {
         EditTesterPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2045,7 +2041,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a, C, NC, A> {
+    pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a, C, A> {
         EditCommitCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2064,7 +2060,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a, C, NC, A> {
+    pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a, C, A> {
         EditTrackListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2083,7 +2079,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a, C, NC, A> {
+    pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a, C, A> {
         EditValidateCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2104,7 +2100,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn listings_update(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn listings_update(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a, C, A> {
         EditListingUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2127,7 +2123,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
     /// * `expansionFileType` - No description provided.
-    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, C, A> {
         EditExpansionfileGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2150,7 +2146,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     /// * `imageType` - No description provided.
-    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, C, A> {
         EditImageDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2172,7 +2168,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
-    pub fn details_patch(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a, C, NC, A> {
+    pub fn details_patch(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a, C, A> {
         EditDetailPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2194,7 +2190,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - The track type to read or modify.
-    pub fn tracks_patch(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn tracks_patch(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, C, A> {
         EditTrackPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2216,7 +2212,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a, C, NC, A> {
+    pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a, C, A> {
         EditListingDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2238,7 +2234,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn apklistings_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn apklistings_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingGetCall<'a, C, A> {
         EditApklistingGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2258,7 +2254,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `track` - No description provided.
-    pub fn testers_update(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn testers_update(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, C, A> {
         EditTesterUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2280,7 +2276,7 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
-    pub fn apklistings_list(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingListCall<'a, C, NC, A> {
+    pub fn apklistings_list(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingListCall<'a, C, A> {
         EditApklistingListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2323,21 +2319,21 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
 /// let rb = hub.inappproducts();
 /// # }
 /// ```
-pub struct InappproductMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for InappproductMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for InappproductMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
+impl<'a, C, A> InappproductMethods<'a, C, A> {
     
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch(&self, request: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, NC, A> {
+    pub fn batch(&self, request: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, A> {
         InappproductBatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2354,7 +2350,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `packageName` - Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
-    pub fn list(&self, package_name: &str) -> InappproductListCall<'a, C, NC, A> {
+    pub fn list(&self, package_name: &str) -> InappproductListCall<'a, C, A> {
         InappproductListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2375,7 +2371,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
-    pub fn insert(&self, request: &InAppProduct, package_name: &str) -> InappproductInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &InAppProduct, package_name: &str) -> InappproductInsertCall<'a, C, A> {
         InappproductInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2395,7 +2391,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a, C, A> {
         InappproductDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2414,7 +2410,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     ///
     /// * `packageName` - No description provided.
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a, C, NC, A> {
+    pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a, C, A> {
         InappproductGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2434,7 +2430,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn update(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a, C, A> {
         InappproductUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2456,7 +2452,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn patch(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a, C, A> {
         InappproductPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2508,10 +2504,10 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseSubscriptionRevokeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseSubscriptionRevokeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -2520,9 +2516,9 @@ pub struct PurchaseSubscriptionRevokeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseSubscriptionRevokeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseSubscriptionRevokeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseSubscriptionRevokeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2645,7 +2641,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -2655,7 +2651,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The purchased subscription ID (for example, 'monthly001').
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2665,7 +2661,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the subscription was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -2676,7 +2672,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRevokeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2697,7 +2693,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRevokeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2714,7 +2710,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionRevokeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2752,10 +2748,10 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseProductGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseProductGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _product_id: String,
     _token: String,
@@ -2764,9 +2760,9 @@ pub struct PurchaseProductGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseProductGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseProductGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2900,7 +2896,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -2910,7 +2906,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The inapp product SKU (for example, 'com.some.thing.inapp1').
-    pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
+    pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2920,7 +2916,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the inapp product was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -2931,7 +2927,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseProductGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseProductGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2952,7 +2948,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2969,7 +2965,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseProductGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseProductGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3007,10 +3003,10 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseSubscriptionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseSubscriptionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -3019,9 +3015,9 @@ pub struct PurchaseSubscriptionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseSubscriptionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseSubscriptionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3155,7 +3151,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -3165,7 +3161,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The purchased subscription ID (for example, 'monthly001').
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3175,7 +3171,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the subscription was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -3186,7 +3182,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3207,7 +3203,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3224,7 +3220,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3262,10 +3258,10 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseSubscriptionCancelCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseSubscriptionCancelCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -3274,9 +3270,9 @@ pub struct PurchaseSubscriptionCancelCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseSubscriptionCancelCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseSubscriptionCancelCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseSubscriptionCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3399,7 +3395,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -3409,7 +3405,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The purchased subscription ID (for example, 'monthly001').
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3419,7 +3415,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the subscription was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -3430,7 +3426,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3451,7 +3447,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionCancelCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionCancelCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3468,7 +3464,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionCancelCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3506,10 +3502,10 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseSubscriptionRefundCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseSubscriptionRefundCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -3518,9 +3514,9 @@ pub struct PurchaseSubscriptionRefundCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseSubscriptionRefundCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseSubscriptionRefundCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseSubscriptionRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3643,7 +3639,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -3653,7 +3649,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The purchased subscription ID (for example, 'monthly001').
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3663,7 +3659,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the subscription was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -3674,7 +3670,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionRefundCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3695,7 +3691,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRefundCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRefundCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3712,7 +3708,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionRefundCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3756,10 +3752,10 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct PurchaseSubscriptionDeferCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PurchaseSubscriptionDeferCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: SubscriptionPurchasesDeferRequest,
     _package_name: String,
     _subscription_id: String,
@@ -3769,9 +3765,9 @@ pub struct PurchaseSubscriptionDeferCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PurchaseSubscriptionDeferCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PurchaseSubscriptionDeferCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3912,7 +3908,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &SubscriptionPurchasesDeferRequest) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &SubscriptionPurchasesDeferRequest) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3922,7 +3918,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -3932,7 +3928,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The purchased subscription ID (for example, 'monthly001').
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3942,7 +3938,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The token provided to the user's device when the subscription was purchased.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._token = new_value.to_string();
         self
     }
@@ -3953,7 +3949,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PurchaseSubscriptionDeferCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3974,7 +3970,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionDeferCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionDeferCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3991,7 +3987,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PurchaseSubscriptionDeferCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4030,10 +4026,10 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct EditImageUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditImageUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -4043,9 +4039,9 @@ pub struct EditImageUploadCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditImageUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditImageUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4289,7 +4285,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4299,7 +4295,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4309,7 +4305,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -4318,7 +4314,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
@@ -4329,7 +4325,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4350,7 +4346,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4367,7 +4363,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditImageUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditImageUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4411,10 +4407,10 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditExpansionfileUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditExpansionfileUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: ExpansionFile,
     _package_name: String,
     _edit_id: String,
@@ -4425,9 +4421,9 @@ pub struct EditExpansionfileUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditExpansionfileUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditExpansionfileUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditExpansionfileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4569,7 +4565,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4579,7 +4575,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4589,7 +4585,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4599,7 +4595,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The version code of the APK whose Expansion File configuration is being read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -4608,7 +4604,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -4619,7 +4615,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4640,7 +4636,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4657,7 +4653,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4695,10 +4691,10 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct EditDetailGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditDetailGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4706,9 +4702,9 @@ pub struct EditDetailGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditDetailGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditDetailGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4841,7 +4837,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4851,7 +4847,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4862,7 +4858,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4883,7 +4879,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4900,7 +4896,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditDetailGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditDetailGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4938,10 +4934,10 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -4951,9 +4947,9 @@ pub struct EditApklistingDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5077,7 +5073,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5087,7 +5083,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5097,7 +5093,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -5107,7 +5103,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -5118,7 +5114,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5139,7 +5135,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5156,7 +5152,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5194,10 +5190,10 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingDeleteallCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingDeleteallCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5205,9 +5201,9 @@ pub struct EditListingDeleteallCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingDeleteallCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingDeleteallCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5329,7 +5325,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5339,7 +5335,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5350,7 +5346,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteallCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5371,7 +5367,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteallCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5388,7 +5384,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingDeleteallCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingDeleteallCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5432,10 +5428,10 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApkAddexternallyhostedCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApkAddexternallyhostedCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: ApksAddExternallyHostedRequest,
     _package_name: String,
     _edit_id: String,
@@ -5444,9 +5440,9 @@ pub struct EditApkAddexternallyhostedCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApkAddexternallyhostedCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApkAddexternallyhostedCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5586,7 +5582,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ApksAddExternallyHostedRequest) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ApksAddExternallyHostedRequest) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5596,7 +5592,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5606,7 +5602,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5617,7 +5613,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkAddexternallyhostedCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5638,7 +5634,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkAddexternallyhostedCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkAddexternallyhostedCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5655,7 +5651,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApkAddexternallyhostedCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApkAddexternallyhostedCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5693,10 +5689,10 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingDeleteallCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingDeleteallCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -5705,9 +5701,9 @@ pub struct EditApklistingDeleteallCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingDeleteallCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingDeleteallCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5830,7 +5826,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5840,7 +5836,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5850,7 +5846,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteallCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteallCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -5861,7 +5857,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteallCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5882,7 +5878,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteallCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5899,7 +5895,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteallCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteallCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5943,10 +5939,10 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct EditDetailUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditDetailUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: AppDetails,
     _package_name: String,
     _edit_id: String,
@@ -5955,9 +5951,9 @@ pub struct EditDetailUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditDetailUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditDetailUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditDetailUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6097,7 +6093,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AppDetails) -> EditDetailUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AppDetails) -> EditDetailUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6107,7 +6103,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6117,7 +6113,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6128,7 +6124,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6149,7 +6145,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6166,7 +6162,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditDetailUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditDetailUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6204,10 +6200,10 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTrackGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTrackGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _track: String,
@@ -6216,9 +6212,9 @@ pub struct EditTrackGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTrackGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTrackGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6352,7 +6348,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6362,7 +6358,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6372,7 +6368,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The track type to read or modify.
-    pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -6383,7 +6379,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6404,7 +6400,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6421,7 +6417,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTrackGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTrackGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6465,10 +6461,10 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct EditExpansionfilePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditExpansionfilePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: ExpansionFile,
     _package_name: String,
     _edit_id: String,
@@ -6479,9 +6475,9 @@ pub struct EditExpansionfilePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditExpansionfilePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditExpansionfilePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditExpansionfilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6623,7 +6619,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ExpansionFile) -> EditExpansionfilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6633,7 +6629,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6643,7 +6639,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6653,7 +6649,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The version code of the APK whose Expansion File configuration is being read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -6662,7 +6658,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -6673,7 +6669,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfilePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6694,7 +6690,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfilePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfilePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6711,7 +6707,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfilePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfilePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6749,10 +6745,10 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct EditImageListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditImageListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -6762,9 +6758,9 @@ pub struct EditImageListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditImageListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditImageListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditImageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6899,7 +6895,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6909,7 +6905,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6919,7 +6915,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -6928,7 +6924,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
@@ -6939,7 +6935,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6960,7 +6956,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6977,7 +6973,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditImageListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditImageListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7021,10 +7017,10 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTrackUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTrackUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Track,
     _package_name: String,
     _edit_id: String,
@@ -7034,9 +7030,9 @@ pub struct EditTrackUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTrackUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTrackUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTrackUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7177,7 +7173,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Track) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Track) -> EditTrackUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7187,7 +7183,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7197,7 +7193,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7207,7 +7203,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The track type to read or modify.
-    pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -7218,7 +7214,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7239,7 +7235,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7256,7 +7252,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTrackUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTrackUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7300,10 +7296,10 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Listing,
     _package_name: String,
     _edit_id: String,
@@ -7313,9 +7309,9 @@ pub struct EditListingPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7456,7 +7452,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Listing) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Listing) -> EditListingPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7466,7 +7462,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7476,7 +7472,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7486,7 +7482,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -7497,7 +7493,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7518,7 +7514,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7535,7 +7531,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7573,10 +7569,10 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct EditGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7584,9 +7580,9 @@ pub struct EditGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7719,7 +7715,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7729,7 +7725,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7740,7 +7736,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7761,7 +7757,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7778,7 +7774,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7816,10 +7812,10 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct EditImageDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditImageDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -7830,9 +7826,9 @@ pub struct EditImageDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditImageDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditImageDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditImageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7957,7 +7953,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7967,7 +7963,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7977,7 +7973,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -7986,7 +7982,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
@@ -7996,7 +7992,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier an image within the set of images attached to this edit.
-    pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, A> {
         self._image_id = new_value.to_string();
         self
     }
@@ -8007,7 +8003,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8028,7 +8024,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8045,7 +8041,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditImageDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditImageDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8082,10 +8078,10 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct EditApkUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApkUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8093,9 +8089,9 @@ pub struct EditApkUploadCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApkUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApkUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8337,7 +8333,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8347,7 +8343,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8358,7 +8354,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8379,7 +8375,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8396,7 +8392,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApkUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApkUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8440,10 +8436,10 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: ApkListing,
     _package_name: String,
     _edit_id: String,
@@ -8454,9 +8450,9 @@ pub struct EditApklistingUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8598,7 +8594,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ApkListing) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ApkListing) -> EditApklistingUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8608,7 +8604,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8618,7 +8614,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8628,7 +8624,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingUpdateCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -8638,7 +8634,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -8649,7 +8645,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8670,7 +8666,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8687,7 +8683,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8723,10 +8719,10 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8734,9 +8730,9 @@ pub struct EditApkListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8869,7 +8865,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8879,7 +8875,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8890,7 +8886,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8911,7 +8907,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8928,7 +8924,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApkListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApkListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8972,10 +8968,10 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: ApkListing,
     _package_name: String,
     _edit_id: String,
@@ -8986,9 +8982,9 @@ pub struct EditApklistingPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9130,7 +9126,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ApkListing) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ApkListing) -> EditApklistingPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9140,7 +9136,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9150,7 +9146,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9160,7 +9156,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingPatchCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -9170,7 +9166,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -9181,7 +9177,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9202,7 +9198,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9219,7 +9215,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9257,10 +9253,10 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -9269,9 +9265,9 @@ pub struct EditListingGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9405,7 +9401,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9415,7 +9411,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9425,7 +9421,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -9436,7 +9432,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9457,7 +9453,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9474,7 +9470,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9510,10 +9506,10 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTesterGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTesterGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _track: String,
@@ -9522,9 +9518,9 @@ pub struct EditTesterGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTesterGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTesterGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTesterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9658,7 +9654,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9668,7 +9664,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9677,7 +9673,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn track(mut self, new_value: &str) -> EditTesterGetCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTesterGetCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -9688,7 +9684,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9709,7 +9705,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9726,7 +9722,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTesterGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTesterGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9764,10 +9760,10 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EditDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9775,9 +9771,9 @@ pub struct EditDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9899,7 +9895,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9909,7 +9905,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9920,7 +9916,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9941,7 +9937,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9958,7 +9954,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9997,10 +9993,10 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct EditExpansionfileUploadCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditExpansionfileUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -10010,9 +10006,9 @@ pub struct EditExpansionfileUploadCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditExpansionfileUploadCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditExpansionfileUploadCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10256,7 +10252,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10266,7 +10262,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10276,7 +10272,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The version code of the APK whose Expansion File configuration is being read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -10285,7 +10281,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -10296,7 +10292,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUploadCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileUploadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10317,7 +10313,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUploadCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10334,7 +10330,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileUploadCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileUploadCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10378,10 +10374,10 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct EditInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: AppEdit,
     _package_name: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10389,9 +10385,9 @@ pub struct EditInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10530,7 +10526,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AppEdit) -> EditInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AppEdit) -> EditInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10540,7 +10536,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10551,7 +10547,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10572,7 +10568,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10589,7 +10585,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10627,10 +10623,10 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10638,9 +10634,9 @@ pub struct EditListingListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10773,7 +10769,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10783,7 +10779,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10794,7 +10790,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10815,7 +10811,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10832,7 +10828,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10874,10 +10870,10 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTesterPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTesterPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Testers,
     _package_name: String,
     _edit_id: String,
@@ -10887,9 +10883,9 @@ pub struct EditTesterPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTesterPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTesterPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTesterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11030,7 +11026,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Testers) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Testers) -> EditTesterPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11040,7 +11036,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11050,7 +11046,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11059,7 +11055,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn track(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -11070,7 +11066,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11091,7 +11087,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11108,7 +11104,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTesterPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTesterPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11146,10 +11142,10 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditCommitCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditCommitCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11157,9 +11153,9 @@ pub struct EditCommitCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditCommitCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditCommitCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11292,7 +11288,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11302,7 +11298,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11313,7 +11309,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditCommitCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditCommitCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11334,7 +11330,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditCommitCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditCommitCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11351,7 +11347,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditCommitCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditCommitCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11389,10 +11385,10 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTrackListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTrackListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11400,9 +11396,9 @@ pub struct EditTrackListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTrackListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTrackListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTrackListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11535,7 +11531,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11545,7 +11541,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11556,7 +11552,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11577,7 +11573,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11594,7 +11590,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTrackListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTrackListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11632,10 +11628,10 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EditValidateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditValidateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11643,9 +11639,9 @@ pub struct EditValidateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditValidateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditValidateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11778,7 +11774,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11788,7 +11784,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11799,7 +11795,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditValidateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditValidateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11820,7 +11816,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditValidateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditValidateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11837,7 +11833,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditValidateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditValidateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11881,10 +11877,10 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Listing,
     _package_name: String,
     _edit_id: String,
@@ -11894,9 +11890,9 @@ pub struct EditListingUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12037,7 +12033,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Listing) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Listing) -> EditListingUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12047,7 +12043,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12057,7 +12053,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12067,7 +12063,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -12078,7 +12074,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12099,7 +12095,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12116,7 +12112,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12154,10 +12150,10 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct EditExpansionfileGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditExpansionfileGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -12167,9 +12163,9 @@ pub struct EditExpansionfileGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditExpansionfileGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditExpansionfileGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditExpansionfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12304,7 +12300,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12314,7 +12310,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12324,7 +12320,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The version code of the APK whose Expansion File configuration is being read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -12333,7 +12329,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, A> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -12344,7 +12340,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditExpansionfileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12365,7 +12361,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12382,7 +12378,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditExpansionfileGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12420,10 +12416,10 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct EditImageDeleteallCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditImageDeleteallCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -12433,9 +12429,9 @@ pub struct EditImageDeleteallCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditImageDeleteallCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditImageDeleteallCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditImageDeleteallCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12570,7 +12566,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12580,7 +12576,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12590,7 +12586,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -12599,7 +12595,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, A> {
         self._image_type = new_value.to_string();
         self
     }
@@ -12610,7 +12606,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteallCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditImageDeleteallCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12631,7 +12627,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteallCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteallCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12648,7 +12644,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditImageDeleteallCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditImageDeleteallCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12692,10 +12688,10 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct EditDetailPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditDetailPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: AppDetails,
     _package_name: String,
     _edit_id: String,
@@ -12704,9 +12700,9 @@ pub struct EditDetailPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditDetailPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditDetailPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditDetailPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12846,7 +12842,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AppDetails) -> EditDetailPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AppDetails) -> EditDetailPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12856,7 +12852,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12866,7 +12862,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12877,7 +12873,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditDetailPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12898,7 +12894,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12915,7 +12911,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditDetailPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditDetailPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12959,10 +12955,10 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTrackPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTrackPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Track,
     _package_name: String,
     _edit_id: String,
@@ -12972,9 +12968,9 @@ pub struct EditTrackPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTrackPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTrackPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTrackPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13115,7 +13111,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Track) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Track) -> EditTrackPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13125,7 +13121,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13135,7 +13131,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13145,7 +13141,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The track type to read or modify.
-    pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -13156,7 +13152,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTrackPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13177,7 +13173,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13194,7 +13190,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTrackPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTrackPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13232,10 +13228,10 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct EditListingDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditListingDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -13244,9 +13240,9 @@ pub struct EditListingDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditListingDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditListingDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13369,7 +13365,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13379,7 +13375,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13389,7 +13385,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -13400,7 +13396,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditListingDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13421,7 +13417,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13438,7 +13434,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditListingDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditListingDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13476,10 +13472,10 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -13489,9 +13485,9 @@ pub struct EditApklistingGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13626,7 +13622,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13636,7 +13632,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13646,7 +13642,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingGetCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -13656,7 +13652,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn language(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn language(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, A> {
         self._language = new_value.to_string();
         self
     }
@@ -13667,7 +13663,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13688,7 +13684,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13705,7 +13701,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13747,10 +13743,10 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct EditTesterUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditTesterUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: Testers,
     _package_name: String,
     _edit_id: String,
@@ -13760,9 +13756,9 @@ pub struct EditTesterUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditTesterUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditTesterUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13903,7 +13899,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Testers) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Testers) -> EditTesterUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13913,7 +13909,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13923,7 +13919,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13932,7 +13928,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn track(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn track(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, A> {
         self._track = new_value.to_string();
         self
     }
@@ -13943,7 +13939,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditTesterUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13964,7 +13960,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13981,7 +13977,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditTesterUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditTesterUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14019,10 +14015,10 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct EditApklistingListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EditApklistingListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -14031,9 +14027,9 @@ pub struct EditApklistingListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EditApklistingListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EditApklistingListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EditApklistingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14167,7 +14163,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14177,7 +14173,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for this edit.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingListCall<'a, C, NC, A> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingListCall<'a, C, A> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -14187,7 +14183,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The APK version code whose APK-specific listings should be read or modified.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingListCall<'a, C, NC, A> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingListCall<'a, C, A> {
         self._apk_version_code = new_value;
         self
     }
@@ -14198,7 +14194,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14219,7 +14215,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14236,7 +14232,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14278,19 +14274,19 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductBatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductBatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: InappproductsBatchRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductBatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductBatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14404,7 +14400,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14415,7 +14411,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductBatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductBatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14436,7 +14432,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14453,7 +14449,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductBatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductBatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14494,10 +14490,10 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _token: Option<String>,
     _start_index: Option<u32>,
@@ -14507,9 +14503,9 @@ pub struct InappproductListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14650,28 +14646,28 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
     /// Sets the *token* query property to the given value.
     ///
     /// 
-    pub fn token(mut self, new_value: &str) -> InappproductListCall<'a, C, NC, A> {
+    pub fn token(mut self, new_value: &str) -> InappproductListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -14682,7 +14678,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14703,7 +14699,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14720,7 +14716,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14765,10 +14761,10 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: InAppProduct,
     _package_name: String,
     _auto_convert_missing_prices: Option<bool>,
@@ -14777,9 +14773,9 @@ pub struct InappproductInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14921,7 +14917,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InAppProduct) -> InappproductInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InAppProduct) -> InappproductInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14931,7 +14927,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14939,7 +14935,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, C, NC, A> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
@@ -14950,7 +14946,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14971,7 +14967,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14988,7 +14984,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15026,10 +15022,10 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _sku: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15037,9 +15033,9 @@ pub struct InappproductDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15161,7 +15157,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -15171,7 +15167,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the in-app product.
-    pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, NC, A> {
+    pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
@@ -15182,7 +15178,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15203,7 +15199,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15220,7 +15216,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15258,10 +15254,10 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
     _sku: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15269,9 +15265,9 @@ pub struct InappproductGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15403,7 +15399,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn package_name(mut self, new_value: &str) -> InappproductGetCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductGetCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -15413,7 +15409,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the in-app product.
-    pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a, C, NC, A> {
+    pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
@@ -15424,7 +15420,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15445,7 +15441,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15462,7 +15458,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15507,10 +15503,10 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
@@ -15520,9 +15516,9 @@ pub struct InappproductUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15665,7 +15661,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InAppProduct) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InAppProduct) -> InappproductUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15675,7 +15671,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -15685,7 +15681,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the in-app product.
-    pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
@@ -15693,7 +15689,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
@@ -15704,7 +15700,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15725,7 +15721,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15742,7 +15738,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15787,10 +15783,10 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct InappproductPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct InappproductPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AndroidPublisher<C, NC, A>,
+    hub: &'a AndroidPublisher<C, A>,
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
@@ -15800,9 +15796,9 @@ pub struct InappproductPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for InappproductPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for InappproductPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15945,7 +15941,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InAppProduct) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InAppProduct) -> InappproductPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15955,7 +15951,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
-    pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a, C, A> {
         self._package_name = new_value.to_string();
         self
     }
@@ -15965,7 +15961,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Unique identifier for the in-app product.
-    pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a, C, A> {
         self._sku = new_value.to_string();
         self
     }
@@ -15973,7 +15969,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, C, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
@@ -15984,7 +15980,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16005,7 +16001,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16022,7 +16018,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InappproductPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InappproductPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

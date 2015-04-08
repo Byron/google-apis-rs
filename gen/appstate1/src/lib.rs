@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *App State* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *App State* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *App State* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/web/api/states).
@@ -196,7 +196,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -294,34 +293,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AppState<C, NC, A> {
+pub struct AppState<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for AppState<C, NC, A> {}
+impl<'a, C, A> Hub for AppState<C, A> {}
 
-impl<'a, C, NC, A> AppState<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AppState<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> AppState<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> AppState<C, A> {
         AppState {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn states(&'a self) -> StateMethods<'a, C, NC, A> {
+    pub fn states(&'a self) -> StateMethods<'a, C, A> {
         StateMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -462,15 +458,15 @@ impl ResponseResult for WriteResult {}
 /// let rb = hub.states();
 /// # }
 /// ```
-pub struct StateMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for StateMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for StateMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
+impl<'a, C, A> StateMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -479,7 +475,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, C, A> {
         StateDeleteCall {
             hub: self.hub,
             _state_key: state_key,
@@ -496,7 +492,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn get(&self, state_key: i32) -> StateGetCall<'a, C, NC, A> {
+    pub fn get(&self, state_key: i32) -> StateGetCall<'a, C, A> {
         StateGetCall {
             hub: self.hub,
             _state_key: state_key,
@@ -513,7 +509,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn clear(&self, state_key: i32) -> StateClearCall<'a, C, NC, A> {
+    pub fn clear(&self, state_key: i32) -> StateClearCall<'a, C, A> {
         StateClearCall {
             hub: self.hub,
             _state_key: state_key,
@@ -527,7 +523,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the states keys, and optionally the state data.
-    pub fn list(&self) -> StateListCall<'a, C, NC, A> {
+    pub fn list(&self) -> StateListCall<'a, C, A> {
         StateListCall {
             hub: self.hub,
             _include_data: Default::default(),
@@ -545,7 +541,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn update(&self, request: &UpdateRequest, state_key: i32) -> StateUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &UpdateRequest, state_key: i32) -> StateUpdateCall<'a, C, A> {
         StateUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -596,19 +592,19 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct StateDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
     _state_key: i32,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StateDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StateDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -729,7 +725,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The key for the data to be retrieved.
-    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, C, NC, A> {
+    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, C, A> {
         self._state_key = new_value;
         self
     }
@@ -740,7 +736,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -761,7 +757,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -778,7 +774,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StateDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StateDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -816,19 +812,19 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct StateGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
     _state_key: i32,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StateGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StateGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -960,7 +956,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The key for the data to be retrieved.
-    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, C, NC, A> {
+    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, C, A> {
         self._state_key = new_value;
         self
     }
@@ -971,7 +967,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -992,7 +988,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1009,7 +1005,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StateGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StateGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1048,10 +1044,10 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct StateClearCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateClearCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
     _state_key: i32,
     _current_data_version: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -1059,9 +1055,9 @@ pub struct StateClearCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StateClearCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StateClearCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StateClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1196,7 +1192,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The key for the data to be retrieved.
-    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, C, NC, A> {
+    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, C, A> {
         self._state_key = new_value;
         self
     }
@@ -1204,7 +1200,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The version of the data to be cleared. Version strings are returned by the server.
-    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, C, NC, A> {
+    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, C, A> {
         self._current_data_version = Some(new_value.to_string());
         self
     }
@@ -1215,7 +1211,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateClearCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1236,7 +1232,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1253,7 +1249,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StateClearCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StateClearCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1292,19 +1288,19 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct StateListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
     _include_data: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StateListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StateListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1412,7 +1408,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to include the full data in addition to the version number
-    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, C, NC, A> {
+    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, C, A> {
         self._include_data = Some(new_value);
         self
     }
@@ -1423,7 +1419,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1444,7 +1440,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1461,7 +1457,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StateListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StateListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1506,10 +1502,10 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct StateUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StateUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a AppState<C, NC, A>,
+    hub: &'a AppState<C, A>,
     _request: UpdateRequest,
     _state_key: i32,
     _current_state_version: Option<String>,
@@ -1518,9 +1514,9 @@ pub struct StateUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StateUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StateUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1662,7 +1658,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UpdateRequest) -> StateUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UpdateRequest) -> StateUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1672,7 +1668,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The key for the data to be retrieved.
-    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, C, NC, A> {
+    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, C, A> {
         self._state_key = new_value;
         self
     }
@@ -1680,7 +1676,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The version of the app state your application is attempting to update. If this does not match the current version, this method will return a conflict error. If there is no data stored on the server for this key, the update will succeed irrespective of the value of this parameter.
-    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, C, NC, A> {
+    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, C, A> {
         self._current_state_version = Some(new_value.to_string());
         self
     }
@@ -1691,7 +1687,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StateUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1712,7 +1708,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1729,7 +1725,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StateUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StateUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

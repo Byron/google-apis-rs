@@ -4,12 +4,12 @@
 [package]
 
 name = "google-translate2"
-version = "0.1.4+20141123"
+version = "0.1.5+20141123"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2"
 homepage = "https://developers.google.com/translate/v2/using_rest"
-documentation = "http://byron.github.io/google-apis-rs/google-translate2"
+documentation = "http://byron.github.io/google-apis-rs/google_translate2"
 license = "MIT"
 keywords = ["translate", "google", "protocol", "web", "api"]
 

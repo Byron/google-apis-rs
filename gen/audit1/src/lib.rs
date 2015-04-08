@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *audit* crate version *0.1.4+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *audit* crate version *0.1.5+20130108*, where *20130108* is the exact revision of the *audit:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *audit* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/admin-audit/get_started).
@@ -197,7 +197,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -275,34 +274,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Audit<C, NC, A> {
+pub struct Audit<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Audit<C, NC, A> {}
+impl<'a, C, A> Hub for Audit<C, A> {}
 
-impl<'a, C, NC, A> Audit<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Audit<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Audit<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Audit<C, A> {
         Audit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a, C, NC, A> {
+    pub fn activities(&'a self) -> ActivityMethods<'a, C, A> {
         ActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -476,15 +472,15 @@ impl Part for ActivityEvents {}
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Audit<C, NC, A>,
+    hub: &'a Audit<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ActivityMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
+impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -494,7 +490,7 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     ///
     /// * `customerId` - Represents the customer who is the owner of target object on which action was performed.
     /// * `applicationId` - Application ID of the application on which the event was performed.
-    pub fn list(&self, customer_id: &str, application_id: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn list(&self, customer_id: &str, application_id: &str) -> ActivityListCall<'a, C, A> {
         ActivityListCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -561,10 +557,10 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ActivityListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Audit<C, NC, A>,
+    hub: &'a Audit<C, A>,
     _customer_id: String,
     _application_id: String,
     _start_time: Option<String>,
@@ -580,9 +576,9 @@ pub struct ActivityListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ActivityListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -740,7 +736,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Represents the customer who is the owner of target object on which action was performed.
-    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -750,7 +746,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Application ID of the application on which the event was performed.
-    pub fn application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -758,7 +754,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Return events which occured at or after this time.
-    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
@@ -766,7 +762,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Number of activity records to be shown in each page.
-    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -774,7 +770,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Name of the event being queried.
-    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
@@ -782,7 +778,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Return events which occured at or before this time.
-    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -790,7 +786,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Next page URL.
-    pub fn continuation_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn continuation_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._continuation_token = Some(new_value.to_string());
         self
     }
@@ -798,7 +794,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Type of the caller.
-    pub fn caller(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn caller(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._caller = Some(new_value.to_string());
         self
     }
@@ -806,7 +802,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
-    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
     }
@@ -814,7 +810,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Email address of the user who performed the action.
-    pub fn actor_email(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn actor_email(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_email = Some(new_value.to_string());
         self
     }
@@ -822,7 +818,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Application ID of the application which interacted on behalf of the user while performing the event.
-    pub fn actor_application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
+    pub fn actor_application_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._actor_application_id = Some(new_value.to_string());
         self
     }
@@ -833,7 +829,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -854,7 +850,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

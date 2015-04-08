@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.4+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *books* crate version *0.1.5+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -223,7 +223,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -326,58 +325,55 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Books<C, NC, A> {
+pub struct Books<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Books<C, NC, A> {}
+impl<'a, C, A> Hub for Books<C, A> {}
 
-impl<'a, C, NC, A> Books<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Books<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Books<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Books<C, A> {
         Books {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn bookshelves(&'a self) -> BookshelveMethods<'a, C, NC, A> {
+    pub fn bookshelves(&'a self) -> BookshelveMethods<'a, C, A> {
         BookshelveMethods { hub: &self }
     }
-    pub fn cloudloading(&'a self) -> CloudloadingMethods<'a, C, NC, A> {
+    pub fn cloudloading(&'a self) -> CloudloadingMethods<'a, C, A> {
         CloudloadingMethods { hub: &self }
     }
-    pub fn dictionary(&'a self) -> DictionaryMethods<'a, C, NC, A> {
+    pub fn dictionary(&'a self) -> DictionaryMethods<'a, C, A> {
         DictionaryMethods { hub: &self }
     }
-    pub fn layers(&'a self) -> LayerMethods<'a, C, NC, A> {
+    pub fn layers(&'a self) -> LayerMethods<'a, C, A> {
         LayerMethods { hub: &self }
     }
-    pub fn myconfig(&'a self) -> MyconfigMethods<'a, C, NC, A> {
+    pub fn myconfig(&'a self) -> MyconfigMethods<'a, C, A> {
         MyconfigMethods { hub: &self }
     }
-    pub fn mylibrary(&'a self) -> MylibraryMethods<'a, C, NC, A> {
+    pub fn mylibrary(&'a self) -> MylibraryMethods<'a, C, A> {
         MylibraryMethods { hub: &self }
     }
-    pub fn onboarding(&'a self) -> OnboardingMethods<'a, C, NC, A> {
+    pub fn onboarding(&'a self) -> OnboardingMethods<'a, C, A> {
         OnboardingMethods { hub: &self }
     }
-    pub fn promooffer(&'a self) -> PromoofferMethods<'a, C, NC, A> {
+    pub fn promooffer(&'a self) -> PromoofferMethods<'a, C, A> {
         PromoofferMethods { hub: &self }
     }
-    pub fn volumes(&'a self) -> VolumeMethods<'a, C, NC, A> {
+    pub fn volumes(&'a self) -> VolumeMethods<'a, C, A> {
         VolumeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2060,15 +2056,15 @@ impl Part for VolumeSaleInfoOffersRentalDuration {}
 /// let rb = hub.layers();
 /// # }
 /// ```
-pub struct LayerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LayerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LayerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
+impl<'a, C, A> LayerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2080,7 +2076,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `annotationDataId` - The ID of the annotation data to retrieve.
     /// * `contentVersion` - The content version for the volume you are trying to retrieve.
-    pub fn annotation_data_get(&self, volume_id: &str, layer_id: &str, annotation_data_id: &str, content_version: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn annotation_data_get(&self, volume_id: &str, layer_id: &str, annotation_data_id: &str, content_version: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         LayerAnnotationDataGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2108,7 +2104,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// * `volumeId` - The volume to retrieve annotations for.
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `annotationId` - The ID of the volume annotation to retrieve.
-    pub fn volume_annotations_get(&self, volume_id: &str, layer_id: &str, annotation_id: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn volume_annotations_get(&self, volume_id: &str, layer_id: &str, annotation_id: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         LayerVolumeAnnotationGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2129,7 +2125,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `volumeId` - The volume to retrieve layers for.
-    pub fn list(&self, volume_id: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn list(&self, volume_id: &str) -> LayerListCall<'a, C, A> {
         LayerListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2151,7 +2147,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     ///
     /// * `volumeId` - The volume to retrieve layers for.
     /// * `summaryId` - The ID for the layer to get the summary for.
-    pub fn get(&self, volume_id: &str, summary_id: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn get(&self, volume_id: &str, summary_id: &str) -> LayerGetCall<'a, C, A> {
         LayerGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2173,7 +2169,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// * `volumeId` - The volume to retrieve annotations for.
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `contentVersion` - The content version for the requested volume.
-    pub fn volume_annotations_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn volume_annotations_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         LayerVolumeAnnotationListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2206,7 +2202,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// * `volumeId` - The volume to retrieve annotation data for.
     /// * `layerId` - The ID for the layer to get the annotation data.
     /// * `contentVersion` - The content version for the requested volume.
-    pub fn annotation_data_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn annotation_data_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         LayerAnnotationDataListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2259,15 +2255,15 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
 /// let rb = hub.volumes();
 /// # }
 /// ```
-pub struct VolumeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for VolumeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for VolumeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
+impl<'a, C, A> VolumeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2277,7 +2273,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     ///
     /// * `rating` - Rating to be given to the volume.
     /// * `volumeId` - ID of the source volume.
-    pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         VolumeRecommendedRateCall {
             hub: self.hub,
             _rating: rating.to_string(),
@@ -2293,7 +2289,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of books in My Library.
-    pub fn mybooks_list(&self) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn mybooks_list(&self) -> VolumeMybookListCall<'a, C, A> {
         VolumeMybookListCall {
             hub: self.hub,
             _start_index: Default::default(),
@@ -2315,7 +2311,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `q` - Full-text search query string.
-    pub fn list(&self, q: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn list(&self, q: &str) -> VolumeListCall<'a, C, A> {
         VolumeListCall {
             hub: self.hub,
             _q: q.to_string(),
@@ -2340,7 +2336,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of books uploaded by the current user.
-    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, C, A> {
         VolumeUseruploadedListCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -2362,7 +2358,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of the source volume.
-    pub fn associated_list(&self, volume_id: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn associated_list(&self, volume_id: &str) -> VolumeAssociatedListCall<'a, C, A> {
         VolumeAssociatedListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2382,7 +2378,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of volume to retrieve.
-    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, C, A> {
         VolumeGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -2400,7 +2396,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of recommended books for the current user.
-    pub fn recommended_list(&self) -> VolumeRecommendedListCall<'a, C, NC, A> {
+    pub fn recommended_list(&self) -> VolumeRecommendedListCall<'a, C, A> {
         VolumeRecommendedListCall {
             hub: self.hub,
             _source: Default::default(),
@@ -2442,15 +2438,15 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
 /// let rb = hub.dictionary();
 /// # }
 /// ```
-pub struct DictionaryMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DictionaryMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DictionaryMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DictionaryMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DictionaryMethods<'a, C, NC, A> {
+impl<'a, C, A> DictionaryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2459,7 +2455,7 @@ impl<'a, C, NC, A> DictionaryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `cpksver` - The device/version ID from which to request the data.
-    pub fn list_offline_metadata(&self, cpksver: &str) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> {
+    pub fn list_offline_metadata(&self, cpksver: &str) -> DictionaryListOfflineMetadataCall<'a, C, A> {
         DictionaryListOfflineMetadataCall {
             hub: self.hub,
             _cpksver: cpksver.to_string(),
@@ -2500,15 +2496,15 @@ impl<'a, C, NC, A> DictionaryMethods<'a, C, NC, A> {
 /// let rb = hub.bookshelves();
 /// # }
 /// ```
-pub struct BookshelveMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BookshelveMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BookshelveMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BookshelveMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
+impl<'a, C, A> BookshelveMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2518,7 +2514,7 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelf volumes.
     /// * `shelf` - ID of bookshelf to retrieve volumes.
-    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a, C, A> {
         BookshelveVolumeListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2540,7 +2536,7 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
-    pub fn list(&self, user_id: &str) -> BookshelveListCall<'a, C, NC, A> {
+    pub fn list(&self, user_id: &str) -> BookshelveListCall<'a, C, A> {
         BookshelveListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2559,7 +2555,7 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a, C, NC, A> {
+    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a, C, A> {
         BookshelveGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2602,20 +2598,20 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
 /// let rb = hub.promooffer();
 /// # }
 /// ```
-pub struct PromoofferMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PromoofferMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PromoofferMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PromoofferMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
+impl<'a, C, A> PromoofferMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// 
-    pub fn accept(&self) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn accept(&self) -> PromoofferAcceptCall<'a, C, A> {
         PromoofferAcceptCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -2635,7 +2631,7 @@ impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// 
-    pub fn dismiss(&self) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn dismiss(&self) -> PromoofferDismisCall<'a, C, A> {
         PromoofferDismisCall {
             hub: self.hub,
             _serial: Default::default(),
@@ -2654,7 +2650,7 @@ impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of promo offers available to the user
-    pub fn get(&self) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn get(&self) -> PromoofferGetCall<'a, C, A> {
         PromoofferGetCall {
             hub: self.hub,
             _serial: Default::default(),
@@ -2700,20 +2696,20 @@ impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
 /// let rb = hub.onboarding();
 /// # }
 /// ```
-pub struct OnboardingMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OnboardingMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for OnboardingMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for OnboardingMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> OnboardingMethods<'a, C, NC, A> {
+impl<'a, C, A> OnboardingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List categories for onboarding experience.
-    pub fn list_categories(&self) -> OnboardingListCategoryCall<'a, C, NC, A> {
+    pub fn list_categories(&self) -> OnboardingListCategoryCall<'a, C, A> {
         OnboardingListCategoryCall {
             hub: self.hub,
             _locale: Default::default(),
@@ -2726,7 +2722,7 @@ impl<'a, C, NC, A> OnboardingMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// List available volumes under categories for onboarding experience.
-    pub fn list_category_volumes(&self) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn list_category_volumes(&self) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         OnboardingListCategoryVolumeCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -2770,15 +2766,15 @@ impl<'a, C, NC, A> OnboardingMethods<'a, C, NC, A> {
 /// let rb = hub.myconfig();
 /// # }
 /// ```
-pub struct MyconfigMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MyconfigMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MyconfigMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
+impl<'a, C, A> MyconfigMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2790,7 +2786,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     /// * `volumeId` - The volume to request concurrent/download restrictions for.
     /// * `nonce` - The client nonce value.
     /// * `cpksver` - The device/version ID from which to request the restrictions.
-    pub fn request_access(&self, source: &str, volume_id: &str, nonce: &str, cpksver: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn request_access(&self, source: &str, volume_id: &str, nonce: &str, cpksver: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         MyconfigRequestAccesCall {
             hub: self.hub,
             _source: source.to_string(),
@@ -2813,7 +2809,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     ///
     /// * `volumeIds` - The volume(s) to release restrictions for.
     /// * `cpksver` - The device/version ID from which to release the restriction.
-    pub fn release_download_access(&self, volume_ids: &Vec<String>, cpksver: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn release_download_access(&self, volume_ids: &Vec<String>, cpksver: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         MyconfigReleaseDownloadAccesCall {
             hub: self.hub,
             _volume_ids: volume_ids.clone(),
@@ -2835,7 +2831,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     /// * `source` - String to identify the originator of this request.
     /// * `nonce` - The client nonce value.
     /// * `cpksver` - The device/version ID from which to release the restriction.
-    pub fn sync_volume_licenses(&self, source: &str, nonce: &str, cpksver: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn sync_volume_licenses(&self, source: &str, nonce: &str, cpksver: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         MyconfigSyncVolumeLicenseCall {
             hub: self.hub,
             _source: source.to_string(),
@@ -2854,7 +2850,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the current settings for the user.
-    pub fn get_user_settings(&self) -> MyconfigGetUserSettingCall<'a, C, NC, A> {
+    pub fn get_user_settings(&self) -> MyconfigGetUserSettingCall<'a, C, A> {
         MyconfigGetUserSettingCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2870,7 +2866,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_user_settings(&self, request: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, NC, A> {
+    pub fn update_user_settings(&self, request: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, A> {
         MyconfigUpdateUserSettingCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2911,15 +2907,15 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
 /// let rb = hub.mylibrary();
 /// # }
 /// ```
-pub struct MylibraryMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MylibraryMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MylibraryMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
+impl<'a, C, A> MylibraryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2928,7 +2924,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
-    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
+    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         MylibraryBookshelveClearVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -2948,7 +2944,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// * `shelf` - ID of bookshelf with the volume.
     /// * `volumeId` - ID of volume to move.
     /// * `volumePosition` - Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
-    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         MylibraryBookshelveMoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -2968,7 +2964,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `shelf` - The bookshelf ID or name retrieve volumes for.
-    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         MylibraryBookshelveVolumeListCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -2993,7 +2989,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     ///
     /// * `layerIds` - Array of layer IDs to get the summary for.
     /// * `volumeId` - Volume id to get the summary for.
-    pub fn annotations_summary(&self, layer_ids: &Vec<String>, volume_id: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
+    pub fn annotations_summary(&self, layer_ids: &Vec<String>, volume_id: &str) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         MylibraryAnnotationSummaryCall {
             hub: self.hub,
             _layer_ids: layer_ids.clone(),
@@ -3011,7 +3007,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `annotationId` - The ID for the annotation to delete.
-    pub fn annotations_delete(&self, annotation_id: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
+    pub fn annotations_delete(&self, annotation_id: &str) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         MylibraryAnnotationDeleteCall {
             hub: self.hub,
             _annotation_id: annotation_id.to_string(),
@@ -3030,7 +3026,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     ///
     /// * `shelf` - ID of bookshelf to which to add a volume.
     /// * `volumeId` - ID of volume to add.
-    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         MylibraryBookshelveAddVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3050,7 +3046,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotations_insert(&self, request: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn annotations_insert(&self, request: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, A> {
         MylibraryAnnotationInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3071,7 +3067,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
     /// * `volumeId` - ID of volume to remove.
-    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         MylibraryBookshelveRemoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3087,7 +3083,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of annotations, possibly filtered.
-    pub fn annotations_list(&self) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn annotations_list(&self) -> MylibraryAnnotationListCall<'a, C, A> {
         MylibraryAnnotationListCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -3114,7 +3110,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `annotationId` - The ID for the annotation to update.
-    pub fn annotations_update(&self, request: &Annotation, annotation_id: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
+    pub fn annotations_update(&self, request: &Annotation, annotation_id: &str) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         MylibraryAnnotationUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3135,7 +3131,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// * `volumeId` - ID of volume for which to update the reading position.
     /// * `timestamp` - RFC 3339 UTC format timestamp associated with this reading position.
     /// * `position` - Position string for the new volume reading position.
-    pub fn readingpositions_set_position(&self, volume_id: &str, timestamp: &str, position: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn readingpositions_set_position(&self, volume_id: &str, timestamp: &str, position: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         MylibraryReadingpositionSetPositionCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3158,7 +3154,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
+    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a, C, A> {
         MylibraryBookshelveGetCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3172,7 +3168,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of bookshelves belonging to the authenticated user.
-    pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a, C, NC, A> {
+    pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a, C, A> {
         MylibraryBookshelveListCall {
             hub: self.hub,
             _source: Default::default(),
@@ -3189,7 +3185,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of volume for which to retrieve a reading position.
-    pub fn readingpositions_get(&self, volume_id: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
+    pub fn readingpositions_get(&self, volume_id: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         MylibraryReadingpositionGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3232,20 +3228,20 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
 /// let rb = hub.cloudloading();
 /// # }
 /// ```
-pub struct CloudloadingMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CloudloadingMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CloudloadingMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CloudloadingMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
+impl<'a, C, A> CloudloadingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// 
-    pub fn add_book(&self) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn add_book(&self) -> CloudloadingAddBookCall<'a, C, A> {
         CloudloadingAddBookCall {
             hub: self.hub,
             _upload_client_token: Default::default(),
@@ -3265,7 +3261,7 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_book(&self, request: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, NC, A> {
+    pub fn update_book(&self, request: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, A> {
         CloudloadingUpdateBookCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3282,7 +3278,7 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `volumeId` - The id of the book to be removed.
-    pub fn delete_book(&self, volume_id: &str) -> CloudloadingDeleteBookCall<'a, C, NC, A> {
+    pub fn delete_book(&self, volume_id: &str) -> CloudloadingDeleteBookCall<'a, C, A> {
         CloudloadingDeleteBookCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3337,10 +3333,10 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerAnnotationDataGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerAnnotationDataGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _layer_id: String,
     _annotation_data_id: String,
@@ -3356,9 +3352,9 @@ pub struct LayerAnnotationDataGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerAnnotationDataGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerAnnotationDataGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3511,7 +3507,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve annotations for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -3521,7 +3517,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID for the layer to get the annotations.
-    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -3531,7 +3527,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the annotation data to retrieve.
-    pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._annotation_data_id = new_value.to_string();
         self
     }
@@ -3541,7 +3537,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The content version for the volume you are trying to retrieve.
-    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
@@ -3549,7 +3545,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The requested pixel width for any images. If width is provided height must also be provided.
-    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._w = Some(new_value);
         self
     }
@@ -3557,7 +3553,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -3565,7 +3561,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The requested scale for the image.
-    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._scale = Some(new_value);
         self
     }
@@ -3573,7 +3569,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
-    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -3581,7 +3577,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The requested pixel height for any images. If height is provided width must also be provided.
-    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._h = Some(new_value);
         self
     }
@@ -3589,7 +3585,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// For the dictionary layer. Whether or not to allow web definitions.
-    pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._allow_web_definitions = Some(new_value);
         self
     }
@@ -3600,7 +3596,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3621,7 +3617,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3638,7 +3634,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerAnnotationDataGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerAnnotationDataGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3678,10 +3674,10 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerVolumeAnnotationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerVolumeAnnotationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _layer_id: String,
     _annotation_id: String,
@@ -3692,9 +3688,9 @@ pub struct LayerVolumeAnnotationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerVolumeAnnotationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerVolumeAnnotationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3834,7 +3830,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve annotations for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -3844,7 +3840,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID for the layer to get the annotations.
-    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -3854,7 +3850,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the volume annotation to retrieve.
-    pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -3862,7 +3858,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -3870,7 +3866,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
-    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -3881,7 +3877,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3902,7 +3898,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3919,7 +3915,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerVolumeAnnotationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3961,10 +3957,10 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _source: Option<String>,
     _page_token: Option<String>,
@@ -3975,9 +3971,9 @@ pub struct LayerListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4121,7 +4117,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve layers for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -4129,7 +4125,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -4137,7 +4133,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The value of the nextToken from the previous page.
-    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4145,7 +4141,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4153,7 +4149,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The content version for the requested volume.
-    pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -4164,7 +4160,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4185,7 +4181,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4202,7 +4198,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4242,10 +4238,10 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _summary_id: String,
     _source: Option<String>,
@@ -4255,9 +4251,9 @@ pub struct LayerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4396,7 +4392,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve layers for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -4406,7 +4402,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID for the layer to get the summary for.
-    pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._summary_id = new_value.to_string();
         self
     }
@@ -4414,7 +4410,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -4422,7 +4418,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The content version for the requested volume.
-    pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -4433,7 +4429,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4454,7 +4450,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4471,7 +4467,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4521,10 +4517,10 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerVolumeAnnotationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerVolumeAnnotationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _layer_id: String,
     _content_version: String,
@@ -4545,9 +4541,9 @@ pub struct LayerVolumeAnnotationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerVolumeAnnotationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerVolumeAnnotationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4717,7 +4713,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve annotations for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -4727,7 +4723,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The ID for the layer to get the annotations.
-    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -4737,7 +4733,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The content version for the requested volume.
-    pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
@@ -4745,7 +4741,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The version of the volume annotations that you are requesting.
-    pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._volume_annotations_version = Some(new_value.to_string());
         self
     }
@@ -4753,7 +4749,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
-    pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -4761,7 +4757,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
-    pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
@@ -4769,7 +4765,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The start position to start retrieving data from.
-    pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._start_position = Some(new_value.to_string());
         self
     }
@@ -4777,7 +4773,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The start offset to start retrieving data from.
-    pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._start_offset = Some(new_value.to_string());
         self
     }
@@ -4785,7 +4781,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -4793,7 +4789,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
-    pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -4801,7 +4797,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The value of the nextToken from the previous page.
-    pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4809,7 +4805,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4817,7 +4813,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
-    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -4825,7 +4821,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The end position to end retrieving data from.
-    pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._end_position = Some(new_value.to_string());
         self
     }
@@ -4833,7 +4829,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The end offset to end retrieving data from.
-    pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._end_offset = Some(new_value.to_string());
         self
     }
@@ -4844,7 +4840,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerVolumeAnnotationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4865,7 +4861,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4882,7 +4878,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerVolumeAnnotationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerVolumeAnnotationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4930,10 +4926,10 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct LayerAnnotationDataListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LayerAnnotationDataListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _layer_id: String,
     _content_version: String,
@@ -4952,9 +4948,9 @@ pub struct LayerAnnotationDataListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LayerAnnotationDataListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LayerAnnotationDataListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5122,7 +5118,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The volume to retrieve annotation data for.
-    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -5132,7 +5128,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The ID for the layer to get the annotation data.
-    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -5142,7 +5138,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The content version for the requested volume.
-    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._content_version = new_value.to_string();
         self
     }
@@ -5150,7 +5146,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The requested pixel width for any images. If width is provided height must also be provided.
-    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._w = Some(new_value);
         self
     }
@@ -5158,7 +5154,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
-    pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -5166,7 +5162,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
-    pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
@@ -5174,7 +5170,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -5182,7 +5178,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The requested scale for the image.
-    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._scale = Some(new_value);
         self
     }
@@ -5190,7 +5186,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The value of the nextToken from the previous page.
-    pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5198,7 +5194,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5206,7 +5202,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
-    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -5214,7 +5210,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The requested pixel height for any images. If height is provided width must also be provided.
-    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, A> {
         self._h = Some(new_value);
         self
     }
@@ -5223,7 +5219,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The list of Annotation Data Ids to retrieve. Pagination is ignored if this is set.
-    pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, A> {
         self._annotation_data_id.push(new_value.to_string());
         self
     }
@@ -5234,7 +5230,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LayerAnnotationDataListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5255,7 +5251,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5272,7 +5268,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LayerAnnotationDataListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LayerAnnotationDataListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5312,10 +5308,10 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeRecommendedRateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeRecommendedRateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _rating: String,
     _volume_id: String,
     _source: Option<String>,
@@ -5325,9 +5321,9 @@ pub struct VolumeRecommendedRateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeRecommendedRateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeRecommendedRateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5442,7 +5438,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// Rating to be given to the volume.
-    pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._rating = new_value.to_string();
         self
     }
@@ -5452,7 +5448,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// ID of the source volume.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -5460,7 +5456,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -5468,7 +5464,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
-    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -5479,7 +5475,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedRateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedRateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5500,7 +5496,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedRateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedRateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5517,7 +5513,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeRecommendedRateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeRecommendedRateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5561,10 +5557,10 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeMybookListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeMybookListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _start_index: Option<u32>,
     _source: Option<String>,
     _processing_state: Vec<String>,
@@ -5576,9 +5572,9 @@ pub struct VolumeMybookListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeMybookListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeMybookListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5709,7 +5705,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Index of the first result to return (starts at 0)
-    pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -5717,7 +5713,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -5726,7 +5722,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The processing state of the user uploaded volumes to be returned. Applicable only if the UPLOADED is specified in the acquireMethod.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._processing_state.push(new_value.to_string());
         self
     }
@@ -5734,7 +5730,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Maximum number of results to return.
-    pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5742,7 +5738,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex:'en_US'. Used for generating recommendations.
-    pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -5751,7 +5747,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// How the book was aquired
-    pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, A> {
         self._acquire_method.push(new_value.to_string());
         self
     }
@@ -5762,7 +5758,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeMybookListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeMybookListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5783,7 +5779,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeMybookListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeMybookListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5800,7 +5796,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeMybookListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeMybookListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5850,10 +5846,10 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _q: String,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -5872,9 +5868,9 @@ pub struct VolumeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6018,7 +6014,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Full-text search query string.
-    pub fn q(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._q = new_value.to_string();
         self
     }
@@ -6026,7 +6022,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Index of the first result to return (starts at 0)
-    pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -6034,7 +6030,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -6042,7 +6038,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Set to true to show books available for preorder. Defaults to false.
-    pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a, C, NC, A> {
+    pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
@@ -6050,7 +6046,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict information returned to a set of selected fields.
-    pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -6058,7 +6054,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict to books or magazines.
-    pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._print_type = Some(new_value.to_string());
         self
     }
@@ -6066,7 +6062,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict and brand results for partner ID.
-    pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._partner = Some(new_value.to_string());
         self
     }
@@ -6074,7 +6070,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Sort search results.
-    pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -6082,7 +6078,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of results to return.
-    pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6090,7 +6086,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict search to this user's library.
-    pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._library_restrict = Some(new_value.to_string());
         self
     }
@@ -6098,7 +6094,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict results to books with this language code.
-    pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._lang_restrict = Some(new_value.to_string());
         self
     }
@@ -6106,7 +6102,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Filter search results.
-    pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6114,7 +6110,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Restrict to volumes by download availability.
-    pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
+    pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, C, A> {
         self._download = Some(new_value.to_string());
         self
     }
@@ -6125,7 +6121,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6146,7 +6142,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6163,7 +6159,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6207,10 +6203,10 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeUseruploadedListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeUseruploadedListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: Vec<String>,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -6222,9 +6218,9 @@ pub struct VolumeUseruploadedListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeUseruploadedListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeUseruploadedListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6356,7 +6352,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
-    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._volume_id.push(new_value.to_string());
         self
     }
@@ -6364,7 +6360,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// Index of the first result to return (starts at 0)
-    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -6372,7 +6368,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -6381,7 +6377,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// The processing state of the user uploaded volumes to be returned.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._processing_state.push(new_value.to_string());
         self
     }
@@ -6389,7 +6385,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// Maximum number of results to return.
-    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6397,7 +6393,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
-    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -6408,7 +6404,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeUseruploadedListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeUseruploadedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6429,7 +6425,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6446,7 +6442,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6487,10 +6483,10 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeAssociatedListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeAssociatedListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _source: Option<String>,
     _locale: Option<String>,
@@ -6500,9 +6496,9 @@ pub struct VolumeAssociatedListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeAssociatedListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeAssociatedListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6643,7 +6639,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// ID of the source volume.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -6651,7 +6647,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -6659,7 +6655,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
-    pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -6667,7 +6663,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Association type.
-    pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
         self._association = Some(new_value.to_string());
         self
     }
@@ -6678,7 +6674,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeAssociatedListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeAssociatedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6699,7 +6695,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeAssociatedListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeAssociatedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6716,7 +6712,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeAssociatedListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeAssociatedListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6759,10 +6755,10 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _user_library_consistent_read: Option<bool>,
     _source: Option<String>,
@@ -6774,9 +6770,9 @@ pub struct VolumeGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6923,14 +6919,14 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// ID of volume to retrieve.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
     /// Sets the *user_library_consistent_read* query property to the given value.
     ///
     /// 
-    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
         self._user_library_consistent_read = Some(new_value);
         self
     }
@@ -6938,7 +6934,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -6946,7 +6942,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Restrict information returned to a set of selected fields.
-    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -6954,7 +6950,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Brand results for partner ID.
-    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._partner = Some(new_value.to_string());
         self
     }
@@ -6962,7 +6958,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// ISO-3166-1 code to override the IP-based location.
-    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -6973,7 +6969,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6994,7 +6990,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7011,7 +7007,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7051,10 +7047,10 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeRecommendedListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct VolumeRecommendedListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _source: Option<String>,
     _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -7062,9 +7058,9 @@ pub struct VolumeRecommendedListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VolumeRecommendedListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for VolumeRecommendedListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7175,7 +7171,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -7183,7 +7179,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
-    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -7194,7 +7190,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeRecommendedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7215,7 +7211,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7232,7 +7228,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VolumeRecommendedListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VolumeRecommendedListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7270,19 +7266,19 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct DictionaryListOfflineMetadataCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DictionaryListOfflineMetadataCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _cpksver: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DictionaryListOfflineMetadataCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DictionaryListOfflineMetadataCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7390,7 +7386,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The device/version ID from which to request the data.
-    pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> {
+    pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -7401,7 +7397,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DictionaryListOfflineMetadataCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7422,7 +7418,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DictionaryListOfflineMetadataCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DictionaryListOfflineMetadataCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7439,7 +7435,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DictionaryListOfflineMetadataCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7481,10 +7477,10 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct BookshelveVolumeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BookshelveVolumeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _user_id: String,
     _shelf: String,
     _start_index: Option<u32>,
@@ -7496,9 +7492,9 @@ pub struct BookshelveVolumeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BookshelveVolumeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BookshelveVolumeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7643,7 +7639,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// ID of user for whom to retrieve bookshelf volumes.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7653,7 +7649,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf to retrieve volumes.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -7661,7 +7657,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Index of the first element to return (starts at 0)
-    pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -7669,7 +7665,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -7677,7 +7673,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Set to true to show pre-ordered books. Defaults to false.
-    pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
@@ -7685,7 +7681,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7696,7 +7692,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveVolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7717,7 +7713,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7734,7 +7730,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BookshelveVolumeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BookshelveVolumeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7773,10 +7769,10 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct BookshelveListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BookshelveListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _user_id: String,
     _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -7784,9 +7780,9 @@ pub struct BookshelveListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BookshelveListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BookshelveListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7921,7 +7917,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// ID of user for whom to retrieve bookshelves.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7929,7 +7925,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -7940,7 +7936,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7961,7 +7957,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7978,7 +7974,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BookshelveListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BookshelveListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8017,10 +8013,10 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct BookshelveGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BookshelveGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _user_id: String,
     _shelf: String,
     _source: Option<String>,
@@ -8029,9 +8025,9 @@ pub struct BookshelveGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BookshelveGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BookshelveGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8167,7 +8163,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ID of user for whom to retrieve bookshelves.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8177,7 +8173,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf to retrieve.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -8185,7 +8181,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -8196,7 +8192,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BookshelveGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8217,7 +8213,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8234,7 +8230,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BookshelveGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BookshelveGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8280,10 +8276,10 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PromoofferAcceptCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PromoofferAcceptCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: Option<String>,
     _serial: Option<String>,
     _product: Option<String>,
@@ -8297,9 +8293,9 @@ pub struct PromoofferAcceptCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PromoofferAcceptCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PromoofferAcceptCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8417,7 +8413,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Volume id to exercise the offer
-    pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._volume_id = Some(new_value.to_string());
         self
     }
@@ -8425,7 +8421,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device serial
-    pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
@@ -8433,14 +8429,14 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device product
-    pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
     /// Sets the *offer id* query property to the given value.
     ///
     /// 
-    pub fn offer_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn offer_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._offer_id = Some(new_value.to_string());
         self
     }
@@ -8448,7 +8444,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device model
-    pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
@@ -8456,7 +8452,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device manufacturer
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
@@ -8464,7 +8460,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device device
-    pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
@@ -8472,7 +8468,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device android_id
-    pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -8483,7 +8479,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferAcceptCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferAcceptCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8504,7 +8500,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferAcceptCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferAcceptCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8521,7 +8517,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PromoofferAcceptCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PromoofferAcceptCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8566,10 +8562,10 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct PromoofferDismisCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PromoofferDismisCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _serial: Option<String>,
     _product: Option<String>,
     _offer_id: Option<String>,
@@ -8582,9 +8578,9 @@ pub struct PromoofferDismisCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PromoofferDismisCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PromoofferDismisCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8699,7 +8695,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device serial
-    pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
@@ -8707,7 +8703,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device product
-    pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
@@ -8715,7 +8711,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Offer to dimiss
-    pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._offer_id = Some(new_value.to_string());
         self
     }
@@ -8723,7 +8719,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device model
-    pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
@@ -8731,7 +8727,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device manufacturer
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
@@ -8739,7 +8735,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device device
-    pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
@@ -8747,7 +8743,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// device android_id
-    pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -8758,7 +8754,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferDismisCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferDismisCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8779,7 +8775,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferDismisCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferDismisCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8796,7 +8792,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PromoofferDismisCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PromoofferDismisCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8840,10 +8836,10 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct PromoofferGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PromoofferGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _serial: Option<String>,
     _product: Option<String>,
     _model: Option<String>,
@@ -8855,9 +8851,9 @@ pub struct PromoofferGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PromoofferGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PromoofferGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8980,7 +8976,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device serial
-    pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._serial = Some(new_value.to_string());
         self
     }
@@ -8988,7 +8984,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device product
-    pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._product = Some(new_value.to_string());
         self
     }
@@ -8996,7 +8992,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device model
-    pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._model = Some(new_value.to_string());
         self
     }
@@ -9004,7 +9000,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device manufacturer
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
@@ -9012,7 +9008,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device device
-    pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._device = Some(new_value.to_string());
         self
     }
@@ -9020,7 +9016,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// device android_id
-    pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a, C, A> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -9031,7 +9027,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PromoofferGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9052,7 +9048,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9069,7 +9065,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PromoofferGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PromoofferGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9108,19 +9104,19 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct OnboardingListCategoryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OnboardingListCategoryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OnboardingListCategoryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OnboardingListCategoryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9228,7 +9224,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
-    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9239,7 +9235,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9260,7 +9256,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9277,7 +9273,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OnboardingListCategoryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OnboardingListCategoryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9319,10 +9315,10 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct OnboardingListCategoryVolumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OnboardingListCategoryVolumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _page_token: Option<String>,
     _page_size: Option<u32>,
     _locale: Option<String>,
@@ -9332,9 +9328,9 @@ pub struct OnboardingListCategoryVolumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OnboardingListCategoryVolumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OnboardingListCategoryVolumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9455,7 +9451,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The value of the nextToken from the previous page.
-    pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9463,7 +9459,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// Number of maximum results per page to be included in the response.
-    pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
@@ -9471,7 +9467,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
-    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9480,7 +9476,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// List of category ids requested.
-    pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._category_id.push(new_value.to_string());
         self
     }
@@ -9491,7 +9487,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OnboardingListCategoryVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9512,7 +9508,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryVolumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryVolumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9529,7 +9525,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OnboardingListCategoryVolumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9569,10 +9565,10 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct MyconfigRequestAccesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigRequestAccesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _source: String,
     _volume_id: String,
     _nonce: String,
@@ -9584,9 +9580,9 @@ pub struct MyconfigRequestAccesCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MyconfigRequestAccesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MyconfigRequestAccesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9703,7 +9699,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._source = new_value.to_string();
         self
     }
@@ -9713,7 +9709,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The volume to request concurrent/download restrictions for.
-    pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -9723,7 +9719,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The client nonce value.
-    pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._nonce = new_value.to_string();
         self
     }
@@ -9733,7 +9729,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The device/version ID from which to request the restrictions.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -9741,7 +9737,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
-    pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9749,7 +9745,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The type of access license to request. If not specified, the default is BOTH.
-    pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, A> {
         self._license_types = Some(new_value.to_string());
         self
     }
@@ -9760,7 +9756,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigRequestAccesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigRequestAccesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9781,7 +9777,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigRequestAccesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigRequestAccesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9798,7 +9794,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MyconfigRequestAccesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MyconfigRequestAccesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9838,10 +9834,10 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct MyconfigReleaseDownloadAccesCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigReleaseDownloadAccesCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_ids: Vec<String>,
     _cpksver: String,
     _source: Option<String>,
@@ -9851,9 +9847,9 @@ pub struct MyconfigReleaseDownloadAccesCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MyconfigReleaseDownloadAccesCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9975,7 +9971,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The volume(s) to release restrictions for.
-    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._volume_ids.push(new_value.to_string());
         self
     }
@@ -9985,7 +9981,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The device/version ID from which to release the restriction.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -9993,7 +9989,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -10001,7 +9997,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
-    pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -10012,7 +10008,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigReleaseDownloadAccesCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10033,7 +10029,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigReleaseDownloadAccesCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10050,7 +10046,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MyconfigReleaseDownloadAccesCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10092,10 +10088,10 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct MyconfigSyncVolumeLicenseCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigSyncVolumeLicenseCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _source: String,
     _nonce: String,
     _cpksver: String,
@@ -10108,9 +10104,9 @@ pub struct MyconfigSyncVolumeLicenseCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MyconfigSyncVolumeLicenseCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10240,7 +10236,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._source = new_value.to_string();
         self
     }
@@ -10250,7 +10246,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The client nonce value.
-    pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._nonce = new_value.to_string();
         self
     }
@@ -10260,7 +10256,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The device/version ID from which to release the restriction.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -10269,7 +10265,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The volume(s) to request download restrictions for.
-    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._volume_ids.push(new_value.to_string());
         self
     }
@@ -10277,7 +10273,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Set to true to show pre-ordered books. Defaults to false.
-    pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
@@ -10285,7 +10281,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
-    pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -10294,7 +10290,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// List of features supported by the client, i.e., 'RENTALS'
-    pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._features.push(new_value.to_string());
         self
     }
@@ -10305,7 +10301,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigSyncVolumeLicenseCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10326,7 +10322,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigSyncVolumeLicenseCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10343,7 +10339,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MyconfigSyncVolumeLicenseCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10381,18 +10377,18 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct MyconfigGetUserSettingCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigGetUserSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MyconfigGetUserSettingCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MyconfigGetUserSettingCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10500,7 +10496,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigGetUserSettingCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigGetUserSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10521,7 +10517,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigGetUserSettingCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigGetUserSettingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10538,7 +10534,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MyconfigGetUserSettingCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MyconfigGetUserSettingCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10582,19 +10578,19 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct MyconfigUpdateUserSettingCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MyconfigUpdateUserSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _request: Usersettings,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MyconfigUpdateUserSettingCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MyconfigUpdateUserSettingCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10708,7 +10704,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10719,7 +10715,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigUpdateUserSettingCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MyconfigUpdateUserSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10740,7 +10736,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigUpdateUserSettingCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigUpdateUserSettingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10757,7 +10753,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MyconfigUpdateUserSettingCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MyconfigUpdateUserSettingCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10796,10 +10792,10 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveClearVolumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveClearVolumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -10807,9 +10803,9 @@ pub struct MylibraryBookshelveClearVolumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveClearVolumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10933,7 +10929,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf from which to remove a volume.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -10941,7 +10937,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -10952,7 +10948,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveClearVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10973,7 +10969,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10990,7 +10986,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveClearVolumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11029,10 +11025,10 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveMoveVolumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveMoveVolumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _volume_id: String,
     _volume_position: i32,
@@ -11042,9 +11038,9 @@ pub struct MylibraryBookshelveMoveVolumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveMoveVolumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11170,7 +11166,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf with the volume.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -11180,7 +11176,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// ID of volume to move.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -11190,7 +11186,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
-    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._volume_position = new_value;
         self
     }
@@ -11198,7 +11194,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -11209,7 +11205,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11230,7 +11226,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11247,7 +11243,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveMoveVolumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11292,10 +11288,10 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveVolumeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveVolumeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -11309,9 +11305,9 @@ pub struct MylibraryBookshelveVolumeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveVolumeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveVolumeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11464,7 +11460,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The bookshelf ID or name retrieve volumes for.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -11472,7 +11468,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// Index of the first element to return (starts at 0)
-    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -11480,7 +11476,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -11488,7 +11484,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// Set to true to show pre-ordered books. Defaults to false.
-    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._show_preorders = Some(new_value);
         self
     }
@@ -11496,7 +11492,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// Full-text search query string in this bookshelf.
-    pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -11504,7 +11500,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// Restrict information returned to a set of selected fields.
-    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -11512,7 +11508,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11520,7 +11516,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// ISO-3166-1 code to override the IP-based location.
-    pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -11531,7 +11527,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveVolumeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11552,7 +11548,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11569,7 +11565,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveVolumeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11607,10 +11603,10 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryAnnotationSummaryCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryAnnotationSummaryCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _layer_ids: Vec<String>,
     _volume_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11618,9 +11614,9 @@ pub struct MylibraryAnnotationSummaryCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryAnnotationSummaryCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryAnnotationSummaryCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11736,7 +11732,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Array of layer IDs to get the summary for.
-    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
+    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._layer_ids.push(new_value.to_string());
         self
     }
@@ -11746,7 +11742,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// Volume id to get the summary for.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -11757,7 +11753,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationSummaryCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11778,7 +11774,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationSummaryCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationSummaryCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11795,7 +11791,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationSummaryCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11834,10 +11830,10 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryAnnotationDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryAnnotationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _annotation_id: String,
     _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -11845,9 +11841,9 @@ pub struct MylibraryAnnotationDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryAnnotationDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryAnnotationDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11971,7 +11967,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The ID for the annotation to delete.
-    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -11979,7 +11975,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -11990,7 +11986,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12011,7 +12007,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12028,7 +12024,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12068,10 +12064,10 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveAddVolumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveAddVolumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _volume_id: String,
     _source: Option<String>,
@@ -12081,9 +12077,9 @@ pub struct MylibraryBookshelveAddVolumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveAddVolumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12211,7 +12207,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf to which to add a volume.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -12221,7 +12217,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// ID of volume to add.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -12229,7 +12225,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -12237,7 +12233,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     ///
     /// 
     /// The reason for which the book is added to the library.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._reason = Some(new_value.to_string());
         self
     }
@@ -12248,7 +12244,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveAddVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12269,7 +12265,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12286,7 +12282,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveAddVolumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12333,10 +12329,10 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryAnnotationInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryAnnotationInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _request: Annotation,
     _source: Option<String>,
     _show_only_summary_in_response: Option<bool>,
@@ -12346,9 +12342,9 @@ pub struct MylibraryAnnotationInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryAnnotationInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryAnnotationInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12471,7 +12467,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12479,7 +12475,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -12487,7 +12483,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Requests that only the summary of the specified layer be provided in the response.
-    pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._show_only_summary_in_response = Some(new_value);
         self
     }
@@ -12495,7 +12491,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// ISO-3166-1 code to override the IP-based location.
-    pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -12506,7 +12502,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12527,7 +12523,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12544,7 +12540,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12584,10 +12580,10 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveRemoveVolumeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _volume_id: String,
     _source: Option<String>,
@@ -12597,9 +12593,9 @@ pub struct MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveRemoveVolumeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12727,7 +12723,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf from which to remove a volume.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -12737,7 +12733,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// ID of volume to remove.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -12745,7 +12741,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -12753,7 +12749,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     ///
     /// 
     /// The reason for which the book is removed from the library.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._reason = Some(new_value.to_string());
         self
     }
@@ -12764,7 +12760,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12785,7 +12781,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12802,7 +12798,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12850,10 +12846,10 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryAnnotationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryAnnotationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: Option<String>,
     _updated_min: Option<String>,
     _updated_max: Option<String>,
@@ -12869,9 +12865,9 @@ pub struct MylibraryAnnotationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryAnnotationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryAnnotationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13010,7 +13006,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The volume to restrict annotations to.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._volume_id = Some(new_value.to_string());
         self
     }
@@ -13018,7 +13014,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
-    pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -13026,7 +13022,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
-    pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._updated_max = Some(new_value.to_string());
         self
     }
@@ -13034,7 +13030,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13042,7 +13038,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
-    pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -13050,7 +13046,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The value of the nextToken from the previous page.
-    pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13058,7 +13054,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Maximum number of results to return
-    pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -13067,7 +13063,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The layer ID(s) to limit annotation by.
-    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._layer_ids.push(new_value.to_string());
         self
     }
@@ -13075,7 +13071,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The layer ID to limit annotation by.
-    pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._layer_id = Some(new_value.to_string());
         self
     }
@@ -13083,7 +13079,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The content version for the requested volume.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -13094,7 +13090,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13115,7 +13111,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13132,7 +13128,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13177,10 +13173,10 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryAnnotationUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryAnnotationUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _request: Annotation,
     _annotation_id: String,
     _source: Option<String>,
@@ -13189,9 +13185,9 @@ pub struct MylibraryAnnotationUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryAnnotationUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryAnnotationUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13333,7 +13329,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Annotation) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13343,7 +13339,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The ID for the annotation to update.
-    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._annotation_id = new_value.to_string();
         self
     }
@@ -13351,7 +13347,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13362,7 +13358,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryAnnotationUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13383,7 +13379,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13400,7 +13396,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryAnnotationUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13442,10 +13438,10 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryReadingpositionSetPositionCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryReadingpositionSetPositionCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _timestamp: String,
     _position: String,
@@ -13458,9 +13454,9 @@ pub struct MylibraryReadingpositionSetPositionCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryReadingpositionSetPositionCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13595,7 +13591,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// ID of volume for which to update the reading position.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -13605,7 +13601,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// RFC 3339 UTC format timestamp associated with this reading position.
-    pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._timestamp = new_value.to_string();
         self
     }
@@ -13615,7 +13611,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// we provide this method for API completeness.
     /// 
     /// Position string for the new volume reading position.
-    pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._position = new_value.to_string();
         self
     }
@@ -13623,7 +13619,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13631,7 +13627,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     ///
     /// 
     /// Random persistent device cookie optional on set position.
-    pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._device_cookie = Some(new_value.to_string());
         self
     }
@@ -13639,7 +13635,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     ///
     /// 
     /// Volume content version for which this reading position applies.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -13647,7 +13643,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     ///
     /// 
     /// Action that caused this reading position to be set.
-    pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._action = Some(new_value.to_string());
         self
     }
@@ -13658,7 +13654,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionSetPositionCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13679,7 +13675,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionSetPositionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13696,7 +13692,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryReadingpositionSetPositionCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13735,10 +13731,10 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _shelf: String,
     _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -13746,9 +13742,9 @@ pub struct MylibraryBookshelveGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13883,7 +13879,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// ID of bookshelf to retrieve.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._shelf = new_value.to_string();
         self
     }
@@ -13891,7 +13887,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13902,7 +13898,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13923,7 +13919,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13940,7 +13936,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13979,19 +13975,19 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryBookshelveListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryBookshelveListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryBookshelveListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryBookshelveListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14099,7 +14095,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -14110,7 +14106,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryBookshelveListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14131,7 +14127,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14148,7 +14144,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryBookshelveListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14188,10 +14184,10 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct MylibraryReadingpositionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MylibraryReadingpositionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _source: Option<String>,
     _content_version: Option<String>,
@@ -14200,9 +14196,9 @@ pub struct MylibraryReadingpositionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for MylibraryReadingpositionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MylibraryReadingpositionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14340,7 +14336,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// ID of volume for which to retrieve a reading position.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -14348,7 +14344,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// String to identify the originator of this request.
-    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -14356,7 +14352,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// Volume content version for which this reading position is requested.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -14367,7 +14363,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MylibraryReadingpositionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14388,7 +14384,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14405,7 +14401,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> MylibraryReadingpositionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> MylibraryReadingpositionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14447,10 +14443,10 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct CloudloadingAddBookCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CloudloadingAddBookCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _upload_client_token: Option<String>,
     _name: Option<String>,
     _mime_type: Option<String>,
@@ -14460,9 +14456,9 @@ pub struct CloudloadingAddBookCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CloudloadingAddBookCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CloudloadingAddBookCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14578,7 +14574,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *upload_client_token* query property to the given value.
     ///
     /// 
-    pub fn upload_client_token(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn upload_client_token(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._upload_client_token = Some(new_value.to_string());
         self
     }
@@ -14586,7 +14582,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The document name. It can be set only if the drive_document_id is set.
-    pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -14594,7 +14590,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The document MIME type. It can be set only if the drive_document_id is set.
-    pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._mime_type = Some(new_value.to_string());
         self
     }
@@ -14602,7 +14598,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// A drive document id. The upload_client_token must not be set.
-    pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, A> {
         self._drive_document_id = Some(new_value.to_string());
         self
     }
@@ -14613,7 +14609,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingAddBookCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingAddBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14634,7 +14630,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingAddBookCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingAddBookCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14651,7 +14647,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingAddBookCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingAddBookCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14695,19 +14691,19 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct CloudloadingUpdateBookCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CloudloadingUpdateBookCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _request: BooksCloudloadingResource,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CloudloadingUpdateBookCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CloudloadingUpdateBookCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14821,7 +14817,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14832,7 +14828,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingUpdateBookCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingUpdateBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14853,7 +14849,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingUpdateBookCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingUpdateBookCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14870,7 +14866,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingUpdateBookCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingUpdateBookCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14908,19 +14904,19 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct CloudloadingDeleteBookCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CloudloadingDeleteBookCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Books<C, NC, A>,
+    hub: &'a Books<C, A>,
     _volume_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CloudloadingDeleteBookCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CloudloadingDeleteBookCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15017,7 +15013,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The id of the book to be removed.
-    pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a, C, NC, A> {
+    pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a, C, A> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -15028,7 +15024,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingDeleteBookCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CloudloadingDeleteBookCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15049,7 +15045,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingDeleteBookCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingDeleteBookCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15066,7 +15062,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

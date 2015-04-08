@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gan* crate version *0.1.4+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *gan* crate version *0.1.5+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *gan* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/affiliate-network/).
@@ -213,7 +213,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -295,49 +294,46 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Gan<C, NC, A> {
+pub struct Gan<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Gan<C, NC, A> {}
+impl<'a, C, A> Hub for Gan<C, A> {}
 
-impl<'a, C, NC, A> Gan<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Gan<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Gan<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Gan<C, A> {
         Gan {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn advertisers(&'a self) -> AdvertiserMethods<'a, C, NC, A> {
+    pub fn advertisers(&'a self) -> AdvertiserMethods<'a, C, A> {
         AdvertiserMethods { hub: &self }
     }
-    pub fn cc_offers(&'a self) -> CcOfferMethods<'a, C, NC, A> {
+    pub fn cc_offers(&'a self) -> CcOfferMethods<'a, C, A> {
         CcOfferMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C, NC, A> {
+    pub fn events(&'a self) -> EventMethods<'a, C, A> {
         EventMethods { hub: &self }
     }
-    pub fn links(&'a self) -> LinkMethods<'a, C, NC, A> {
+    pub fn links(&'a self) -> LinkMethods<'a, C, A> {
         LinkMethods { hub: &self }
     }
-    pub fn publishers(&'a self) -> PublisherMethods<'a, C, NC, A> {
+    pub fn publishers(&'a self) -> PublisherMethods<'a, C, A> {
         PublisherMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a, C, NC, A> {
+    pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1145,15 +1141,15 @@ impl Resource for CcOffer {}
 /// let rb = hub.publishers();
 /// # }
 /// ```
-pub struct PublisherMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PublisherMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PublisherMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PublisherMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PublisherMethods<'a, C, NC, A> {
+impl<'a, C, A> PublisherMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1163,7 +1159,7 @@ impl<'a, C, NC, A> PublisherMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn list(&self, role: &str, role_id: &str) -> PublisherListCall<'a, C, A> {
         PublisherListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1188,7 +1184,7 @@ impl<'a, C, NC, A> PublisherMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> PublisherGetCall<'a, C, NC, A> {
+    pub fn get(&self, role: &str, role_id: &str) -> PublisherGetCall<'a, C, A> {
         PublisherGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1230,15 +1226,15 @@ impl<'a, C, NC, A> PublisherMethods<'a, C, NC, A> {
 /// let rb = hub.links();
 /// # }
 /// ```
-pub struct LinkMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LinkMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LinkMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LinkMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LinkMethods<'a, C, NC, A> {
+impl<'a, C, A> LinkMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1249,7 +1245,7 @@ impl<'a, C, NC, A> LinkMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn insert(&self, request: &Link, role: &str, role_id: &str) -> LinkInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Link, role: &str, role_id: &str) -> LinkInsertCall<'a, C, A> {
         LinkInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1269,7 +1265,7 @@ impl<'a, C, NC, A> LinkMethods<'a, C, NC, A> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `linkId` - The ID of the link to look up.
-    pub fn get(&self, role: &str, role_id: &str, link_id: &str) -> LinkGetCall<'a, C, NC, A> {
+    pub fn get(&self, role: &str, role_id: &str, link_id: &str) -> LinkGetCall<'a, C, A> {
         LinkGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1288,7 +1284,7 @@ impl<'a, C, NC, A> LinkMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn list(&self, role: &str, role_id: &str) -> LinkListCall<'a, C, A> {
         LinkListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1342,15 +1338,15 @@ impl<'a, C, NC, A> LinkMethods<'a, C, NC, A> {
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
+impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1361,7 +1357,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `reportType` - The type of report being requested. Valid values: 'order_delta'. Required.
-    pub fn get(&self, role: &str, role_id: &str, report_type: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn get(&self, role: &str, role_id: &str, report_type: &str) -> ReportGetCall<'a, C, A> {
         ReportGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1414,15 +1410,15 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 /// let rb = hub.cc_offers();
 /// # }
 /// ```
-pub struct CcOfferMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CcOfferMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CcOfferMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CcOfferMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CcOfferMethods<'a, C, NC, A> {
+impl<'a, C, A> CcOfferMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1431,7 +1427,7 @@ impl<'a, C, NC, A> CcOfferMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `publisher` - The ID of the publisher in question.
-    pub fn list(&self, publisher: &str) -> CcOfferListCall<'a, C, NC, A> {
+    pub fn list(&self, publisher: &str) -> CcOfferListCall<'a, C, A> {
         CcOfferListCall {
             hub: self.hub,
             _publisher: publisher.to_string(),
@@ -1473,15 +1469,15 @@ impl<'a, C, NC, A> CcOfferMethods<'a, C, NC, A> {
 /// let rb = hub.advertisers();
 /// # }
 /// ```
-pub struct AdvertiserMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdvertiserMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AdvertiserMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AdvertiserMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AdvertiserMethods<'a, C, NC, A> {
+impl<'a, C, A> AdvertiserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1491,7 +1487,7 @@ impl<'a, C, NC, A> AdvertiserMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> AdvertiserGetCall<'a, C, NC, A> {
+    pub fn get(&self, role: &str, role_id: &str) -> AdvertiserGetCall<'a, C, A> {
         AdvertiserGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1510,7 +1506,7 @@ impl<'a, C, NC, A> AdvertiserMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn list(&self, role: &str, role_id: &str) -> AdvertiserListCall<'a, C, A> {
         AdvertiserListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1558,15 +1554,15 @@ impl<'a, C, NC, A> AdvertiserMethods<'a, C, NC, A> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for EventMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
+impl<'a, C, A> EventMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1576,7 +1572,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn list(&self, role: &str, role_id: &str) -> EventListCall<'a, C, A> {
         EventListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1648,10 +1644,10 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct PublisherListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PublisherListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _relationship_status: Option<String>,
@@ -1665,9 +1661,9 @@ pub struct PublisherListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PublisherListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PublisherListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PublisherListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1819,7 +1815,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -1829,7 +1825,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -1837,7 +1833,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Filters out all publishers for which do not have the given relationship status with the requesting publisher.
-    pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
@@ -1845,7 +1841,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Caret(^) delimted list of publisher categories. Valid categories: (unclassified|community_and_content|shopping_and_promotion|loyalty_and_rewards|network|search_specialist|comparison_shopping|email). Filters out all publishers not in one of the given advertiser categories. Optional.
-    pub fn publisher_category(mut self, new_value: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn publisher_category(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._publisher_category = Some(new_value.to_string());
         self
     }
@@ -1853,7 +1849,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
-    pub fn page_token(mut self, new_value: &str) -> PublisherListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PublisherListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1861,7 +1857,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Filters out all publishers that have a seven day EPC average lower than the given value (inclusive). Min value 0.0. Optional.
-    pub fn min_seven_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, NC, A> {
+    pub fn min_seven_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, A> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
@@ -1869,7 +1865,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// A value between 1 and 4, where 1 represents the quartile of publishers with the lowest ranks and 4 represents the quartile of publishers with the highest ranks. Filters out all publishers with a lower rank than the given quartile. For example if a 2 was given only publishers with a payout rank of 25 or higher would be included. Optional.
-    pub fn min_payout_rank(mut self, new_value: i32) -> PublisherListCall<'a, C, NC, A> {
+    pub fn min_payout_rank(mut self, new_value: i32) -> PublisherListCall<'a, C, A> {
         self._min_payout_rank = Some(new_value);
         self
     }
@@ -1877,7 +1873,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Filters out all publishers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
-    pub fn min_ninety_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, NC, A> {
+    pub fn min_ninety_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, C, A> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
@@ -1885,7 +1881,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
-    pub fn max_results(mut self, new_value: u32) -> PublisherListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PublisherListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1896,7 +1892,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1917,7 +1913,7 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PublisherListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PublisherListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1957,10 +1953,10 @@ impl<'a, C, NC, A> PublisherListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PublisherGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PublisherGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _publisher_id: Option<String>,
@@ -1968,9 +1964,9 @@ pub struct PublisherGetCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for PublisherGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PublisherGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PublisherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2104,7 +2100,7 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -2114,7 +2110,7 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -2122,7 +2118,7 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The ID of the publisher to look up. Optional.
-    pub fn publisher_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, NC, A> {
+    pub fn publisher_id(mut self, new_value: &str) -> PublisherGetCall<'a, C, A> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
@@ -2133,7 +2129,7 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PublisherGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2154,7 +2150,7 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PublisherGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PublisherGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2199,10 +2195,10 @@ impl<'a, C, NC, A> PublisherGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct LinkInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LinkInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _request: Link,
     _role: String,
     _role_id: String,
@@ -2210,9 +2206,9 @@ pub struct LinkInsertCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LinkInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LinkInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2350,7 +2346,7 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Link) -> LinkInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Link) -> LinkInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2360,7 +2356,7 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -2370,7 +2366,7 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> LinkInsertCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> LinkInsertCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -2381,7 +2377,7 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2402,7 +2398,7 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2441,10 +2437,10 @@ impl<'a, C, NC, A> LinkInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct LinkGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LinkGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _link_id: String,
@@ -2452,9 +2448,9 @@ pub struct LinkGetCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LinkGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LinkGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2586,7 +2582,7 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> LinkGetCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -2596,7 +2592,7 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> LinkGetCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -2606,7 +2602,7 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID of the link to look up.
-    pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a, C, A> {
         self._link_id = new_value.to_string();
         self
     }
@@ -2617,7 +2613,7 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2638,7 +2634,7 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2690,10 +2686,10 @@ impl<'a, C, NC, A> LinkGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct LinkListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LinkListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _start_date_min: Option<String>,
@@ -2713,9 +2709,9 @@ pub struct LinkListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LinkListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LinkListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2897,7 +2893,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -2907,7 +2903,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -2915,7 +2911,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The beginning of the start date range.
-    pub fn start_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn start_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._start_date_min = Some(new_value.to_string());
         self
     }
@@ -2923,7 +2919,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The end of the start date range.
-    pub fn start_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn start_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._start_date_max = Some(new_value.to_string());
         self
     }
@@ -2931,7 +2927,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Field for full text search across title and merchandising text, supports link id search.
-    pub fn search_text(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn search_text(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._search_text = Some(new_value.to_string());
         self
     }
@@ -2939,7 +2935,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The status of the relationship.
-    pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
@@ -2948,7 +2944,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The promotion type.
-    pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._promotion_type.push(new_value.to_string());
         self
     }
@@ -2956,7 +2952,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
-    pub fn page_token(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2964,7 +2960,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
-    pub fn max_results(mut self, new_value: u32) -> LinkListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LinkListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2972,7 +2968,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The type of the link.
-    pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._link_type = Some(new_value.to_string());
         self
     }
@@ -2980,7 +2976,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The beginning of the create date range.
-    pub fn create_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn create_date_min(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._create_date_min = Some(new_value.to_string());
         self
     }
@@ -2988,7 +2984,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The end of the create date range.
-    pub fn create_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn create_date_max(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._create_date_max = Some(new_value.to_string());
         self
     }
@@ -2996,7 +2992,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The role of the author of the link.
-    pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._authorship = Some(new_value.to_string());
         self
     }
@@ -3005,7 +3001,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The size of the given asset.
-    pub fn add_asset_size(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn add_asset_size(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._asset_size.push(new_value.to_string());
         self
     }
@@ -3014,7 +3010,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Limits the resulting links to the ones belonging to the listed advertisers.
-    pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a, C, NC, A> {
+    pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a, C, A> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
@@ -3025,7 +3021,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LinkListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3046,7 +3042,7 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3096,10 +3092,10 @@ impl<'a, C, NC, A> LinkListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _report_type: String,
@@ -3118,9 +3114,9 @@ pub struct ReportGetCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3301,7 +3297,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -3311,7 +3307,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -3321,7 +3317,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The type of report being requested. Valid values: 'order_delta'. Required.
-    pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._report_type = new_value.to_string();
         self
     }
@@ -3329,7 +3325,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled', or 'invalid'. Optional.
-    pub fn status(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn status(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._status = Some(new_value.to_string());
         self
     }
@@ -3337,7 +3333,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Offset on which to return results when paging. Optional.
-    pub fn start_index(mut self, new_value: u32) -> ReportGetCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> ReportGetCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -3345,7 +3341,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The start date (inclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day before endDate, if that is given, or yesterday. Optional.
-    pub fn start_date(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -3354,7 +3350,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The IDs of the publishers to look up, if applicable.
-    pub fn add_publisher_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn add_publisher_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._publisher_id.push(new_value.to_string());
         self
     }
@@ -3363,7 +3359,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters to capture one of the given order IDs. Optional.
-    pub fn add_order_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn add_order_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._order_id.push(new_value.to_string());
         self
     }
@@ -3371,7 +3367,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Max number of items to return in this page. Optional. Defaults to return all results.
-    pub fn max_results(mut self, new_value: u32) -> ReportGetCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3380,7 +3376,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters to capture one of given link IDs. Optional.
-    pub fn add_link_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn add_link_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._link_id.push(new_value.to_string());
         self
     }
@@ -3388,7 +3384,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', or 'charge'. Optional.
-    pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._event_type = Some(new_value.to_string());
         self
     }
@@ -3396,7 +3392,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The end date (exclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day after startDate, if that is given, or today. Optional.
-    pub fn end_date(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -3404,7 +3400,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether or not to calculate totals rows. Optional.
-    pub fn calculate_totals(mut self, new_value: bool) -> ReportGetCall<'a, C, NC, A> {
+    pub fn calculate_totals(mut self, new_value: bool) -> ReportGetCall<'a, C, A> {
         self._calculate_totals = Some(new_value);
         self
     }
@@ -3413,7 +3409,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The IDs of the advertisers to look up, if applicable.
-    pub fn add_advertiser_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn add_advertiser_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
@@ -3424,7 +3420,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3445,7 +3441,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3486,10 +3482,10 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct CcOfferListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CcOfferListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _publisher: String,
     _projection: Option<String>,
     _advertiser: Vec<String>,
@@ -3497,9 +3493,9 @@ pub struct CcOfferListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for CcOfferListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CcOfferListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CcOfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3639,7 +3635,7 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the publisher in question.
-    pub fn publisher(mut self, new_value: &str) -> CcOfferListCall<'a, C, NC, A> {
+    pub fn publisher(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._publisher = new_value.to_string();
         self
     }
@@ -3647,7 +3643,7 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The set of fields to return.
-    pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -3656,7 +3652,7 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The advertiser ID of a card issuer whose offers to include. Optional, may be repeated.
-    pub fn add_advertiser(mut self, new_value: &str) -> CcOfferListCall<'a, C, NC, A> {
+    pub fn add_advertiser(mut self, new_value: &str) -> CcOfferListCall<'a, C, A> {
         self._advertiser.push(new_value.to_string());
         self
     }
@@ -3667,7 +3663,7 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CcOfferListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CcOfferListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3688,7 +3684,7 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CcOfferListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CcOfferListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3728,10 +3724,10 @@ impl<'a, C, NC, A> CcOfferListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct AdvertiserGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdvertiserGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _advertiser_id: Option<String>,
@@ -3739,9 +3735,9 @@ pub struct AdvertiserGetCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for AdvertiserGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdvertiserGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3875,7 +3871,7 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -3885,7 +3881,7 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -3893,7 +3889,7 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The ID of the advertiser to look up. Optional.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, NC, A> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -3904,7 +3900,7 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3925,7 +3921,7 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3971,10 +3967,10 @@ impl<'a, C, NC, A> AdvertiserGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct AdvertiserListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AdvertiserListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _relationship_status: Option<String>,
@@ -3988,9 +3984,9 @@ pub struct AdvertiserListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for AdvertiserListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AdvertiserListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4142,7 +4138,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -4152,7 +4148,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -4160,7 +4156,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Filters out all advertisers for which do not have the given relationship status with the requesting publisher.
-    pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
@@ -4168,7 +4164,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4176,7 +4172,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Filters out all advertisers that have a seven day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
-    pub fn min_seven_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn min_seven_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, A> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
@@ -4184,7 +4180,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// A value between 1 and 4, where 1 represents the quartile of advertisers with the lowest ranks and 4 represents the quartile of advertisers with the highest ranks. Filters out all advertisers with a lower rank than the given quartile. For example if a 2 was given only advertisers with a payout rank of 25 or higher would be included. Optional.
-    pub fn min_payout_rank(mut self, new_value: i32) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn min_payout_rank(mut self, new_value: i32) -> AdvertiserListCall<'a, C, A> {
         self._min_payout_rank = Some(new_value);
         self
     }
@@ -4192,7 +4188,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Filters out all advertisers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
-    pub fn min_ninety_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn min_ninety_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, C, A> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
@@ -4200,7 +4196,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Max number of items to return in this page. Optional. Defaults to 20.
-    pub fn max_results(mut self, new_value: u32) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> AdvertiserListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4208,7 +4204,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Caret(^) delimted list of advertiser categories. Valid categories are defined here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581. Filters out all advertisers not in one of the given advertiser categories. Optional.
-    pub fn advertiser_category(mut self, new_value: &str) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn advertiser_category(mut self, new_value: &str) -> AdvertiserListCall<'a, C, A> {
         self._advertiser_category = Some(new_value.to_string());
         self
     }
@@ -4219,7 +4215,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AdvertiserListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4240,7 +4236,7 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4295,10 +4291,10 @@ impl<'a, C, NC, A> AdvertiserListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct EventListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gan<C, NC, A>,
+    hub: &'a Gan<C, A>,
     _role: String,
     _role_id: String,
     _type_: Option<String>,
@@ -4321,9 +4317,9 @@ pub struct EventListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for EventListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4502,7 +4498,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The role of the requester. Valid values: 'advertisers' or 'publishers'.
-    pub fn role(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn role(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._role = new_value.to_string();
         self
     }
@@ -4512,7 +4508,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the requesting advertiser or publisher.
-    pub fn role_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn role_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._role_id = new_value.to_string();
         self
     }
@@ -4520,7 +4516,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', 'charge'. Optional.
-    pub fn type_(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn type_(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
@@ -4528,7 +4524,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled'. Optional.
-    pub fn status(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn status(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._status = Some(new_value.to_string());
         self
     }
@@ -4536,7 +4532,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of SKUs. Filters out all events that do not reference one of the given SKU. Optional.
-    pub fn sku(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn sku(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._sku = Some(new_value.to_string());
         self
     }
@@ -4544,7 +4540,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of publisher IDs. Filters out all events that do not reference one of the given publishers IDs. Only used when under advertiser role. Optional.
-    pub fn publisher_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn publisher_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
@@ -4552,7 +4548,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of product categories. Filters out all events that do not reference a product in one of the given product categories. Optional.
-    pub fn product_category(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn product_category(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._product_category = Some(new_value.to_string());
         self
     }
@@ -4560,7 +4556,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The value of 'nextPageToken' from the previous page. Optional.
-    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4568,7 +4564,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of order IDs. Filters out all events that do not reference one of the given order IDs. Optional.
-    pub fn order_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn order_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._order_id = Some(new_value.to_string());
         self
     }
@@ -4576,7 +4572,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events modified earlier than given date. Optional. Defaults to 24 hours before the current modifyDateMax, if modifyDateMax is explicitly set.
-    pub fn modify_date_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn modify_date_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._modify_date_min = Some(new_value.to_string());
         self
     }
@@ -4584,7 +4580,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events modified later than given date. Optional. Defaults to 24 hours after modifyDateMin, if modifyDateMin is explicitly set.
-    pub fn modify_date_max(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn modify_date_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._modify_date_max = Some(new_value.to_string());
         self
     }
@@ -4592,7 +4588,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of member IDs. Filters out all events that do not reference one of the given member IDs. Optional.
-    pub fn member_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn member_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._member_id = Some(new_value.to_string());
         self
     }
@@ -4600,7 +4596,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Max number of offers to return in this page. Optional. Defaults to 20.
-    pub fn max_results(mut self, new_value: u32) -> EventListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> EventListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4608,7 +4604,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of link IDs. Filters out all events that do not reference one of the given link IDs. Optional.
-    pub fn link_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn link_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._link_id = Some(new_value.to_string());
         self
     }
@@ -4616,7 +4612,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events earlier than given date. Optional. Defaults to 24 hours from current date/time.
-    pub fn event_date_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn event_date_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._event_date_min = Some(new_value.to_string());
         self
     }
@@ -4624,7 +4620,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all events later than given date. Optional. Defaults to 24 hours after eventMin.
-    pub fn event_date_max(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn event_date_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._event_date_max = Some(new_value.to_string());
         self
     }
@@ -4632,7 +4628,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Filters out all charge events that are not of the given charge type. Valid values: 'other', 'slotting_fee', 'monthly_minimum', 'tier_bonus', 'credit', 'debit'. Optional.
-    pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._charge_type = Some(new_value.to_string());
         self
     }
@@ -4640,7 +4636,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Caret(^) delimited list of advertiser IDs. Filters out all events that do not reference one of the given advertiser IDs. Only used when under publishers role. Optional.
-    pub fn advertiser_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
+    pub fn advertiser_id(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -4651,7 +4647,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4672,7 +4668,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

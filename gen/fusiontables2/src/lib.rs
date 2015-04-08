@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fusiontables* crate version *0.1.4+20150226*, where *20150226* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *fusiontables* crate version *0.1.5+20150226*, where *20150226* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *fusiontables* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/fusiontables).
@@ -217,7 +217,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -315,49 +314,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Fusiontables<C, NC, A> {
+pub struct Fusiontables<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Fusiontables<C, NC, A> {}
+impl<'a, C, A> Hub for Fusiontables<C, A> {}
 
-impl<'a, C, NC, A> Fusiontables<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Fusiontables<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Fusiontables<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Fusiontables<C, A> {
         Fusiontables {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn column(&'a self) -> ColumnMethods<'a, C, NC, A> {
+    pub fn column(&'a self) -> ColumnMethods<'a, C, A> {
         ColumnMethods { hub: &self }
     }
-    pub fn query(&'a self) -> QueryMethods<'a, C, NC, A> {
+    pub fn query(&'a self) -> QueryMethods<'a, C, A> {
         QueryMethods { hub: &self }
     }
-    pub fn style(&'a self) -> StyleMethods<'a, C, NC, A> {
+    pub fn style(&'a self) -> StyleMethods<'a, C, A> {
         StyleMethods { hub: &self }
     }
-    pub fn table(&'a self) -> TableMethods<'a, C, NC, A> {
+    pub fn table(&'a self) -> TableMethods<'a, C, A> {
         TableMethods { hub: &self }
     }
-    pub fn task(&'a self) -> TaskMethods<'a, C, NC, A> {
+    pub fn task(&'a self) -> TaskMethods<'a, C, A> {
         TaskMethods { hub: &self }
     }
-    pub fn template(&'a self) -> TemplateMethods<'a, C, NC, A> {
+    pub fn template(&'a self) -> TemplateMethods<'a, C, A> {
         TemplateMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -962,15 +958,15 @@ impl Part for StyleFunctionGradientColors {}
 /// let rb = hub.style();
 /// # }
 /// ```
-pub struct StyleMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for StyleMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for StyleMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
+impl<'a, C, A> StyleMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -979,7 +975,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose styles are being listed
-    pub fn list(&self, table_id: &str) -> StyleListCall<'a, C, NC, A> {
+    pub fn list(&self, table_id: &str) -> StyleListCall<'a, C, A> {
         StyleListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1000,7 +996,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table whose style is being updated.
     /// * `styleId` - Identifier (within a table) for the style being updated.
-    pub fn update(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StyleUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StyleUpdateCall<'a, C, A> {
         StyleUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1020,7 +1016,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new style is being added
-    pub fn insert(&self, request: &StyleSetting, table_id: &str) -> StyleInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &StyleSetting, table_id: &str) -> StyleInsertCall<'a, C, A> {
         StyleInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1039,7 +1035,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table to which the requested style belongs
     /// * `styleId` - Identifier (integer) for a specific style in a table
-    pub fn get(&self, table_id: &str, style_id: i32) -> StyleGetCall<'a, C, NC, A> {
+    pub fn get(&self, table_id: &str, style_id: i32) -> StyleGetCall<'a, C, A> {
         StyleGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1058,7 +1054,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table from which the style is being deleted
     /// * `styleId` - Identifier (within a table) for the style being deleted
-    pub fn delete(&self, table_id: &str, style_id: i32) -> StyleDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, table_id: &str, style_id: i32) -> StyleDeleteCall<'a, C, A> {
         StyleDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1078,7 +1074,7 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table whose style is being updated.
     /// * `styleId` - Identifier (within a table) for the style being updated.
-    pub fn patch(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StylePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StylePatchCall<'a, C, A> {
         StylePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1121,15 +1117,15 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
 /// let rb = hub.task();
 /// # }
 /// ```
-pub struct TaskMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TaskMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TaskMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
+impl<'a, C, A> TaskMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1138,7 +1134,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose tasks are being listed.
-    pub fn list(&self, table_id: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn list(&self, table_id: &str) -> TaskListCall<'a, C, A> {
         TaskListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1159,7 +1155,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table from which the task is being deleted.
     /// * `taskId` - The identifier of the task to delete.
-    pub fn delete(&self, table_id: &str, task_id: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, table_id: &str, task_id: &str) -> TaskDeleteCall<'a, C, A> {
         TaskDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1178,7 +1174,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table to which the task belongs.
     /// * `taskId` - The identifier of the task to get.
-    pub fn get(&self, table_id: &str, task_id: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn get(&self, table_id: &str, task_id: &str) -> TaskGetCall<'a, C, A> {
         TaskGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1220,15 +1216,15 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
 /// let rb = hub.column();
 /// # }
 /// ```
-pub struct ColumnMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ColumnMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ColumnMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
+impl<'a, C, A> ColumnMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1238,7 +1234,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new column is being added.
-    pub fn insert(&self, request: &Column, table_id: &str) -> ColumnInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Column, table_id: &str) -> ColumnInsertCall<'a, C, A> {
         ColumnInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1258,7 +1254,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table for which the column is being updated.
     /// * `columnId` - Name or identifier for the column that is being updated.
-    pub fn update(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnUpdateCall<'a, C, A> {
         ColumnUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1277,7 +1273,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose columns are being listed.
-    pub fn list(&self, table_id: &str) -> ColumnListCall<'a, C, NC, A> {
+    pub fn list(&self, table_id: &str) -> ColumnListCall<'a, C, A> {
         ColumnListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1298,7 +1294,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table for which the column is being updated.
     /// * `columnId` - Name or identifier for the column that is being updated.
-    pub fn patch(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnPatchCall<'a, C, A> {
         ColumnPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1318,7 +1314,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table from which the column is being deleted.
     /// * `columnId` - Name or identifier for the column being deleted.
-    pub fn delete(&self, table_id: &str, column_id: &str) -> ColumnDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, table_id: &str, column_id: &str) -> ColumnDeleteCall<'a, C, A> {
         ColumnDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1337,7 +1333,7 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table to which the column belongs.
     /// * `columnId` - Name or identifier for the column that is being requested.
-    pub fn get(&self, table_id: &str, column_id: &str) -> ColumnGetCall<'a, C, NC, A> {
+    pub fn get(&self, table_id: &str, column_id: &str) -> ColumnGetCall<'a, C, A> {
         ColumnGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1379,15 +1375,15 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
 /// let rb = hub.template();
 /// # }
 /// ```
-pub struct TemplateMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TemplateMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TemplateMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
+impl<'a, C, A> TemplateMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1398,7 +1394,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table to which the updated template belongs
     /// * `templateId` - Identifier for the template that is being updated
-    pub fn update(&self, request: &Template, table_id: &str, template_id: i32) -> TemplateUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Template, table_id: &str, template_id: i32) -> TemplateUpdateCall<'a, C, A> {
         TemplateUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1417,7 +1413,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Identifier for the table whose templates are being requested
-    pub fn list(&self, table_id: &str) -> TemplateListCall<'a, C, NC, A> {
+    pub fn list(&self, table_id: &str) -> TemplateListCall<'a, C, A> {
         TemplateListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1437,7 +1433,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table from which the template is being deleted
     /// * `templateId` - Identifier for the template which is being deleted
-    pub fn delete(&self, table_id: &str, template_id: i32) -> TemplateDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, table_id: &str, template_id: i32) -> TemplateDeleteCall<'a, C, A> {
         TemplateDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1456,7 +1452,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new template is being created
-    pub fn insert(&self, request: &Template, table_id: &str) -> TemplateInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Template, table_id: &str) -> TemplateInsertCall<'a, C, A> {
         TemplateInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1476,7 +1472,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tableId` - Table to which the updated template belongs
     /// * `templateId` - Identifier for the template that is being updated
-    pub fn patch(&self, request: &Template, table_id: &str, template_id: i32) -> TemplatePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Template, table_id: &str, template_id: i32) -> TemplatePatchCall<'a, C, A> {
         TemplatePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1496,7 +1492,7 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     ///
     /// * `tableId` - Table to which the template belongs
     /// * `templateId` - Identifier for the template that is being requested
-    pub fn get(&self, table_id: &str, template_id: i32) -> TemplateGetCall<'a, C, NC, A> {
+    pub fn get(&self, table_id: &str, template_id: i32) -> TemplateGetCall<'a, C, A> {
         TemplateGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1538,15 +1534,15 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
 /// let rb = hub.query();
 /// # }
 /// ```
-pub struct QueryMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QueryMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for QueryMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for QueryMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
+impl<'a, C, A> QueryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1561,7 +1557,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     ///           - SELECT
     ///           - SHOW
     ///           - DESCRIBE
-    pub fn sql_get(&self, sql: &str) -> QuerySqlGetCall<'a, C, NC, A> {
+    pub fn sql_get(&self, sql: &str) -> QuerySqlGetCall<'a, C, A> {
         QuerySqlGetCall {
             hub: self.hub,
             _sql: sql.to_string(),
@@ -1594,7 +1590,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     ///           - SHOW
     ///           - DESCRIBE
     ///           - CREATE
-    pub fn sql(&self, sql: &str) -> QuerySqlCall<'a, C, NC, A> {
+    pub fn sql(&self, sql: &str) -> QuerySqlCall<'a, C, A> {
         QuerySqlCall {
             hub: self.hub,
             _sql: sql.to_string(),
@@ -1637,15 +1633,15 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
 /// let rb = hub.table();
 /// # }
 /// ```
-pub struct TableMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TableMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TableMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
+impl<'a, C, A> TableMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1655,7 +1651,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - ID of the table that is being updated.
-    pub fn patch(&self, request: &Table, table_id: &str) -> TablePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Table, table_id: &str) -> TablePatchCall<'a, C, A> {
         TablePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1674,7 +1670,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose rows will be replaced.
-    pub fn replace_rows(&self, table_id: &str) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn replace_rows(&self, table_id: &str) -> TableReplaceRowCall<'a, C, A> {
         TableReplaceRowCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1697,7 +1693,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - ID of the table that is being updated.
-    pub fn update(&self, request: &Table, table_id: &str) -> TableUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Table, table_id: &str) -> TableUpdateCall<'a, C, A> {
         TableUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1716,7 +1712,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - ID of the table to be deleted.
-    pub fn delete(&self, table_id: &str) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, table_id: &str) -> TableDeleteCall<'a, C, A> {
         TableDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1733,7 +1729,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &Table) -> TableInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Table) -> TableInsertCall<'a, C, A> {
         TableInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1750,7 +1746,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - Identifier for the table being requested.
-    pub fn get(&self, table_id: &str) -> TableGetCall<'a, C, NC, A> {
+    pub fn get(&self, table_id: &str) -> TableGetCall<'a, C, A> {
         TableGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1763,7 +1759,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of tables a user owns.
-    pub fn list(&self) -> TableListCall<'a, C, NC, A> {
+    pub fn list(&self) -> TableListCall<'a, C, A> {
         TableListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1781,7 +1777,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - The table into which new rows are being imported.
-    pub fn import_rows(&self, table_id: &str) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn import_rows(&self, table_id: &str) -> TableImportRowCall<'a, C, A> {
         TableImportRowCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1803,7 +1799,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `name` - The name to be assigned to the new table.
-    pub fn import_table(&self, name: &str) -> TableImportTableCall<'a, C, NC, A> {
+    pub fn import_table(&self, name: &str) -> TableImportTableCall<'a, C, A> {
         TableImportTableCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1822,7 +1818,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tableId` - ID of the table that is being copied.
-    pub fn copy(&self, table_id: &str) -> TableCopyCall<'a, C, NC, A> {
+    pub fn copy(&self, table_id: &str) -> TableCopyCall<'a, C, A> {
         TableCopyCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1874,10 +1870,10 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct StyleListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -1886,9 +1882,9 @@ pub struct StyleListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StyleListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StyleListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2026,7 +2022,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Table whose styles are being listed
-    pub fn table_id(mut self, new_value: &str) -> StyleListCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StyleListCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2034,7 +2030,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Continuation token specifying which result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> StyleListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> StyleListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2042,7 +2038,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Maximum number of styles to return. Optional. Default is 5.
-    pub fn max_results(mut self, new_value: u32) -> StyleListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> StyleListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2053,7 +2049,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2074,7 +2070,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2091,7 +2087,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StyleListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StyleListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2135,10 +2131,10 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct StyleUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: StyleSetting,
     _table_id: String,
     _style_id: i32,
@@ -2147,9 +2143,9 @@ pub struct StyleUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StyleUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StyleUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StyleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2289,7 +2285,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &StyleSetting) -> StyleUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &StyleSetting) -> StyleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2299,7 +2295,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Table whose style is being updated.
-    pub fn table_id(mut self, new_value: &str) -> StyleUpdateCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StyleUpdateCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2309,7 +2305,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Identifier (within a table) for the style being updated.
-    pub fn style_id(mut self, new_value: i32) -> StyleUpdateCall<'a, C, NC, A> {
+    pub fn style_id(mut self, new_value: i32) -> StyleUpdateCall<'a, C, A> {
         self._style_id = new_value;
         self
     }
@@ -2320,7 +2316,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2341,7 +2337,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2358,7 +2354,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StyleUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StyleUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2402,10 +2398,10 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct StyleInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: StyleSetting,
     _table_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2413,9 +2409,9 @@ pub struct StyleInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StyleInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StyleInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StyleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2554,7 +2550,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &StyleSetting) -> StyleInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &StyleSetting) -> StyleInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2564,7 +2560,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Table for which a new style is being added
-    pub fn table_id(mut self, new_value: &str) -> StyleInsertCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StyleInsertCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2575,7 +2571,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2596,7 +2592,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2613,7 +2609,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StyleInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StyleInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2651,10 +2647,10 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct StyleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _style_id: i32,
     _delegate: Option<&'a mut Delegate>,
@@ -2662,9 +2658,9 @@ pub struct StyleGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StyleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StyleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2797,7 +2793,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Table to which the requested style belongs
-    pub fn table_id(mut self, new_value: &str) -> StyleGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StyleGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2807,7 +2803,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Identifier (integer) for a specific style in a table
-    pub fn style_id(mut self, new_value: i32) -> StyleGetCall<'a, C, NC, A> {
+    pub fn style_id(mut self, new_value: i32) -> StyleGetCall<'a, C, A> {
         self._style_id = new_value;
         self
     }
@@ -2818,7 +2814,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2839,7 +2835,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2856,7 +2852,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StyleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StyleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2894,10 +2890,10 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct StyleDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StyleDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _style_id: i32,
     _delegate: Option<&'a mut Delegate>,
@@ -2905,9 +2901,9 @@ pub struct StyleDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StyleDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StyleDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StyleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3029,7 +3025,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Table from which the style is being deleted
-    pub fn table_id(mut self, new_value: &str) -> StyleDeleteCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StyleDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -3039,7 +3035,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Identifier (within a table) for the style being deleted
-    pub fn style_id(mut self, new_value: i32) -> StyleDeleteCall<'a, C, NC, A> {
+    pub fn style_id(mut self, new_value: i32) -> StyleDeleteCall<'a, C, A> {
         self._style_id = new_value;
         self
     }
@@ -3050,7 +3046,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StyleDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3071,7 +3067,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3088,7 +3084,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StyleDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StyleDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3132,10 +3128,10 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct StylePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct StylePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: StyleSetting,
     _table_id: String,
     _style_id: i32,
@@ -3144,9 +3140,9 @@ pub struct StylePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for StylePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for StylePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> StylePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3286,7 +3282,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &StyleSetting) -> StylePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &StyleSetting) -> StylePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3296,7 +3292,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Table whose style is being updated.
-    pub fn table_id(mut self, new_value: &str) -> StylePatchCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> StylePatchCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -3306,7 +3302,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Identifier (within a table) for the style being updated.
-    pub fn style_id(mut self, new_value: i32) -> StylePatchCall<'a, C, NC, A> {
+    pub fn style_id(mut self, new_value: i32) -> StylePatchCall<'a, C, A> {
         self._style_id = new_value;
         self
     }
@@ -3317,7 +3313,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StylePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> StylePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3338,7 +3334,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> StylePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> StylePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3355,7 +3351,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> StylePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> StylePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3396,10 +3392,10 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _start_index: Option<u32>,
     _page_token: Option<String>,
@@ -3409,9 +3405,9 @@ pub struct TaskListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3552,7 +3548,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Table whose tasks are being listed.
-    pub fn table_id(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -3560,7 +3556,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Index of the first result returned in the current page.
-    pub fn start_index(mut self, new_value: u32) -> TaskListCall<'a, C, NC, A> {
+    pub fn start_index(mut self, new_value: u32) -> TaskListCall<'a, C, A> {
         self._start_index = Some(new_value);
         self
     }
@@ -3568,7 +3564,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Continuation token specifying which result page to return.
-    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3576,7 +3572,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of tasks to return. Default is 5.
-    pub fn max_results(mut self, new_value: u32) -> TaskListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TaskListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3587,7 +3583,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3608,7 +3604,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3625,7 +3621,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3663,10 +3659,10 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _task_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3674,9 +3670,9 @@ pub struct TaskDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3798,7 +3794,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Table from which the task is being deleted.
-    pub fn table_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -3808,7 +3804,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The identifier of the task to delete.
-    pub fn task_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn task_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._task_id = new_value.to_string();
         self
     }
@@ -3819,7 +3815,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3840,7 +3836,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3857,7 +3853,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3895,10 +3891,10 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _task_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3906,9 +3902,9 @@ pub struct TaskGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4041,7 +4037,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Table to which the task belongs.
-    pub fn table_id(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4051,7 +4047,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The identifier of the task to get.
-    pub fn task_id(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn task_id(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._task_id = new_value.to_string();
         self
     }
@@ -4062,7 +4058,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4083,7 +4079,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4100,7 +4096,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4144,10 +4140,10 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Column,
     _table_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4155,9 +4151,9 @@ pub struct ColumnInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4296,7 +4292,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Column) -> ColumnInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Column) -> ColumnInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4306,7 +4302,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Table for which a new column is being added.
-    pub fn table_id(mut self, new_value: &str) -> ColumnInsertCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnInsertCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4317,7 +4313,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4338,7 +4334,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4355,7 +4351,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4399,10 +4395,10 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Column,
     _table_id: String,
     _column_id: String,
@@ -4411,9 +4407,9 @@ pub struct ColumnUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4553,7 +4549,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Column) -> ColumnUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Column) -> ColumnUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4563,7 +4559,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Table for which the column is being updated.
-    pub fn table_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4573,7 +4569,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name or identifier for the column that is being updated.
-    pub fn column_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, NC, A> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, A> {
         self._column_id = new_value.to_string();
         self
     }
@@ -4584,7 +4580,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4605,7 +4601,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4622,7 +4618,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4662,10 +4658,10 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -4674,9 +4670,9 @@ pub struct ColumnListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4814,7 +4810,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Table whose columns are being listed.
-    pub fn table_id(mut self, new_value: &str) -> ColumnListCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnListCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4822,7 +4818,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Continuation token specifying which result page to return.
-    pub fn page_token(mut self, new_value: &str) -> ColumnListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ColumnListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4830,7 +4826,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of columns to return. Default is 5.
-    pub fn max_results(mut self, new_value: u32) -> ColumnListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ColumnListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4841,7 +4837,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4862,7 +4858,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4879,7 +4875,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4923,10 +4919,10 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Column,
     _table_id: String,
     _column_id: String,
@@ -4935,9 +4931,9 @@ pub struct ColumnPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5077,7 +5073,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Column) -> ColumnPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Column) -> ColumnPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5087,7 +5083,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Table for which the column is being updated.
-    pub fn table_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5097,7 +5093,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Name or identifier for the column that is being updated.
-    pub fn column_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, NC, A> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, A> {
         self._column_id = new_value.to_string();
         self
     }
@@ -5108,7 +5104,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5129,7 +5125,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5146,7 +5142,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5184,10 +5180,10 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _column_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5195,9 +5191,9 @@ pub struct ColumnDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5319,7 +5315,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Table from which the column is being deleted.
-    pub fn table_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5329,7 +5325,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name or identifier for the column being deleted.
-    pub fn column_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, NC, A> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, A> {
         self._column_id = new_value.to_string();
         self
     }
@@ -5340,7 +5336,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5361,7 +5357,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5378,7 +5374,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5416,10 +5412,10 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ColumnGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ColumnGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _column_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5427,9 +5423,9 @@ pub struct ColumnGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ColumnGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ColumnGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ColumnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5562,7 +5558,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Table to which the column belongs.
-    pub fn table_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5572,7 +5568,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Name or identifier for the column that is being requested.
-    pub fn column_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, NC, A> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, A> {
         self._column_id = new_value.to_string();
         self
     }
@@ -5583,7 +5579,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ColumnGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5604,7 +5600,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5621,7 +5617,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ColumnGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ColumnGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5665,10 +5661,10 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplateUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Template,
     _table_id: String,
     _template_id: i32,
@@ -5677,9 +5673,9 @@ pub struct TemplateUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplateUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplateUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5819,7 +5815,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Template) -> TemplateUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Template) -> TemplateUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5829,7 +5825,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Table to which the updated template belongs
-    pub fn table_id(mut self, new_value: &str) -> TemplateUpdateCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateUpdateCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5839,7 +5835,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the template that is being updated
-    pub fn template_id(mut self, new_value: i32) -> TemplateUpdateCall<'a, C, NC, A> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateUpdateCall<'a, C, A> {
         self._template_id = new_value;
         self
     }
@@ -5850,7 +5846,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5871,7 +5867,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5888,7 +5884,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplateUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplateUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5928,10 +5924,10 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplateListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -5940,9 +5936,9 @@ pub struct TemplateListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplateListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplateListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6080,7 +6076,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the table whose templates are being requested
-    pub fn table_id(mut self, new_value: &str) -> TemplateListCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateListCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -6088,7 +6084,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Continuation token specifying which results page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6096,7 +6092,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of templates to return. Optional. Default is 5.
-    pub fn max_results(mut self, new_value: u32) -> TemplateListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TemplateListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6107,7 +6103,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6128,7 +6124,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6145,7 +6141,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplateListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplateListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6183,10 +6179,10 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplateDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _template_id: i32,
     _delegate: Option<&'a mut Delegate>,
@@ -6194,9 +6190,9 @@ pub struct TemplateDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplateDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplateDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6318,7 +6314,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Table from which the template is being deleted
-    pub fn table_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -6328,7 +6324,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the template which is being deleted
-    pub fn template_id(mut self, new_value: i32) -> TemplateDeleteCall<'a, C, NC, A> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateDeleteCall<'a, C, A> {
         self._template_id = new_value;
         self
     }
@@ -6339,7 +6335,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6360,7 +6356,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6377,7 +6373,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplateDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplateDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6421,10 +6417,10 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplateInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Template,
     _table_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6432,9 +6428,9 @@ pub struct TemplateInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplateInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplateInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6573,7 +6569,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Template) -> TemplateInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Template) -> TemplateInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6583,7 +6579,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Table for which a new template is being created
-    pub fn table_id(mut self, new_value: &str) -> TemplateInsertCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateInsertCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -6594,7 +6590,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6615,7 +6611,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6632,7 +6628,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplateInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplateInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6676,10 +6672,10 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplatePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplatePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Template,
     _table_id: String,
     _template_id: i32,
@@ -6688,9 +6684,9 @@ pub struct TemplatePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplatePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplatePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6830,7 +6826,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Template) -> TemplatePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Template) -> TemplatePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6840,7 +6836,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Table to which the updated template belongs
-    pub fn table_id(mut self, new_value: &str) -> TemplatePatchCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplatePatchCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -6850,7 +6846,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the template that is being updated
-    pub fn template_id(mut self, new_value: i32) -> TemplatePatchCall<'a, C, NC, A> {
+    pub fn template_id(mut self, new_value: i32) -> TemplatePatchCall<'a, C, A> {
         self._template_id = new_value;
         self
     }
@@ -6861,7 +6857,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplatePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplatePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6882,7 +6878,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplatePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplatePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6899,7 +6895,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplatePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplatePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6937,10 +6933,10 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct TemplateGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TemplateGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _template_id: i32,
     _delegate: Option<&'a mut Delegate>,
@@ -6948,9 +6944,9 @@ pub struct TemplateGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TemplateGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TemplateGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7083,7 +7079,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Table to which the template belongs
-    pub fn table_id(mut self, new_value: &str) -> TemplateGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -7093,7 +7089,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the template that is being requested
-    pub fn template_id(mut self, new_value: i32) -> TemplateGetCall<'a, C, NC, A> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateGetCall<'a, C, A> {
         self._template_id = new_value;
         self
     }
@@ -7104,7 +7100,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TemplateGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7125,7 +7121,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7142,7 +7138,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TemplateGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TemplateGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7190,10 +7186,10 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct QuerySqlGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuerySqlGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _sql: String,
     _typed: Option<bool>,
     _hdrs: Option<bool>,
@@ -7202,9 +7198,9 @@ pub struct QuerySqlGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuerySqlGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuerySqlGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuerySqlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7337,7 +7333,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// - SELECT
     /// - SHOW
     /// - DESCRIBE
-    pub fn sql(mut self, new_value: &str) -> QuerySqlGetCall<'a, C, NC, A> {
+    pub fn sql(mut self, new_value: &str) -> QuerySqlGetCall<'a, C, A> {
         self._sql = new_value.to_string();
         self
     }
@@ -7345,7 +7341,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
-    pub fn typed(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, NC, A> {
+    pub fn typed(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, A> {
         self._typed = Some(new_value);
         self
     }
@@ -7353,7 +7349,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether column names are included (in the first row). Default is true.
-    pub fn hdrs(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, NC, A> {
+    pub fn hdrs(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, A> {
         self._hdrs = Some(new_value);
         self
     }
@@ -7364,7 +7360,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuerySqlGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuerySqlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7385,7 +7381,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7402,7 +7398,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuerySqlGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuerySqlGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7454,10 +7450,10 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct QuerySqlCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuerySqlCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _sql: String,
     _typed: Option<bool>,
     _hdrs: Option<bool>,
@@ -7466,9 +7462,9 @@ pub struct QuerySqlCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuerySqlCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuerySqlCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuerySqlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7605,7 +7601,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// - SHOW
     /// - DESCRIBE
     /// - CREATE
-    pub fn sql(mut self, new_value: &str) -> QuerySqlCall<'a, C, NC, A> {
+    pub fn sql(mut self, new_value: &str) -> QuerySqlCall<'a, C, A> {
         self._sql = new_value.to_string();
         self
     }
@@ -7613,7 +7609,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
-    pub fn typed(mut self, new_value: bool) -> QuerySqlCall<'a, C, NC, A> {
+    pub fn typed(mut self, new_value: bool) -> QuerySqlCall<'a, C, A> {
         self._typed = Some(new_value);
         self
     }
@@ -7621,7 +7617,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether column names are included in the first row. Default is true.
-    pub fn hdrs(mut self, new_value: bool) -> QuerySqlCall<'a, C, NC, A> {
+    pub fn hdrs(mut self, new_value: bool) -> QuerySqlCall<'a, C, A> {
         self._hdrs = Some(new_value);
         self
     }
@@ -7632,7 +7628,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuerySqlCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuerySqlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7653,7 +7649,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7670,7 +7666,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuerySqlCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuerySqlCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7715,10 +7711,10 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TablePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TablePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Table,
     _table_id: String,
     _replace_view_definition: Option<bool>,
@@ -7727,9 +7723,9 @@ pub struct TablePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TablePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TablePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7871,7 +7867,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7881,7 +7877,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// ID of the table that is being updated.
-    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -7889,7 +7885,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
-    pub fn replace_view_definition(mut self, new_value: bool) -> TablePatchCall<'a, C, NC, A> {
+    pub fn replace_view_definition(mut self, new_value: bool) -> TablePatchCall<'a, C, A> {
         self._replace_view_definition = Some(new_value);
         self
     }
@@ -7900,7 +7896,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TablePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7921,7 +7917,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7938,7 +7934,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7982,10 +7978,10 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct TableReplaceRowCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableReplaceRowCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _start_line: Option<i32>,
     _is_strict: Option<bool>,
@@ -7997,9 +7993,9 @@ pub struct TableReplaceRowCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableReplaceRowCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableReplaceRowCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8255,7 +8251,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Table whose rows will be replaced.
-    pub fn table_id(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -8263,7 +8259,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The index of the first line from which to start importing, inclusive. Default is 0.
-    pub fn start_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn start_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, A> {
         self._start_line = Some(new_value);
         self
     }
@@ -8271,7 +8267,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Whether the imported CSV must have the same number of column values for each row. If true, throws an exception if the CSV does not have the same number of columns. If false, rows with fewer column values will be padded with empty values. Default is true.
-    pub fn is_strict(mut self, new_value: bool) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn is_strict(mut self, new_value: bool) -> TableReplaceRowCall<'a, C, A> {
         self._is_strict = Some(new_value);
         self
     }
@@ -8279,7 +8275,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
-    pub fn end_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn end_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, A> {
         self._end_line = Some(new_value);
         self
     }
@@ -8287,7 +8283,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.
-    pub fn encoding(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn encoding(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, A> {
         self._encoding = Some(new_value.to_string());
         self
     }
@@ -8295,7 +8291,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
-    pub fn delimiter(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn delimiter(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -8306,7 +8302,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableReplaceRowCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableReplaceRowCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8327,7 +8323,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableReplaceRowCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableReplaceRowCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8344,7 +8340,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableReplaceRowCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableReplaceRowCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8389,10 +8385,10 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Table,
     _table_id: String,
     _replace_view_definition: Option<bool>,
@@ -8401,9 +8397,9 @@ pub struct TableUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8545,7 +8541,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TableUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TableUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8555,7 +8551,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ID of the table that is being updated.
-    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -8563,7 +8559,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
-    pub fn replace_view_definition(mut self, new_value: bool) -> TableUpdateCall<'a, C, NC, A> {
+    pub fn replace_view_definition(mut self, new_value: bool) -> TableUpdateCall<'a, C, A> {
         self._replace_view_definition = Some(new_value);
         self
     }
@@ -8574,7 +8570,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8595,7 +8591,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8612,7 +8608,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8650,19 +8646,19 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8783,7 +8779,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ID of the table to be deleted.
-    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -8794,7 +8790,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8815,7 +8811,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8832,7 +8828,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8876,19 +8872,19 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _request: Table,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9002,7 +8998,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Table) -> TableInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Table) -> TableInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9013,7 +9009,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9034,7 +9030,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9051,7 +9047,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9089,19 +9085,19 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct TableGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9233,7 +9229,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Identifier for the table being requested.
-    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -9244,7 +9240,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9265,7 +9261,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9282,7 +9278,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9322,10 +9318,10 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TableListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut Delegate>,
@@ -9333,9 +9329,9 @@ pub struct TableListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9446,7 +9442,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Continuation token specifying which result page to return.
-    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9454,7 +9450,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Maximum number of tables to return. Default is 5.
-    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9465,7 +9461,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9486,7 +9482,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9503,7 +9499,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9547,10 +9543,10 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct TableImportRowCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableImportRowCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _start_line: Option<i32>,
     _is_strict: Option<bool>,
@@ -9562,9 +9558,9 @@ pub struct TableImportRowCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableImportRowCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableImportRowCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9820,7 +9816,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The table into which new rows are being imported.
-    pub fn table_id(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableImportRowCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -9828,7 +9824,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The index of the first line from which to start importing, inclusive. Default is 0.
-    pub fn start_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn start_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, A> {
         self._start_line = Some(new_value);
         self
     }
@@ -9836,7 +9832,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Whether the imported CSV must have the same number of values for each row. If false, rows with fewer values will be padded with empty values. Default is true.
-    pub fn is_strict(mut self, new_value: bool) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn is_strict(mut self, new_value: bool) -> TableImportRowCall<'a, C, A> {
         self._is_strict = Some(new_value);
         self
     }
@@ -9844,7 +9840,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
-    pub fn end_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn end_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, A> {
         self._end_line = Some(new_value);
         self
     }
@@ -9852,7 +9848,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
-    pub fn encoding(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn encoding(mut self, new_value: &str) -> TableImportRowCall<'a, C, A> {
         self._encoding = Some(new_value.to_string());
         self
     }
@@ -9860,7 +9856,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
-    pub fn delimiter(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn delimiter(mut self, new_value: &str) -> TableImportRowCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -9871,7 +9867,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableImportRowCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableImportRowCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9892,7 +9888,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableImportRowCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableImportRowCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9909,7 +9905,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableImportRowCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableImportRowCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9950,10 +9946,10 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct TableImportTableCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableImportTableCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _name: String,
     _encoding: Option<String>,
     _delimiter: Option<String>,
@@ -9962,9 +9958,9 @@ pub struct TableImportTableCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableImportTableCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableImportTableCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10187,7 +10183,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The name to be assigned to the new table.
-    pub fn name(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> TableImportTableCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -10195,7 +10191,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
-    pub fn encoding(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
+    pub fn encoding(mut self, new_value: &str) -> TableImportTableCall<'a, C, A> {
         self._encoding = Some(new_value.to_string());
         self
     }
@@ -10203,7 +10199,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
-    pub fn delimiter(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
+    pub fn delimiter(mut self, new_value: &str) -> TableImportTableCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -10214,7 +10210,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableImportTableCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableImportTableCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10235,7 +10231,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableImportTableCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableImportTableCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10252,7 +10248,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableImportTableCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableImportTableCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10291,10 +10287,10 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct TableCopyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TableCopyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Fusiontables<C, NC, A>,
+    hub: &'a Fusiontables<C, A>,
     _table_id: String,
     _copy_presentation: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
@@ -10302,9 +10298,9 @@ pub struct TableCopyCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TableCopyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TableCopyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TableCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10439,7 +10435,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// ID of the table that is being copied.
-    pub fn table_id(mut self, new_value: &str) -> TableCopyCall<'a, C, NC, A> {
+    pub fn table_id(mut self, new_value: &str) -> TableCopyCall<'a, C, A> {
         self._table_id = new_value.to_string();
         self
     }
@@ -10447,7 +10443,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to also copy tabs, styles, and templates. Default is false.
-    pub fn copy_presentation(mut self, new_value: bool) -> TableCopyCall<'a, C, NC, A> {
+    pub fn copy_presentation(mut self, new_value: bool) -> TableCopyCall<'a, C, A> {
         self._copy_presentation = Some(new_value);
         self
     }
@@ -10458,7 +10454,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableCopyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableCopyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10479,7 +10475,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TableCopyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TableCopyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10496,7 +10492,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TableCopyCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TableCopyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

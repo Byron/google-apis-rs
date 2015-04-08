@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *resourceviews* crate version *0.1.4+20150302*, where *20150302* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *resourceviews* crate version *0.1.5+20150302*, where *20150302* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *resourceviews* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/).
@@ -201,7 +201,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -314,37 +313,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Resourceviews<C, NC, A> {
+pub struct Resourceviews<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Resourceviews<C, NC, A> {}
+impl<'a, C, A> Hub for Resourceviews<C, A> {}
 
-impl<'a, C, NC, A> Resourceviews<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Resourceviews<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Resourceviews<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Resourceviews<C, A> {
         Resourceviews {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, NC, A> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C, A> {
         ZoneOperationMethods { hub: &self }
     }
-    pub fn zone_views(&'a self) -> ZoneViewMethods<'a, C, NC, A> {
+    pub fn zone_views(&'a self) -> ZoneViewMethods<'a, C, A> {
         ZoneViewMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -779,15 +775,15 @@ impl Part for OperationWarningsData {}
 /// let rb = hub.zone_views();
 /// # }
 /// ```
-pub struct ZoneViewMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneViewMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneViewMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneViewMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -799,7 +795,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn remove_resources(&self, request: &ZoneViewsRemoveResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn remove_resources(&self, request: &ZoneViewsRemoveResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewRemoveResourceCall<'a, C, A> {
         ZoneViewRemoveResourceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -822,7 +818,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn add_resources(&self, request: &ZoneViewsAddResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn add_resources(&self, request: &ZoneViewsAddResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewAddResourceCall<'a, C, A> {
         ZoneViewAddResourceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -844,7 +840,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn list_resources(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn list_resources(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewListResourceCall<'a, C, A> {
         ZoneViewListResourceCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -870,7 +866,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn get(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetCall<'a, C, A> {
         ZoneViewGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -890,7 +886,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     ///
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneViewListCall<'a, C, A> {
         ZoneViewListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -912,7 +908,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
-    pub fn insert(&self, request: &ResourceView, project: &str, zone: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ResourceView, project: &str, zone: &str) -> ZoneViewInsertCall<'a, C, A> {
         ZoneViewInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -933,7 +929,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn delete(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewDeleteCall<'a, C, A> {
         ZoneViewDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -955,7 +951,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn set_service(&self, request: &ZoneViewsSetServiceRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn set_service(&self, request: &ZoneViewsSetServiceRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewSetServiceCall<'a, C, A> {
         ZoneViewSetServiceCall {
             hub: self.hub,
             _request: request.clone(),
@@ -977,7 +973,7 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn get_service(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn get_service(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetServiceCall<'a, C, A> {
         ZoneViewGetServiceCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1021,15 +1017,15 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ZoneOperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
+impl<'a, C, A> ZoneOperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1040,7 +1036,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
     /// * `operation` - Name of the operation resource to return.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, A> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1060,7 +1056,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, A> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1119,10 +1115,10 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewRemoveResourceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewRemoveResourceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _request: ZoneViewsRemoveResourcesRequest,
     _project: String,
     _zone: String,
@@ -1132,9 +1128,9 @@ pub struct ZoneViewRemoveResourceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewRemoveResourceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewRemoveResourceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewRemoveResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1275,7 +1271,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ZoneViewsRemoveResourcesRequest) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ZoneViewsRemoveResourcesRequest) -> ZoneViewRemoveResourceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1285,7 +1281,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1295,7 +1291,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1305,7 +1301,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -1316,7 +1312,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewRemoveResourceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1337,7 +1333,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewRemoveResourceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewRemoveResourceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1354,7 +1350,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewRemoveResourceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewRemoveResourceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1398,10 +1394,10 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewAddResourceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewAddResourceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _request: ZoneViewsAddResourcesRequest,
     _project: String,
     _zone: String,
@@ -1411,9 +1407,9 @@ pub struct ZoneViewAddResourceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewAddResourceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewAddResourceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewAddResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1554,7 +1550,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ZoneViewsAddResourcesRequest) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ZoneViewsAddResourcesRequest) -> ZoneViewAddResourceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1564,7 +1560,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1574,7 +1570,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1584,7 +1580,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -1595,7 +1591,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewAddResourceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewAddResourceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1616,7 +1612,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewAddResourceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewAddResourceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1633,7 +1629,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewAddResourceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewAddResourceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1676,10 +1672,10 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewListResourceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewListResourceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -1693,9 +1689,9 @@ pub struct ZoneViewListResourceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewListResourceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewListResourceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewListResourceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1844,7 +1840,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1854,7 +1850,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -1864,7 +1860,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -1872,7 +1868,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The service name to return in the response. It is optional and if it is not set, all the service end points will be returned.
-    pub fn service_name(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn service_name(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._service_name = Some(new_value.to_string());
         self
     }
@@ -1880,7 +1876,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1888,7 +1884,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
-    pub fn max_results(mut self, new_value: i32) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ZoneViewListResourceCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1896,7 +1892,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The state of the instance to list. By default, it lists all instances.
-    pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._list_state = Some(new_value.to_string());
         self
     }
@@ -1904,7 +1900,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The requested format of the return value. It can be URL or URL_PORT. A JSON object will be included in the response based on the format. The default format is NONE, which results in no JSON in the response.
-    pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -1915,7 +1911,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewListResourceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewListResourceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1936,7 +1932,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListResourceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListResourceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1953,7 +1949,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewListResourceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewListResourceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1991,10 +1987,10 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -2003,9 +1999,9 @@ pub struct ZoneViewGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2139,7 +2135,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2149,7 +2145,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2159,7 +2155,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -2170,7 +2166,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2191,7 +2187,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2208,7 +2204,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2248,10 +2244,10 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -2261,9 +2257,9 @@ pub struct ZoneViewListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2402,7 +2398,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2412,7 +2408,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2420,7 +2416,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneViewListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2428,7 +2424,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
-    pub fn max_results(mut self, new_value: i32) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ZoneViewListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2439,7 +2435,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2460,7 +2456,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2477,7 +2473,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2521,10 +2517,10 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _request: ResourceView,
     _project: String,
     _zone: String,
@@ -2533,9 +2529,9 @@ pub struct ZoneViewInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2675,7 +2671,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ResourceView) -> ZoneViewInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ResourceView) -> ZoneViewInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2685,7 +2681,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2695,7 +2691,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2706,7 +2702,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2727,7 +2723,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2744,7 +2740,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2782,10 +2778,10 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -2794,9 +2790,9 @@ pub struct ZoneViewDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2930,7 +2926,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2940,7 +2936,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -2950,7 +2946,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -2961,7 +2957,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2982,7 +2978,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2999,7 +2995,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3043,10 +3039,10 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewSetServiceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewSetServiceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _request: ZoneViewsSetServiceRequest,
     _project: String,
     _zone: String,
@@ -3056,9 +3052,9 @@ pub struct ZoneViewSetServiceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewSetServiceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewSetServiceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewSetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3199,7 +3195,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ZoneViewsSetServiceRequest) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ZoneViewsSetServiceRequest) -> ZoneViewSetServiceCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3209,7 +3205,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3219,7 +3215,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3229,7 +3225,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -3240,7 +3236,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewSetServiceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewSetServiceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3261,7 +3257,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewSetServiceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewSetServiceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3278,7 +3274,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewSetServiceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewSetServiceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3317,10 +3313,10 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneViewGetServiceCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneViewGetServiceCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -3330,9 +3326,9 @@ pub struct ZoneViewGetServiceCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneViewGetServiceCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneViewGetServiceCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneViewGetServiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3469,7 +3465,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The project name of the resource view.
-    pub fn project(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3479,7 +3475,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The zone name of the resource view.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3489,7 +3485,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The name of the resource view.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, A> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -3497,7 +3493,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The name of the resource if user wants to get the service information of the resource.
-    pub fn resource_name(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn resource_name(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, A> {
         self._resource_name = Some(new_value.to_string());
         self
     }
@@ -3508,7 +3504,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewGetServiceCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneViewGetServiceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3529,7 +3525,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetServiceCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetServiceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3546,7 +3542,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewGetServiceCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneViewGetServiceCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3584,10 +3580,10 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -3596,9 +3592,9 @@ pub struct ZoneOperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3732,7 +3728,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the project scoping this request.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3742,7 +3738,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the zone scoping this request.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -3752,7 +3748,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Name of the operation resource to return.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -3763,7 +3759,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3784,7 +3780,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3801,7 +3797,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3842,10 +3838,10 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ZoneOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Resourceviews<C, NC, A>,
+    hub: &'a Resourceviews<C, A>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -3856,9 +3852,9 @@ pub struct ZoneOperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ZoneOperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ZoneOperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4000,7 +3996,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Name of the project scoping this request.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -4010,7 +4006,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// Name of the zone scoping this request.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._zone = new_value.to_string();
         self
     }
@@ -4018,7 +4014,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4026,7 +4022,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4034,7 +4030,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Optional. Filter expression for filtering listed resources.
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, A> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4045,7 +4041,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ZoneOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4066,7 +4062,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4083,7 +4079,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

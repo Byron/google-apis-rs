@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *translate* crate version *0.1.4+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *translate* crate version *0.1.5+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *translate* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/translate/v2/using_rest).
@@ -192,7 +192,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -261,40 +260,37 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Translate<C, NC, A> {
+pub struct Translate<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Translate<C, NC, A> {}
+impl<'a, C, A> Hub for Translate<C, A> {}
 
-impl<'a, C, NC, A> Translate<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Translate<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Translate<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Translate<C, A> {
         Translate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn detections(&'a self) -> DetectionMethods<'a, C, NC, A> {
+    pub fn detections(&'a self) -> DetectionMethods<'a, C, A> {
         DetectionMethods { hub: &self }
     }
-    pub fn languages(&'a self) -> LanguageMethods<'a, C, NC, A> {
+    pub fn languages(&'a self) -> LanguageMethods<'a, C, A> {
         LanguageMethods { hub: &self }
     }
-    pub fn translations(&'a self) -> TranslationMethods<'a, C, NC, A> {
+    pub fn translations(&'a self) -> TranslationMethods<'a, C, A> {
         TranslationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -466,20 +462,20 @@ impl ResponseResult for TranslationsListResponse {}
 /// let rb = hub.languages();
 /// # }
 /// ```
-pub struct LanguageMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LanguageMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for LanguageMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for LanguageMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> LanguageMethods<'a, C, NC, A> {
+impl<'a, C, A> LanguageMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List the source/target languages supported by the API
-    pub fn list(&self) -> LanguageListCall<'a, C, NC, A> {
+    pub fn list(&self) -> LanguageListCall<'a, C, A> {
         LanguageListCall {
             hub: self.hub,
             _target: Default::default(),
@@ -519,15 +515,15 @@ impl<'a, C, NC, A> LanguageMethods<'a, C, NC, A> {
 /// let rb = hub.detections();
 /// # }
 /// ```
-pub struct DetectionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DetectionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DetectionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DetectionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DetectionMethods<'a, C, NC, A> {
+impl<'a, C, A> DetectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -536,7 +532,7 @@ impl<'a, C, NC, A> DetectionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `q` - The text to detect
-    pub fn list(&self, q: &Vec<String>) -> DetectionListCall<'a, C, NC, A> {
+    pub fn list(&self, q: &Vec<String>) -> DetectionListCall<'a, C, A> {
         DetectionListCall {
             hub: self.hub,
             _q: q.clone(),
@@ -576,15 +572,15 @@ impl<'a, C, NC, A> DetectionMethods<'a, C, NC, A> {
 /// let rb = hub.translations();
 /// # }
 /// ```
-pub struct TranslationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TranslationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TranslationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TranslationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TranslationMethods<'a, C, NC, A> {
+impl<'a, C, A> TranslationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -594,7 +590,7 @@ impl<'a, C, NC, A> TranslationMethods<'a, C, NC, A> {
     ///
     /// * `q` - The text to translate
     /// * `target` - The target language into which the text should be translated
-    pub fn list(&self, q: &Vec<String>, target: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn list(&self, q: &Vec<String>, target: &str) -> TranslationListCall<'a, C, A> {
         TranslationListCall {
             hub: self.hub,
             _q: q.clone(),
@@ -647,18 +643,18 @@ impl<'a, C, NC, A> TranslationMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct LanguageListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct LanguageListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
     _target: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for LanguageListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for LanguageListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> LanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -764,7 +760,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// the language and collation in which the localized results should be returned
-    pub fn target(mut self, new_value: &str) -> LanguageListCall<'a, C, NC, A> {
+    pub fn target(mut self, new_value: &str) -> LanguageListCall<'a, C, A> {
         self._target = Some(new_value.to_string());
         self
     }
@@ -775,7 +771,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LanguageListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LanguageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -796,7 +792,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LanguageListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LanguageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -835,18 +831,18 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct DetectionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DetectionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
     _q: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for DetectionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DetectionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DetectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -959,7 +955,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The text to detect
-    pub fn add_q(mut self, new_value: &str) -> DetectionListCall<'a, C, NC, A> {
+    pub fn add_q(mut self, new_value: &str) -> DetectionListCall<'a, C, A> {
         self._q.push(new_value.to_string());
         self
     }
@@ -970,7 +966,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DetectionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DetectionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -991,7 +987,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DetectionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DetectionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1033,10 +1029,10 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct TranslationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TranslationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Translate<C, NC, A>,
+    hub: &'a Translate<C, A>,
     _q: Vec<String>,
     _target: String,
     _source: Option<String>,
@@ -1046,9 +1042,9 @@ pub struct TranslationListCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for TranslationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TranslationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TranslationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1175,7 +1171,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The text to translate
-    pub fn add_q(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn add_q(mut self, new_value: &str) -> TranslationListCall<'a, C, A> {
         self._q.push(new_value.to_string());
         self
     }
@@ -1185,7 +1181,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The target language into which the text should be translated
-    pub fn target(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn target(mut self, new_value: &str) -> TranslationListCall<'a, C, A> {
         self._target = new_value.to_string();
         self
     }
@@ -1193,7 +1189,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The source language of the text
-    pub fn source(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn source(mut self, new_value: &str) -> TranslationListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -1201,7 +1197,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The format of the text
-    pub fn format(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> TranslationListCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -1210,7 +1206,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The customization id for translate
-    pub fn add_cid(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
+    pub fn add_cid(mut self, new_value: &str) -> TranslationListCall<'a, C, A> {
         self._cid.push(new_value.to_string());
         self
     }
@@ -1221,7 +1217,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TranslationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TranslationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1242,7 +1238,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TranslationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TranslationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

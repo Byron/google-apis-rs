@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *doubleclicksearch* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *doubleclicksearch* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -199,7 +199,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -290,40 +289,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Doubleclicksearch<C, NC, A> {
+pub struct Doubleclicksearch<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Doubleclicksearch<C, NC, A> {}
+impl<'a, C, A> Hub for Doubleclicksearch<C, A> {}
 
-impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Doubleclicksearch<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Doubleclicksearch<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Doubleclicksearch<C, A> {
         Doubleclicksearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn conversion(&'a self) -> ConversionMethods<'a, C, NC, A> {
+    pub fn conversion(&'a self) -> ConversionMethods<'a, C, A> {
         ConversionMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a, C, NC, A> {
+    pub fn reports(&'a self) -> ReportMethods<'a, C, A> {
         ReportMethods { hub: &self }
     }
-    pub fn saved_columns(&'a self) -> SavedColumnMethods<'a, C, NC, A> {
+    pub fn saved_columns(&'a self) -> SavedColumnMethods<'a, C, A> {
         SavedColumnMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -875,15 +871,15 @@ impl ResponseResult for ConversionList {}
 /// let rb = hub.conversion();
 /// # }
 /// ```
-pub struct ConversionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ConversionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ConversionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
+impl<'a, C, A> ConversionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -892,7 +888,7 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &ConversionList) -> ConversionInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ConversionList) -> ConversionInsertCall<'a, C, A> {
         ConversionInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -915,7 +911,7 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     /// * `rowCount` - The number of conversions to return per call.
     /// * `startDate` - First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     /// * `startRow` - The 0-based starting index for retrieving conversions results.
-    pub fn get(&self, agency_id: &str, advertiser_id: &str, engine_account_id: &str, end_date: i32, row_count: i32, start_date: i32, start_row: u32) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn get(&self, agency_id: &str, advertiser_id: &str, engine_account_id: &str, end_date: i32, row_count: i32, start_date: i32, start_row: u32) -> ConversionGetCall<'a, C, A> {
         ConversionGetCall {
             hub: self.hub,
             _agency_id: agency_id.to_string(),
@@ -942,7 +938,7 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_availability(&self, request: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, NC, A> {
+    pub fn update_availability(&self, request: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, A> {
         ConversionUpdateAvailabilityCall {
             hub: self.hub,
             _request: request.clone(),
@@ -966,7 +962,7 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     /// * `rowCount` - The number of conversions to return per call.
     /// * `startDate` - First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     /// * `startRow` - The 0-based starting index for retrieving conversions results.
-    pub fn patch(&self, request: &ConversionList, advertiser_id: &str, agency_id: &str, end_date: i32, engine_account_id: &str, row_count: i32, start_date: i32, start_row: u32) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &ConversionList, advertiser_id: &str, agency_id: &str, end_date: i32, engine_account_id: &str, row_count: i32, start_date: i32, start_row: u32) -> ConversionPatchCall<'a, C, A> {
         ConversionPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -990,7 +986,7 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: &ConversionList) -> ConversionUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &ConversionList) -> ConversionUpdateCall<'a, C, A> {
         ConversionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1031,15 +1027,15 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
 /// let rb = hub.saved_columns();
 /// # }
 /// ```
-pub struct SavedColumnMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SavedColumnMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for SavedColumnMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for SavedColumnMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> SavedColumnMethods<'a, C, NC, A> {
+impl<'a, C, A> SavedColumnMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1049,7 +1045,7 @@ impl<'a, C, NC, A> SavedColumnMethods<'a, C, NC, A> {
     ///
     /// * `agencyId` - DS ID of the agency.
     /// * `advertiserId` - DS ID of the advertiser.
-    pub fn list(&self, agency_id: &str, advertiser_id: &str) -> SavedColumnListCall<'a, C, NC, A> {
+    pub fn list(&self, agency_id: &str, advertiser_id: &str) -> SavedColumnListCall<'a, C, A> {
         SavedColumnListCall {
             hub: self.hub,
             _agency_id: agency_id.to_string(),
@@ -1091,15 +1087,15 @@ impl<'a, C, NC, A> SavedColumnMethods<'a, C, NC, A> {
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReportMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
+impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1109,7 +1105,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     ///
     /// * `reportId` - ID of the report.
     /// * `reportFragment` - The index of the report fragment to download.
-    pub fn get_file(&self, report_id: &str, report_fragment: i32) -> ReportGetFileCall<'a, C, NC, A> {
+    pub fn get_file(&self, report_id: &str, report_fragment: i32) -> ReportGetFileCall<'a, C, A> {
         ReportGetFileCall {
             hub: self.hub,
             _report_id: report_id.to_string(),
@@ -1127,7 +1123,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn generate(&self, request: &ReportRequest) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn generate(&self, request: &ReportRequest) -> ReportGenerateCall<'a, C, A> {
         ReportGenerateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1144,7 +1140,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `reportId` - ID of the report request being polled.
-    pub fn get(&self, report_id: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn get(&self, report_id: &str) -> ReportGetCall<'a, C, A> {
         ReportGetCall {
             hub: self.hub,
             _report_id: report_id.to_string(),
@@ -1161,7 +1157,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn request(&self, request: &ReportRequest) -> ReportRequestCall<'a, C, NC, A> {
+    pub fn request(&self, request: &ReportRequest) -> ReportRequestCall<'a, C, A> {
         ReportRequestCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1216,19 +1212,19 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ConversionInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: ConversionList,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ConversionInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ConversionInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ConversionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1342,7 +1338,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ConversionList) -> ConversionInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ConversionList) -> ConversionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1353,7 +1349,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1374,7 +1370,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ConversionInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1391,7 +1387,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ConversionInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ConversionInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1433,10 +1429,10 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct ConversionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _agency_id: String,
     _advertiser_id: String,
     _engine_account_id: String,
@@ -1453,9 +1449,9 @@ pub struct ConversionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ConversionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ConversionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ConversionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1605,7 +1601,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the agency.
-    pub fn agency_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn agency_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
@@ -1615,7 +1611,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the advertiser.
-    pub fn advertiser_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn advertiser_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -1625,7 +1621,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the engine account.
-    pub fn engine_account_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn engine_account_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._engine_account_id = new_value.to_string();
         self
     }
@@ -1635,7 +1631,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    pub fn end_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._end_date = new_value;
         self
     }
@@ -1645,7 +1641,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The number of conversions to return per call.
-    pub fn row_count(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn row_count(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._row_count = new_value;
         self
     }
@@ -1655,7 +1651,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    pub fn start_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, A> {
         self._start_date = new_value;
         self
     }
@@ -1665,7 +1661,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The 0-based starting index for retrieving conversions results.
-    pub fn start_row(mut self, new_value: u32) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn start_row(mut self, new_value: u32) -> ConversionGetCall<'a, C, A> {
         self._start_row = new_value;
         self
     }
@@ -1673,7 +1669,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Numeric ID of the criterion.
-    pub fn criterion_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn criterion_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._criterion_id = Some(new_value.to_string());
         self
     }
@@ -1681,7 +1677,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Numeric ID of the campaign.
-    pub fn campaign_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn campaign_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._campaign_id = Some(new_value.to_string());
         self
     }
@@ -1689,7 +1685,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Numeric ID of the ad.
-    pub fn ad_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn ad_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._ad_id = Some(new_value.to_string());
         self
     }
@@ -1697,7 +1693,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Numeric ID of the ad group.
-    pub fn ad_group_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn ad_group_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, A> {
         self._ad_group_id = Some(new_value.to_string());
         self
     }
@@ -1708,7 +1704,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1729,7 +1725,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ConversionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1746,7 +1742,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ConversionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ConversionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1790,19 +1786,19 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ConversionUpdateAvailabilityCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionUpdateAvailabilityCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: UpdateAvailabilityRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ConversionUpdateAvailabilityCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ConversionUpdateAvailabilityCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1916,7 +1912,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1927,7 +1923,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateAvailabilityCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateAvailabilityCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1948,7 +1944,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionUpdateAvailabilityCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ConversionUpdateAvailabilityCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1965,7 +1961,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ConversionUpdateAvailabilityCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ConversionUpdateAvailabilityCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2009,10 +2005,10 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct ConversionPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: ConversionList,
     _advertiser_id: String,
     _agency_id: String,
@@ -2026,9 +2022,9 @@ pub struct ConversionPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ConversionPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ConversionPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2149,7 +2145,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ConversionList) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ConversionList) -> ConversionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2159,7 +2155,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the advertiser.
-    pub fn advertiser_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn advertiser_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -2169,7 +2165,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the agency.
-    pub fn agency_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn agency_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
@@ -2179,7 +2175,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    pub fn end_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn end_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._end_date = new_value;
         self
     }
@@ -2189,7 +2185,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// Numeric ID of the engine account.
-    pub fn engine_account_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn engine_account_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
         self._engine_account_id = new_value.to_string();
         self
     }
@@ -2199,7 +2195,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The number of conversions to return per call.
-    pub fn row_count(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn row_count(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._row_count = new_value;
         self
     }
@@ -2209,7 +2205,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    pub fn start_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn start_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
         self._start_date = new_value;
         self
     }
@@ -2219,7 +2215,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The 0-based starting index for retrieving conversions results.
-    pub fn start_row(mut self, new_value: u32) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn start_row(mut self, new_value: u32) -> ConversionPatchCall<'a, C, A> {
         self._start_row = new_value;
         self
     }
@@ -2230,7 +2226,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2251,7 +2247,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ConversionPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2268,7 +2264,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ConversionPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ConversionPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2312,19 +2308,19 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ConversionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ConversionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: ConversionList,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ConversionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ConversionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ConversionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2438,7 +2434,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ConversionList) -> ConversionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ConversionList) -> ConversionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2449,7 +2445,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ConversionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2470,7 +2466,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ConversionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2487,7 +2483,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ConversionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ConversionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2525,10 +2521,10 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct SavedColumnListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct SavedColumnListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _agency_id: String,
     _advertiser_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2536,9 +2532,9 @@ pub struct SavedColumnListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SavedColumnListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for SavedColumnListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2671,7 +2667,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// DS ID of the agency.
-    pub fn agency_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, NC, A> {
+    pub fn agency_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, A> {
         self._agency_id = new_value.to_string();
         self
     }
@@ -2681,7 +2677,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// DS ID of the advertiser.
-    pub fn advertiser_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, NC, A> {
+    pub fn advertiser_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, A> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -2692,7 +2688,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedColumnListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SavedColumnListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2713,7 +2709,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SavedColumnListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SavedColumnListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2730,7 +2726,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SavedColumnListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SavedColumnListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2771,10 +2767,10 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportGetFileCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportGetFileCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _report_id: String,
     _report_fragment: i32,
     _delegate: Option<&'a mut Delegate>,
@@ -2782,9 +2778,9 @@ pub struct ReportGetFileCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportGetFileCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportGetFileCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportGetFileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2906,7 +2902,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ID of the report.
-    pub fn report_id(mut self, new_value: &str) -> ReportGetFileCall<'a, C, NC, A> {
+    pub fn report_id(mut self, new_value: &str) -> ReportGetFileCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
@@ -2916,7 +2912,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The index of the report fragment to download.
-    pub fn report_fragment(mut self, new_value: i32) -> ReportGetFileCall<'a, C, NC, A> {
+    pub fn report_fragment(mut self, new_value: i32) -> ReportGetFileCall<'a, C, A> {
         self._report_fragment = new_value;
         self
     }
@@ -2927,7 +2923,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetFileCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetFileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2948,7 +2944,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGetFileCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGetFileCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2965,7 +2961,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportGetFileCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportGetFileCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3009,19 +3005,19 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportGenerateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportGenerateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: ReportRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportGenerateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportGenerateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3135,7 +3131,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ReportRequest) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ReportRequest) -> ReportGenerateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3146,7 +3142,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGenerateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGenerateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3167,7 +3163,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3184,7 +3180,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportGenerateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3222,19 +3218,19 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _report_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3366,7 +3362,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// ID of the report request being polled.
-    pub fn report_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
+    pub fn report_id(mut self, new_value: &str) -> ReportGetCall<'a, C, A> {
         self._report_id = new_value.to_string();
         self
     }
@@ -3377,7 +3373,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3398,7 +3394,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3415,7 +3411,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3459,19 +3455,19 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ReportRequestCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReportRequestCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Doubleclicksearch<C, NC, A>,
+    hub: &'a Doubleclicksearch<C, A>,
     _request: ReportRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReportRequestCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReportRequestCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReportRequestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3585,7 +3581,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ReportRequest) -> ReportRequestCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ReportRequest) -> ReportRequestCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3596,7 +3592,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportRequestCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReportRequestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3617,7 +3613,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportRequestCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportRequestCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3634,7 +3630,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReportRequestCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReportRequestCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

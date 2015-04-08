@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *drive* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -261,7 +261,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -394,70 +393,67 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Drive<C, NC, A> {
+pub struct Drive<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Drive<C, NC, A> {}
+impl<'a, C, A> Hub for Drive<C, A> {}
 
-impl<'a, C, NC, A> Drive<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Drive<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Drive<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Drive<C, A> {
         Drive {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn about(&'a self) -> AboutMethods<'a, C, NC, A> {
+    pub fn about(&'a self) -> AboutMethods<'a, C, A> {
         AboutMethods { hub: &self }
     }
-    pub fn apps(&'a self) -> AppMethods<'a, C, NC, A> {
+    pub fn apps(&'a self) -> AppMethods<'a, C, A> {
         AppMethods { hub: &self }
     }
-    pub fn changes(&'a self) -> ChangeMethods<'a, C, NC, A> {
+    pub fn changes(&'a self) -> ChangeMethods<'a, C, A> {
         ChangeMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C, NC, A> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, C, A> {
         ChannelMethods { hub: &self }
     }
-    pub fn children(&'a self) -> ChildrenMethods<'a, C, NC, A> {
+    pub fn children(&'a self) -> ChildrenMethods<'a, C, A> {
         ChildrenMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a, C, NC, A> {
+    pub fn comments(&'a self) -> CommentMethods<'a, C, A> {
         CommentMethods { hub: &self }
     }
-    pub fn files(&'a self) -> FileMethods<'a, C, NC, A> {
+    pub fn files(&'a self) -> FileMethods<'a, C, A> {
         FileMethods { hub: &self }
     }
-    pub fn parents(&'a self) -> ParentMethods<'a, C, NC, A> {
+    pub fn parents(&'a self) -> ParentMethods<'a, C, A> {
         ParentMethods { hub: &self }
     }
-    pub fn permissions(&'a self) -> PermissionMethods<'a, C, NC, A> {
+    pub fn permissions(&'a self) -> PermissionMethods<'a, C, A> {
         PermissionMethods { hub: &self }
     }
-    pub fn properties(&'a self) -> PropertyMethods<'a, C, NC, A> {
+    pub fn properties(&'a self) -> PropertyMethods<'a, C, A> {
         PropertyMethods { hub: &self }
     }
-    pub fn realtime(&'a self) -> RealtimeMethods<'a, C, NC, A> {
+    pub fn realtime(&'a self) -> RealtimeMethods<'a, C, A> {
         RealtimeMethods { hub: &self }
     }
-    pub fn replies(&'a self) -> ReplyMethods<'a, C, NC, A> {
+    pub fn replies(&'a self) -> ReplyMethods<'a, C, A> {
         ReplyMethods { hub: &self }
     }
-    pub fn revisions(&'a self) -> RevisionMethods<'a, C, NC, A> {
+    pub fn revisions(&'a self) -> RevisionMethods<'a, C, A> {
         RevisionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1920,15 +1916,15 @@ impl ResponseResult for Change {}
 /// let rb = hub.files();
 /// # }
 /// ```
-pub struct FileMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for FileMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for FileMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
+impl<'a, C, A> FileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1938,7 +1934,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file in question.
-    pub fn watch(&self, request: &Channel, file_id: &str) -> FileWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel, file_id: &str) -> FileWatchCall<'a, C, A> {
         FileWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1961,7 +1957,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &File) -> FileInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &File) -> FileInsertCall<'a, C, A> {
         FileInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1986,7 +1982,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file to untrash.
-    pub fn untrash(&self, file_id: &str) -> FileUntrashCall<'a, C, NC, A> {
+    pub fn untrash(&self, file_id: &str) -> FileUntrashCall<'a, C, A> {
         FileUntrashCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2004,7 +2000,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file to copy.
-    pub fn copy(&self, request: &File, file_id: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn copy(&self, request: &File, file_id: &str) -> FileCopyCall<'a, C, A> {
         FileCopyCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2029,7 +2025,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file to trash.
-    pub fn trash(&self, file_id: &str) -> FileTrashCall<'a, C, NC, A> {
+    pub fn trash(&self, file_id: &str) -> FileTrashCall<'a, C, A> {
         FileTrashCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2042,7 +2038,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Permanently deletes all of the user's trashed files.
-    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, C, NC, A> {
+    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, C, A> {
         FileEmptyTrashCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2054,7 +2050,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the user's files.
-    pub fn list(&self) -> FileListCall<'a, C, NC, A> {
+    pub fn list(&self) -> FileListCall<'a, C, A> {
         FileListCall {
             hub: self.hub,
             _q: Default::default(),
@@ -2075,7 +2071,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file to update.
-    pub fn touch(&self, file_id: &str) -> FileTouchCall<'a, C, NC, A> {
+    pub fn touch(&self, file_id: &str) -> FileTouchCall<'a, C, A> {
         FileTouchCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2093,7 +2089,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file to update.
-    pub fn update(&self, request: &File, file_id: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &File, file_id: &str) -> FileUpdateCall<'a, C, A> {
         FileUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2123,7 +2119,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file to delete.
-    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C, A> {
         FileDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2141,7 +2137,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file to update.
-    pub fn patch(&self, request: &File, file_id: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &File, file_id: &str) -> FilePatchCall<'a, C, A> {
         FilePatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2171,7 +2167,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID for the file in question.
-    pub fn get(&self, file_id: &str) -> FileGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str) -> FileGetCall<'a, C, A> {
         FileGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2217,20 +2213,20 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
 /// let rb = hub.about();
 /// # }
 /// ```
-pub struct AboutMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AboutMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AboutMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AboutMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AboutMethods<'a, C, NC, A> {
+impl<'a, C, A> AboutMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the information about the current user along with Drive API settings
-    pub fn get(&self) -> AboutGetCall<'a, C, NC, A> {
+    pub fn get(&self) -> AboutGetCall<'a, C, A> {
         AboutGetCall {
             hub: self.hub,
             _start_change_id: Default::default(),
@@ -2273,15 +2269,15 @@ impl<'a, C, NC, A> AboutMethods<'a, C, NC, A> {
 /// let rb = hub.realtime();
 /// # }
 /// ```
-pub struct RealtimeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RealtimeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RealtimeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RealtimeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
+impl<'a, C, A> RealtimeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2290,7 +2286,7 @@ impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
-    pub fn update(&self, file_id: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, file_id: &str) -> RealtimeUpdateCall<'a, C, A> {
         RealtimeUpdateCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2308,7 +2304,7 @@ impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
-    pub fn get(&self, file_id: &str) -> RealtimeGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str) -> RealtimeGetCall<'a, C, A> {
         RealtimeGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2350,15 +2346,15 @@ impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
 /// let rb = hub.apps();
 /// # }
 /// ```
-pub struct AppMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AppMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AppMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AppMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
+impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2367,7 +2363,7 @@ impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `appId` - The ID of the app.
-    pub fn get(&self, app_id: &str) -> AppGetCall<'a, C, NC, A> {
+    pub fn get(&self, app_id: &str) -> AppGetCall<'a, C, A> {
         AppGetCall {
             hub: self.hub,
             _app_id: app_id.to_string(),
@@ -2380,7 +2376,7 @@ impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists a user's installed apps.
-    pub fn list(&self) -> AppListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AppListCall<'a, C, A> {
         AppListCall {
             hub: self.hub,
             _language_code: Default::default(),
@@ -2423,15 +2419,15 @@ impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for CommentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for CommentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
+impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2441,7 +2437,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, A> {
         CommentDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2460,7 +2456,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a, C, A> {
         CommentGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2480,7 +2476,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn insert(&self, request: &Comment, file_id: &str) -> CommentInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Comment, file_id: &str) -> CommentInsertCall<'a, C, A> {
         CommentInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2500,7 +2496,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn patch(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentPatchCall<'a, C, A> {
         CommentPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2521,7 +2517,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn update(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a, C, A> {
         CommentUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2540,7 +2536,7 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str) -> CommentListCall<'a, C, A> {
         CommentListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2585,15 +2581,15 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
 /// let rb = hub.children();
 /// # }
 /// ```
-pub struct ChildrenMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChildrenMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChildrenMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChildrenMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
+impl<'a, C, A> ChildrenMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2602,7 +2598,7 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `folderId` - The ID of the folder.
-    pub fn list(&self, folder_id: &str) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn list(&self, folder_id: &str) -> ChildrenListCall<'a, C, A> {
         ChildrenListCall {
             hub: self.hub,
             _folder_id: folder_id.to_string(),
@@ -2623,7 +2619,7 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     ///
     /// * `folderId` - The ID of the folder.
     /// * `childId` - The ID of the child.
-    pub fn get(&self, folder_id: &str, child_id: &str) -> ChildrenGetCall<'a, C, NC, A> {
+    pub fn get(&self, folder_id: &str, child_id: &str) -> ChildrenGetCall<'a, C, A> {
         ChildrenGetCall {
             hub: self.hub,
             _folder_id: folder_id.to_string(),
@@ -2642,7 +2638,7 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     ///
     /// * `folderId` - The ID of the folder.
     /// * `childId` - The ID of the child.
-    pub fn delete(&self, folder_id: &str, child_id: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, folder_id: &str, child_id: &str) -> ChildrenDeleteCall<'a, C, A> {
         ChildrenDeleteCall {
             hub: self.hub,
             _folder_id: folder_id.to_string(),
@@ -2661,7 +2657,7 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `folderId` - The ID of the folder.
-    pub fn insert(&self, request: &ChildReference, folder_id: &str) -> ChildrenInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ChildReference, folder_id: &str) -> ChildrenInsertCall<'a, C, A> {
         ChildrenInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2703,15 +2699,15 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
+impl<'a, C, A> ChannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2720,7 +2716,7 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, A> {
         ChannelStopCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2761,15 +2757,15 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 /// let rb = hub.parents();
 /// # }
 /// ```
-pub struct ParentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ParentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ParentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ParentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
+impl<'a, C, A> ParentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2778,7 +2774,7 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> ParentListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str) -> ParentListCall<'a, C, A> {
         ParentListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2796,7 +2792,7 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `parentId` - The ID of the parent.
-    pub fn delete(&self, file_id: &str, parent_id: &str) -> ParentDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, parent_id: &str) -> ParentDeleteCall<'a, C, A> {
         ParentDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2815,7 +2811,7 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn insert(&self, request: &ParentReference, file_id: &str) -> ParentInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ParentReference, file_id: &str) -> ParentInsertCall<'a, C, A> {
         ParentInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2834,7 +2830,7 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `parentId` - The ID of the parent.
-    pub fn get(&self, file_id: &str, parent_id: &str) -> ParentGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, parent_id: &str) -> ParentGetCall<'a, C, A> {
         ParentGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2876,15 +2872,15 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
 /// let rb = hub.replies();
 /// # }
 /// ```
-pub struct ReplyMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ReplyMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ReplyMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
+impl<'a, C, A> ReplyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2896,7 +2892,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn patch(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyPatchCall<'a, C, A> {
         ReplyPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2917,7 +2913,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a, C, A> {
         ReplyListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2940,7 +2936,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a, C, A> {
         ReplyGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2962,7 +2958,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn insert(&self, request: &CommentReply, file_id: &str, comment_id: &str) -> ReplyInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &CommentReply, file_id: &str, comment_id: &str) -> ReplyInsertCall<'a, C, A> {
         ReplyInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2983,7 +2979,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a, C, A> {
         ReplyDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3005,7 +3001,7 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn update(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a, C, A> {
         ReplyUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3049,15 +3045,15 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
 /// let rb = hub.permissions();
 /// # }
 /// ```
-pub struct PermissionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PermissionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PermissionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
+impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3067,7 +3063,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID for the file.
     /// * `permissionId` - The ID for the permission.
-    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, C, A> {
         PermissionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3086,7 +3082,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file.
-    pub fn insert(&self, request: &Permission, file_id: &str) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Permission, file_id: &str) -> PermissionInsertCall<'a, C, A> {
         PermissionInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3108,7 +3104,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file.
     /// * `permissionId` - The ID for the permission.
-    pub fn update(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, C, A> {
         PermissionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3130,7 +3126,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file.
     /// * `permissionId` - The ID for the permission.
-    pub fn patch(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionPatchCall<'a, C, A> {
         PermissionPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3150,7 +3146,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID for the file.
-    pub fn list(&self, file_id: &str) -> PermissionListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str) -> PermissionListCall<'a, C, A> {
         PermissionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3168,7 +3164,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID for the file.
     /// * `permissionId` - The ID for the permission.
-    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, C, A> {
         PermissionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3186,7 +3182,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `email` - The email address for which to return a permission ID
-    pub fn get_id_for_email(&self, email: &str) -> PermissionGetIdForEmailCall<'a, C, NC, A> {
+    pub fn get_id_for_email(&self, email: &str) -> PermissionGetIdForEmailCall<'a, C, A> {
         PermissionGetIdForEmailCall {
             hub: self.hub,
             _email: email.to_string(),
@@ -3227,15 +3223,15 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
 /// let rb = hub.changes();
 /// # }
 /// ```
-pub struct ChangeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChangeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChangeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
+impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3244,7 +3240,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: &Channel) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn watch(&self, request: &Channel) -> ChangeWatchCall<'a, C, A> {
         ChangeWatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3262,7 +3258,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the changes for a user.
-    pub fn list(&self) -> ChangeListCall<'a, C, NC, A> {
+    pub fn list(&self) -> ChangeListCall<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
             _start_change_id: Default::default(),
@@ -3283,7 +3279,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `changeId` - The ID of the change.
-    pub fn get(&self, change_id: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn get(&self, change_id: &str) -> ChangeGetCall<'a, C, A> {
         ChangeGetCall {
             hub: self.hub,
             _change_id: change_id.to_string(),
@@ -3324,15 +3320,15 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
 /// let rb = hub.properties();
 /// # }
 /// ```
-pub struct PropertyMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PropertyMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PropertyMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
+impl<'a, C, A> PropertyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3343,7 +3339,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `propertyKey` - The key of the property.
-    pub fn patch(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyPatchCall<'a, C, A> {
         PropertyPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3364,7 +3360,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `propertyKey` - The key of the property.
-    pub fn delete(&self, file_id: &str, property_key: &str) -> PropertyDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, property_key: &str) -> PropertyDeleteCall<'a, C, A> {
         PropertyDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3384,7 +3380,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn insert(&self, request: &Property, file_id: &str) -> PropertyInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Property, file_id: &str) -> PropertyInsertCall<'a, C, A> {
         PropertyInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3402,7 +3398,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> PropertyListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str) -> PropertyListCall<'a, C, A> {
         PropertyListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3421,7 +3417,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `propertyKey` - The key of the property.
-    pub fn update(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyUpdateCall<'a, C, A> {
         PropertyUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3442,7 +3438,7 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `propertyKey` - The key of the property.
-    pub fn get(&self, file_id: &str, property_key: &str) -> PropertyGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, property_key: &str) -> PropertyGetCall<'a, C, A> {
         PropertyGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3485,15 +3481,15 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
 /// let rb = hub.revisions();
 /// # }
 /// ```
-pub struct RevisionMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RevisionMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RevisionMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
+impl<'a, C, A> RevisionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3503,7 +3499,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C, NC, A> {
+    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C, A> {
         RevisionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3522,7 +3518,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, C, A> {
         RevisionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3542,7 +3538,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file.
     /// * `revisionId` - The ID for the revision.
-    pub fn update(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a, C, A> {
         RevisionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3561,7 +3557,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> RevisionListCall<'a, C, NC, A> {
+    pub fn list(&self, file_id: &str) -> RevisionListCall<'a, C, A> {
         RevisionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3580,7 +3576,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID for the file.
     /// * `revisionId` - The ID for the revision.
-    pub fn patch(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionPatchCall<'a, C, A> {
         RevisionPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -3647,10 +3643,10 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct FileWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Channel,
     _file_id: String,
     _update_viewed_date: Option<bool>,
@@ -3663,9 +3659,9 @@ pub struct FileWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3835,7 +3831,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> FileWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> FileWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3845,7 +3841,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file in question.
-    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -3853,7 +3849,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to update the view date after successfully retrieving the file.
-    pub fn update_viewed_date(mut self, new_value: bool) -> FileWatchCall<'a, C, NC, A> {
+    pub fn update_viewed_date(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
@@ -3861,7 +3857,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
-    pub fn revision_id(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._revision_id = Some(new_value.to_string());
         self
     }
@@ -3869,7 +3865,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// This parameter is deprecated and has no function.
-    pub fn projection(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -3877,7 +3873,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Specifies the type of resource representation to return. The default is 'json' to return file metadata. Specifying 'media' will cause the file content to be returned.
-    pub fn alt(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
+    pub fn alt(mut self, new_value: &str) -> FileWatchCall<'a, C, A> {
         self._alt = Some(new_value.to_string());
         self
     }
@@ -3885,7 +3881,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. Ignored unless alt=media is specified.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C, NC, A> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C, A> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -3896,7 +3892,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3917,7 +3913,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3934,7 +3930,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3987,10 +3983,10 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct FileInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: File,
     _visibility: Option<String>,
     _use_content_as_indexable_text: Option<bool>,
@@ -4005,9 +4001,9 @@ pub struct FileInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4259,7 +4255,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &File) -> FileInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &File) -> FileInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4267,7 +4263,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The visibility of the new file. This parameter is only relevant when convert=false.
-    pub fn visibility(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -4275,7 +4271,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to use the content as indexable text.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
@@ -4283,7 +4279,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The timed text track name.
-    pub fn timed_text_track_name(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
+    pub fn timed_text_track_name(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
@@ -4291,7 +4287,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The language of the timed text.
-    pub fn timed_text_language(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
+    pub fn timed_text_language(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
@@ -4299,7 +4295,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to pin the head revision of the uploaded file. A file can have a maximum of 200 pinned revisions.
-    pub fn pinned(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
+    pub fn pinned(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
@@ -4307,7 +4303,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
-    pub fn ocr_language(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
@@ -4315,7 +4311,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
-    pub fn ocr(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
+    pub fn ocr(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
@@ -4323,7 +4319,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to convert this file to the corresponding Google Docs format.
-    pub fn convert(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
+    pub fn convert(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
@@ -4334,7 +4330,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4355,7 +4351,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4372,7 +4368,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4410,19 +4406,19 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct FileUntrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileUntrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileUntrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileUntrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4554,7 +4550,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to untrash.
-    pub fn file_id(mut self, new_value: &str) -> FileUntrashCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileUntrashCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -4565,7 +4561,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUntrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4586,7 +4582,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileUntrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileUntrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4603,7 +4599,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileUntrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileUntrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4654,10 +4650,10 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct FileCopyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileCopyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: File,
     _file_id: String,
     _visibility: Option<String>,
@@ -4672,9 +4668,9 @@ pub struct FileCopyCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileCopyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileCopyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4834,7 +4830,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &File) -> FileCopyCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &File) -> FileCopyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4844,7 +4840,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to copy.
-    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -4852,7 +4848,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The visibility of the new file. This parameter is only relevant when the source is not a native Google Doc and convert=false.
-    pub fn visibility(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -4860,7 +4856,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The timed text track name.
-    pub fn timed_text_track_name(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn timed_text_track_name(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
@@ -4868,7 +4864,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The language of the timed text.
-    pub fn timed_text_language(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn timed_text_language(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
@@ -4876,7 +4872,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to pin the head revision of the new copy. A file can have a maximum of 200 pinned revisions.
-    pub fn pinned(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
+    pub fn pinned(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
@@ -4884,7 +4880,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
-    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
@@ -4892,7 +4888,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
-    pub fn ocr(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
+    pub fn ocr(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
@@ -4900,7 +4896,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Whether to convert this file to the corresponding Google Docs format.
-    pub fn convert(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
+    pub fn convert(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
@@ -4911,7 +4907,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileCopyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileCopyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4932,7 +4928,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4949,7 +4945,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileCopyCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileCopyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4987,19 +4983,19 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct FileTrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileTrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileTrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileTrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5131,7 +5127,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to trash.
-    pub fn file_id(mut self, new_value: &str) -> FileTrashCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileTrashCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5142,7 +5138,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5163,7 +5159,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileTrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileTrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5180,7 +5176,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileTrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileTrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5218,18 +5214,18 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct FileEmptyTrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileEmptyTrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileEmptyTrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileEmptyTrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5326,7 +5322,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileEmptyTrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileEmptyTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5347,7 +5343,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5364,7 +5360,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileEmptyTrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileEmptyTrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5407,10 +5403,10 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct FileListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _q: Option<String>,
     _projection: Option<String>,
     _page_token: Option<String>,
@@ -5421,9 +5417,9 @@ pub struct FileListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5543,7 +5539,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Query string for searching files.
-    pub fn q(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -5551,7 +5547,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// This parameter is deprecated and has no function.
-    pub fn projection(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -5559,7 +5555,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Page token for files.
-    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5567,7 +5563,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of files to return.
-    pub fn max_results(mut self, new_value: i32) -> FileListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> FileListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5575,7 +5571,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// The body of items (files/documents) to which the query applies.
-    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
+    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C, A> {
         self._corpus = Some(new_value.to_string());
         self
     }
@@ -5586,7 +5582,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5607,7 +5603,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5624,7 +5620,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5662,19 +5658,19 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct FileTouchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileTouchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileTouchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileTouchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5806,7 +5802,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to update.
-    pub fn file_id(mut self, new_value: &str) -> FileTouchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileTouchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5817,7 +5813,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTouchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileTouchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5838,7 +5834,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileTouchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileTouchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5855,7 +5851,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileTouchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileTouchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5912,10 +5908,10 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct FileUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -5935,9 +5931,9 @@ pub struct FileUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6226,7 +6222,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &File) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &File) -> FileUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6236,7 +6232,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to update.
-    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -6244,7 +6240,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to use the content as indexable text.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
@@ -6252,7 +6248,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to update the view date after successfully updating the file.
-    pub fn update_viewed_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn update_viewed_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
@@ -6260,7 +6256,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The timed text track name.
-    pub fn timed_text_track_name(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn timed_text_track_name(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
@@ -6268,7 +6264,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// The language of the timed text.
-    pub fn timed_text_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn timed_text_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
@@ -6276,7 +6272,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to set the modified date with the supplied modified date.
-    pub fn set_modified_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn set_modified_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._set_modified_date = Some(new_value);
         self
     }
@@ -6284,7 +6280,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Comma-separated list of parent IDs to remove.
-    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
@@ -6292,7 +6288,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
-    pub fn pinned(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn pinned(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
@@ -6300,7 +6296,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
-    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
@@ -6308,7 +6304,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
-    pub fn ocr(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn ocr(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
@@ -6316,7 +6312,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
-    pub fn new_revision(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn new_revision(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._new_revision = Some(new_value);
         self
     }
@@ -6324,7 +6320,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to convert this file to the corresponding Google Docs format.
-    pub fn convert(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn convert(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
@@ -6332,7 +6328,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Comma-separated list of parent IDs to add.
-    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
         self._add_parents = Some(new_value.to_string());
         self
     }
@@ -6343,7 +6339,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6364,7 +6360,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6381,7 +6377,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6419,19 +6415,19 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct FileDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6552,7 +6548,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to delete.
-    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -6563,7 +6559,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6584,7 +6580,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6601,7 +6597,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6657,10 +6653,10 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct FilePatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FilePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -6680,9 +6676,9 @@ pub struct FilePatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FilePatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FilePatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6857,7 +6853,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &File) -> FilePatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &File) -> FilePatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6867,7 +6863,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file to update.
-    pub fn file_id(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -6875,7 +6871,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to use the content as indexable text.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
@@ -6883,7 +6879,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to update the view date after successfully updating the file.
-    pub fn update_viewed_date(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn update_viewed_date(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
@@ -6891,7 +6887,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The timed text track name.
-    pub fn timed_text_track_name(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn timed_text_track_name(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
     }
@@ -6899,7 +6895,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The language of the timed text.
-    pub fn timed_text_language(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn timed_text_language(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
     }
@@ -6907,7 +6903,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to set the modified date with the supplied modified date.
-    pub fn set_modified_date(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn set_modified_date(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._set_modified_date = Some(new_value);
         self
     }
@@ -6915,7 +6911,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Comma-separated list of parent IDs to remove.
-    pub fn remove_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn remove_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
@@ -6923,7 +6919,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
-    pub fn pinned(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn pinned(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._pinned = Some(new_value);
         self
     }
@@ -6931,7 +6927,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
-    pub fn ocr_language(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn ocr_language(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
@@ -6939,7 +6935,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
-    pub fn ocr(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn ocr(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._ocr = Some(new_value);
         self
     }
@@ -6947,7 +6943,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
-    pub fn new_revision(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn new_revision(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._new_revision = Some(new_value);
         self
     }
@@ -6955,7 +6951,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Whether to convert this file to the corresponding Google Docs format.
-    pub fn convert(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
+    pub fn convert(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
         self._convert = Some(new_value);
         self
     }
@@ -6963,7 +6959,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Comma-separated list of parent IDs to add.
-    pub fn add_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
+    pub fn add_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
         self._add_parents = Some(new_value.to_string());
         self
     }
@@ -6974,7 +6970,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FilePatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FilePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6995,7 +6991,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FilePatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FilePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7012,7 +7008,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FilePatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FilePatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7060,10 +7056,10 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct FileGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct FileGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _update_viewed_date: Option<bool>,
     _revision_id: Option<String>,
@@ -7075,9 +7071,9 @@ pub struct FileGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for FileGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for FileGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7240,7 +7236,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file in question.
-    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -7248,7 +7244,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Whether to update the view date after successfully retrieving the file.
-    pub fn update_viewed_date(mut self, new_value: bool) -> FileGetCall<'a, C, NC, A> {
+    pub fn update_viewed_date(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
         self._update_viewed_date = Some(new_value);
         self
     }
@@ -7256,7 +7252,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies the Revision ID that should be downloaded. Ignored unless alt=media is specified.
-    pub fn revision_id(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._revision_id = Some(new_value.to_string());
         self
     }
@@ -7264,7 +7260,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// This parameter is deprecated and has no function.
-    pub fn projection(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -7272,7 +7268,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Specifies the type of resource representation to return. The default is 'json' to return file metadata. Specifying 'media' will cause the file content to be returned.
-    pub fn alt(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
+    pub fn alt(mut self, new_value: &str) -> FileGetCall<'a, C, A> {
         self._alt = Some(new_value.to_string());
         self
     }
@@ -7280,7 +7276,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. Ignored unless alt=media is specified.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C, NC, A> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C, A> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -7291,7 +7287,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FileGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7312,7 +7308,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7329,7 +7325,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> FileGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> FileGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7370,10 +7366,10 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct AboutGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AboutGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _start_change_id: Option<String>,
     _max_change_id_count: Option<i64>,
     _include_subscribed: Option<bool>,
@@ -7382,9 +7378,9 @@ pub struct AboutGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AboutGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AboutGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7498,7 +7494,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Change ID to start counting from when calculating number of remaining change IDs
-    pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, NC, A> {
+    pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
@@ -7506,7 +7502,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of remaining change IDs to count
-    pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, NC, A> {
+    pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, A> {
         self._max_change_id_count = Some(new_value);
         self
     }
@@ -7514,7 +7510,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// When calculating the number of remaining change IDs, whether to include public files the user has opened and shared files. When set to false, this counts only change IDs for owned files and any shared or public files that the user has explicitly added to a folder they own.
-    pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, NC, A> {
+    pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
@@ -7525,7 +7521,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AboutGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AboutGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7546,7 +7542,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7563,7 +7559,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AboutGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AboutGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7603,10 +7599,10 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct RealtimeUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RealtimeUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _base_revision: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -7614,9 +7610,9 @@ pub struct RealtimeUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RealtimeUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RealtimeUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7849,7 +7845,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file that the Realtime API data model is associated with.
-    pub fn file_id(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -7857,7 +7853,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.
-    pub fn base_revision(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
+    pub fn base_revision(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
         self._base_revision = Some(new_value.to_string());
         self
     }
@@ -7868,7 +7864,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7889,7 +7885,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RealtimeUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RealtimeUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7906,7 +7902,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RealtimeUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RealtimeUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7948,10 +7944,10 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct RealtimeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RealtimeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _revision: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -7959,9 +7955,9 @@ pub struct RealtimeGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RealtimeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RealtimeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8085,7 +8081,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file that the Realtime API data model is associated with.
-    pub fn file_id(mut self, new_value: &str) -> RealtimeGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RealtimeGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -8093,7 +8089,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.
-    pub fn revision(mut self, new_value: i32) -> RealtimeGetCall<'a, C, NC, A> {
+    pub fn revision(mut self, new_value: i32) -> RealtimeGetCall<'a, C, A> {
         self._revision = Some(new_value);
         self
     }
@@ -8104,7 +8100,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RealtimeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8125,7 +8121,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RealtimeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RealtimeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8142,7 +8138,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RealtimeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RealtimeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8180,19 +8176,19 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct AppGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AppGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _app_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AppGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AppGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8324,7 +8320,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// we provide this method for API completeness.
     /// 
     /// The ID of the app.
-    pub fn app_id(mut self, new_value: &str) -> AppGetCall<'a, C, NC, A> {
+    pub fn app_id(mut self, new_value: &str) -> AppGetCall<'a, C, A> {
         self._app_id = new_value.to_string();
         self
     }
@@ -8335,7 +8331,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8356,7 +8352,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8373,7 +8369,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8414,10 +8410,10 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///              .doit();
 /// # }
 /// ```
-pub struct AppListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AppListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _language_code: Option<String>,
     _app_filter_mime_types: Option<String>,
     _app_filter_extensions: Option<String>,
@@ -8426,9 +8422,9 @@ pub struct AppListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AppListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AppListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8542,7 +8538,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// A language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
-    pub fn language_code(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
+    pub fn language_code(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -8550,7 +8546,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// A comma-separated list of MIME types for open with filtering. All apps within the given app query scope which can open any of the given MIME types will be included in the response. If appFilterExtensions are provided as well, the result is a union of the two resulting app lists.
-    pub fn app_filter_mime_types(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
+    pub fn app_filter_mime_types(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._app_filter_mime_types = Some(new_value.to_string());
         self
     }
@@ -8558,7 +8554,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// A comma-separated list of file extensions for open with filtering. All apps within the given app query scope which can open any of the given file extensions will be included in the response. If appFilterMimeTypes are provided as well, the result is a union of the two resulting app lists.
-    pub fn app_filter_extensions(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
+    pub fn app_filter_extensions(mut self, new_value: &str) -> AppListCall<'a, C, A> {
         self._app_filter_extensions = Some(new_value.to_string());
         self
     }
@@ -8569,7 +8565,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8590,7 +8586,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AppListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AppListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8607,7 +8603,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AppListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AppListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8645,10 +8641,10 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _comment_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8656,9 +8652,9 @@ pub struct CommentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8780,7 +8776,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -8790,7 +8786,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -8801,7 +8797,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8822,7 +8818,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8839,7 +8835,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8878,10 +8874,10 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _comment_id: String,
     _include_deleted: Option<bool>,
@@ -8890,9 +8886,9 @@ pub struct CommentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9028,7 +9024,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9038,7 +9034,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -9046,7 +9042,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If set, this will succeed when retrieving a deleted comment, and will include any deleted replies.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -9057,7 +9053,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9078,7 +9074,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9095,7 +9091,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9139,10 +9135,10 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Comment,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9150,9 +9146,9 @@ pub struct CommentInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9291,7 +9287,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Comment) -> CommentInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Comment) -> CommentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9301,7 +9297,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9312,7 +9308,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9333,7 +9329,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9350,7 +9346,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9394,10 +9390,10 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -9406,9 +9402,9 @@ pub struct CommentPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9548,7 +9544,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Comment) -> CommentPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Comment) -> CommentPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9558,7 +9554,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9568,7 +9564,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -9579,7 +9575,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9600,7 +9596,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9617,7 +9613,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9661,10 +9657,10 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -9673,9 +9669,9 @@ pub struct CommentUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9815,7 +9811,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Comment) -> CommentUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Comment) -> CommentUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9825,7 +9821,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9835,7 +9831,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -9846,7 +9842,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9867,7 +9863,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9884,7 +9880,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9926,10 +9922,10 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct CommentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct CommentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _updated_min: Option<String>,
     _page_token: Option<String>,
@@ -9940,9 +9936,9 @@ pub struct CommentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for CommentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for CommentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10086,7 +10082,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -10094,7 +10090,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Only discussions that were updated after this timestamp will be returned. Formatted as an RFC 3339 timestamp.
-    pub fn updated_min(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -10102,7 +10098,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10110,7 +10106,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The maximum number of discussions to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> CommentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> CommentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10118,7 +10114,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// If set, all comments and replies, including deleted comments and replies (with content stripped) will be returned.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -10129,7 +10125,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CommentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10150,7 +10146,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10167,7 +10163,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> CommentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10208,10 +10204,10 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ChildrenListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChildrenListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _folder_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -10221,9 +10217,9 @@ pub struct ChildrenListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChildrenListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChildrenListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChildrenListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10364,7 +10360,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the folder.
-    pub fn folder_id(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn folder_id(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -10372,7 +10368,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Query string for searching children.
-    pub fn q(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -10380,7 +10376,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Page token for children.
-    pub fn page_token(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ChildrenListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10388,7 +10384,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of children to return.
-    pub fn max_results(mut self, new_value: i32) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ChildrenListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -10399,7 +10395,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10420,7 +10416,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChildrenListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChildrenListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10437,7 +10433,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChildrenListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChildrenListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10475,10 +10471,10 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ChildrenGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChildrenGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _folder_id: String,
     _child_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10486,9 +10482,9 @@ pub struct ChildrenGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChildrenGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChildrenGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10621,7 +10617,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the folder.
-    pub fn folder_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, NC, A> {
+    pub fn folder_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -10631,7 +10627,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the child.
-    pub fn child_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, NC, A> {
+    pub fn child_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, A> {
         self._child_id = new_value.to_string();
         self
     }
@@ -10642,7 +10638,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10663,7 +10659,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChildrenGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChildrenGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10680,7 +10676,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChildrenGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChildrenGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10718,10 +10714,10 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ChildrenDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChildrenDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _folder_id: String,
     _child_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10729,9 +10725,9 @@ pub struct ChildrenDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChildrenDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChildrenDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10853,7 +10849,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the folder.
-    pub fn folder_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
+    pub fn folder_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -10863,7 +10859,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the child.
-    pub fn child_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
+    pub fn child_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, A> {
         self._child_id = new_value.to_string();
         self
     }
@@ -10874,7 +10870,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10895,7 +10891,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChildrenDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChildrenDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10912,7 +10908,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChildrenDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChildrenDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10956,10 +10952,10 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ChildrenInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChildrenInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: ChildReference,
     _folder_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10967,9 +10963,9 @@ pub struct ChildrenInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChildrenInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChildrenInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11108,7 +11104,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ChildReference) -> ChildrenInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ChildReference) -> ChildrenInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11118,7 +11114,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the folder.
-    pub fn folder_id(mut self, new_value: &str) -> ChildrenInsertCall<'a, C, NC, A> {
+    pub fn folder_id(mut self, new_value: &str) -> ChildrenInsertCall<'a, C, A> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -11129,7 +11125,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChildrenInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11150,7 +11146,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChildrenInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChildrenInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11167,7 +11163,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChildrenInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChildrenInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11211,19 +11207,19 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelStopCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelStopCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11326,7 +11322,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11337,7 +11333,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11358,7 +11354,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11375,7 +11371,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11413,19 +11409,19 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ParentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ParentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ParentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ParentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11557,7 +11553,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ParentListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ParentListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -11568,7 +11564,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11589,7 +11585,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ParentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ParentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11606,7 +11602,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ParentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ParentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11644,10 +11640,10 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ParentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ParentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _parent_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11655,9 +11651,9 @@ pub struct ParentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ParentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ParentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11779,7 +11775,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -11789,7 +11785,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the parent.
-    pub fn parent_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, NC, A> {
+    pub fn parent_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, A> {
         self._parent_id = new_value.to_string();
         self
     }
@@ -11800,7 +11796,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11821,7 +11817,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ParentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ParentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11838,7 +11834,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ParentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ParentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11882,10 +11878,10 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ParentInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ParentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: ParentReference,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -11893,9 +11889,9 @@ pub struct ParentInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ParentInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ParentInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12034,7 +12030,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ParentReference) -> ParentInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ParentReference) -> ParentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12044,7 +12040,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ParentInsertCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ParentInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12055,7 +12051,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12076,7 +12072,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ParentInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ParentInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12093,7 +12089,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ParentInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ParentInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12131,10 +12127,10 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ParentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ParentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _parent_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12142,9 +12138,9 @@ pub struct ParentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ParentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ParentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12277,7 +12273,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ParentGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ParentGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12287,7 +12283,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the parent.
-    pub fn parent_id(mut self, new_value: &str) -> ParentGetCall<'a, C, NC, A> {
+    pub fn parent_id(mut self, new_value: &str) -> ParentGetCall<'a, C, A> {
         self._parent_id = new_value.to_string();
         self
     }
@@ -12298,7 +12294,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ParentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12319,7 +12315,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ParentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ParentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12336,7 +12332,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ParentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ParentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12380,10 +12376,10 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: CommentReply,
     _file_id: String,
     _comment_id: String,
@@ -12393,9 +12389,9 @@ pub struct ReplyPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12536,7 +12532,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CommentReply) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CommentReply) -> ReplyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12546,7 +12542,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12556,7 +12552,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -12566,7 +12562,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reply.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -12577,7 +12573,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12598,7 +12594,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12615,7 +12611,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12656,10 +12652,10 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _comment_id: String,
     _page_token: Option<String>,
@@ -12670,9 +12666,9 @@ pub struct ReplyListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12814,7 +12810,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12824,7 +12820,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -12832,7 +12828,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
-    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -12840,7 +12836,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// The maximum number of replies to include in the response, used for paging.
-    pub fn max_results(mut self, new_value: i32) -> ReplyListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ReplyListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -12848,7 +12844,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// If set, all replies, including deleted replies (with content stripped) will be returned.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -12859,7 +12855,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12880,7 +12876,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12897,7 +12893,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12936,10 +12932,10 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -12949,9 +12945,9 @@ pub struct ReplyGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13088,7 +13084,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13098,7 +13094,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13108,7 +13104,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reply.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -13116,7 +13112,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// If set, this will succeed when retrieving a deleted reply.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -13127,7 +13123,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13148,7 +13144,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13165,7 +13161,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13209,10 +13205,10 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: CommentReply,
     _file_id: String,
     _comment_id: String,
@@ -13221,9 +13217,9 @@ pub struct ReplyInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13363,7 +13359,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CommentReply) -> ReplyInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CommentReply) -> ReplyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13373,7 +13369,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13383,7 +13379,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13394,7 +13390,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13415,7 +13411,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13432,7 +13428,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13470,10 +13466,10 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -13482,9 +13478,9 @@ pub struct ReplyDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13607,7 +13603,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13617,7 +13613,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13627,7 +13623,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reply.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -13638,7 +13634,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13659,7 +13655,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13676,7 +13672,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13720,10 +13716,10 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ReplyUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ReplyUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: CommentReply,
     _file_id: String,
     _comment_id: String,
@@ -13733,9 +13729,9 @@ pub struct ReplyUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ReplyUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ReplyUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13876,7 +13872,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CommentReply) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CommentReply) -> ReplyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13886,7 +13882,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13896,7 +13892,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the comment.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13906,7 +13902,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the reply.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, A> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -13917,7 +13913,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ReplyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13938,7 +13934,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13955,7 +13951,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ReplyUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ReplyUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13993,10 +13989,10 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -14004,9 +14000,9 @@ pub struct PermissionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14128,7 +14124,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14138,7 +14134,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID for the permission.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14149,7 +14145,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14170,7 +14166,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14187,7 +14183,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14233,10 +14229,10 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Permission,
     _file_id: String,
     _send_notification_emails: Option<bool>,
@@ -14246,9 +14242,9 @@ pub struct PermissionInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14393,7 +14389,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Permission) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Permission) -> PermissionInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14403,7 +14399,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14411,7 +14407,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
-    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
         self._send_notification_emails = Some(new_value);
         self
     }
@@ -14419,7 +14415,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// A custom message to include in notification emails.
-    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
         self._email_message = Some(new_value.to_string());
         self
     }
@@ -14430,7 +14426,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14451,7 +14447,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14468,7 +14464,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14513,10 +14509,10 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
@@ -14526,9 +14522,9 @@ pub struct PermissionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14671,7 +14667,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Permission) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Permission) -> PermissionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14681,7 +14677,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14691,7 +14687,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID for the permission.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14699,7 +14695,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
         self
     }
@@ -14710,7 +14706,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14731,7 +14727,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14748,7 +14744,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -14793,10 +14789,10 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
@@ -14806,9 +14802,9 @@ pub struct PermissionPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14951,7 +14947,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Permission) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Permission) -> PermissionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -14961,7 +14957,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14971,7 +14967,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID for the permission.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14979,7 +14975,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionPatchCall<'a, C, A> {
         self._transfer_ownership = Some(new_value);
         self
     }
@@ -14990,7 +14986,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15011,7 +15007,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15028,7 +15024,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15066,19 +15062,19 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15210,7 +15206,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -15221,7 +15217,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15242,7 +15238,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15259,7 +15255,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15297,10 +15293,10 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -15308,9 +15304,9 @@ pub struct PermissionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15443,7 +15439,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -15453,7 +15449,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID for the permission.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -15464,7 +15460,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15485,7 +15481,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15502,7 +15498,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15540,19 +15536,19 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PermissionGetIdForEmailCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PermissionGetIdForEmailCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _email: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PermissionGetIdForEmailCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PermissionGetIdForEmailCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15684,7 +15680,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The email address for which to return a permission ID
-    pub fn email(mut self, new_value: &str) -> PermissionGetIdForEmailCall<'a, C, NC, A> {
+    pub fn email(mut self, new_value: &str) -> PermissionGetIdForEmailCall<'a, C, A> {
         self._email = new_value.to_string();
         self
     }
@@ -15695,7 +15691,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetIdForEmailCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PermissionGetIdForEmailCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15716,7 +15712,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetIdForEmailCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetIdForEmailCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15733,7 +15729,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PermissionGetIdForEmailCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PermissionGetIdForEmailCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -15782,10 +15778,10 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeWatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Channel,
     _start_change_id: Option<String>,
     _page_token: Option<String>,
@@ -15797,9 +15793,9 @@ pub struct ChangeWatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeWatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeWatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15928,7 +15924,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChangeWatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -15936,7 +15932,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Change ID to start listing changes from.
-    pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
@@ -15944,7 +15940,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Page token for changes.
-    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -15952,7 +15948,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Maximum number of changes to return.
-    pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -15960,7 +15956,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
-    pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
@@ -15968,7 +15964,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Whether to include deleted items.
-    pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -15979,7 +15975,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeWatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeWatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16000,7 +15996,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16017,7 +16013,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeWatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeWatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16060,10 +16056,10 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _start_change_id: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -16074,9 +16070,9 @@ pub struct ChangeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16196,7 +16192,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Change ID to start listing changes from.
-    pub fn start_change_id(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn start_change_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
         self
     }
@@ -16204,7 +16200,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Page token for changes.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -16212,7 +16208,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of changes to return.
-    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -16220,7 +16216,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
-    pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, NC, A> {
+    pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_subscribed = Some(new_value);
         self
     }
@@ -16228,7 +16224,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Whether to include deleted items.
-    pub fn include_deleted(mut self, new_value: bool) -> ChangeListCall<'a, C, NC, A> {
+    pub fn include_deleted(mut self, new_value: bool) -> ChangeListCall<'a, C, A> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -16239,7 +16235,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16260,7 +16256,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16277,7 +16273,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16315,19 +16311,19 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChangeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _change_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChangeGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChangeGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16459,7 +16455,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// The ID of the change.
-    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
         self._change_id = new_value.to_string();
         self
     }
@@ -16470,7 +16466,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16491,7 +16487,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16508,7 +16504,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChangeGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChangeGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16553,10 +16549,10 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Property,
     _file_id: String,
     _property_key: String,
@@ -16566,9 +16562,9 @@ pub struct PropertyPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16711,7 +16707,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Property) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Property) -> PropertyPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -16721,7 +16717,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -16731,7 +16727,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The key of the property.
-    pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
@@ -16739,7 +16735,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The visibility of the property.
-    pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -16750,7 +16746,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16771,7 +16767,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16788,7 +16784,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -16827,10 +16823,10 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _property_key: String,
     _visibility: Option<String>,
@@ -16839,9 +16835,9 @@ pub struct PropertyDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16966,7 +16962,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -16976,7 +16972,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The key of the property.
-    pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
+    pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
@@ -16984,7 +16980,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The visibility of the property.
-    pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -16995,7 +16991,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17016,7 +17012,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17033,7 +17029,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17077,10 +17073,10 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Property,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -17088,9 +17084,9 @@ pub struct PropertyInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17229,7 +17225,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Property) -> PropertyInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Property) -> PropertyInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17239,7 +17235,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyInsertCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyInsertCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -17250,7 +17246,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17271,7 +17267,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17288,7 +17284,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17326,19 +17322,19 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17470,7 +17466,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -17481,7 +17477,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17502,7 +17498,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17519,7 +17515,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17564,10 +17560,10 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Property,
     _file_id: String,
     _property_key: String,
@@ -17577,9 +17573,9 @@ pub struct PropertyUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17722,7 +17718,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Property) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Property) -> PropertyUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -17732,7 +17728,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -17742,7 +17738,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The key of the property.
-    pub fn property_key(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn property_key(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
@@ -17750,7 +17746,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The visibility of the property.
-    pub fn visibility(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -17761,7 +17757,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17782,7 +17778,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17799,7 +17795,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -17838,10 +17834,10 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct PropertyGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PropertyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _property_key: String,
     _visibility: Option<String>,
@@ -17850,9 +17846,9 @@ pub struct PropertyGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PropertyGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PropertyGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17988,7 +17984,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -17998,7 +17994,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The key of the property.
-    pub fn property_key(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
+    pub fn property_key(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._property_key = new_value.to_string();
         self
     }
@@ -18006,7 +18002,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// The visibility of the property.
-    pub fn visibility(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
+    pub fn visibility(mut self, new_value: &str) -> PropertyGetCall<'a, C, A> {
         self._visibility = Some(new_value.to_string());
         self
     }
@@ -18017,7 +18013,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PropertyGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18038,7 +18034,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18055,7 +18051,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PropertyGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PropertyGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18093,10 +18089,10 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct RevisionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _revision_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -18104,9 +18100,9 @@ pub struct RevisionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RevisionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RevisionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18239,7 +18235,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -18249,7 +18245,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the revision.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -18260,7 +18256,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18281,7 +18277,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18298,7 +18294,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RevisionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RevisionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18336,10 +18332,10 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct RevisionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _revision_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -18347,9 +18343,9 @@ pub struct RevisionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RevisionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RevisionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18471,7 +18467,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -18481,7 +18477,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the revision.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -18492,7 +18488,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18513,7 +18509,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18530,7 +18526,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RevisionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RevisionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18574,10 +18570,10 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct RevisionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -18586,9 +18582,9 @@ pub struct RevisionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RevisionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RevisionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18728,7 +18724,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Revision) -> RevisionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Revision) -> RevisionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -18738,7 +18734,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -18748,7 +18744,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID for the revision.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -18759,7 +18755,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18780,7 +18776,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18797,7 +18793,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RevisionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RevisionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -18835,19 +18831,19 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct RevisionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _file_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RevisionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RevisionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18979,7 +18975,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the file.
-    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -18990,7 +18986,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19011,7 +19007,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19028,7 +19024,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RevisionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RevisionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -19072,10 +19068,10 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct RevisionPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RevisionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Drive<C, NC, A>,
+    hub: &'a Drive<C, A>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -19084,9 +19080,9 @@ pub struct RevisionPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RevisionPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RevisionPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -19226,7 +19222,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Revision) -> RevisionPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Revision) -> RevisionPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -19236,7 +19232,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID for the file.
-    pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, NC, A> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
         self._file_id = new_value.to_string();
         self
     }
@@ -19246,7 +19242,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID for the revision.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, NC, A> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -19257,7 +19253,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RevisionPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19278,7 +19274,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19295,7 +19291,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RevisionPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RevisionPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

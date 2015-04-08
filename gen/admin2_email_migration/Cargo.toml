@@ -4,12 +4,12 @@
 [package]
 
 name = "google-admin2_email_migration"
-version = "0.1.4+20150303"
+version = "0.1.5+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with admin (protocol email_migration_v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin2_email_migration"
 homepage = "https://developers.google.com/admin-sdk/email-migration/v2/"
-documentation = "http://byron.github.io/google-apis-rs/google-admin2_email_migration"
+documentation = "http://byron.github.io/google-apis-rs/google_admin2_email_migration"
 license = "MIT"
 keywords = ["admin", "google", "protocol", "web", "api"]
 

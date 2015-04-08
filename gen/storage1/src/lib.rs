@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *0.1.4+20150326*, where *20150326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *storage* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -231,7 +231,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -341,49 +340,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Storage<C, NC, A> {
+pub struct Storage<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Storage<C, NC, A> {}
+impl<'a, C, A> Hub for Storage<C, A> {}
 
-impl<'a, C, NC, A> Storage<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Storage<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Storage<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Storage<C, A> {
         Storage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn bucket_access_controls(&'a self) -> BucketAccessControlMethods<'a, C, NC, A> {
+    pub fn bucket_access_controls(&'a self) -> BucketAccessControlMethods<'a, C, A> {
         BucketAccessControlMethods { hub: &self }
     }
-    pub fn buckets(&'a self) -> BucketMethods<'a, C, NC, A> {
+    pub fn buckets(&'a self) -> BucketMethods<'a, C, A> {
         BucketMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C, NC, A> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, C, A> {
         ChannelMethods { hub: &self }
     }
-    pub fn default_object_access_controls(&'a self) -> DefaultObjectAccessControlMethods<'a, C, NC, A> {
+    pub fn default_object_access_controls(&'a self) -> DefaultObjectAccessControlMethods<'a, C, A> {
         DefaultObjectAccessControlMethods { hub: &self }
     }
-    pub fn object_access_controls(&'a self) -> ObjectAccessControlMethods<'a, C, NC, A> {
+    pub fn object_access_controls(&'a self) -> ObjectAccessControlMethods<'a, C, A> {
         ObjectAccessControlMethods { hub: &self }
     }
-    pub fn objects(&'a self) -> ObjectMethods<'a, C, NC, A> {
+    pub fn objects(&'a self) -> ObjectMethods<'a, C, A> {
         ObjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1101,15 +1097,15 @@ impl ResponseResult for Buckets {}
 /// let rb = hub.default_object_access_controls();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DefaultObjectAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DefaultObjectAccessControlMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
+impl<'a, C, A> DefaultObjectAccessControlMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1119,7 +1115,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn insert(&self, request: &ObjectAccessControl, bucket: &str) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ObjectAccessControl, bucket: &str) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         DefaultObjectAccessControlInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1139,7 +1135,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         DefaultObjectAccessControlUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1158,7 +1154,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn list(&self, bucket: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn list(&self, bucket: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         DefaultObjectAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1179,7 +1175,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         DefaultObjectAccessControlPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1199,7 +1195,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         DefaultObjectAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1218,7 +1214,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn get(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         DefaultObjectAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1260,15 +1256,15 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
 /// let rb = hub.bucket_access_controls();
 /// # }
 /// ```
-pub struct BucketAccessControlMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BucketAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BucketAccessControlMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
+impl<'a, C, A> BucketAccessControlMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1279,7 +1275,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlPatchCall<'a, C, A> {
         BucketAccessControlPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1299,7 +1295,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, entity: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, bucket: &str, entity: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
         BucketAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1318,7 +1314,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn insert(&self, request: &BucketAccessControl, bucket: &str) -> BucketAccessControlInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &BucketAccessControl, bucket: &str) -> BucketAccessControlInsertCall<'a, C, A> {
         BucketAccessControlInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1337,7 +1333,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, entity: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
+    pub fn get(&self, bucket: &str, entity: &str) -> BucketAccessControlGetCall<'a, C, A> {
         BucketAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1357,7 +1353,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
         BucketAccessControlUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1376,7 +1372,7 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn list(&self, bucket: &str) -> BucketAccessControlListCall<'a, C, NC, A> {
+    pub fn list(&self, bucket: &str) -> BucketAccessControlListCall<'a, C, A> {
         BucketAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1417,15 +1413,15 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
+impl<'a, C, A> ChannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1434,7 +1430,7 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, A> {
         ChannelStopCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1475,15 +1471,15 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 /// let rb = hub.objects();
 /// # }
 /// ```
-pub struct ObjectMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ObjectMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ObjectMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
+impl<'a, C, A> ObjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1493,7 +1489,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object.
-    pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a, C, A> {
         ObjectGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1521,7 +1517,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which to look for objects.
-    pub fn watch_all(&self, request: &Channel, bucket: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn watch_all(&self, request: &Channel, bucket: &str) -> ObjectWatchAllCall<'a, C, A> {
         ObjectWatchAllCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1547,7 +1543,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object.
-    pub fn update(&self, request: &Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, A> {
         ObjectUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1577,7 +1573,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
-    pub fn insert(&self, request: &Object, bucket: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Object, bucket: &str) -> ObjectInsertCall<'a, C, A> {
         ObjectInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1608,7 +1604,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `destinationBucket` - Name of the bucket in which to store the new object.
     /// * `destinationObject` - Name of the new object.
-    pub fn compose(&self, request: &ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn compose(&self, request: &ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a, C, A> {
         ObjectComposeCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1634,7 +1630,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object.
-    pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a, C, A> {
         ObjectDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1657,7 +1653,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of the bucket in which to look for objects.
-    pub fn list(&self, bucket: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn list(&self, bucket: &str) -> ObjectListCall<'a, C, A> {
         ObjectListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1684,7 +1680,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     /// * `sourceObject` - Name of the source object.
     /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
-    pub fn copy(&self, request: &Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn copy(&self, request: &Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a, C, A> {
         ObjectCopyCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1721,7 +1717,7 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object.
-    pub fn patch(&self, request: &Object, bucket: &str, object: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Object, bucket: &str, object: &str) -> ObjectPatchCall<'a, C, A> {
         ObjectPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1774,15 +1770,15 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
 /// let rb = hub.object_access_controls();
 /// # }
 /// ```
-pub struct ObjectAccessControlMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ObjectAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ObjectAccessControlMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
+impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1793,7 +1789,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         ObjectAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1815,7 +1811,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
-    pub fn insert(&self, request: &ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         ObjectAccessControlInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1838,7 +1834,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         ObjectAccessControlPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1860,7 +1856,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
-    pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a, C, A> {
         ObjectAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1881,7 +1877,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         ObjectAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1904,7 +1900,7 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         ObjectAccessControlUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1949,15 +1945,15 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
 /// let rb = hub.buckets();
 /// # }
 /// ```
-pub struct BucketMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for BucketMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for BucketMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
+impl<'a, C, A> BucketMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1967,7 +1963,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn update(&self, request: &Bucket, bucket: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Bucket, bucket: &str) -> BucketUpdateCall<'a, C, A> {
         BucketUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1990,7 +1986,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn get(&self, bucket: &str) -> BucketGetCall<'a, C, NC, A> {
+    pub fn get(&self, bucket: &str) -> BucketGetCall<'a, C, A> {
         BucketGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2010,7 +2006,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn delete(&self, bucket: &str) -> BucketDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, bucket: &str) -> BucketDeleteCall<'a, C, A> {
         BucketDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2030,7 +2026,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - A valid API project identifier.
-    pub fn insert(&self, request: &Bucket, project: &str) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Bucket, project: &str) -> BucketInsertCall<'a, C, A> {
         BucketInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2052,7 +2048,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn patch(&self, request: &Bucket, bucket: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Bucket, bucket: &str) -> BucketPatchCall<'a, C, A> {
         BucketPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2075,7 +2071,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - A valid API project identifier.
-    pub fn list(&self, project: &str) -> BucketListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> BucketListCall<'a, C, A> {
         BucketListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -2134,10 +2130,10 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2145,9 +2141,9 @@ pub struct DefaultObjectAccessControlInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2286,7 +2282,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2296,7 +2292,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -2307,7 +2303,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2328,7 +2324,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2345,7 +2341,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2389,10 +2385,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _entity: String,
@@ -2401,9 +2397,9 @@ pub struct DefaultObjectAccessControlUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2543,7 +2539,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2553,7 +2549,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -2563,7 +2559,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -2574,7 +2570,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2595,7 +2591,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2612,7 +2608,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2652,10 +2648,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
@@ -2664,9 +2660,9 @@ pub struct DefaultObjectAccessControlListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2804,7 +2800,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -2812,7 +2808,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -2820,7 +2816,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// If present, only return default ACL listing if the bucket's current metageneration matches this value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -2831,7 +2827,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2852,7 +2848,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2869,7 +2865,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2913,10 +2909,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _entity: String,
@@ -2925,9 +2921,9 @@ pub struct DefaultObjectAccessControlPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3067,7 +3063,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3077,7 +3073,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3087,7 +3083,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -3098,7 +3094,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3119,7 +3115,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3136,7 +3132,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3174,10 +3170,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3185,9 +3181,9 @@ pub struct DefaultObjectAccessControlDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3309,7 +3305,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3319,7 +3315,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -3330,7 +3326,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3351,7 +3347,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3368,7 +3364,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3406,10 +3402,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DefaultObjectAccessControlGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3417,9 +3413,9 @@ pub struct DefaultObjectAccessControlGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DefaultObjectAccessControlGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DefaultObjectAccessControlGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3552,7 +3548,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3562,7 +3558,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -3573,7 +3569,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DefaultObjectAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3594,7 +3590,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3611,7 +3607,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3655,10 +3651,10 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
@@ -3667,9 +3663,9 @@ pub struct BucketAccessControlPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3809,7 +3805,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3819,7 +3815,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3829,7 +3825,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -3840,7 +3836,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3861,7 +3857,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3878,7 +3874,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3916,10 +3912,10 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3927,9 +3923,9 @@ pub struct BucketAccessControlDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4051,7 +4047,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4061,7 +4057,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -4072,7 +4068,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4093,7 +4089,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4110,7 +4106,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4154,10 +4150,10 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: BucketAccessControl,
     _bucket: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4165,9 +4161,9 @@ pub struct BucketAccessControlInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4306,7 +4302,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4316,7 +4312,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4327,7 +4323,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4348,7 +4344,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4365,7 +4361,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4403,10 +4399,10 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _entity: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4414,9 +4410,9 @@ pub struct BucketAccessControlGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4549,7 +4545,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4559,7 +4555,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -4570,7 +4566,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4591,7 +4587,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4608,7 +4604,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4652,10 +4648,10 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
@@ -4664,9 +4660,9 @@ pub struct BucketAccessControlUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4806,7 +4802,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &BucketAccessControl) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4816,7 +4812,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4826,7 +4822,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -4837,7 +4833,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4858,7 +4854,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4875,7 +4871,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4913,19 +4909,19 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketAccessControlListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketAccessControlListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketAccessControlListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketAccessControlListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5057,7 +5053,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -5068,7 +5064,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5089,7 +5085,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5106,7 +5102,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5150,19 +5146,19 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ChannelStopCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelStopCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5265,7 +5261,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChannelStopCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5276,7 +5272,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5297,7 +5293,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5314,7 +5310,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5366,10 +5362,10 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
     _projection: Option<String>,
@@ -5386,9 +5382,9 @@ pub struct ObjectGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5564,7 +5560,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which the object resides.
-    pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -5574,7 +5570,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -5582,7 +5578,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl.
-    pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -5590,7 +5586,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -5598,7 +5594,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -5606,7 +5602,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the operation conditional on whether the object's generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -5614,7 +5610,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the operation conditional on whether the object's generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -5622,7 +5618,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -5630,7 +5626,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -5638,7 +5634,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -5646,7 +5642,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -5657,7 +5653,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5678,7 +5674,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5695,7 +5691,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5745,10 +5741,10 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectWatchAllCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectWatchAllCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Channel,
     _bucket: String,
     _versions: Option<bool>,
@@ -5762,9 +5758,9 @@ pub struct ObjectWatchAllCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectWatchAllCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectWatchAllCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5921,7 +5917,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ObjectWatchAllCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5931,7 +5927,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to look for objects.
-    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -5939,7 +5935,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// If true, lists all versions of a file as distinct results.
-    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, A> {
         self._versions = Some(new_value);
         self
     }
@@ -5947,7 +5943,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl.
-    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -5955,7 +5951,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Filter results to objects whose names begin with this prefix.
-    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
@@ -5963,7 +5959,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5971,7 +5967,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
-    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -5979,7 +5975,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
-    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -5990,7 +5986,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectWatchAllCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectWatchAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6011,7 +6007,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6028,7 +6024,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectWatchAllCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectWatchAllCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6087,10 +6083,10 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Object,
     _bucket: String,
     _object: String,
@@ -6109,9 +6105,9 @@ pub struct ObjectUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6297,7 +6293,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Object) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Object) -> ObjectUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6307,7 +6303,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which the object resides.
-    pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -6317,7 +6313,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -6325,7 +6321,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Set of properties to return. Defaults to full.
-    pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -6333,7 +6329,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of access controls to this object.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -6341,7 +6337,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -6349,7 +6345,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -6357,7 +6353,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -6365,7 +6361,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -6373,7 +6369,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -6381,7 +6377,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -6389,7 +6385,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -6397,7 +6393,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -6408,7 +6404,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6429,7 +6425,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6446,7 +6442,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6507,10 +6503,10 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ObjectInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Object,
     _bucket: String,
     _projection: Option<String>,
@@ -6529,9 +6525,9 @@ pub struct ObjectInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6829,7 +6825,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Object) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Object) -> ObjectInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6839,7 +6835,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
-    pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -6847,7 +6843,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
-    pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -6855,7 +6851,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of access controls to this object.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -6863,7 +6859,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
-    pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -6871,7 +6867,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -6879,7 +6875,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -6887,7 +6883,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -6895,7 +6891,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -6903,7 +6899,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -6911,7 +6907,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Provides a base64-encoded 256-bit key to encrypt the object. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -6919,7 +6915,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Specifies the encryption algorithm that would be used to encrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -6927,7 +6923,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If set, sets the contentEncoding property of the final object to this value. Setting this parameter is equivalent to setting the contentEncoding metadata property. This can be useful when uploading an object with uploadType=media to indicate the encoding of the content being uploaded.
-    pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
         self._content_encoding = Some(new_value.to_string());
         self
     }
@@ -6938,7 +6934,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6959,7 +6955,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6976,7 +6972,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7031,10 +7027,10 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectComposeCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectComposeCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ComposeRequest,
     _destination_bucket: String,
     _destination_object: String,
@@ -7049,9 +7045,9 @@ pub struct ObjectComposeCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectComposeCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectComposeCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7225,7 +7221,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ComposeRequest) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ComposeRequest) -> ObjectComposeCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7235,7 +7231,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to store the new object.
-    pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_bucket = new_value.to_string();
         self
     }
@@ -7245,7 +7241,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Name of the new object.
-    pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_object = new_value.to_string();
         self
     }
@@ -7253,7 +7249,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -7261,7 +7257,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -7269,7 +7265,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -7277,7 +7273,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -7285,7 +7281,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -7293,7 +7289,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Apply a predefined set of access controls to the destination object.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
@@ -7304,7 +7300,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectComposeCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectComposeCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7325,7 +7321,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectComposeCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectComposeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7342,7 +7338,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectComposeCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectComposeCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7385,10 +7381,10 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
     _if_metageneration_not_match: Option<String>,
@@ -7401,9 +7397,9 @@ pub struct ObjectDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7540,7 +7536,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which the object resides.
-    pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -7550,7 +7546,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -7558,7 +7554,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -7566,7 +7562,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -7574,7 +7570,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -7582,7 +7578,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -7590,7 +7586,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If present, permanently deletes a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -7601,7 +7597,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7622,7 +7618,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7639,7 +7635,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7683,10 +7679,10 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _versions: Option<bool>,
     _projection: Option<String>,
@@ -7699,9 +7695,9 @@ pub struct ObjectListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7851,7 +7847,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to look for objects.
-    pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -7859,7 +7855,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If true, lists all versions of a file as distinct results.
-    pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, C, NC, A> {
+    pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, C, A> {
         self._versions = Some(new_value);
         self
     }
@@ -7867,7 +7863,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl.
-    pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -7875,7 +7871,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Filter results to objects whose names begin with this prefix.
-    pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
@@ -7883,7 +7879,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7891,7 +7887,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
-    pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7899,7 +7895,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
-    pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
+    pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -7910,7 +7906,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7931,7 +7927,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7948,7 +7944,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8011,10 +8007,10 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectCopyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectCopyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Object,
     _source_bucket: String,
     _source_object: String,
@@ -8039,9 +8035,9 @@ pub struct ObjectCopyCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectCopyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectCopyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8241,7 +8237,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Object) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Object) -> ObjectCopyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8251,7 +8247,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to find the source object.
-    pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_bucket = new_value.to_string();
         self
     }
@@ -8261,7 +8257,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the source object.
-    pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_object = new_value.to_string();
         self
     }
@@ -8271,7 +8267,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
-    pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_bucket = new_value.to_string();
         self
     }
@@ -8281,7 +8277,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
-    pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_object = new_value.to_string();
         self
     }
@@ -8289,7 +8285,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
-    pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._source_generation = Some(new_value.to_string());
         self
     }
@@ -8297,7 +8293,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
-    pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -8305,7 +8301,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
-    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -8313,7 +8309,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the source object's current metageneration matches the given value.
-    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -8321,7 +8317,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the source object's generation does not match the given value.
-    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -8329,7 +8325,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the source object's generation matches the given value.
-    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_source_generation_match = Some(new_value.to_string());
         self
     }
@@ -8337,7 +8333,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -8345,7 +8341,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -8353,7 +8349,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the destination object's current generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -8361,7 +8357,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Makes the operation conditional on whether the destination object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -8369,7 +8365,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -8377,7 +8373,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -8385,7 +8381,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -8393,7 +8389,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Apply a predefined set of access controls to the destination object.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
@@ -8404,7 +8400,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectCopyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectCopyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8425,7 +8421,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectCopyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectCopyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8442,7 +8438,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectCopyCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectCopyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8496,10 +8492,10 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Object,
     _bucket: String,
     _object: String,
@@ -8518,9 +8514,9 @@ pub struct ObjectPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8690,7 +8686,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Object) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Object) -> ObjectPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8700,7 +8696,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Name of the bucket in which the object resides.
-    pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -8710,7 +8706,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -8718,7 +8714,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Set of properties to return. Defaults to full.
-    pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -8726,7 +8722,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Apply a predefined set of access controls to this object.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -8734,7 +8730,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -8742,7 +8738,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -8750,7 +8746,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation does not match the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
@@ -8758,7 +8754,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the operation conditional on whether the object's current generation matches the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
@@ -8766,7 +8762,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -8774,7 +8770,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_key_hash = Some(new_value.to_string());
         self
     }
@@ -8782,7 +8778,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_key(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_key = Some(new_value.to_string());
         self
     }
@@ -8790,7 +8786,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
-    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectPatchCall<'a, C, A> {
         self._encryption_algorithm = Some(new_value.to_string());
         self
     }
@@ -8801,7 +8797,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8822,7 +8818,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8839,7 +8835,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8878,10 +8874,10 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
     _entity: String,
@@ -8891,9 +8887,9 @@ pub struct ObjectAccessControlGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9030,7 +9026,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9040,7 +9036,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -9050,7 +9046,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -9058,7 +9054,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -9069,7 +9065,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9090,7 +9086,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9107,7 +9103,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9152,10 +9148,10 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -9165,9 +9161,9 @@ pub struct ObjectAccessControlInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9310,7 +9306,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9320,7 +9316,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9330,7 +9326,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -9338,7 +9334,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -9349,7 +9345,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9370,7 +9366,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9387,7 +9383,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9432,10 +9428,10 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -9446,9 +9442,9 @@ pub struct ObjectAccessControlPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9592,7 +9588,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9602,7 +9598,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9612,7 +9608,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -9622,7 +9618,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -9630,7 +9626,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -9641,7 +9637,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9662,7 +9658,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9679,7 +9675,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9718,10 +9714,10 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
     _generation: Option<String>,
@@ -9730,9 +9726,9 @@ pub struct ObjectAccessControlListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9868,7 +9864,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9878,7 +9874,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -9886,7 +9882,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -9897,7 +9893,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9918,7 +9914,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9935,7 +9931,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9974,10 +9970,10 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _object: String,
     _entity: String,
@@ -9987,9 +9983,9 @@ pub struct ObjectAccessControlDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10115,7 +10111,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -10125,7 +10121,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -10135,7 +10131,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -10143,7 +10139,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -10154,7 +10150,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10175,7 +10171,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10192,7 +10188,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10237,10 +10233,10 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ObjectAccessControlUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ObjectAccessControlUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -10251,9 +10247,9 @@ pub struct ObjectAccessControlUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ObjectAccessControlUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ObjectAccessControlUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10397,7 +10393,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ObjectAccessControl) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10407,7 +10403,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -10417,7 +10413,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// Name of the object.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._object = new_value.to_string();
         self
     }
@@ -10427,7 +10423,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._entity = new_value.to_string();
         self
     }
@@ -10435,7 +10431,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -10446,7 +10442,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ObjectAccessControlUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10467,7 +10463,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10484,7 +10480,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10533,10 +10529,10 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Bucket,
     _bucket: String,
     _projection: Option<String>,
@@ -10549,9 +10545,9 @@ pub struct BucketUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10705,7 +10701,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Bucket) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Bucket) -> BucketUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10715,7 +10711,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -10723,7 +10719,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Set of properties to return. Defaults to full.
-    pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -10731,7 +10727,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of default object access controls to this bucket.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
@@ -10739,7 +10735,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of access controls to this bucket.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -10747,7 +10743,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -10755,7 +10751,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -10766,7 +10762,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10787,7 +10783,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10804,7 +10800,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10845,10 +10841,10 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<String>,
@@ -10858,9 +10854,9 @@ pub struct BucketGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11001,7 +10997,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11009,7 +11005,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl.
-    pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -11017,7 +11013,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -11025,7 +11021,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -11036,7 +11032,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11057,7 +11053,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11074,7 +11070,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11114,10 +11110,10 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _bucket: String,
     _if_metageneration_not_match: Option<String>,
     _if_metageneration_match: Option<String>,
@@ -11126,9 +11122,9 @@ pub struct BucketDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11255,7 +11251,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11263,7 +11259,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If set, only deletes the bucket if its metageneration does not match this value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -11271,7 +11267,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// If set, only deletes the bucket if its metageneration matches this value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -11282,7 +11278,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11303,7 +11299,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11320,7 +11316,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11367,10 +11363,10 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Bucket,
     _project: String,
     _projection: Option<String>,
@@ -11381,9 +11377,9 @@ pub struct BucketInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11507,7 +11503,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Bucket) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Bucket) -> BucketInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11517,7 +11513,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// A valid API project identifier.
-    pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -11525,7 +11521,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.
-    pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -11533,7 +11529,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of default object access controls to this bucket.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
@@ -11541,7 +11537,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Apply a predefined set of access controls to this bucket.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -11552,7 +11548,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11573,7 +11569,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11590,7 +11586,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11639,10 +11635,10 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _request: Bucket,
     _bucket: String,
     _projection: Option<String>,
@@ -11655,9 +11651,9 @@ pub struct BucketPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11811,7 +11807,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Bucket) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Bucket) -> BucketPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11821,7 +11817,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Name of a bucket.
-    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11829,7 +11825,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Set of properties to return. Defaults to full.
-    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -11837,7 +11833,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Apply a predefined set of default object access controls to this bucket.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
@@ -11845,7 +11841,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Apply a predefined set of access controls to this bucket.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -11853,7 +11849,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
@@ -11861,7 +11857,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     ///
     /// 
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -11872,7 +11868,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11893,7 +11889,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11910,7 +11906,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11952,10 +11948,10 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct BucketListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct BucketListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Storage<C, NC, A>,
+    hub: &'a Storage<C, A>,
     _project: String,
     _projection: Option<String>,
     _prefix: Option<String>,
@@ -11966,9 +11962,9 @@ pub struct BucketListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for BucketListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for BucketListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12088,7 +12084,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// A valid API project identifier.
-    pub fn project(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -12096,7 +12092,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Set of properties to return. Defaults to noAcl.
-    pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
+    pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -12104,7 +12100,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Filter results to buckets whose names begin with this prefix.
-    pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
+    pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._prefix = Some(new_value.to_string());
         self
     }
@@ -12112,7 +12108,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// A previously-returned page token representing part of the larger set of results to view.
-    pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -12120,7 +12116,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Maximum number of buckets to return.
-    pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -12131,7 +12127,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BucketListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12152,7 +12148,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12169,7 +12165,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> BucketListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> BucketListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

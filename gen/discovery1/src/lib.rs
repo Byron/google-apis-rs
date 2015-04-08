@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *discovery* crate version *0.1.4+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *discovery* crate version *0.1.5+00000000*, where *00000000* is the exact revision of the *discovery:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *discovery* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/discovery/).
@@ -188,7 +188,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -257,34 +256,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Discovery<C, NC, A> {
+pub struct Discovery<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Discovery<C, NC, A> {}
+impl<'a, C, A> Hub for Discovery<C, A> {}
 
-impl<'a, C, NC, A> Discovery<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Discovery<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Discovery<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Discovery<C, A> {
         Discovery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn apis(&'a self) -> ApiMethods<'a, C, NC, A> {
+    pub fn apis(&'a self) -> ApiMethods<'a, C, A> {
         ApiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -818,15 +814,15 @@ impl Part for RestMethodMediaUploadProtocolsSimple {}
 /// let rb = hub.apis();
 /// # }
 /// ```
-pub struct ApiMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ApiMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Discovery<C, NC, A>,
+    hub: &'a Discovery<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ApiMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ApiMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ApiMethods<'a, C, NC, A> {
+impl<'a, C, A> ApiMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -836,7 +832,7 @@ impl<'a, C, NC, A> ApiMethods<'a, C, NC, A> {
     ///
     /// * `api` - The name of the API.
     /// * `version` - The version of the API.
-    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, C, NC, A> {
+    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, C, A> {
         ApiGetRestCall {
             hub: self.hub,
             _api: api.to_string(),
@@ -849,7 +845,7 @@ impl<'a, C, NC, A> ApiMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve the list of APIs supported at this endpoint.
-    pub fn list(&self) -> ApiListCall<'a, C, NC, A> {
+    pub fn list(&self) -> ApiListCall<'a, C, A> {
         ApiListCall {
             hub: self.hub,
             _preferred: Default::default(),
@@ -898,19 +894,19 @@ impl<'a, C, NC, A> ApiMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct ApiGetRestCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ApiGetRestCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Discovery<C, NC, A>,
+    hub: &'a Discovery<C, A>,
     _api: String,
     _version: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ApiGetRestCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ApiGetRestCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ApiGetRestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1041,7 +1037,7 @@ impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The name of the API.
-    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, C, NC, A> {
+    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, C, A> {
         self._api = new_value.to_string();
         self
     }
@@ -1051,7 +1047,7 @@ impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The version of the API.
-    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, C, NC, A> {
+    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, C, A> {
         self._version = new_value.to_string();
         self
     }
@@ -1062,7 +1058,7 @@ impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiGetRestCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiGetRestCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1083,7 +1079,7 @@ impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1124,19 +1120,19 @@ impl<'a, C, NC, A> ApiGetRestCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct ApiListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ApiListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Discovery<C, NC, A>,
+    hub: &'a Discovery<C, A>,
     _preferred: Option<bool>,
     _name: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for ApiListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ApiListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ApiListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ApiListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1245,7 +1241,7 @@ impl<'a, C, NC, A> ApiListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Return only the preferred version of an API.
-    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, C, NC, A> {
+    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, C, A> {
         self._preferred = Some(new_value);
         self
     }
@@ -1253,7 +1249,7 @@ impl<'a, C, NC, A> ApiListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     ///
     /// 
     /// Only include APIs with the given name.
-    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -1264,7 +1260,7 @@ impl<'a, C, NC, A> ApiListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApiListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1285,7 +1281,7 @@ impl<'a, C, NC, A> ApiListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

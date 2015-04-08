@@ -4,12 +4,12 @@
 [package]
 
 name = "google-adsensehost4d1"
-version = "0.1.4+20150326"
+version = "0.1.5+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with AdSense Host (protocol v4.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsensehost4d1"
 homepage = "https://developers.google.com/adsense/host/"
-documentation = "http://byron.github.io/google-apis-rs/google-adsensehost4d1"
+documentation = "http://byron.github.io/google-apis-rs/google_adsensehost4d1"
 license = "MIT"
 keywords = ["adsensehost", "google", "protocol", "web", "api"]
 

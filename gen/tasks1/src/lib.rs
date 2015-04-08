@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *tasks* crate version *0.1.4+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *tasks* crate version *0.1.5+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *tasks* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
@@ -207,7 +207,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -312,37 +311,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct TasksHub<C, NC, A> {
+pub struct TasksHub<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for TasksHub<C, NC, A> {}
+impl<'a, C, A> Hub for TasksHub<C, A> {}
 
-impl<'a, C, NC, A> TasksHub<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasksHub<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> TasksHub<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> TasksHub<C, A> {
         TasksHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn tasklists(&'a self) -> TasklistMethods<'a, C, NC, A> {
+    pub fn tasklists(&'a self) -> TasklistMethods<'a, C, A> {
         TasklistMethods { hub: &self }
     }
-    pub fn tasks(&'a self) -> TaskMethods<'a, C, NC, A> {
+    pub fn tasks(&'a self) -> TaskMethods<'a, C, A> {
         TaskMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -548,15 +544,15 @@ impl ResponseResult for Tasks {}
 /// let rb = hub.tasks();
 /// # }
 /// ```
-pub struct TaskMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TaskMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TaskMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
+impl<'a, C, A> TaskMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -565,7 +561,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn list(&self, tasklist: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn list(&self, tasklist: &str) -> TaskListCall<'a, C, A> {
         TaskListCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -594,7 +590,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn update(&self, request: &Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a, C, A> {
         TaskUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -615,7 +611,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn patch(&self, request: &Task, tasklist: &str, task: &str) -> TaskPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &Task, tasklist: &str, task: &str) -> TaskPatchCall<'a, C, A> {
         TaskPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -634,7 +630,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a, C, NC, A> {
+    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a, C, A> {
         TaskClearCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -652,7 +648,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a, C, A> {
         TaskMoveCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -673,7 +669,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a, C, A> {
         TaskDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -692,7 +688,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a, C, A> {
         TaskGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -711,7 +707,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn insert(&self, request: &Task, tasklist: &str) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Task, tasklist: &str) -> TaskInsertCall<'a, C, A> {
         TaskInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -755,20 +751,20 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
 /// let rb = hub.tasklists();
 /// # }
 /// ```
-pub struct TasklistMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TasklistMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TasklistMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
+impl<'a, C, A> TasklistMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all the authenticated user's task lists.
-    pub fn list(&self) -> TasklistListCall<'a, C, NC, A> {
+    pub fn list(&self) -> TasklistListCall<'a, C, A> {
         TasklistListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -787,7 +783,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn update(&self, request: &TaskList, tasklist: &str) -> TasklistUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &TaskList, tasklist: &str) -> TasklistUpdateCall<'a, C, A> {
         TasklistUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -805,7 +801,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a, C, A> {
         TasklistDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -823,7 +819,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn patch(&self, request: &TaskList, tasklist: &str) -> TasklistPatchCall<'a, C, NC, A> {
+    pub fn patch(&self, request: &TaskList, tasklist: &str) -> TasklistPatchCall<'a, C, A> {
         TasklistPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -841,7 +837,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: &TaskList) -> TasklistInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &TaskList) -> TasklistInsertCall<'a, C, A> {
         TasklistInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -858,7 +854,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a, C, NC, A> {
+    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a, C, A> {
         TasklistGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -917,10 +913,10 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _updated_min: Option<String>,
     _show_hidden: Option<bool>,
@@ -937,9 +933,9 @@ pub struct TaskListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1101,7 +1097,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1109,7 +1105,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
-    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._updated_min = Some(new_value.to_string());
         self
     }
@@ -1117,7 +1113,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
-    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
+    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_hidden = Some(new_value);
         self
     }
@@ -1125,7 +1121,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
-    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
+    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -1133,7 +1129,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True.
-    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
+    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C, A> {
         self._show_completed = Some(new_value);
         self
     }
@@ -1141,7 +1137,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Token specifying the result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1149,7 +1145,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Maximum number of task lists returned on one page. Optional. The default is 100.
-    pub fn max_results(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._max_results = Some(new_value.to_string());
         self
     }
@@ -1157,7 +1153,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
-    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_min = Some(new_value.to_string());
         self
     }
@@ -1165,7 +1161,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
-    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._due_max = Some(new_value.to_string());
         self
     }
@@ -1173,7 +1169,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
-    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._completed_min = Some(new_value.to_string());
         self
     }
@@ -1181,7 +1177,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
-    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
+    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C, A> {
         self._completed_max = Some(new_value.to_string());
         self
     }
@@ -1192,7 +1188,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1213,7 +1209,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1230,7 +1226,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1274,10 +1270,10 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -1286,9 +1282,9 @@ pub struct TaskUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1428,7 +1424,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Task) -> TaskUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Task) -> TaskUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1438,7 +1434,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1448,7 +1444,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Task identifier.
-    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C, NC, A> {
+    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
@@ -1459,7 +1455,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1480,7 +1476,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1497,7 +1493,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1541,10 +1537,10 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -1553,9 +1549,9 @@ pub struct TaskPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1695,7 +1691,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Task) -> TaskPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Task) -> TaskPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1705,7 +1701,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1715,7 +1711,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Task identifier.
-    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C, NC, A> {
+    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
@@ -1726,7 +1722,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1747,7 +1743,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1764,7 +1760,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1802,19 +1798,19 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskClearCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskClearCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskClearCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskClearCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1935,7 +1931,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1946,7 +1942,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskClearCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskClearCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1967,7 +1963,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1984,7 +1980,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskClearCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskClearCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2024,10 +2020,10 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskMoveCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskMoveCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _task: String,
     _previous: Option<String>,
@@ -2037,9 +2033,9 @@ pub struct TaskMoveCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskMoveCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskMoveCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2178,7 +2174,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2188,7 +2184,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// Task identifier.
-    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
@@ -2196,7 +2192,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
-    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
@@ -2204,7 +2200,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
-    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C, A> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -2215,7 +2211,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskMoveCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskMoveCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2236,7 +2232,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2253,7 +2249,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskMoveCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskMoveCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2291,10 +2287,10 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2302,9 +2298,9 @@ pub struct TaskDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2426,7 +2422,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2436,7 +2432,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Task identifier.
-    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
@@ -2447,7 +2443,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2468,7 +2464,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2485,7 +2481,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2523,10 +2519,10 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2534,9 +2530,9 @@ pub struct TaskGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2669,7 +2665,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2679,7 +2675,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// we provide this method for API completeness.
     /// 
     /// Task identifier.
-    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
+    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C, A> {
         self._task = new_value.to_string();
         self
     }
@@ -2690,7 +2686,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2711,7 +2707,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2728,7 +2724,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2774,10 +2770,10 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///              .doit();
 /// # }
 /// ```
-pub struct TaskInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TaskInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: Task,
     _tasklist: String,
     _previous: Option<String>,
@@ -2787,9 +2783,9 @@ pub struct TaskInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TaskInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TaskInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TaskInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2934,7 +2930,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Task) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Task) -> TaskInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2944,7 +2940,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2952,7 +2948,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
-    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._previous = Some(new_value.to_string());
         self
     }
@@ -2960,7 +2956,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     ///
     /// 
     /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
-    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C, A> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -2971,7 +2967,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TaskInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2992,7 +2988,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3009,7 +3005,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TaskInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TaskInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3049,10 +3045,10 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _page_token: Option<String>,
     _max_results: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -3060,9 +3056,9 @@ pub struct TasklistListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3173,7 +3169,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Token specifying the result page to return. Optional.
-    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3181,7 +3177,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of task lists returned on one page. Optional. The default is 100.
-    pub fn max_results(mut self, new_value: &str) -> TasklistListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: &str) -> TasklistListCall<'a, C, A> {
         self._max_results = Some(new_value.to_string());
         self
     }
@@ -3192,7 +3188,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3213,7 +3209,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3230,7 +3226,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3274,10 +3270,10 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3285,9 +3281,9 @@ pub struct TasklistUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3426,7 +3422,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &TaskList) -> TasklistUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &TaskList) -> TasklistUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3436,7 +3432,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -3447,7 +3443,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3468,7 +3464,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3485,7 +3481,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3523,19 +3519,19 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3656,7 +3652,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -3667,7 +3663,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3688,7 +3684,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3705,7 +3701,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3749,10 +3745,10 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3760,9 +3756,9 @@ pub struct TasklistPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3901,7 +3897,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &TaskList) -> TasklistPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &TaskList) -> TasklistPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3911,7 +3907,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -3922,7 +3918,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3943,7 +3939,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3960,7 +3956,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4004,19 +4000,19 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _request: TaskList,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4130,7 +4126,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &TaskList) -> TasklistInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &TaskList) -> TasklistInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4141,7 +4137,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4162,7 +4158,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4179,7 +4175,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4217,19 +4213,19 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct TasklistGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TasklistGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TasksHub<C, NC, A>,
+    hub: &'a TasksHub<C, A>,
     _tasklist: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TasklistGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TasklistGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TasklistGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4361,7 +4357,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// Task list identifier.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, C, NC, A> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, C, A> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -4372,7 +4368,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TasklistGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4393,7 +4389,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4410,7 +4406,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TasklistGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TasklistGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

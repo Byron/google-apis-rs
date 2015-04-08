@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Management* crate version *0.1.4+20150325*, where *20150325* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Games Management* crate version *0.1.5+20150325*, where *20150325* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Games Management* *v1_management* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -203,7 +203,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -298,55 +297,52 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GamesManagement<C, NC, A> {
+pub struct GamesManagement<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for GamesManagement<C, NC, A> {}
+impl<'a, C, A> Hub for GamesManagement<C, A> {}
 
-impl<'a, C, NC, A> GamesManagement<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> GamesManagement<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> GamesManagement<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> GamesManagement<C, A> {
         GamesManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn achievements(&'a self) -> AchievementMethods<'a, C, NC, A> {
+    pub fn achievements(&'a self) -> AchievementMethods<'a, C, A> {
         AchievementMethods { hub: &self }
     }
-    pub fn applications(&'a self) -> ApplicationMethods<'a, C, NC, A> {
+    pub fn applications(&'a self) -> ApplicationMethods<'a, C, A> {
         ApplicationMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C, NC, A> {
+    pub fn events(&'a self) -> EventMethods<'a, C, A> {
         EventMethods { hub: &self }
     }
-    pub fn players(&'a self) -> PlayerMethods<'a, C, NC, A> {
+    pub fn players(&'a self) -> PlayerMethods<'a, C, A> {
         PlayerMethods { hub: &self }
     }
-    pub fn quests(&'a self) -> QuestMethods<'a, C, NC, A> {
+    pub fn quests(&'a self) -> QuestMethods<'a, C, A> {
         QuestMethods { hub: &self }
     }
-    pub fn rooms(&'a self) -> RoomMethods<'a, C, NC, A> {
+    pub fn rooms(&'a self) -> RoomMethods<'a, C, A> {
         RoomMethods { hub: &self }
     }
-    pub fn scores(&'a self) -> ScoreMethods<'a, C, NC, A> {
+    pub fn scores(&'a self) -> ScoreMethods<'a, C, A> {
         ScoreMethods { hub: &self }
     }
-    pub fn turn_based_matches(&'a self) -> TurnBasedMatcheMethods<'a, C, NC, A> {
+    pub fn turn_based_matches(&'a self) -> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -728,20 +724,20 @@ impl Part for HiddenPlayer {}
 /// let rb = hub.achievements();
 /// # }
 /// ```
-pub struct AchievementMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AchievementMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AchievementMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
+impl<'a, C, A> AchievementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a, C, A> {
         AchievementResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -757,7 +753,7 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a, C, A> {
         AchievementResetForAllPlayerCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -774,7 +770,7 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a, C, NC, A> {
+    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a, C, A> {
         AchievementResetCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -791,7 +787,7 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: &AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_multiple_for_all_players(&self, request: &AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C, A> {
         AchievementResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request.clone(),
@@ -804,7 +800,7 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> AchievementResetAllCall<'a, C, NC, A> {
+    pub fn reset_all(&self) -> AchievementResetAllCall<'a, C, A> {
         AchievementResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -844,15 +840,15 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
 /// let rb = hub.players();
 /// # }
 /// ```
-pub struct PlayerMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PlayerMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for PlayerMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for PlayerMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
+impl<'a, C, A> PlayerMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -862,7 +858,7 @@ impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
-    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a, C, NC, A> {
+    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a, C, A> {
         PlayerHideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -881,7 +877,7 @@ impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
-    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a, C, NC, A> {
+    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a, C, A> {
         PlayerUnhideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -923,15 +919,15 @@ impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
 /// let rb = hub.scores();
 /// # }
 /// ```
-pub struct ScoreMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ScoreMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ScoreMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
+impl<'a, C, A> ScoreMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -940,7 +936,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: &ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_multiple_for_all_players(&self, request: &ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C, A> {
         ScoreResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request.clone(),
@@ -953,7 +949,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a, C, A> {
         ScoreResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -965,7 +961,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> ScoreResetAllCall<'a, C, NC, A> {
+    pub fn reset_all(&self) -> ScoreResetAllCall<'a, C, A> {
         ScoreResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -981,7 +977,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a, C, A> {
         ScoreResetForAllPlayerCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -998,7 +994,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a, C, NC, A> {
+    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a, C, A> {
         ScoreResetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -1039,20 +1035,20 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
 /// let rb = hub.turn_based_matches();
 /// # }
 /// ```
-pub struct TurnBasedMatcheMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TurnBasedMatcheMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TurnBasedMatcheMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TurnBasedMatcheMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
+impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Reset all turn-based match data for a user. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset(&self) -> TurnBasedMatcheResetCall<'a, C, NC, A> {
+    pub fn reset(&self) -> TurnBasedMatcheResetCall<'a, C, A> {
         TurnBasedMatcheResetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1064,7 +1060,7 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes turn-based matches where the only match participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
-    pub fn reset_for_all_players(&self) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, A> {
         TurnBasedMatcheResetForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1104,15 +1100,15 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
 /// let rb = hub.applications();
 /// # }
 /// ```
-pub struct ApplicationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ApplicationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ApplicationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ApplicationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
+impl<'a, C, A> ApplicationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1121,7 +1117,7 @@ impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
+    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a, C, A> {
         ApplicationListHiddenCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -1164,20 +1160,20 @@ impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
 /// let rb = hub.rooms();
 /// # }
 /// ```
-pub struct RoomMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RoomMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for RoomMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for RoomMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
+impl<'a, C, A> RoomMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes rooms where the only room participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
-    pub fn reset_for_all_players(&self) -> RoomResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self) -> RoomResetForAllPlayerCall<'a, C, A> {
         RoomResetForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1189,7 +1185,7 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Reset all rooms for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset(&self) -> RoomResetCall<'a, C, NC, A> {
+    pub fn reset(&self) -> RoomResetCall<'a, C, A> {
         RoomResetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1229,20 +1225,20 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
 /// let rb = hub.quests();
 /// # }
 /// ```
-pub struct QuestMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for QuestMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for QuestMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
+impl<'a, C, A> QuestMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft quests for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> QuestResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_all_for_all_players(&self) -> QuestResetAllForAllPlayerCall<'a, C, A> {
         QuestResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1258,7 +1254,7 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: &QuestsResetMultipleForAllRequest) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_multiple_for_all_players(&self, request: &QuestsResetMultipleForAllRequest) -> QuestResetMultipleForAllPlayerCall<'a, C, A> {
         QuestResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1271,7 +1267,7 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> QuestResetAllCall<'a, C, NC, A> {
+    pub fn reset_all(&self) -> QuestResetAllCall<'a, C, A> {
         QuestResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1287,7 +1283,7 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `questId` - The ID of the quest.
-    pub fn reset_for_all_players(&self, quest_id: &str) -> QuestResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self, quest_id: &str) -> QuestResetForAllPlayerCall<'a, C, A> {
         QuestResetForAllPlayerCall {
             hub: self.hub,
             _quest_id: quest_id.to_string(),
@@ -1304,7 +1300,7 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `questId` - The ID of the quest.
-    pub fn reset(&self, quest_id: &str) -> QuestResetCall<'a, C, NC, A> {
+    pub fn reset(&self, quest_id: &str) -> QuestResetCall<'a, C, A> {
         QuestResetCall {
             hub: self.hub,
             _quest_id: quest_id.to_string(),
@@ -1345,20 +1341,20 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for EventMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
+impl<'a, C, A> EventMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset.
-    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a, C, A> {
         EventResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1374,7 +1370,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset(&self, event_id: &str) -> EventResetCall<'a, C, NC, A> {
+    pub fn reset(&self, event_id: &str) -> EventResetCall<'a, C, A> {
         EventResetCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -1387,7 +1383,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset.
-    pub fn reset_all(&self) -> EventResetAllCall<'a, C, NC, A> {
+    pub fn reset_all(&self) -> EventResetAllCall<'a, C, A> {
         EventResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1403,7 +1399,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: &EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_multiple_for_all_players(&self, request: &EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C, A> {
         EventResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1420,7 +1416,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a, C, A> {
         EventResetForAllPlayerCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -1469,18 +1465,18 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementResetAllForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementResetAllForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementResetAllForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementResetAllForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1577,7 +1573,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetAllForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1598,7 +1594,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1615,7 +1611,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1653,19 +1649,19 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1786,7 +1782,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1797,7 +1793,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1818,7 +1814,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1835,7 +1831,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1873,19 +1869,19 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _achievement_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2017,7 +2013,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the achievement used by this method.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a, C, NC, A> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a, C, A> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -2028,7 +2024,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2049,7 +2045,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2066,7 +2062,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2110,19 +2106,19 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementResetMultipleForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementResetMultipleForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _request: AchievementResetMultipleForAllRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementResetMultipleForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2225,7 +2221,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2236,7 +2232,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetMultipleForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2257,7 +2253,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2274,7 +2270,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2312,18 +2308,18 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementResetAllCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AchievementResetAllCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AchievementResetAllCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AchievementResetAllCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2431,7 +2427,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetAllCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AchievementResetAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2452,7 +2448,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2469,7 +2465,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetAllCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AchievementResetAllCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2507,10 +2503,10 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct PlayerHideCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PlayerHideCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2518,9 +2514,9 @@ pub struct PlayerHideCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlayerHideCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PlayerHideCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PlayerHideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2642,7 +2638,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -2652,7 +2648,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// A player ID. A value of me may be used in place of the authenticated player's ID.
-    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, NC, A> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
@@ -2663,7 +2659,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerHideCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerHideCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2684,7 +2680,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2701,7 +2697,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlayerHideCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlayerHideCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2739,10 +2735,10 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct PlayerUnhideCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct PlayerUnhideCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2750,9 +2746,9 @@ pub struct PlayerUnhideCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlayerUnhideCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for PlayerUnhideCall<'a, C, A> {}
 
-impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> PlayerUnhideCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2874,7 +2870,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -2884,7 +2880,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// A player ID. A value of me may be used in place of the authenticated player's ID.
-    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, NC, A> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, A> {
         self._player_id = new_value.to_string();
         self
     }
@@ -2895,7 +2891,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerUnhideCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlayerUnhideCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2916,7 +2912,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2933,7 +2929,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlayerUnhideCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlayerUnhideCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2977,19 +2973,19 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreResetMultipleForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreResetMultipleForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _request: ScoresResetMultipleForAllRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScoreResetMultipleForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3092,7 +3088,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3103,7 +3099,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetMultipleForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3124,7 +3120,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3141,7 +3137,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3179,18 +3175,18 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreResetAllForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreResetAllForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScoreResetAllForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScoreResetAllForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3287,7 +3283,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetAllForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3308,7 +3304,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3325,7 +3321,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3363,18 +3359,18 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreResetAllCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreResetAllCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScoreResetAllCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScoreResetAllCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3482,7 +3478,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetAllCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3503,7 +3499,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3520,7 +3516,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetAllCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetAllCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3558,19 +3554,19 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScoreResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScoreResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3691,7 +3687,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3702,7 +3698,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3723,7 +3719,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3740,7 +3736,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3778,19 +3774,19 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ScoreResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ScoreResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ScoreResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3922,7 +3918,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the leaderboard.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a, C, NC, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3933,7 +3929,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ScoreResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3954,7 +3950,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3971,7 +3967,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ScoreResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4009,18 +4005,18 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct TurnBasedMatcheResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TurnBasedMatcheResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TurnBasedMatcheResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TurnBasedMatcheResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TurnBasedMatcheResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4117,7 +4113,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4138,7 +4134,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4155,7 +4151,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TurnBasedMatcheResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TurnBasedMatcheResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4193,18 +4189,18 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TurnBasedMatcheResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TurnBasedMatcheResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4301,7 +4297,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4322,7 +4318,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4339,7 +4335,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4379,10 +4375,10 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
 ///              .doit();
 /// # }
 /// ```
-pub struct ApplicationListHiddenCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ApplicationListHiddenCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -4391,9 +4387,9 @@ pub struct ApplicationListHiddenCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ApplicationListHiddenCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ApplicationListHiddenCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ApplicationListHiddenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4531,7 +4527,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The application ID from the Google Play developer console.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, A> {
         self._application_id = new_value.to_string();
         self
     }
@@ -4539,7 +4535,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The token returned by the previous request.
-    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4547,7 +4543,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.
-    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -4558,7 +4554,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApplicationListHiddenCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApplicationListHiddenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4579,7 +4575,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4596,7 +4592,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ApplicationListHiddenCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ApplicationListHiddenCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4634,18 +4630,18 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct RoomResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RoomResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RoomResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RoomResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RoomResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4742,7 +4738,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4763,7 +4759,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RoomResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RoomResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4780,7 +4776,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RoomResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RoomResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4818,18 +4814,18 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct RoomResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct RoomResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for RoomResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for RoomResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> RoomResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4926,7 +4922,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> RoomResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4947,7 +4943,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RoomResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RoomResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4964,7 +4960,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> RoomResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> RoomResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5002,18 +4998,18 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestResetAllForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestResetAllForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuestResetAllForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuestResetAllForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuestResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5110,7 +5106,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetAllForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5131,7 +5127,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestResetAllForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuestResetAllForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5148,7 +5144,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuestResetAllForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuestResetAllForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5192,19 +5188,19 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestResetMultipleForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestResetMultipleForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _request: QuestsResetMultipleForAllRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuestResetMultipleForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuestResetMultipleForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuestResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5307,7 +5303,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &QuestsResetMultipleForAllRequest) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &QuestsResetMultipleForAllRequest) -> QuestResetMultipleForAllPlayerCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5318,7 +5314,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetMultipleForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5339,7 +5335,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuestResetMultipleForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5356,7 +5352,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuestResetMultipleForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5394,18 +5390,18 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestResetAllCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestResetAllCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuestResetAllCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuestResetAllCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuestResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5502,7 +5498,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetAllCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5523,7 +5519,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestResetAllCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuestResetAllCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5540,7 +5536,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuestResetAllCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuestResetAllCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5578,19 +5574,19 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _quest_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuestResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuestResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuestResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5711,7 +5707,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the quest.
-    pub fn quest_id(mut self, new_value: &str) -> QuestResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn quest_id(mut self, new_value: &str) -> QuestResetForAllPlayerCall<'a, C, A> {
         self._quest_id = new_value.to_string();
         self
     }
@@ -5722,7 +5718,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5743,7 +5739,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuestResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5760,7 +5756,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuestResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuestResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5798,19 +5794,19 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct QuestResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _quest_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for QuestResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for QuestResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> QuestResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5931,7 +5927,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the quest.
-    pub fn quest_id(mut self, new_value: &str) -> QuestResetCall<'a, C, NC, A> {
+    pub fn quest_id(mut self, new_value: &str) -> QuestResetCall<'a, C, A> {
         self._quest_id = new_value.to_string();
         self
     }
@@ -5942,7 +5938,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> QuestResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5963,7 +5959,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> QuestResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5980,7 +5976,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> QuestResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> QuestResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6018,18 +6014,18 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EventResetAllForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventResetAllForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventResetAllForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventResetAllForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventResetAllForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6126,7 +6122,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetAllForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetAllForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6147,7 +6143,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6164,7 +6160,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6202,19 +6198,19 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct EventResetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventResetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _event_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventResetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventResetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventResetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6335,7 +6331,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The ID of the event.
-    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -6346,7 +6342,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6367,7 +6363,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6384,7 +6380,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventResetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventResetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6422,18 +6418,18 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct EventResetAllCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventResetAllCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventResetAllCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventResetAllCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventResetAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6530,7 +6526,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetAllCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetAllCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6551,7 +6547,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6568,7 +6564,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventResetAllCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventResetAllCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6612,19 +6608,19 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct EventResetMultipleForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventResetMultipleForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _request: EventsResetMultipleForAllRequest,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventResetMultipleForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventResetMultipleForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventResetMultipleForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6727,7 +6723,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6738,7 +6734,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetMultipleForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6759,7 +6755,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6776,7 +6772,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6814,19 +6810,19 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct EventResetForAllPlayerCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct EventResetForAllPlayerCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a GamesManagement<C, NC, A>,
+    hub: &'a GamesManagement<C, A>,
     _event_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for EventResetForAllPlayerCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for EventResetForAllPlayerCall<'a, C, A> {}
 
-impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> EventResetForAllPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6947,7 +6943,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the event.
-    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a, C, A> {
         self._event_id = new_value.to_string();
         self
     }
@@ -6958,7 +6954,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetForAllPlayerCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EventResetForAllPlayerCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6979,7 +6975,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6996,7 +6992,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EventResetForAllPlayerCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> EventResetForAllPlayerCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

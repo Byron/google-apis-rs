@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *freebase* crate version *0.1.4+20150330*, where *20150330* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *freebase* crate version *0.1.5+20150330*, where *20150330* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *freebase* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/freebase/).
@@ -198,7 +198,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -273,34 +272,31 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// }
 /// # }
 /// ```
-pub struct Freebase<C, NC, A> {
+pub struct Freebase<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Freebase<C, NC, A> {}
+impl<'a, C, A> Hub for Freebase<C, A> {}
 
-impl<'a, C, NC, A> Freebase<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Freebase<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Freebase<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Freebase<C, A> {
         Freebase {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn methods(&'a self) -> MethodMethods<'a, C, NC, A> {
+    pub fn methods(&'a self) -> MethodMethods<'a, C, A> {
         MethodMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -443,20 +439,20 @@ impl Part for ReconcileCandidateNotable {}
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Freebase<C, NC, A>,
+    hub: &'a Freebase<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for MethodMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for MethodMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
+impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Reconcile entities to Freebase open data.
-    pub fn reconcile(&self) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn reconcile(&self) -> MethodReconcileCall<'a, C, A> {
         MethodReconcileCall {
             hub: self.hub,
             _prop: Default::default(),
@@ -473,7 +469,7 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Search Freebase open data.
-    pub fn search(&self) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn search(&self) -> MethodSearchCall<'a, C, A> {
         MethodSearchCall {
             hub: self.hub,
             _without: Default::default(),
@@ -549,10 +545,10 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct MethodReconcileCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodReconcileCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Freebase<C, NC, A>,
+    hub: &'a Freebase<C, A>,
     _prop: Vec<String>,
     _name: Option<String>,
     _limit: Option<i32>,
@@ -563,9 +559,9 @@ pub struct MethodReconcileCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for MethodReconcileCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MethodReconcileCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MethodReconcileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -700,7 +696,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// 
     /// Property values for entity formatted as
     /// :
-    pub fn add_prop(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn add_prop(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._prop.push(new_value.to_string());
         self
     }
@@ -708,7 +704,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Name of entity.
-    pub fn name(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn name(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -716,7 +712,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Maximum number of candidates to return.
-    pub fn limit(mut self, new_value: i32) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn limit(mut self, new_value: i32) -> MethodReconcileCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
@@ -725,7 +721,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Languages for names and values. First language is used for display. Default is 'en'.
-    pub fn add_lang(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn add_lang(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._lang.push(new_value.to_string());
         self
     }
@@ -734,7 +730,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Classifications of entity e.g. type, category, title.
-    pub fn add_kind(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn add_kind(mut self, new_value: &str) -> MethodReconcileCall<'a, C, A> {
         self._kind.push(new_value.to_string());
         self
     }
@@ -742,7 +738,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Required confidence for a candidate to match. Must be between .5 and 1.0
-    pub fn confidence(mut self, new_value: f32) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn confidence(mut self, new_value: f32) -> MethodReconcileCall<'a, C, A> {
         self._confidence = Some(new_value);
         self
     }
@@ -753,7 +749,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodReconcileCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodReconcileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -774,7 +770,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodReconcileCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodReconcileCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -839,10 +835,10 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct MethodSearchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct MethodSearchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Freebase<C, NC, A>,
+    hub: &'a Freebase<C, A>,
     _without: Vec<String>,
     _with: Vec<String>,
     _type_: Vec<String>,
@@ -870,9 +866,9 @@ pub struct MethodSearchCall<'a, C, NC, A>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, NC, A> CallBuilder for MethodSearchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for MethodSearchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> MethodSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1062,7 +1058,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A rule to not match against.
-    pub fn add_without(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_without(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._without.push(new_value.to_string());
         self
     }
@@ -1071,7 +1067,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A rule to match against.
-    pub fn add_with(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_with(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._with.push(new_value.to_string());
         self
     }
@@ -1080,7 +1076,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Restrict to topics with this Freebase type id.
-    pub fn add_type(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_type(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._type_.push(new_value.to_string());
         self
     }
@@ -1088,7 +1084,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Query on stemmed names and aliases. May not be used with prefixed.
-    pub fn stemmed(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn stemmed(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._stemmed = Some(new_value);
         self
     }
@@ -1096,7 +1092,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Request 'did you mean' suggestions
-    pub fn spell(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn spell(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._spell = Some(new_value.to_string());
         self
     }
@@ -1104,7 +1100,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Relevance scoring algorithm to use.
-    pub fn scoring(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn scoring(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._scoring = Some(new_value.to_string());
         self
     }
@@ -1112,7 +1108,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Query term to search for.
-    pub fn query(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn query(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1120,7 +1116,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Prefix match against names and aliases.
-    pub fn prefixed(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn prefixed(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._prefixed = Some(new_value);
         self
     }
@@ -1128,7 +1124,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// An output expression to request data from matches.
-    pub fn output(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn output(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._output = Some(new_value.to_string());
         self
     }
@@ -1136,7 +1132,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The MQL query to run againist the results to extract more data.
-    pub fn mql_output(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn mql_output(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._mql_output = Some(new_value.to_string());
         self
     }
@@ -1145,7 +1141,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A mid to use instead of a query.
-    pub fn add_mid(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_mid(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._mid.push(new_value.to_string());
         self
     }
@@ -1153,7 +1149,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Maximum number of results to return.
-    pub fn limit(mut self, new_value: i32) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn limit(mut self, new_value: i32) -> MethodSearchCall<'a, C, A> {
         self._limit = Some(new_value);
         self
     }
@@ -1162,7 +1158,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The code of the language to run the query with. Default is 'en'.
-    pub fn add_lang(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_lang(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._lang.push(new_value.to_string());
         self
     }
@@ -1170,7 +1166,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Whether to indent the json results or not.
-    pub fn indent(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn indent(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._indent = Some(new_value);
         self
     }
@@ -1178,7 +1174,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The keyword to request help on.
-    pub fn help(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn help(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._help = Some(new_value.to_string());
         self
     }
@@ -1186,7 +1182,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Structural format of the json response.
-    pub fn format(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -1195,7 +1191,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A filter to apply to the query.
-    pub fn add_filter(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_filter(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._filter.push(new_value.to_string());
         self
     }
@@ -1203,7 +1199,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Query on exact name and keys only.
-    pub fn exact(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn exact(mut self, new_value: bool) -> MethodSearchCall<'a, C, A> {
         self._exact = Some(new_value);
         self
     }
@@ -1211,7 +1207,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The encoding of the response. You can use this parameter to enable html encoding.
-    pub fn encode(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn encode(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._encode = Some(new_value.to_string());
         self
     }
@@ -1220,7 +1216,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// Restrict to topics with this Freebase domain id.
-    pub fn add_domain(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn add_domain(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._domain.push(new_value.to_string());
         self
     }
@@ -1228,7 +1224,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The cursor value to use for the next page of results.
-    pub fn cursor(mut self, new_value: i32) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn cursor(mut self, new_value: i32) -> MethodSearchCall<'a, C, A> {
         self._cursor = Some(new_value);
         self
     }
@@ -1236,7 +1232,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// JS method name for JSONP callbacks.
-    pub fn callback(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn callback(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._callback = Some(new_value.to_string());
         self
     }
@@ -1244,7 +1240,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// A mql as_of_time value to use with mql_output queries.
-    pub fn as_of_time(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn as_of_time(mut self, new_value: &str) -> MethodSearchCall<'a, C, A> {
         self._as_of_time = Some(new_value.to_string());
         self
     }
@@ -1255,7 +1251,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodSearchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodSearchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1276,7 +1272,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

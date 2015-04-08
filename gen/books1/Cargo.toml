@@ -4,12 +4,12 @@
 [package]
 
 name = "google-books1"
-version = "0.1.4+20150309"
+version = "0.1.5+20150309"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with books (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/books1"
 homepage = "https://developers.google.com/books/docs/v1/getting_started"
-documentation = "http://byron.github.io/google-apis-rs/google-books1"
+documentation = "http://byron.github.io/google-apis-rs/google_books1"
 license = "MIT"
 keywords = ["books", "google", "protocol", "web", "api"]
 

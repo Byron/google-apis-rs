@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *0.1.4+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *Tag Manager* crate version *0.1.5+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -240,7 +240,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -362,34 +361,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct TagManager<C, NC, A> {
+pub struct TagManager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for TagManager<C, NC, A> {}
+impl<'a, C, A> Hub for TagManager<C, A> {}
 
-impl<'a, C, NC, A> TagManager<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TagManager<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> TagManager<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> TagManager<C, A> {
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a, C, NC, A> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, C, A> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1259,15 +1255,15 @@ impl Part for Condition {}
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for AccountMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
+impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1276,7 +1272,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a, C, NC, A> {
+    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a, C, A> {
         AccountContainerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1293,7 +1289,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID. @required tagmanager.accounts.permissions.list
-    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, C, NC, A> {
+    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, C, A> {
         AccountPermissionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1312,7 +1308,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
+    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         AccountContainerVersionUndeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1332,7 +1328,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn permissions_create(&self, request: &UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a, C, NC, A> {
+    pub fn permissions_create(&self, request: &UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a, C, A> {
         AccountPermissionCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1351,7 +1347,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
+    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a, C, A> {
         AccountPermissionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1370,7 +1366,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a, C, NC, A> {
+    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a, C, A> {
         AccountContainerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1389,7 +1385,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
+    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a, C, A> {
         AccountContainerVersionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1411,7 +1407,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_update(&self, request: &Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn containers_triggers_update(&self, request: &Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         AccountContainerTriggerUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1434,7 +1430,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
+    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         AccountContainerTriggerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1454,7 +1450,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
+    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a, C, A> {
         AccountContainerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1473,7 +1469,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_create(&self, request: &Container, account_id: &str) -> AccountContainerCreateCall<'a, C, NC, A> {
+    pub fn containers_create(&self, request: &Container, account_id: &str) -> AccountContainerCreateCall<'a, C, A> {
         AccountContainerCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1493,7 +1489,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
+    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         AccountContainerTagDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1515,7 +1511,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `ruleId` - The GTM Rule ID.
-    pub fn containers_rules_update(&self, request: &Rule, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn containers_rules_update(&self, request: &Rule, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         AccountContainerRuleUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1538,7 +1534,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `ruleId` - The GTM Rule ID.
-    pub fn containers_rules_delete(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
+    pub fn containers_rules_delete(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         AccountContainerRuleDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1558,7 +1554,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
+    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a, C, A> {
         AccountContainerTagListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1578,7 +1574,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         AccountContainerVersionPublishCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1600,7 +1596,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_create(&self, request: &Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
+    pub fn containers_tags_create(&self, request: &Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a, C, A> {
         AccountContainerTagCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1620,7 +1616,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
+    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a, C, A> {
         AccountContainerTriggerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1640,7 +1636,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
+    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         AccountContainerVersionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1660,7 +1656,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn update(&self, request: &Account, account_id: &str) -> AccountUpdateCall<'a, C, NC, A> {
+    pub fn update(&self, request: &Account, account_id: &str) -> AccountUpdateCall<'a, C, A> {
         AccountUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1681,7 +1677,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `macroId` - The GTM Macro ID.
-    pub fn containers_macros_delete(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
+    pub fn containers_macros_delete(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         AccountContainerMacroDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1702,7 +1698,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_create(&self, request: &CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
+    pub fn containers_versions_create(&self, request: &CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a, C, A> {
         AccountContainerVersionCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1722,7 +1718,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
+    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a, C, A> {
         AccountPermissionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1742,7 +1738,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_rules_create(&self, request: &Rule, account_id: &str, container_id: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
+    pub fn containers_rules_create(&self, request: &Rule, account_id: &str, container_id: &str) -> AccountContainerRuleCreateCall<'a, C, A> {
         AccountContainerRuleCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1763,7 +1759,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
+    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         AccountContainerVersionRestoreCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1784,7 +1780,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `ruleId` - The GTM Rule ID.
-    pub fn containers_rules_get(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
+    pub fn containers_rules_get(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         AccountContainerRuleGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1805,7 +1801,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_create(&self, request: &Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
+    pub fn containers_variables_create(&self, request: &Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a, C, A> {
         AccountContainerVariableCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1825,7 +1821,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
+    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a, C, A> {
         AccountContainerVariableListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1845,7 +1841,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_macros_create(&self, request: &Macro, account_id: &str, container_id: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
+    pub fn containers_macros_create(&self, request: &Macro, account_id: &str, container_id: &str) -> AccountContainerMacroCreateCall<'a, C, A> {
         AccountContainerMacroCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1866,7 +1862,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
+    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a, C, A> {
         AccountContainerTagGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1887,7 +1883,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
+    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         AccountContainerVariableGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1908,7 +1904,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
+    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         AccountContainerTriggerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1928,7 +1924,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_macros_list(&self, account_id: &str, container_id: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
+    pub fn containers_macros_list(&self, account_id: &str, container_id: &str) -> AccountContainerMacroListCall<'a, C, A> {
         AccountContainerMacroListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1948,7 +1944,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_create(&self, request: &Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
+    pub fn containers_triggers_create(&self, request: &Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a, C, A> {
         AccountContainerTriggerCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1970,7 +1966,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `macroId` - The GTM Macro ID.
-    pub fn containers_macros_update(&self, request: &Macro, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn containers_macros_update(&self, request: &Macro, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         AccountContainerMacroUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1987,7 +1983,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all GTM Accounts that a user has access to.
-    pub fn list(&self) -> AccountListCall<'a, C, NC, A> {
+    pub fn list(&self) -> AccountListCall<'a, C, A> {
         AccountListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2005,7 +2001,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_update(&self, request: &UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
+    pub fn permissions_update(&self, request: &UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a, C, A> {
         AccountPermissionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2026,7 +2022,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
+    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         AccountContainerVariableDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2045,7 +2041,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
+    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, A> {
         AccountGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2064,7 +2060,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_update(&self, request: &Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn containers_update(&self, request: &Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a, C, A> {
         AccountContainerUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2085,7 +2081,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_rules_list(&self, account_id: &str, container_id: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
+    pub fn containers_rules_list(&self, account_id: &str, container_id: &str) -> AccountContainerRuleListCall<'a, C, A> {
         AccountContainerRuleListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2106,7 +2102,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_update(&self, request: &Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn containers_tags_update(&self, request: &Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         AccountContainerTagUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2129,7 +2125,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `macroId` - The GTM Macro ID.
-    pub fn containers_macros_get(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
+    pub fn containers_macros_get(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         AccountContainerMacroGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2151,7 +2147,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_update(&self, request: &ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn containers_versions_update(&self, request: &ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         AccountContainerVersionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2175,7 +2171,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_update(&self, request: &Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn containers_variables_update(&self, request: &Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         AccountContainerVariableUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -2198,7 +2194,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID. Specify published to retrieve the currently published version.
-    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
+    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         AccountContainerVersionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2249,19 +2245,19 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2393,7 +2389,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2404,7 +2400,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2425,7 +2421,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2442,7 +2438,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2480,19 +2476,19 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPermissionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPermissionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPermissionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPermissionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2624,7 +2620,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID. @required tagmanager.accounts.permissions.list
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2635,7 +2631,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2656,7 +2652,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2673,7 +2669,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2711,10 +2707,10 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionUndeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionUndeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -2723,9 +2719,9 @@ pub struct AccountContainerVersionUndeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionUndeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionUndeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2859,7 +2855,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2869,7 +2865,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -2879,7 +2875,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -2890,7 +2886,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2911,7 +2907,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2928,7 +2924,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2972,10 +2968,10 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPermissionCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPermissionCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: UserAccess,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2983,9 +2979,9 @@ pub struct AccountPermissionCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPermissionCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPermissionCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3124,7 +3120,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3134,7 +3130,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3145,7 +3141,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3166,7 +3162,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3183,7 +3179,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3221,10 +3217,10 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPermissionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPermissionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3232,9 +3228,9 @@ pub struct AccountPermissionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPermissionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPermissionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3356,7 +3352,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3366,7 +3362,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM User ID.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -3377,7 +3373,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3398,7 +3394,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3415,7 +3411,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3453,10 +3449,10 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3464,9 +3460,9 @@ pub struct AccountContainerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3599,7 +3595,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3609,7 +3605,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3620,7 +3616,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3641,7 +3637,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3658,7 +3654,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3697,10 +3693,10 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _headers: Option<bool>,
@@ -3709,9 +3705,9 @@ pub struct AccountContainerVersionListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3847,7 +3843,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3857,7 +3853,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3865,7 +3861,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// Retrieve headers only when true.
-    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C, NC, A> {
+    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C, A> {
         self._headers = Some(new_value);
         self
     }
@@ -3876,7 +3872,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3897,7 +3893,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3914,7 +3910,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3959,10 +3955,10 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTriggerUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTriggerUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -3973,9 +3969,9 @@ pub struct AccountContainerTriggerUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTriggerUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTriggerUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4119,7 +4115,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4129,7 +4125,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4139,7 +4135,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4149,7 +4145,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Trigger ID.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -4157,7 +4153,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -4168,7 +4164,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4189,7 +4185,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4206,7 +4202,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4244,10 +4240,10 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTriggerGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTriggerGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -4256,9 +4252,9 @@ pub struct AccountContainerTriggerGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTriggerGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTriggerGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4392,7 +4388,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4402,7 +4398,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4412,7 +4408,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Trigger ID.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -4423,7 +4419,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4444,7 +4440,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4461,7 +4457,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4499,10 +4495,10 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4510,9 +4506,9 @@ pub struct AccountContainerDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4634,7 +4630,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4644,7 +4640,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4655,7 +4651,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4676,7 +4672,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4693,7 +4689,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4737,10 +4733,10 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Container,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4748,9 +4744,9 @@ pub struct AccountContainerCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4889,7 +4885,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Container) -> AccountContainerCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Container) -> AccountContainerCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4899,7 +4895,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4910,7 +4906,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4931,7 +4927,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4948,7 +4944,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4986,10 +4982,10 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTagDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTagDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -4998,9 +4994,9 @@ pub struct AccountContainerTagDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTagDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTagDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5123,7 +5119,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5133,7 +5129,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5143,7 +5139,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Tag ID.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -5154,7 +5150,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5175,7 +5171,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5192,7 +5188,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5237,10 +5233,10 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerRuleUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerRuleUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Rule,
     _account_id: String,
     _container_id: String,
@@ -5251,9 +5247,9 @@ pub struct AccountContainerRuleUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerRuleUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerRuleUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerRuleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5397,7 +5393,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5407,7 +5403,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5417,7 +5413,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5427,7 +5423,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Rule ID.
-    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -5435,7 +5431,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the rule in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -5446,7 +5442,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5467,7 +5463,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5484,7 +5480,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5522,10 +5518,10 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerRuleDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerRuleDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _rule_id: String,
@@ -5534,9 +5530,9 @@ pub struct AccountContainerRuleDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerRuleDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerRuleDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerRuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5659,7 +5655,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5669,7 +5665,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5679,7 +5675,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Rule ID.
-    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -5690,7 +5686,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5711,7 +5707,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5728,7 +5724,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5766,10 +5762,10 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTagListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTagListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5777,9 +5773,9 @@ pub struct AccountContainerTagListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTagListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTagListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5912,7 +5908,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5922,7 +5918,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5933,7 +5929,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5954,7 +5950,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5971,7 +5967,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6010,10 +6006,10 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionPublishCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionPublishCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -6023,9 +6019,9 @@ pub struct AccountContainerVersionPublishCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionPublishCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionPublishCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6162,7 +6158,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6172,7 +6168,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6182,7 +6178,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -6190,7 +6186,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -6201,7 +6197,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionPublishCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6222,7 +6218,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6239,7 +6235,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6283,10 +6279,10 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTagCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTagCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -6295,9 +6291,9 @@ pub struct AccountContainerTagCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTagCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTagCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6437,7 +6433,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Tag) -> AccountContainerTagCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Tag) -> AccountContainerTagCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6447,7 +6443,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6457,7 +6453,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6468,7 +6464,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6489,7 +6485,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6506,7 +6502,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6544,10 +6540,10 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTriggerListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTriggerListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6555,9 +6551,9 @@ pub struct AccountContainerTriggerListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTriggerListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTriggerListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6690,7 +6686,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6700,7 +6696,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6711,7 +6707,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6732,7 +6728,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6749,7 +6745,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6787,10 +6783,10 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -6799,9 +6795,9 @@ pub struct AccountContainerVersionDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6924,7 +6920,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6934,7 +6930,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6944,7 +6940,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -6955,7 +6951,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6976,7 +6972,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6993,7 +6989,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7038,10 +7034,10 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Account,
     _account_id: String,
     _fingerprint: Option<String>,
@@ -7050,9 +7046,9 @@ pub struct AccountUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7194,7 +7190,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Account) -> AccountUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Account) -> AccountUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7204,7 +7200,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7212,7 +7208,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the account in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -7223,7 +7219,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7244,7 +7240,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7261,7 +7257,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7299,10 +7295,10 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerMacroDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerMacroDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _macro_id: String,
@@ -7311,9 +7307,9 @@ pub struct AccountContainerMacroDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerMacroDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerMacroDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerMacroDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7436,7 +7432,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7446,7 +7442,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7456,7 +7452,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Macro ID.
-    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
+    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
@@ -7467,7 +7463,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7488,7 +7484,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7505,7 +7501,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7549,10 +7545,10 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: CreateContainerVersionRequestVersionOptions,
     _account_id: String,
     _container_id: String,
@@ -7561,9 +7557,9 @@ pub struct AccountContainerVersionCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7703,7 +7699,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7713,7 +7709,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7723,7 +7719,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7734,7 +7730,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7755,7 +7751,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7772,7 +7768,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7810,10 +7806,10 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPermissionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPermissionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7821,9 +7817,9 @@ pub struct AccountPermissionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPermissionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPermissionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7956,7 +7952,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7966,7 +7962,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// we provide this method for API completeness.
     /// 
     /// The GTM User ID.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -7977,7 +7973,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7998,7 +7994,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8015,7 +8011,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8059,10 +8055,10 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerRuleCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerRuleCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Rule,
     _account_id: String,
     _container_id: String,
@@ -8071,9 +8067,9 @@ pub struct AccountContainerRuleCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerRuleCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerRuleCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerRuleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8213,7 +8209,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Rule) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8223,7 +8219,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8233,7 +8229,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8244,7 +8240,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8265,7 +8261,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8282,7 +8278,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8320,10 +8316,10 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionRestoreCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionRestoreCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -8332,9 +8328,9 @@ pub struct AccountContainerVersionRestoreCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionRestoreCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionRestoreCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8468,7 +8464,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8478,7 +8474,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8488,7 +8484,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -8499,7 +8495,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionRestoreCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8520,7 +8516,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8537,7 +8533,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8575,10 +8571,10 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerRuleGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerRuleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _rule_id: String,
@@ -8587,9 +8583,9 @@ pub struct AccountContainerRuleGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerRuleGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerRuleGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerRuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8723,7 +8719,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8733,7 +8729,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8743,7 +8739,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Rule ID.
-    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
+    pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, A> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -8754,7 +8750,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8775,7 +8771,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8792,7 +8788,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8836,10 +8832,10 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVariableCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVariableCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -8848,9 +8844,9 @@ pub struct AccountContainerVariableCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVariableCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVariableCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8990,7 +8986,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9000,7 +8996,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9010,7 +9006,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9021,7 +9017,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9042,7 +9038,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9059,7 +9055,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9097,10 +9093,10 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVariableListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVariableListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -9108,9 +9104,9 @@ pub struct AccountContainerVariableListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVariableListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVariableListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9243,7 +9239,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9253,7 +9249,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9264,7 +9260,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9285,7 +9281,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9302,7 +9298,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9346,10 +9342,10 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerMacroCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerMacroCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Macro,
     _account_id: String,
     _container_id: String,
@@ -9358,9 +9354,9 @@ pub struct AccountContainerMacroCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerMacroCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerMacroCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerMacroCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9500,7 +9496,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9510,7 +9506,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9520,7 +9516,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9531,7 +9527,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9552,7 +9548,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9569,7 +9565,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9607,10 +9603,10 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTagGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTagGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -9619,9 +9615,9 @@ pub struct AccountContainerTagGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTagGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTagGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9755,7 +9751,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9765,7 +9761,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9775,7 +9771,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Tag ID.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -9786,7 +9782,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9807,7 +9803,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9824,7 +9820,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9862,10 +9858,10 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVariableGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVariableGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -9874,9 +9870,9 @@ pub struct AccountContainerVariableGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVariableGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVariableGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10010,7 +10006,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10020,7 +10016,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10030,7 +10026,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Variable ID.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -10041,7 +10037,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10062,7 +10058,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10079,7 +10075,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10117,10 +10113,10 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTriggerDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTriggerDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -10129,9 +10125,9 @@ pub struct AccountContainerTriggerDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTriggerDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTriggerDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10254,7 +10250,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10264,7 +10260,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10274,7 +10270,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Trigger ID.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -10285,7 +10281,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10306,7 +10302,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10323,7 +10319,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10361,10 +10357,10 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerMacroListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerMacroListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -10372,9 +10368,9 @@ pub struct AccountContainerMacroListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerMacroListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerMacroListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerMacroListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10507,7 +10503,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10517,7 +10513,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10528,7 +10524,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10549,7 +10545,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10566,7 +10562,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10610,10 +10606,10 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTriggerCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTriggerCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -10622,9 +10618,9 @@ pub struct AccountContainerTriggerCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTriggerCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTriggerCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10764,7 +10760,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Trigger) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -10774,7 +10770,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10784,7 +10780,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10795,7 +10791,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTriggerCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10816,7 +10812,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10833,7 +10829,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10878,10 +10874,10 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerMacroUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerMacroUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Macro,
     _account_id: String,
     _container_id: String,
@@ -10892,9 +10888,9 @@ pub struct AccountContainerMacroUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerMacroUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerMacroUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerMacroUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11038,7 +11034,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Macro) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11048,7 +11044,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11058,7 +11054,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11068,7 +11064,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The GTM Macro ID.
-    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
@@ -11076,7 +11072,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the macro in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -11087,7 +11083,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11108,7 +11104,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11125,7 +11121,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11163,18 +11159,18 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11282,7 +11278,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11303,7 +11299,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11320,7 +11316,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11364,10 +11360,10 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountPermissionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountPermissionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: UserAccess,
     _account_id: String,
     _permission_id: String,
@@ -11376,9 +11372,9 @@ pub struct AccountPermissionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountPermissionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountPermissionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11518,7 +11514,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &UserAccess) -> AccountPermissionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -11528,7 +11524,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11538,7 +11534,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The GTM User ID.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, A> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -11549,7 +11545,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountPermissionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11570,7 +11566,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11587,7 +11583,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11625,10 +11621,10 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVariableDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVariableDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -11637,9 +11633,9 @@ pub struct AccountContainerVariableDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVariableDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVariableDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11762,7 +11758,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11772,7 +11768,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11782,7 +11778,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Variable ID.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -11793,7 +11789,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11814,7 +11810,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11831,7 +11827,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11869,19 +11865,19 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12013,7 +12009,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12024,7 +12020,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12045,7 +12041,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12062,7 +12058,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12107,10 +12103,10 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Container,
     _account_id: String,
     _container_id: String,
@@ -12120,9 +12116,9 @@ pub struct AccountContainerUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12265,7 +12261,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Container) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Container) -> AccountContainerUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12275,7 +12271,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12285,7 +12281,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12293,7 +12289,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the container in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -12304,7 +12300,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12325,7 +12321,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12342,7 +12338,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12380,10 +12376,10 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerRuleListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerRuleListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -12391,9 +12387,9 @@ pub struct AccountContainerRuleListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerRuleListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerRuleListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerRuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12526,7 +12522,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12536,7 +12532,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12547,7 +12543,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerRuleListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12568,7 +12564,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12585,7 +12581,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12630,10 +12626,10 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerTagUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerTagUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -12644,9 +12640,9 @@ pub struct AccountContainerTagUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerTagUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerTagUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12790,7 +12786,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Tag) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Tag) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -12800,7 +12796,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12810,7 +12806,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12820,7 +12816,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The GTM Tag ID.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -12828,7 +12824,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the tag in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -12839,7 +12835,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerTagUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12860,7 +12856,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12877,7 +12873,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -12915,10 +12911,10 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerMacroGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerMacroGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _macro_id: String,
@@ -12927,9 +12923,9 @@ pub struct AccountContainerMacroGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerMacroGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerMacroGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerMacroGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13063,7 +13059,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13073,7 +13069,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13083,7 +13079,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The GTM Macro ID.
-    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
+    pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, A> {
         self._macro_id = new_value.to_string();
         self
     }
@@ -13094,7 +13090,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerMacroGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13115,7 +13111,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13132,7 +13128,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13177,10 +13173,10 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: ContainerVersion,
     _account_id: String,
     _container_id: String,
@@ -13191,9 +13187,9 @@ pub struct AccountContainerVersionUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13337,7 +13333,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ContainerVersion) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ContainerVersion) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13347,7 +13343,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13357,7 +13353,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13367,7 +13363,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -13375,7 +13371,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -13386,7 +13382,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13407,7 +13403,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13424,7 +13420,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13469,10 +13465,10 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVariableUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVariableUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -13483,9 +13479,9 @@ pub struct AccountContainerVariableUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVariableUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVariableUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13629,7 +13625,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Variable) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -13639,7 +13635,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13649,7 +13645,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13659,7 +13655,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The GTM Variable ID.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -13667,7 +13663,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     ///
     /// 
     /// When provided, this fingerprint must match the fingerprint of the variable in storage.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -13678,7 +13674,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVariableUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13699,7 +13695,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13716,7 +13712,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -13754,10 +13750,10 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountContainerVersionGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct AccountContainerVersionGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a TagManager<C, NC, A>,
+    hub: &'a TagManager<C, A>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -13766,9 +13762,9 @@ pub struct AccountContainerVersionGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for AccountContainerVersionGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for AccountContainerVersionGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13902,7 +13898,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Account ID.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13912,7 +13908,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container ID.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13922,7 +13918,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The GTM Container Version ID. Specify published to retrieve the currently published version.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -13933,7 +13929,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountContainerVersionGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13954,7 +13950,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13971,7 +13967,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

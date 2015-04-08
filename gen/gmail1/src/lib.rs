@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gmail* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *gmail* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -215,7 +215,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -337,34 +336,31 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Gmail<C, NC, A> {
+pub struct Gmail<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Gmail<C, NC, A> {}
+impl<'a, C, A> Hub for Gmail<C, A> {}
 
-impl<'a, C, NC, A> Gmail<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Gmail<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Gmail<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Gmail<C, A> {
         Gmail {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a, C, NC, A> {
+    pub fn users(&'a self) -> UserMethods<'a, C, A> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -889,15 +885,15 @@ impl Part for HistoryLabelRemoved {}
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
+impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -907,7 +903,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn messages_import(&self, request: &Message, user_id: &str) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn messages_import(&self, request: &Message, user_id: &str) -> UserMessageImportCall<'a, C, A> {
         UserMessageImportCall {
             hub: self.hub,
             _request: request.clone(),
@@ -929,7 +925,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn history_list(&self, user_id: &str) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn history_list(&self, user_id: &str) -> UserHistoryListCall<'a, C, A> {
         UserHistoryListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -951,7 +947,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn drafts_create(&self, request: &Draft, user_id: &str) -> UserDraftCreateCall<'a, C, NC, A> {
+    pub fn drafts_create(&self, request: &Draft, user_id: &str) -> UserDraftCreateCall<'a, C, A> {
         UserDraftCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -970,7 +966,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn labels_create(&self, request: &Label, user_id: &str) -> UserLabelCreateCall<'a, C, NC, A> {
+    pub fn labels_create(&self, request: &Label, user_id: &str) -> UserLabelCreateCall<'a, C, A> {
         UserLabelCreateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -989,7 +985,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to delete.
-    pub fn labels_delete(&self, user_id: &str, id: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
+    pub fn labels_delete(&self, user_id: &str, id: &str) -> UserLabelDeleteCall<'a, C, A> {
         UserLabelDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1008,7 +1004,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to retrieve.
-    pub fn labels_get(&self, user_id: &str, id: &str) -> UserLabelGetCall<'a, C, NC, A> {
+    pub fn labels_get(&self, user_id: &str, id: &str) -> UserLabelGetCall<'a, C, A> {
         UserLabelGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1027,7 +1023,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to Trash.
-    pub fn messages_trash(&self, user_id: &str, id: &str) -> UserMessageTrashCall<'a, C, NC, A> {
+    pub fn messages_trash(&self, user_id: &str, id: &str) -> UserMessageTrashCall<'a, C, A> {
         UserMessageTrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1046,7 +1042,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn drafts_send(&self, request: &Draft, user_id: &str) -> UserDraftSendCall<'a, C, NC, A> {
+    pub fn drafts_send(&self, request: &Draft, user_id: &str) -> UserDraftSendCall<'a, C, A> {
         UserDraftSendCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1065,7 +1061,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to remove from Trash.
-    pub fn messages_untrash(&self, user_id: &str, id: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
+    pub fn messages_untrash(&self, user_id: &str, id: &str) -> UserMessageUntrashCall<'a, C, A> {
         UserMessageUntrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1083,7 +1079,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, C, NC, A> {
+    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, C, A> {
         UserLabelListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1101,7 +1097,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to delete.
-    pub fn messages_delete(&self, user_id: &str, id: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
+    pub fn messages_delete(&self, user_id: &str, id: &str) -> UserMessageDeleteCall<'a, C, A> {
         UserMessageDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1121,7 +1117,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to update.
-    pub fn drafts_update(&self, request: &Draft, user_id: &str, id: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
+    pub fn drafts_update(&self, request: &Draft, user_id: &str, id: &str) -> UserDraftUpdateCall<'a, C, A> {
         UserDraftUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1141,7 +1137,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to retrieve.
-    pub fn drafts_get(&self, user_id: &str, id: &str) -> UserDraftGetCall<'a, C, NC, A> {
+    pub fn drafts_get(&self, user_id: &str, id: &str) -> UserDraftGetCall<'a, C, A> {
         UserDraftGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1162,7 +1158,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to update.
-    pub fn labels_update(&self, request: &Label, user_id: &str, id: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
+    pub fn labels_update(&self, request: &Label, user_id: &str, id: &str) -> UserLabelUpdateCall<'a, C, A> {
         UserLabelUpdateCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1182,7 +1178,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to remove from Trash.
-    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
+    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, C, A> {
         UserThreadUntrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1202,7 +1198,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to update.
-    pub fn labels_patch(&self, request: &Label, user_id: &str, id: &str) -> UserLabelPatchCall<'a, C, NC, A> {
+    pub fn labels_patch(&self, request: &Label, user_id: &str, id: &str) -> UserLabelPatchCall<'a, C, A> {
         UserLabelPatchCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1222,7 +1218,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to delete.
-    pub fn drafts_delete(&self, user_id: &str, id: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
+    pub fn drafts_delete(&self, user_id: &str, id: &str) -> UserDraftDeleteCall<'a, C, A> {
         UserDraftDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1240,7 +1236,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn threads_list(&self, user_id: &str) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn threads_list(&self, user_id: &str) -> UserThreadListCall<'a, C, A> {
         UserThreadListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1264,7 +1260,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to modify.
-    pub fn threads_modify(&self, request: &ModifyThreadRequest, user_id: &str, id: &str) -> UserThreadModifyCall<'a, C, NC, A> {
+    pub fn threads_modify(&self, request: &ModifyThreadRequest, user_id: &str, id: &str) -> UserThreadModifyCall<'a, C, A> {
         UserThreadModifyCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1284,7 +1280,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - ID of the Thread to delete.
-    pub fn threads_delete(&self, user_id: &str, id: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
+    pub fn threads_delete(&self, user_id: &str, id: &str) -> UserThreadDeleteCall<'a, C, A> {
         UserThreadDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1304,7 +1300,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `messageId` - The ID of the message containing the attachment.
     /// * `id` - The ID of the attachment.
-    pub fn messages_attachments_get(&self, user_id: &str, message_id: &str, id: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
+    pub fn messages_attachments_get(&self, user_id: &str, message_id: &str, id: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         UserMessageAttachmentGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1325,7 +1321,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to modify.
-    pub fn messages_modify(&self, request: &ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, C, NC, A> {
+    pub fn messages_modify(&self, request: &ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, C, A> {
         UserMessageModifyCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1345,7 +1341,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to Trash.
-    pub fn threads_trash(&self, user_id: &str, id: &str) -> UserThreadTrashCall<'a, C, NC, A> {
+    pub fn threads_trash(&self, user_id: &str, id: &str) -> UserThreadTrashCall<'a, C, A> {
         UserThreadTrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1363,7 +1359,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn drafts_list(&self, user_id: &str) -> UserDraftListCall<'a, C, NC, A> {
+    pub fn drafts_list(&self, user_id: &str) -> UserDraftListCall<'a, C, A> {
         UserDraftListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1383,7 +1379,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn messages_send(&self, request: &Message, user_id: &str) -> UserMessageSendCall<'a, C, NC, A> {
+    pub fn messages_send(&self, request: &Message, user_id: &str) -> UserMessageSendCall<'a, C, A> {
         UserMessageSendCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1402,7 +1398,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to retrieve.
-    pub fn messages_get(&self, user_id: &str, id: &str) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn messages_get(&self, user_id: &str, id: &str) -> UserMessageGetCall<'a, C, A> {
         UserMessageGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1422,7 +1418,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn messages_list(&self, user_id: &str) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn messages_list(&self, user_id: &str) -> UserMessageListCall<'a, C, A> {
         UserMessageListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1444,7 +1440,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn get_profile(&self, user_id: &str) -> UserGetProfileCall<'a, C, NC, A> {
+    pub fn get_profile(&self, user_id: &str) -> UserGetProfileCall<'a, C, A> {
         UserGetProfileCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1462,7 +1458,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to retrieve.
-    pub fn threads_get(&self, user_id: &str, id: &str) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn threads_get(&self, user_id: &str, id: &str) -> UserThreadGetCall<'a, C, A> {
         UserThreadGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1483,7 +1479,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn messages_insert(&self, request: &Message, user_id: &str) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn messages_insert(&self, request: &Message, user_id: &str) -> UserMessageInsertCall<'a, C, A> {
         UserMessageInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -1546,10 +1542,10 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserMessageImportCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageImportCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Message,
     _user_id: String,
     _process_for_calendar: Option<bool>,
@@ -1561,9 +1557,9 @@ pub struct UserMessageImportCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageImportCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageImportCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1828,7 +1824,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Message) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Message) -> UserMessageImportCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1838,7 +1834,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1846,7 +1842,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.
-    pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._process_for_calendar = Some(new_value);
         self
     }
@@ -1854,7 +1850,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.
-    pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._never_mark_spam = Some(new_value);
         self
     }
@@ -1862,7 +1858,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Source for Gmail's internal date of the message.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, C, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
@@ -1870,7 +1866,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
-    pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, C, A> {
         self._deleted = Some(new_value);
         self
     }
@@ -1881,7 +1877,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageImportCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageImportCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1902,7 +1898,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageImportCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageImportCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1919,7 +1915,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageImportCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageImportCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1961,10 +1957,10 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserHistoryListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserHistoryListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _start_history_id: Option<String>,
     _page_token: Option<String>,
@@ -1975,9 +1971,9 @@ pub struct UserHistoryListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserHistoryListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserHistoryListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2121,7 +2117,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2129,7 +2125,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Required. Returns history records after the specified startHistoryId. The supplied startHistoryId should be obtained from the historyId of a message, thread, or previous list response. History IDs increase chronologically but are not contiguous with random gaps in between valid IDs. Supplying an invalid or out of date startHistoryId typically returns an HTTP 404 error code. A historyId is typically valid for at least a week, but in some circumstances may be valid for only a few hours. If you receive an HTTP 404 error response, your application should perform a full sync. If you receive no nextPageToken in the response, there are no updates to retrieve and you can store the returned historyId for a future request.
-    pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._start_history_id = Some(new_value.to_string());
         self
     }
@@ -2137,7 +2133,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Page token to retrieve a specific page of results in the list.
-    pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2145,7 +2141,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// The maximum number of history records to return.
-    pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2153,7 +2149,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Only return messages with a label matching the ID.
-    pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, A> {
         self._label_id = Some(new_value.to_string());
         self
     }
@@ -2164,7 +2160,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserHistoryListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserHistoryListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2185,7 +2181,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserHistoryListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserHistoryListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2202,7 +2198,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserHistoryListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserHistoryListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2247,10 +2243,10 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserDraftCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Draft,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2258,9 +2254,9 @@ pub struct UserDraftCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2513,7 +2509,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Draft) -> UserDraftCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Draft) -> UserDraftCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2523,7 +2519,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2534,7 +2530,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2555,7 +2551,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2572,7 +2568,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2616,10 +2612,10 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelCreateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Label,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2627,9 +2623,9 @@ pub struct UserLabelCreateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelCreateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelCreateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2768,7 +2764,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Label) -> UserLabelCreateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Label) -> UserLabelCreateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -2778,7 +2774,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2789,7 +2785,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelCreateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2810,7 +2806,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelCreateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2827,7 +2823,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelCreateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelCreateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2865,10 +2861,10 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2876,9 +2872,9 @@ pub struct UserLabelDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3000,7 +2996,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3010,7 +3006,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the label to delete.
-    pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -3021,7 +3017,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3042,7 +3038,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3059,7 +3055,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3097,10 +3093,10 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3108,9 +3104,9 @@ pub struct UserLabelGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3243,7 +3239,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3253,7 +3249,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the label to retrieve.
-    pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -3264,7 +3260,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3285,7 +3281,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3302,7 +3298,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3340,10 +3336,10 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageTrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageTrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3351,9 +3347,9 @@ pub struct UserMessageTrashCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageTrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageTrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3486,7 +3482,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3496,7 +3492,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message to Trash.
-    pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -3507,7 +3503,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageTrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3528,7 +3524,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageTrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageTrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3545,7 +3541,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageTrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageTrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3590,10 +3586,10 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserDraftSendCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftSendCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Draft,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3601,9 +3597,9 @@ pub struct UserDraftSendCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftSendCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftSendCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3856,7 +3852,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Draft) -> UserDraftSendCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Draft) -> UserDraftSendCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -3866,7 +3862,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3877,7 +3873,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftSendCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftSendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3898,7 +3894,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftSendCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftSendCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3915,7 +3911,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftSendCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftSendCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3953,10 +3949,10 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageUntrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageUntrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -3964,9 +3960,9 @@ pub struct UserMessageUntrashCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageUntrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageUntrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4099,7 +4095,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4109,7 +4105,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message to remove from Trash.
-    pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -4120,7 +4116,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageUntrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4141,7 +4137,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageUntrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageUntrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4158,7 +4154,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageUntrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageUntrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4196,19 +4192,19 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4340,7 +4336,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4351,7 +4347,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4372,7 +4368,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4389,7 +4385,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4427,10 +4423,10 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -4438,9 +4434,9 @@ pub struct UserMessageDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4562,7 +4558,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4572,7 +4568,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message to delete.
-    pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -4583,7 +4579,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4604,7 +4600,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4621,7 +4617,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -4666,10 +4662,10 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserDraftUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Draft,
     _user_id: String,
     _id: String,
@@ -4678,9 +4674,9 @@ pub struct UserDraftUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -4934,7 +4930,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Draft) -> UserDraftUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Draft) -> UserDraftUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -4944,7 +4940,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4954,7 +4950,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the draft to update.
-    pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -4965,7 +4961,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -4986,7 +4982,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5003,7 +4999,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5042,10 +5038,10 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDraftGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _format: Option<String>,
@@ -5054,9 +5050,9 @@ pub struct UserDraftGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5192,7 +5188,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5202,7 +5198,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// The ID of the draft to retrieve.
-    pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5210,7 +5206,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// The format to return the draft in.
-    pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -5221,7 +5217,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5242,7 +5238,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5259,7 +5255,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5303,10 +5299,10 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelUpdateCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Label,
     _user_id: String,
     _id: String,
@@ -5315,9 +5311,9 @@ pub struct UserLabelUpdateCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelUpdateCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelUpdateCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5457,7 +5453,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Label) -> UserLabelUpdateCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Label) -> UserLabelUpdateCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5467,7 +5463,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5477,7 +5473,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the label to update.
-    pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5488,7 +5484,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelUpdateCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5509,7 +5505,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelUpdateCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5526,7 +5522,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelUpdateCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelUpdateCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5564,10 +5560,10 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadUntrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadUntrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5575,9 +5571,9 @@ pub struct UserThreadUntrashCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadUntrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadUntrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5710,7 +5706,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5720,7 +5716,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the thread to remove from Trash.
-    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5731,7 +5727,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadUntrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadUntrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5752,7 +5748,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5769,7 +5765,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadUntrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadUntrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5813,10 +5809,10 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserLabelPatchCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserLabelPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Label,
     _user_id: String,
     _id: String,
@@ -5825,9 +5821,9 @@ pub struct UserLabelPatchCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserLabelPatchCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserLabelPatchCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserLabelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5967,7 +5963,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Label) -> UserLabelPatchCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Label) -> UserLabelPatchCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -5977,7 +5973,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5987,7 +5983,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the label to update.
-    pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -5998,7 +5994,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelPatchCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserLabelPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6019,7 +6015,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelPatchCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6036,7 +6032,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserLabelPatchCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserLabelPatchCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6074,10 +6070,10 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDraftDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6085,9 +6081,9 @@ pub struct UserDraftDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6209,7 +6205,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6219,7 +6215,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the draft to delete.
-    pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -6230,7 +6226,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6251,7 +6247,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6268,7 +6264,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6311,10 +6307,10 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -6326,9 +6322,9 @@ pub struct UserThreadListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6479,7 +6475,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6487,7 +6483,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Only return threads matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
-    pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -6495,7 +6491,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Page token to retrieve a specific page of results in the list.
-    pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6503,7 +6499,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Maximum number of threads to return.
-    pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -6512,7 +6508,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Only return threads with labels that match all of the specified label IDs.
-    pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a, C, A> {
         self._label_ids.push(new_value.to_string());
         self
     }
@@ -6520,7 +6516,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// Include threads from SPAM and TRASH in the results.
-    pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a, C, A> {
         self._include_spam_trash = Some(new_value);
         self
     }
@@ -6531,7 +6527,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6552,7 +6548,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6569,7 +6565,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6613,10 +6609,10 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadModifyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadModifyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: ModifyThreadRequest,
     _user_id: String,
     _id: String,
@@ -6625,9 +6621,9 @@ pub struct UserThreadModifyCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadModifyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadModifyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6767,7 +6763,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ModifyThreadRequest) -> UserThreadModifyCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ModifyThreadRequest) -> UserThreadModifyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -6777,7 +6773,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6787,7 +6783,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The ID of the thread to modify.
-    pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -6798,7 +6794,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadModifyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadModifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6819,7 +6815,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadModifyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadModifyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6836,7 +6832,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadModifyCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadModifyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6874,10 +6870,10 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6885,9 +6881,9 @@ pub struct UserThreadDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7009,7 +7005,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7019,7 +7015,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ID of the Thread to delete.
-    pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7030,7 +7026,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7051,7 +7047,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7068,7 +7064,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7106,10 +7102,10 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageAttachmentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageAttachmentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _message_id: String,
     _id: String,
@@ -7118,9 +7114,9 @@ pub struct UserMessageAttachmentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageAttachmentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageAttachmentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageAttachmentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7254,7 +7250,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7264,7 +7260,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message containing the attachment.
-    pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
+    pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._message_id = new_value.to_string();
         self
     }
@@ -7274,7 +7270,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The ID of the attachment.
-    pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7285,7 +7281,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageAttachmentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7306,7 +7302,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageAttachmentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageAttachmentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7323,7 +7319,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageAttachmentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageAttachmentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7367,10 +7363,10 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageModifyCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageModifyCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: ModifyMessageRequest,
     _user_id: String,
     _id: String,
@@ -7379,9 +7375,9 @@ pub struct UserMessageModifyCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageModifyCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageModifyCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageModifyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7521,7 +7517,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ModifyMessageRequest) -> UserMessageModifyCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ModifyMessageRequest) -> UserMessageModifyCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -7531,7 +7527,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7541,7 +7537,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message to modify.
-    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7552,7 +7548,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageModifyCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageModifyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7573,7 +7569,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7590,7 +7586,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageModifyCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageModifyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7628,10 +7624,10 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadTrashCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadTrashCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7639,9 +7635,9 @@ pub struct UserThreadTrashCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadTrashCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadTrashCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7774,7 +7770,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7784,7 +7780,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The ID of the thread to Trash.
-    pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -7795,7 +7791,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadTrashCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadTrashCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7816,7 +7812,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadTrashCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadTrashCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7833,7 +7829,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadTrashCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadTrashCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7873,10 +7869,10 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserDraftListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserDraftListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -7885,9 +7881,9 @@ pub struct UserDraftListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserDraftListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserDraftListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserDraftListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8025,7 +8021,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8033,7 +8029,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Page token to retrieve a specific page of results in the list.
-    pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8041,7 +8037,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// Maximum number of drafts to return.
-    pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8052,7 +8048,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserDraftListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8073,7 +8069,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8090,7 +8086,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserDraftListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserDraftListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8135,10 +8131,10 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserMessageSendCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageSendCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Message,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -8146,9 +8142,9 @@ pub struct UserMessageSendCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageSendCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageSendCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageSendCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8401,7 +8397,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Message) -> UserMessageSendCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Message) -> UserMessageSendCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -8411,7 +8407,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8422,7 +8418,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageSendCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageSendCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8443,7 +8439,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageSendCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageSendCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8460,7 +8456,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageSendCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageSendCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8500,10 +8496,10 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _metadata_headers: Vec<String>,
@@ -8513,9 +8509,9 @@ pub struct UserMessageGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8658,7 +8654,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8668,7 +8664,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The ID of the message to retrieve.
-    pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8677,7 +8673,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// When given and format is METADATA, only include headers specified.
-    pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
@@ -8685,7 +8681,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// The format to return the message in.
-    pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -8696,7 +8692,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8717,7 +8713,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8734,7 +8730,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -8777,10 +8773,10 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct UserMessageListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -8792,9 +8788,9 @@ pub struct UserMessageListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8945,7 +8941,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8953,7 +8949,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
-    pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -8961,7 +8957,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Page token to retrieve a specific page of results in the list.
-    pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -8969,7 +8965,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Maximum number of messages to return.
-    pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -8978,7 +8974,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Only return messages with labels that match all of the specified label IDs.
-    pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a, C, A> {
         self._label_ids.push(new_value.to_string());
         self
     }
@@ -8986,7 +8982,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     ///
     /// 
     /// Include messages from SPAM and TRASH in the results.
-    pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a, C, A> {
         self._include_spam_trash = Some(new_value);
         self
     }
@@ -8997,7 +8993,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9018,7 +9014,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9035,7 +9031,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9073,19 +9069,19 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///              .doit();
 /// # }
 /// ```
-pub struct UserGetProfileCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserGetProfileCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserGetProfileCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserGetProfileCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserGetProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9217,7 +9213,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9228,7 +9224,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetProfileCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetProfileCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9249,7 +9245,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetProfileCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetProfileCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9266,7 +9262,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserGetProfileCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserGetProfileCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9306,10 +9302,10 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct UserThreadGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserThreadGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _user_id: String,
     _id: String,
     _metadata_headers: Vec<String>,
@@ -9319,9 +9315,9 @@ pub struct UserThreadGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserThreadGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserThreadGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserThreadGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9464,7 +9460,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9474,7 +9470,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// The ID of the thread to retrieve.
-    pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9483,7 +9479,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// When given and format is METADATA, only include headers specified.
-    pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
@@ -9491,7 +9487,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// The format to return the messages in.
-    pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, C, A> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -9502,7 +9498,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserThreadGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9523,7 +9519,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9540,7 +9536,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserThreadGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserThreadGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -9587,10 +9583,10 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct UserMessageInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct UserMessageInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Gmail<C, NC, A>,
+    hub: &'a Gmail<C, A>,
     _request: Message,
     _user_id: String,
     _internal_date_source: Option<String>,
@@ -9600,9 +9596,9 @@ pub struct UserMessageInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for UserMessageInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for UserMessageInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> UserMessageInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9861,7 +9857,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Message) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Message) -> UserMessageInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -9871,7 +9867,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// we provide this method for API completeness.
     /// 
     /// The user's email address. The special value me can be used to indicate the authenticated user.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, A> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9879,7 +9875,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Source for Gmail's internal date of the message.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
@@ -9887,7 +9883,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
-    pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, C, A> {
         self._deleted = Some(new_value);
         self
     }
@@ -9898,7 +9894,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserMessageInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9919,7 +9915,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9936,7 +9932,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> UserMessageInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> UserMessageInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

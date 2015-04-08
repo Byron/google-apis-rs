@@ -4,12 +4,12 @@
 [package]
 
 name = "google-coordinate1"
-version = "0.1.4+20141215"
+version = "0.1.5+20141215"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with coordinate (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1"
 homepage = "https://developers.google.com/coordinate/"
-documentation = "http://byron.github.io/google-apis-rs/google-coordinate1"
+documentation = "http://byron.github.io/google-apis-rs/google_coordinate1"
 license = "MIT"
 keywords = ["coordinate", "google", "protocol", "web", "api"]
 

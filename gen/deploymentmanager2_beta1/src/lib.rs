@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *deploymentmanager* crate version *0.1.4+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.4*.
+//! This documentation was generated from *deploymentmanager* crate version *0.1.5+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
 //! 
 //! Everything else about the *deploymentmanager* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -201,7 +201,6 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
@@ -302,46 +301,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Deploymentmanager<C, NC, A> {
+pub struct Deploymentmanager<C, A> {
     client: RefCell<C>,
     auth: RefCell<A>,
     _user_agent: String,
-
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for Deploymentmanager<C, NC, A> {}
+impl<'a, C, A> Hub for Deploymentmanager<C, A> {}
 
-impl<'a, C, NC, A> Deploymentmanager<C, NC, A>
-    where  NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> Deploymentmanager<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> Deploymentmanager<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> Deploymentmanager<C, A> {
         Deploymentmanager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.4".to_string(),
-            _m: PhantomData
+            _user_agent: "google-api-rust-client/0.1.5".to_string(),
         }
     }
 
-    pub fn deployments(&'a self) -> DeploymentMethods<'a, C, NC, A> {
+    pub fn deployments(&'a self) -> DeploymentMethods<'a, C, A> {
         DeploymentMethods { hub: &self }
     }
-    pub fn manifests(&'a self) -> ManifestMethods<'a, C, NC, A> {
+    pub fn manifests(&'a self) -> ManifestMethods<'a, C, A> {
         ManifestMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C, NC, A> {
+    pub fn operations(&'a self) -> OperationMethods<'a, C, A> {
         OperationMethods { hub: &self }
     }
-    pub fn resources(&'a self) -> ResourceMethods<'a, C, NC, A> {
+    pub fn resources(&'a self) -> ResourceMethods<'a, C, A> {
         ResourceMethods { hub: &self }
     }
-    pub fn types(&'a self) -> TypeMethods<'a, C, NC, A> {
+    pub fn types(&'a self) -> TypeMethods<'a, C, A> {
         TypeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.4`.
+    /// It defaults to `google-api-rust-client/0.1.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -738,15 +734,15 @@ impl ResponseResult for ManifestsListResponse {}
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for OperationMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for OperationMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
+impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -756,7 +752,7 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     ///
     /// * `project` - ! The project ID for this request.
     /// * `operation` - ! The name of the operation for this request.
-    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, A> {
         OperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -774,7 +770,7 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - ! The project ID for this request.
-    pub fn list(&self, project: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> OperationListCall<'a, C, A> {
         OperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -817,15 +813,15 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DeploymentMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for DeploymentMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for DeploymentMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
+impl<'a, C, A> DeploymentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -835,7 +831,7 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - ! The project ID for this request.
-    pub fn insert(&self, request: &Deployment, project: &str) -> DeploymentInsertCall<'a, C, NC, A> {
+    pub fn insert(&self, request: &Deployment, project: &str) -> DeploymentInsertCall<'a, C, A> {
         DeploymentInsertCall {
             hub: self.hub,
             _request: request.clone(),
@@ -854,7 +850,7 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     ///
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
-    pub fn get(&self, project: &str, deployment: &str) -> DeploymentGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, deployment: &str) -> DeploymentGetCall<'a, C, A> {
         DeploymentGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -872,7 +868,7 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - ! The project ID for this request.
-    pub fn list(&self, project: &str) -> DeploymentListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> DeploymentListCall<'a, C, A> {
         DeploymentListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -892,7 +888,7 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     ///
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
-    pub fn delete(&self, project: &str, deployment: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
+    pub fn delete(&self, project: &str, deployment: &str) -> DeploymentDeleteCall<'a, C, A> {
         DeploymentDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -934,15 +930,15 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
 /// let rb = hub.types();
 /// # }
 /// ```
-pub struct TypeMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TypeMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for TypeMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for TypeMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> TypeMethods<'a, C, NC, A> {
+impl<'a, C, A> TypeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -951,7 +947,7 @@ impl<'a, C, NC, A> TypeMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `project` - ! The project ID for this request.
-    pub fn list(&self, project: &str) -> TypeListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str) -> TypeListCall<'a, C, A> {
         TypeListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -994,15 +990,15 @@ impl<'a, C, NC, A> TypeMethods<'a, C, NC, A> {
 /// let rb = hub.resources();
 /// # }
 /// ```
-pub struct ResourceMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ResourceMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ResourceMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ResourceMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
+impl<'a, C, A> ResourceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1013,7 +1009,7 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
     /// * `resource` - ! The name of the resource for this request.
-    pub fn get(&self, project: &str, deployment: &str, resource: &str) -> ResourceGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, deployment: &str, resource: &str) -> ResourceGetCall<'a, C, A> {
         ResourceGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1033,7 +1029,7 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
     ///
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
-    pub fn list(&self, project: &str, deployment: &str) -> ResourceListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, deployment: &str) -> ResourceListCall<'a, C, A> {
         ResourceListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1077,15 +1073,15 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
 /// let rb = hub.manifests();
 /// # }
 /// ```
-pub struct ManifestMethods<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManifestMethods<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
 }
 
-impl<'a, C, NC, A> MethodsBuilder for ManifestMethods<'a, C, NC, A> {}
+impl<'a, C, A> MethodsBuilder for ManifestMethods<'a, C, A> {}
 
-impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
+impl<'a, C, A> ManifestMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1095,7 +1091,7 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
     ///
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
-    pub fn list(&self, project: &str, deployment: &str) -> ManifestListCall<'a, C, NC, A> {
+    pub fn list(&self, project: &str, deployment: &str) -> ManifestListCall<'a, C, A> {
         ManifestListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1117,7 +1113,7 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
     /// * `project` - ! The project ID for this request.
     /// * `deployment` - ! The name of the deployment for this request.
     /// * `manifest` - ! The name of the manifest for this request.
-    pub fn get(&self, project: &str, deployment: &str, manifest: &str) -> ManifestGetCall<'a, C, NC, A> {
+    pub fn get(&self, project: &str, deployment: &str, manifest: &str) -> ManifestGetCall<'a, C, A> {
         ManifestGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1168,10 +1164,10 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _operation: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1179,9 +1175,9 @@ pub struct OperationGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OperationGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1314,7 +1310,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1324,7 +1320,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the operation for this request.
-    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
+    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
         self._operation = new_value.to_string();
         self
     }
@@ -1335,7 +1331,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1356,7 +1352,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1373,7 +1369,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OperationGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OperationGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1413,10 +1409,10 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct OperationListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct OperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -1425,9 +1421,9 @@ pub struct OperationListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for OperationListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for OperationListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1565,7 +1561,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1573,7 +1569,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1581,7 +1577,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     ///
     /// 
     /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
-    pub fn max_results(mut self, new_value: i32) -> OperationListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> OperationListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -1592,7 +1588,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1613,7 +1609,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1630,7 +1626,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> OperationListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OperationListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1674,10 +1670,10 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DeploymentInsertCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DeploymentInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _request: Deployment,
     _project: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1685,9 +1681,9 @@ pub struct DeploymentInsertCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DeploymentInsertCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DeploymentInsertCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1826,7 +1822,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &Deployment) -> DeploymentInsertCall<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Deployment) -> DeploymentInsertCall<'a, C, A> {
         self._request = new_value.clone();
         self
     }
@@ -1836,7 +1832,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> DeploymentInsertCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DeploymentInsertCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1847,7 +1843,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentInsertCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1868,7 +1864,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1885,7 +1881,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DeploymentInsertCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DeploymentInsertCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1923,10 +1919,10 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DeploymentGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _delegate: Option<&'a mut Delegate>,
@@ -1934,9 +1930,9 @@ pub struct DeploymentGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DeploymentGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DeploymentGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2069,7 +2065,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> DeploymentGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DeploymentGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2079,7 +2075,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentGetCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentGetCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -2090,7 +2086,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2111,7 +2107,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2128,7 +2124,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DeploymentGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DeploymentGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2168,10 +2164,10 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///              .doit();
 /// # }
 /// ```
-pub struct DeploymentListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DeploymentListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2180,9 +2176,9 @@ pub struct DeploymentListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DeploymentListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DeploymentListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2320,7 +2316,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> DeploymentListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DeploymentListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2328,7 +2324,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
-    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2336,7 +2332,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     ///
     /// 
     /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
-    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2347,7 +2343,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2368,7 +2364,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2385,7 +2381,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DeploymentListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DeploymentListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2423,10 +2419,10 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///              .doit();
 /// # }
 /// ```
-pub struct DeploymentDeleteCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct DeploymentDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _delegate: Option<&'a mut Delegate>,
@@ -2434,9 +2430,9 @@ pub struct DeploymentDeleteCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for DeploymentDeleteCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for DeploymentDeleteCall<'a, C, A> {}
 
-impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2569,7 +2565,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2579,7 +2575,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -2590,7 +2586,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentDeleteCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DeploymentDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2611,7 +2607,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2628,7 +2624,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> DeploymentDeleteCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> DeploymentDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2668,10 +2664,10 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct TypeListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct TypeListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2680,9 +2676,9 @@ pub struct TypeListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for TypeListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for TypeListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2820,7 +2816,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> TypeListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> TypeListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -2828,7 +2824,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
-    pub fn page_token(mut self, new_value: &str) -> TypeListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> TypeListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -2836,7 +2832,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     ///
     /// 
     /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
-    pub fn max_results(mut self, new_value: i32) -> TypeListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> TypeListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -2847,7 +2843,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TypeListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TypeListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2868,7 +2864,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2885,7 +2881,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> TypeListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> TypeListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -2923,10 +2919,10 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///              .doit();
 /// # }
 /// ```
-pub struct ResourceGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ResourceGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _resource: String,
@@ -2935,9 +2931,9 @@ pub struct ResourceGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ResourceGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ResourceGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3071,7 +3067,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ResourceGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3081,7 +3077,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> ResourceGetCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -3091,7 +3087,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the resource for this request.
-    pub fn resource(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
+    pub fn resource(mut self, new_value: &str) -> ResourceGetCall<'a, C, A> {
         self._resource = new_value.to_string();
         self
     }
@@ -3102,7 +3098,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3123,7 +3119,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3140,7 +3136,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ResourceGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ResourceGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3180,10 +3176,10 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .doit();
 /// # }
 /// ```
-pub struct ResourceListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ResourceListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _page_token: Option<String>,
@@ -3193,9 +3189,9 @@ pub struct ResourceListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ResourceListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ResourceListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3334,7 +3330,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ResourceListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3344,7 +3340,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> ResourceListCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -3352,7 +3348,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
-    pub fn page_token(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ResourceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3360,7 +3356,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
-    pub fn max_results(mut self, new_value: i32) -> ResourceListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ResourceListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3371,7 +3367,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResourceListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3392,7 +3388,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3409,7 +3405,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ResourceListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ResourceListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3449,10 +3445,10 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ManifestListCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManifestListCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _page_token: Option<String>,
@@ -3462,9 +3458,9 @@ pub struct ManifestListCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManifestListCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManifestListCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3603,7 +3599,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManifestListCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3613,7 +3609,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> ManifestListCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -3621,7 +3617,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
-    pub fn page_token(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ManifestListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3629,7 +3625,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     ///
     /// 
     /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
-    pub fn max_results(mut self, new_value: i32) -> ManifestListCall<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: i32) -> ManifestListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -3640,7 +3636,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManifestListCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManifestListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3661,7 +3657,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3678,7 +3674,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManifestListCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManifestListCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -3716,10 +3712,10 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///              .doit();
 /// # }
 /// ```
-pub struct ManifestGetCall<'a, C, NC, A>
-    where C: 'a, NC: 'a, A: 'a {
+pub struct ManifestGetCall<'a, C, A>
+    where C: 'a, A: 'a {
 
-    hub: &'a Deploymentmanager<C, NC, A>,
+    hub: &'a Deploymentmanager<C, A>,
     _project: String,
     _deployment: String,
     _manifest: String,
@@ -3728,9 +3724,9 @@ pub struct ManifestGetCall<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ManifestGetCall<'a, C, NC, A> {}
+impl<'a, C, A> CallBuilder for ManifestGetCall<'a, C, A> {}
 
-impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -3864,7 +3860,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The project ID for this request.
-    pub fn project(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
+    pub fn project(mut self, new_value: &str) -> ManifestGetCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -3874,7 +3870,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the deployment for this request.
-    pub fn deployment(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
+    pub fn deployment(mut self, new_value: &str) -> ManifestGetCall<'a, C, A> {
         self._deployment = new_value.to_string();
         self
     }
@@ -3884,7 +3880,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// we provide this method for API completeness.
     /// 
     /// ! The name of the manifest for this request.
-    pub fn manifest(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
+    pub fn manifest(mut self, new_value: &str) -> ManifestGetCall<'a, C, A> {
         self._manifest = new_value.to_string();
         self
     }
@@ -3895,7 +3891,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManifestGetCall<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManifestGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3916,7 +3912,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3933,7 +3929,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ManifestGetCall<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ManifestGetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
