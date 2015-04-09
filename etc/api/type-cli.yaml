@@ -19,3 +19,7 @@ make:
 cargo:
   build_version: "0.0.1"
   keywords: [cli]
+  dependencies:
+    - docopt = "*"
+    - docopt_macros = "*"
+    - rustc-serialize = "*"
