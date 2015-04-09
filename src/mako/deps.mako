@@ -44,15 +44,17 @@
 	import os
 	import json
 
+	CMN_SRC = '/src/cmn.rs'
+
 	api_name = util.library_name(an, version)
 	api_target = util.target_directory_name(an, version, suffix)
 	depends_on_target = ''
 	if make.depends_on_suffix is not None:
-		depends_on_target = util.target_directory_name(an, version, make.depends_on_suffix)
+		depends_on_target = directories.output + '/' + util.target_directory_name(an, version, make.depends_on_suffix) + CMN_SRC
 	crate_name = util.library_to_crate_name(api_name, suffix)
 	gen_root = directories.output + '/' + api_target
 	gen_root_stamp = gen_root + '/.timestamp'
-	api_common = gen_root + '/src/cmn.rs'
+	api_common = gen_root + CMN_SRC
 	api_clean = api_target + '-clean'
 	api_cargo = api_target + '-cargo'
 	api_doc = api_target + '-doc'

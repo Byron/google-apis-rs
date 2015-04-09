@@ -47,3 +47,7 @@ ${name}\
 ${canonicalName}\
 % endif
 </%def>
+
+<%def name="program_name()" buffered="True">\
+${self.library_name().replace('_', '-')}\
+</%def>

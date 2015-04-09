@@ -17,6 +17,11 @@ documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 
+% if cargo.get('is_executable', False):
+[[bin]]
+name = "${util.program_name()}"
+% endif
+
 [dependencies]
 hyper = "*"
 mime = "*"
