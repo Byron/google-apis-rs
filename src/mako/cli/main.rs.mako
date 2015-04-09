@@ -11,7 +11,7 @@
 extern crate docopt;
 extern crate rustc_serialize;
 
-<%docopt:new c="c"/>\
+${docopt.new(c)}\
 
 fn main() {
     let _: Args = Args::docopt().decode().unwrap_or_else(|e| e.exit());
