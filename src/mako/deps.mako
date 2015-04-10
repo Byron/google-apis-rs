@@ -98,7 +98,7 @@ ${api_crate_publish_file}:
 ${api_cargo}: ${api_target}
 	cd ${gen_root} && cargo $(ARGS)
 
-${api_doc_index}: ${api_target}
+${api_doc_index}: ${api_common}
 	% if make.documentation_engine == 'rustdoc':
 	cd ${gen_root} && cargo doc
 	@echo "Docs for ${api_target} at $@"
