@@ -14,8 +14,8 @@ def mangle_subcommand(name):
 
 
 # transform the resource name into a suitable filename to contain the markdown documentation for it
-def subcommand_md_filename(resource):
-    return mangle_subcommand(resource) + '.md'
+def subcommand_md_filename(resource, method):
+    return mangle_subcommand(resource) + '_' + mangle_subcommand(method) + '.md'
 
 
 # split the result along split segments

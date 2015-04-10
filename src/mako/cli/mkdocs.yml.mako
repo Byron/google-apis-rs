@@ -3,6 +3,9 @@
     from cli import (subcommand_md_filename, mangle_subcommand)
 
     c = new_context(schemas, resources, context.get('methods'))
+
+    def pretty(n):
+        return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))
 %>\
 <%namespace name="util" file="../lib/util.mako"/>\
 site_name: ${util.canonical_name()} v${util.crate_version()}
@@ -17,8 +20,10 @@ site_dir: ${mkdocs.site_dir}
 pages:
 - ['index.md', 'Home']
 % for resource in sorted(c.rta_map.keys()):
-- ['${subcommand_md_filename(resource)}', 'Commands', '${' '.join(s.capitalize() for s in mangle_subcommand(resource).split('-'))}']
-% endfor
+% for method in sorted(c.rta_map[resource]):
+- ['${subcommand_md_filename(resource, method)}', '${pretty(resource)}', '${pretty(method)}']
+% endfor # each method
+% endfor # each resource
 
 theme: readthedocs
 
