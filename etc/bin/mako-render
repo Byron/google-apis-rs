@@ -271,6 +271,11 @@ def cmdline(argv=None):
                     "parent directory of the file provided.")
     parser.add_argument('-io', nargs="+",
                         help="input and ouptut pairs. can be used multiple times, use TEMPLATE_FILE_IN=[OUTPUT_FILE])")
+    parser.add_argument('--post-process-python-module', default="",
+                        help="Specify a python module with a `module.process_template_result(r, output_file|None) -> None|r'."
+                             "If it returns None, no output file will be written. Use it to perform any operation on "
+                             "the template's result. The module, like 'foo.handler' will be imported and thus "
+                             " needs to be in the PYTHONPATH.")
 
     options = parser.parse_args(argv)
     if len(options.io) == 0:
@@ -283,6 +288,16 @@ def cmdline(argv=None):
     data_converted.update((k, v) for k, v in data.items() if not isinstance(v, dict))
     data_converted.update(dict([varsplit(var) for var in options.var]))
     del data
+
+    post_processor = lambda r, of: r
+    if options.post_process_python_module:
+        fn_name = 'process_template_result'
+        pm = __import__(options.post_process_python_module, globals(), locals(), [])
+        post_processor = getattr(pm, fn_name, None)
+        if post_processor is None:
+            raise AssertionError("python module '%s' must have a function called '%s'" 
+                                 % (options.post_process_python_module, fn_name))
+    # end handle post processor
 
     seen_stdin = False
     for input_file, output_file in options.io:
@@ -306,7 +321,9 @@ def cmdline(argv=None):
                 _exit()
 
         try:
-            result = template.render(**data_converted)
+            result = post_processor(template.render(**data_converted), output_file)
+            if result is None:
+                continue
             if output_file:
                 dir = dirname(output_file)
                 if dir and not os.path.isdir(dir):

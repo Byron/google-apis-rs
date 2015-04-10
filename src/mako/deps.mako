@@ -28,6 +28,10 @@
 	agsuffix = make.aggregated_target_suffix
 	global_targets = make.get('global_targets', False)
 
+	post_processor_arg = ''
+	if mako is not UNDEFINED:
+		post_processor_arg = '--post-process-python-module=%s' % mako.post_processor_module
+
 	try:
 		root = directories.mako_src + '/' + make.id + '/lib'
 		lib_files = [os.path.join(root, file_name) for file_name in os.listdir(root)]
@@ -85,7 +89,7 @@ ${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_
 
 ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${' '.join(lib_files)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
 	@echo Generating ${api_target}
-	@$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	@$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} ${post_processor_arg} --data-files ${api_json_inputs}
 	@touch $@
 
 ${api_target}: ${api_common}
@@ -105,7 +109,7 @@ ${api_doc_index}: ${api_common}
 	% else:
 	@echo mkdocs ${api_doc_index}
 	## Our README is the landing page, and thus will serve multiple roles at once !
-	@cd ${gen_root} && (mkdir -p docs && cd docs && ln -s ../README.md index.md &>/dev/null) || : && $(MKDOCS) build --clean
+	@cd ${gen_root} && (mkdir -p ${mkdocs.docs_dir} && cd ${mkdocs.docs_dir} && ln -s ../README.md index.md &>/dev/null) || : && $(MKDOCS) build --clean
 	% endif
 
 ${api_doc}: ${api_doc_index}

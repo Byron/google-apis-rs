@@ -2,6 +2,10 @@ mkdocs:
   ## A directory to bring us from the mkdocs invocation directory to the gen-root
   gen_root_dir: ..
   site_dir: build_html
+  # if docs_dir changes, remember to update the sources as well.
+  docs_dir: docs
+mako:
+  post_processor_module: cli
 make:
   id: cli
   target_name: CLIs
@@ -12,6 +16,7 @@ make:
   templates:
     - source: ../LICENSE.md
     - source: ../Cargo.toml
+    - source: docs/commands.yml
     - source: mkdocs.yml
     - source: README.md
     - source: main.rs

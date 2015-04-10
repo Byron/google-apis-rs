@@ -6,6 +6,7 @@ gen/*-cli/
 *.go
 *.pyc
 **target/
+**docs/
 **build_html/
 .*.deps
 **Cargo.lock
