@@ -67,12 +67,12 @@
 	api_doc_index = api_doc_root + '/index.html'
 
 	# source, destination of individual output files
-	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source.strip('../')) 
-																								for i in make.templates]
+	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' + 
+		   i.get('output_dir', '') + '/' + i.source.strip('../')) for i in make.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_meta_dir = os.path.dirname(api_json)
-	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + make.aggregated_target_suffix,
-																		 	json.load(open(api_json, 'r')).get('revision', '00000000'))
+	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + 
+			make.aggregated_target_suffix, json.load(open(api_json, 'r')).get('revision', '00000000'))
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
 	type_specific_json = '$(API_DIR)/type-' + make.id + '.yaml'
 	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_json
@@ -117,9 +117,9 @@ ${api_doc}: ${api_doc_index}
 ${central_api_index(crate_name)}: ${api_doc_index}
 	@mkdir -p ${doc_root}
 	% if make.documentation_engine == 'rustdoc':
-	cp -Rf ${os.path.dirname(api_doc_root)}/* ${doc_root}
+	cp -Rf ${os.path.dirname(api_doc_root)}  $(dir $@)
 	% else:
-	cp -Rf ${api_doc_root} ${doc_root}
+	cp -Rf ${api_doc_root} $(dir $@)
 	% endif
 
 ${api_clean}:

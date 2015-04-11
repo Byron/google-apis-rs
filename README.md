@@ -26,6 +26,12 @@ Click the image below to see the playlist with all project related content:
 
 [![thumb][playlist-thumb]][playlist]
 
+# Developer Diary
+
+Each episode sums up one major step in project development:
+
+* [Episode 1](http://youtu.be/2U3SpepKaBE): generating Rust APIs
+
 # Build Instructions
 
 ## Prerequisites
