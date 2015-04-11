@@ -129,9 +129,9 @@ bar\r\n\
     #[test]
     fn content_range() {
         for &(ref c, ref expected) in 
-          &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes */50\r\n"),
+          &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes=*/50\r\n"),
             (ContentRange {range: Some(Chunk { first: 23, last: 40 }), total_length: 45},
-             "Content-Range: bytes 23-40/45\r\n")] {
+             "Content-Range: bytes=23-40/45\r\n")] {
             let mut headers = hyper::header::Headers::new();
             headers.set(c.clone());
             assert_eq!(headers.to_string(), expected.to_string());
