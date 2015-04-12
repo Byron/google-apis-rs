@@ -2,7 +2,7 @@
 <%!
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property)
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP)
 
     v_arg = '<%s>' % VALUE_ARG
     file_arg = '<file>'
@@ -63,9 +63,9 @@ Usage:
 Options:
 % if struct_used:
     -${STRUCT_FLAG} ${v_arg}  set request structure field;
-            ${v_arg} supports cursor form 'field[:subfield]...' to 
+            ${v_arg} supports cursor form 'field[${FIELD_SEP}subfield]...' to 
             set the curor for upcoming values and supports the value form
-            'field[:subfield]...=value' to set an actual field.
+            'field[${FIELD_SEP}subfield]...=value' to set an actual field.
 % endif
 % if upload_protocols_used:
     -${UPLOAD_FLAG}  <mode> ${file_arg} ${mime_arg}

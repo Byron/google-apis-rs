@@ -14,6 +14,8 @@ OUTPUT_FLAG = 'o'
 VALUE_ARG = 'v'
 SCOPE_FLAG = 'scope'
 
+FIELD_SEP = '.'
+
 CONFIG_DIR = '~/.google-service-cli'
 
 re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE|re.DOTALL)
