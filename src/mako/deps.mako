@@ -127,7 +127,7 @@ ${api_clean}:
 % endfor
 % endfor
 
-clean${agsuffix}: ${space_join(1)} docs-clean${agsuffix}
+clean-all${agsuffix}: ${space_join(1)} docs-clean${agsuffix}
 cargo${agsuffix}: ${space_join(2)}
 publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
