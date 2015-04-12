@@ -37,6 +37,9 @@ def pretty(n):
     return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))
 
 
+def is_request_value_property(mc, p):
+    return mc.request_value and mc.request_value.id == p.get(util.TREF)
+
 # transform name to be a suitable subcommand
 def mangle_subcommand(name):
     return util.camel_to_under(name).replace('_', '-').replace('.', '-')

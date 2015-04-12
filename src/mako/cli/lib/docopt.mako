@@ -2,7 +2,7 @@
 <%!
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG)
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property)
 
     v_arg = '<%s>' % VALUE_ARG
     file_arg = '<file>'
@@ -24,10 +24,11 @@ Usage:
     mc = new_method_context(resource, method, c)
 
     args = list()
-    if mc.optional_props or parameters is not UNDEFINED:
-        args.append('[-%s %s]...' % (PARAM_FLAG, v_arg))
-        param_used = True
-    # end paramters
+    for p in mc.required_props:
+        if is_request_value_property(mc, p):
+            continue
+        args.append('<%s>' % mangle_subcommand(p.name))
+    # end for each required property
 
     if mc.request_value:
         args.append('-%s %s...' % (STRUCT_FLAG, v_arg))
@@ -43,6 +44,11 @@ Usage:
         upload_protocols_used = upload_protocols_used|set(upload_protocols)
     # end upload handling
 
+    if mc.optional_props or parameters is not UNDEFINED:
+        args.append('[-%s %s]...' % (PARAM_FLAG, v_arg))
+        param_used = True
+    # end paramters
+    
     if mc.response_schema:
         args.append('[-%s %s]' % (OUTPUT_FLAG, out_arg))
         output_used = True
@@ -55,9 +61,6 @@ Usage:
 
 % if param_used|struct_used|output_used or upload_protocols_used:
 Options:
-% if param_used:
-    -${PARAM_FLAG} ${v_arg}  set optional request parameter; ${v_arg} is of form 'name=value'
-% endif
 % if struct_used:
     -${STRUCT_FLAG} ${v_arg}  set request structure field;
             ${v_arg} supports cursor form 'field[:subfield]...' to 
@@ -70,6 +73,9 @@ Options:
             ${file_arg} path to file to upload. It must be seekable.
             ${mime_arg} the mime type, like 'application/octet-stream', 
             which is the default
+% endif
+% if param_used:
+    -${PARAM_FLAG} ${v_arg}  set optional request parameter; ${v_arg} is of form 'name=value'
 % endif
 % if output_used:
     -${OUTPUT_FLAG} ${out_arg}
