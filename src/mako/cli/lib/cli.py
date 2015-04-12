@@ -6,6 +6,12 @@ import re
 SPLIT_START = '>>>>>>>'
 SPLIT_END = '<<<<<<<'
 
+PARAM_FLAG = 'p'
+STRUCT_FLAG = 'r'
+UPLOAD_FLAG = 'u'
+OUTPUT_FLAG = 'o'
+VALUE_ARG = 'v'
+
 re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE|re.DOTALL)
 
 # transform name to be a suitable subcommand
