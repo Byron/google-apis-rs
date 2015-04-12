@@ -28,7 +28,8 @@ endif
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.'
+MAKO = $(TPL) --template-dir '.'
+PYPATH = PYTHONPATH=$(MAKO_LIB_DIR)
 MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER)
 
 help:
@@ -60,10 +61,10 @@ $(MAKO_RENDER): $(PYTHON)
 # Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
 # to a URL get call to the google discovery service
 $(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_API_INFO) $(API_LIST)
-	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
+	$(PYPATH) $(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
 
 $(CLI_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_CLI_INFO) $(API_LIST)
-	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_CLI_INFO) $(API_LIST)
+	$(PYPATH) $(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_CLI_INFO) $(API_LIST)
 
 deps: $(API_DEPS) $(CLI_DEPS)
 

@@ -10,7 +10,7 @@ re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END
 
 # transform name to be a suitable subcommand
 def mangle_subcommand(name):
-    return util.camel_to_under(name).replace('_', '-').replace('.', '-')
+    return util.camel_to_under(util.singular(name)).replace('_', '-').replace('.', '-')
 
 
 # transform the resource name into a suitable filename to contain the markdown documentation for it

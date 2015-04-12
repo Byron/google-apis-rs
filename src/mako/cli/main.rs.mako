@@ -18,6 +18,7 @@ extern crate rustc_serialize;
 ${docopt.new(c)}\
 
 fn main() {
-    let _: Args = Args::docopt().decode().unwrap_or_else(|e| e.exit());
+    let args: Args = Args::docopt().decode().unwrap_or_else(|e| e.exit());
+    println!("{:?}", args);
     println!("Hello, ${id} !");
 }
