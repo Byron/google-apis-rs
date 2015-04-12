@@ -442,7 +442,7 @@ impl Header for ContentRange {
 
 impl HeaderFormat for ContentRange {
     fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        try!(fmt.write_str("bytes "));
+        try!(fmt.write_str("bytes="));
         match self.range {
             Some(ref c) => try!(c.fmt(fmt)),
             None => try!(fmt.write_str("*"))

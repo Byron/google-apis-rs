@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_manager1_beta2"
 license = "MIT"
 keywords = ["manager", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

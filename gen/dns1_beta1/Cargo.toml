@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_dns1_beta1"
 license = "MIT"
 keywords = ["dns", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

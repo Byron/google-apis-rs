@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_resourceviews1_bet
 license = "MIT"
 keywords = ["resourceviews", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

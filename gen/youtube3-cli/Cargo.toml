@@ -9,14 +9,20 @@ authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with YouTube (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3-cli"
 homepage = "https://developers.google.com/youtube/v3"
-documentation = "http://byron.github.io/google-apis-rs/google-youtube3-cli"
+documentation = "http://byron.github.io/google-apis-rs/google_youtube3_cli"
 license = "MIT"
 keywords = ["youtube", "google", "cli"]
+
+[[bin]]
+name = "youtube3"
 
 [dependencies]
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
+docopt = "*"
+docopt_macros = "*"
+rustc-serialize = "*"
 
 [dependencies.google-youtube3]
 path = "../youtube3"

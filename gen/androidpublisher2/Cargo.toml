@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_androidpublisher2"
 license = "MIT"
 keywords = ["androidpublisher", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

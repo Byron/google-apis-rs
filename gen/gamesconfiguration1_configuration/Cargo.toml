@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_gamesconfiguration
 license = "MIT"
 keywords = ["gamesConfiguration", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_spectrum1_explorer
 license = "MIT"
 keywords = ["spectrum", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

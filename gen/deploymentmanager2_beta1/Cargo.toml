@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_deploymentmanager2
 license = "MIT"
 keywords = ["deploymentmanager", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"

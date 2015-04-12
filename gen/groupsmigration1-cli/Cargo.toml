@@ -9,14 +9,20 @@ authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
 homepage = "https://developers.google.com/google-apps/groups-migration/"
-documentation = "http://byron.github.io/google-apis-rs/google-groupsmigration1-cli"
+documentation = "http://byron.github.io/google-apis-rs/google_groupsmigration1_cli"
 license = "MIT"
 keywords = ["groupsmigration", "google", "cli"]
+
+[[bin]]
+name = "groupsmigration1"
 
 [dependencies]
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
+docopt = "*"
+docopt_macros = "*"
+rustc-serialize = "*"
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"

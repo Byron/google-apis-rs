@@ -13,6 +13,7 @@ documentation = "http://byron.github.io/google-apis-rs/google_admin1_directory"
 license = "MIT"
 keywords = ["admin", "google", "protocol", "web", "api"]
 
+
 [dependencies]
 hyper = "*"
 mime = "*"
