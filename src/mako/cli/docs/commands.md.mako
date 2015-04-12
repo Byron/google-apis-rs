@@ -1,9 +1,12 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
-<%
-    from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by)
+<%!
+    from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
-                     mangle_subcommand, is_request_value_property, FIELD_SEP)
+                     mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG)
 
+    from copy import deepcopy
+%>\
+<%
     c = new_context(schemas, resources, context.get('methods'))
 %>\
 % for resource in sorted(c.rta_map.keys()):
@@ -34,6 +37,7 @@ You can set the scope for this method like this: `${util.program_name()} --${SCO
 % endif # have method scopes
 <%
     rprops = [p for p in mc.required_props if not is_request_value_property(mc, p)]
+    oprops = [p for p in mc.optional_props if not p.get('skip_example', False)]
 %>\
 % if rprops:
 # Required Scalar ${len(rprops) > 1 and 'Arguments' or 'Argument'}
@@ -72,6 +76,33 @@ can be set completely with the following arguments. Note how the cursor position
 * You can also set nested fields without setting the cursor explicitly. For example, to set the mapping from the root, you would specify `-r struct${FIELD_SEP}sub_struct${FIELD_SEP}mapping=foo=bar`. In case the cursor is not at the root, you may explicitly drill down from the root using a leading '${FIELD_SEP}' character.
 
 % endif # have request value
+% if oprops:
+# Optional Method Properties
+
+You may set the following properties to further configure the call.
+
+% for p in sorted(oprops):
+${self._md_property(p)}
+% endfor 
+% endif # optional method properties
+% if parameters is not UNDEFINED:
+# Optional General Properties
+
+The following properties can configure any call, and are not specific to this method.
+
+% for pn in sorted(parameters.keys()):
+<% 
+    p = deepcopy(parameters[pn])
+    p.name = pn
+%>\
+${self._md_property(p)}
+% endfor 
+% endif # general parameters
 ${SPLIT_END}
 % endfor # each method
 % endfor # each resource
+
+<%def name="_md_property(p)">\
+* **-${PARAM_FLAG} ${mangle_subcommand(p.name)}=${p.type}**
+    - ${p.get('description') or "No description provided" | indent_all_but_first_by(2)}
+</%def>

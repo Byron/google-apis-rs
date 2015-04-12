@@ -548,6 +548,9 @@ def schema_doc_format(s):
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
 
+def is_repeated_property(p):
+    return p.get('repeated', False)
+
 # method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
 def organize_params(params, request_value):
     part_prop = None

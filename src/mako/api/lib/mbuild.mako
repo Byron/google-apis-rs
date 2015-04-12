@@ -10,7 +10,8 @@
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
-                      method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope)
+                      method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
+                      is_repeated_property)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -26,9 +27,6 @@
         part_desc += ''.join('* *%s*\n' % part for part in parts)
         part_desc = part_desc[:-1]
         return part_desc
-
-    def is_repeated_property(p):
-        return p.get('repeated', False)
 
     def setter_fn_name(p):
         fn_name = p.name
@@ -209,30 +207,32 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         part_desc = make_parts_desc(part_prop)
     # end part description
 %>\
+    % if 'description' in p:
+    ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
+    % endif
     % if is_repeated_property(p):
+    ///
     /// Append the given value to the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     % else:
+    ///
     /// Sets the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property to the given value.
     % endif
-    ///
     % if show_part_info(m, p):
+    ///
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
     /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
     % elif is_required_property(p):
+    ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     % endif
     % if part_desc:
     ///
     ${part_desc | rust_doc_comment, indent_all_but_first_by(1)}
-    % endif
-    /// 
-    % if 'description' in p:
-    ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     pub fn ${mangle_ident(setter_fn_name(p))}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
         % if p.get('repeated', False):
