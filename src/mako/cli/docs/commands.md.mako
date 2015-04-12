@@ -2,9 +2,12 @@
 <%!
     from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
-                     mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG)
+                     mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
+                     FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG)
 
     from copy import deepcopy
+
+    escape_html = lambda n: n.replace('>', r'\>')
 %>\
 <%
     c = new_context(schemas, resources, context.get('methods'))
@@ -38,6 +41,8 @@ You can set the scope for this method like this: `${util.program_name()} --${SCO
 <%
     rprops = [p for p in mc.required_props if not is_request_value_property(mc, p)]
     oprops = [p for p in mc.optional_props if not p.get('skip_example', False)]
+
+    smd = mc.m.get('supportsMediaDownload', False)
 %>\
 % if rprops:
 # Required Scalar ${len(rprops) > 1 and 'Arguments' or 'Argument'}
@@ -76,6 +81,50 @@ can be set completely with the following arguments. Note how the cursor position
 * You can also set nested fields without setting the cursor explicitly. For example, to set the mapping from the root, you would specify `-r struct${FIELD_SEP}sub_struct${FIELD_SEP}mapping=foo=bar`. In case the cursor is not at the root, you may explicitly drill down from the root using a leading '${FIELD_SEP}' character.
 
 % endif # have request value
+% if mc.media_params:
+<%
+    protocols = [mp.protocol for mp in mc.media_params]
+%>\
+# Required Upload Flags
+
+This method supports the upload of data, using the following protocol${len(mc.media_params) > 1 and 's' or ''}:
+
+* **-${UPLOAD_FLAG} ${docopt_mode(protocols)} ${escape_html(FILE_ARG)} ${escape_html(MIME_ARG)}**
+% for mp in mc.media_params:
+    - **${mp.protocol}** - ${mp.description.split('\n')[0]}
+% endfor # each media param
+    - **${escape_html(FILE_ARG)}**
+        + Path to file to upload. It must be seekable.
+    - **${escape_html(MIME_ARG)}**
+        + the mime type, like 'application/octet-stream', which is the default
+% endif # have upload capabilities
+% if mc.response_schema or smd:
+# Optional Output Flags
+
+% if mc.response_schema:
+The method's return value a JSON encoded structure, which will be written to standard output by default.
+% endif
+% if smd:
+
+% if mc.response_schema:
+As this method supports **media download**, you may specify the `-${PARAM_FLAG} alt=media` flag to set the output to be an octet stream of the underlying media. In that case, you will not receive JSON output anymore.
+% else:
+The method's return value is a byte stream of the downloadable resource.
+% endif # handle response schema
+% endif # support media download
+
+* **-${OUTPUT_FLAG} ${escape_html(OUT_ARG)}**
+    - *${escape_html(OUT_ARG)}* specifies the *destination* to which to write the server's result to.
+% if smd and mc.response_schema:
+      It will either be a JSON-encoded structure, or the media file you are downloading.
+% elif smd:
+      It will be a byte stream of the downloadable resource.
+% else:
+      It will be a JSON-encoded structure.
+% endif
+      The *destination* may be `-` to indicate standard output, or a filepath that is to contain the received bytes.
+      If unset, it defaults to standard output.
+% endif # have output
 % if oprops:
 # Optional Method Properties
 

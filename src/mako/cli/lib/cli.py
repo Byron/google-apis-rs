@@ -14,6 +14,10 @@ OUTPUT_FLAG = 'o'
 VALUE_ARG = 'v'
 SCOPE_FLAG = 'scope'
 
+FILE_ARG = '<file>'
+MIME_ARG = '<mime>'
+OUT_ARG = '<out>'
+
 FIELD_SEP = '.'
 
 CONFIG_DIR = '~/.google-service-cli'
@@ -51,6 +55,11 @@ def mangle_subcommand(name):
 def subcommand_md_filename(resource, method):
     return mangle_subcommand(resource) + '_' + mangle_subcommand(method) + '.md'
 
+def docopt_mode(protocols):
+    mode = '|'.join(protocols)
+    if len(protocols) > 1:
+        mode = '(%s)' % mode
+    return mode
 
 # split the result along split segments
 def process_template_result(r, output_file):

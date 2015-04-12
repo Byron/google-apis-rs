@@ -2,12 +2,9 @@
 <%!
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP)
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG)
 
     v_arg = '<%s>' % VALUE_ARG
-    file_arg = '<file>'
-    mime_arg = '<mime>'
-    out_arg = '<out>'
 %>\
 <%def name="new(c)">\
 <%
@@ -37,10 +34,8 @@ Usage:
 
     if mc.media_params:
         upload_protocols = [mp.protocol for mp in mc.media_params]
-        mode = '|'.join(upload_protocols)
-        if len(mc.media_params) > 1:
-            mode = '(%s)' % mode
-        args.append('-%s %s %s %s' % (UPLOAD_FLAG, mode, file_arg, mime_arg))
+        mode = docopt_mode(upload_protocols)
+        args.append('-%s %s %s %s' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
         upload_protocols_used = upload_protocols_used|set(upload_protocols)
     # end upload handling
 
@@ -49,8 +44,8 @@ Usage:
         param_used = True
     # end paramters
     
-    if mc.response_schema:
-        args.append('[-%s %s]' % (OUTPUT_FLAG, out_arg))
+    if mc.response_schema or mc.m.get('supportsMediaDownload', False):
+        args.append('[-%s %s]' % (OUTPUT_FLAG, OUT_ARG))
         output_used = True
     # handle output
 %>\
@@ -68,17 +63,17 @@ Options:
             'field[${FIELD_SEP}subfield]...=value' to set an actual field.
 % endif
 % if upload_protocols_used:
-    -${UPLOAD_FLAG}  <mode> ${file_arg} ${mime_arg}
+    -${UPLOAD_FLAG}  <mode> ${FILE_ARG} ${MIME_ARG}
             <mode> may be one of the following upload modes: ${put_and(sorted(upload_protocols_used))}
-            ${file_arg} path to file to upload. It must be seekable.
-            ${mime_arg} the mime type, like 'application/octet-stream', 
+            ${FILE_ARG} path to file to upload. It must be seekable.
+            ${MIME_ARG} the mime type, like 'application/octet-stream', 
             which is the default
 % endif
 % if param_used:
     -${PARAM_FLAG} ${v_arg}  set optional request parameter; ${v_arg} is of form 'name=value'
 % endif
 % if output_used:
-    -${OUTPUT_FLAG} ${out_arg}
+    -${OUTPUT_FLAG} ${OUT_ARG}
             The `destination` to which to write the server result to. 
             It will either be a json-encoded structure, or the
             media file you are downloading.
