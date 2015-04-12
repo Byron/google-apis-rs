@@ -1,11 +1,8 @@
 <%
     from util import (put_and, new_context)
-    from cli import (subcommand_md_filename, mangle_subcommand)
+    from cli import (subcommand_md_filename, mangle_subcommand, pretty)
 
     c = new_context(schemas, resources, context.get('methods'))
-
-    def pretty(n):
-        return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))
 %>\
 <%namespace name="util" file="../lib/util.mako"/>\
 site_name: ${util.canonical_name()} v${util.crate_version()}

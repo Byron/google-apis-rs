@@ -2,6 +2,7 @@ import util
 
 import os
 import re
+import collections
 
 SPLIT_START = '>>>>>>>'
 SPLIT_END = '<<<<<<<'
@@ -11,12 +12,34 @@ STRUCT_FLAG = 'r'
 UPLOAD_FLAG = 'u'
 OUTPUT_FLAG = 'o'
 VALUE_ARG = 'v'
+SCOPE_FLAG = 'scope'
+
+CONFIG_DIR = '~/.google-service-cli'
 
 re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE|re.DOTALL)
 
+MethodContext = collections.namedtuple('MethodContext', ['m', 'response_schema', 'params', 'request_value', 
+                                                         'media_params' ,'required_props', 'optional_props', 
+                                                         'part_prop'])
+
+def new_method_context(resource, method, c):
+    m = c.fqan_map[util.to_fqan(c.rtc_map[resource], resource, method)]
+    response_schema = util.method_response(c, m)
+    params, request_value = util.build_all_params(c, m)
+    media_params = util.method_media_params(m)
+    required_props, optional_props, part_prop = util.organize_params(params, request_value) 
+
+    return MethodContext(m, response_schema, params, request_value, media_params, 
+                         required_props, optional_props, part_prop)
+
+
+def pretty(n):
+    return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))
+
+
 # transform name to be a suitable subcommand
 def mangle_subcommand(name):
-    return util.camel_to_under(util.singular(name)).replace('_', '-').replace('.', '-')
+    return util.camel_to_under(name).replace('_', '-').replace('.', '-')
 
 
 # transform the resource name into a suitable filename to contain the markdown documentation for it

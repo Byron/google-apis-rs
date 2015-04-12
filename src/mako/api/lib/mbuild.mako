@@ -10,7 +10,7 @@
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
-                      method_name_to_variant, unique_type_name, size_to_bytes)
+                      method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -427,15 +427,7 @@ match result {
     auth_call = 'self.hub.auth.borrow_mut()'
 
     if supports_scopes(auth):
-        all_scopes = sorted(auth.oauth2.scopes.keys())
-        default_scope = all_scopes[0]
-        if m.httpMethod in ('HEAD', 'GET', 'OPTIONS', 'TRACE'):
-            for scope in all_scopes:
-                if 'readonly' in scope:
-                    default_scope = scope
-                    break
-            # end for each scope
-        # end try to find read-only default scope
+        default_scope = method_default_scope(m)
     # end handle default scope
 
     # s = '{foo}' -> ('{foo}', 'foo') -> (find_this, replace_with)

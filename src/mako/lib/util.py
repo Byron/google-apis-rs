@@ -834,6 +834,18 @@ def hub_type_bounds():
 def supports_scopes(auth):
     return bool(auth) and bool(auth.oauth2)
 
+# Returns th desired scope for the given method. It will use read-only scopes for read-only methods
+def method_default_scope(m):
+    default_scope = sorted(m.scopes)[0]
+    if m.httpMethod in ('HEAD', 'GET', 'OPTIONS', 'TRACE'):
+        for scope in m.scopes:
+            if 'readonly' in scope:
+                default_scope = scope
+                break
+        # end for each scope
+    # end try to find read-only default scope
+    return default_scope
+
 # return list of type bounds required by method builder
 def mb_type_bounds():
     return hub_type_bounds()

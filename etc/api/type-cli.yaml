@@ -16,7 +16,7 @@ make:
   templates:
     - source: ../LICENSE.md
     - source: ../Cargo.toml
-    - source: docs/commands.yml
+    - source: docs/commands.md
     - source: mkdocs.yml
     - source: README.md
     - source: main.rs
