@@ -93,8 +93,10 @@ at least one of the following scopes to make a valid call, possibly depending on
 % endfor
 % else:
 the *${m.scopes[0]}* scope to make a valid call.
-% endif
-% endif
+% endif # len(scopes) > 1
+/// 
+/// The default scope will be `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
+% endif # have scopes
 ///
 % endif
 /// # Example
@@ -159,8 +161,8 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % if supports_scopes(auth):
     /// Identifies the authorization scope for the method you are building.
     /// 
-    /// Use this method to actively specify which scope should be used, instead of relying on the 
-    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
