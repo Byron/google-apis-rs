@@ -297,7 +297,7 @@ def mangle_ident(n):
         return n + '_'
     return n
 
-def _is_map_prop(p):
+def is_map_prop(p):
     return 'additionalProperties' in p
 
 def _assure_unique_type_name(schemas, tn):
@@ -342,7 +342,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
         if t.type == 'array':
             return wrap_type("%s<%s>" % (rust_type, unique_type_name((nested_type(t)))))
         elif t.type == 'object':
-            if _is_map_prop(t):
+            if is_map_prop(t):
                 return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
             else:
                 return wrap_type(nested_type(t))
@@ -725,7 +725,7 @@ def new_context(schemas, resources, methods):
                         ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
 
                     recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs.id))
-                elif _is_map_prop(p):
+                elif is_map_prop(p):
                     recurse_properties(nested_type_name(prefix, pn), rs, 
                                                         p.additionalProperties, append_unique(parent_ids, rs.id))
                 elif 'items' in p:
@@ -838,7 +838,10 @@ def supports_scopes(auth):
     return bool(auth) and bool(auth.oauth2)
 
 # Returns th desired scope for the given method. It will use read-only scopes for read-only methods
+# May be None no scope-based authentication is required
 def method_default_scope(m):
+    if 'scopes' not in m:
+        return None
     default_scope = sorted(m.scopes)[0]
     if m.httpMethod in ('HEAD', 'GET', 'OPTIONS', 'TRACE'):
         for scope in m.scopes:

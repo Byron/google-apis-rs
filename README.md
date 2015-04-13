@@ -30,7 +30,7 @@ Click the image below to see the playlist with all project related content:
 
 Each episode sums up one major step in project development:
 
-* [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5s
+* [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
 
 # Build Instructions
 

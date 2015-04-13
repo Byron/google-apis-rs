@@ -3,11 +3,13 @@
     from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
-                     FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG)
+                     FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml)
 
     from copy import deepcopy
 
     escape_html = lambda n: n.replace('>', r'\>')
+
+    NO_DESC = 'No description provided.'
 %>\
 <%
     c = new_context(schemas, resources, context.get('methods'))
@@ -18,7 +20,7 @@
     mc = new_method_context(resource, method, c)
 %>\
 ${SPLIT_START} ${subcommand_md_filename(resource, method)}
-% if mc.m.description:
+% if 'description' in mc.m:
 ${mc.m.description}
 % endif # show method description
 % if mc.m.get('scopes'):
@@ -48,10 +50,13 @@ You can set the scope for this method like this: `${util.program_name()} --${SCO
 # Required Scalar ${len(rprops) > 1 and 'Arguments' or 'Argument'}
 % for p in rprops:
 * **<${mangle_subcommand(p.name)}\>**
-    - ${p.get('description') or 'No description provided' | indent_all_but_first_by(2)}
+    - ${p.get('description') or NO_DESC | indent_all_but_first_by(2)}
 % endfor  # each required property (which is not the request value)
 % endif # have required properties
 % if mc.request_value:
+<%
+    request_cli_schema = to_cli_schema(c, mc.request_value)
+%>\
 # Required Request Value
 
 The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
@@ -59,15 +64,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
 For example, a structure like this:
 ```
-"scalar_int": 5,
-"struct": {
-    "scalar_float": 2.4
-    "sub_struct": {
-        "strings": ["baz", "bar"],
-        "mapping": HashMap,
-    }
-}
-"scalar_str": "foo",
+${cli_schema_to_yaml(request_cli_schema)}
 ```
 
 can be set completely with the following arguments. Note how the cursor position is adjusted the respective fields:
@@ -91,7 +88,7 @@ This method supports the upload of data, using the following protocol${len(mc.me
 
 * **-${UPLOAD_FLAG} ${docopt_mode(protocols)} ${escape_html(FILE_ARG)} ${escape_html(MIME_ARG)}**
 % for mp in mc.media_params:
-    - **${mp.protocol}** - ${mp.description.split('\n')[0]}
+    - **${mp.protocol}** - ${mp.get('description', NO_DESC).split('\n')[0]}
 % endfor # each media param
     - **${escape_html(FILE_ARG)}**
         + Path to file to upload. It must be seekable.
@@ -153,5 +150,5 @@ ${SPLIT_END}
 
 <%def name="_md_property(p)">\
 * **-${PARAM_FLAG} ${mangle_subcommand(p.name)}=${p.type}**
-    - ${p.get('description') or "No description provided" | indent_all_but_first_by(2)}
+    - ${p.get('description') or NO_DESC | indent_all_but_first_by(2)}
 </%def>

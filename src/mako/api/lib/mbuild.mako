@@ -8,7 +8,7 @@
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
-                      DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
+                      DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
                       is_repeated_property)
@@ -119,7 +119,7 @@ pub struct ${ThisType}
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
     ${api.properties.params}: HashMap<String, String>,
-    % if supports_scopes(auth):
+    % if method_default_scope(m):
 ## We need the scopes sorted, to not unnecessarily query new tokens
     ${api.properties.scopes}: BTreeMap<String, ()>
     % endif
@@ -156,7 +156,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         self
     }
 
-    % if supports_scopes(auth):
+    % if method_default_scope(m):
     /// Identifies the authorization scope for the method you are building.
     /// 
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
@@ -428,9 +428,7 @@ match result {
     delegate_finish = 'dlg.finished'
     auth_call = 'self.hub.auth.borrow_mut()'
 
-    if supports_scopes(auth):
-        default_scope = method_default_scope(m)
-    # end handle default scope
+    default_scope = method_default_scope(m)
 
     # s = '{foo}' -> ('{foo}', 'foo') -> (find_this, replace_with)
     seen = set()
@@ -573,7 +571,7 @@ else {
         % else:
         let mut url = "${baseUrl}${m.path}".to_string();
         % endif
-        % if not supports_scopes(auth):
+        % if not default_scope:
         <% 
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
@@ -657,7 +655,7 @@ else {
         % endif
 
         loop {
-            % if supports_scopes(auth):
+            % if default_scope:
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
             if token.is_none() {
                 token = dlg.token();
@@ -706,7 +704,7 @@ else {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))\
-                    % if supports_scopes(auth):
+                    % if default_scope:
 
                     .header(auth_header.clone())\
                     % endif
