@@ -69,14 +69,18 @@ For example, a structure like this:
 ${cli_schema_to_yaml(request_cli_schema)}
 ```
 
-can be set completely with the following arguments. Note how the cursor position is adjusted to the respective fields:
+can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.
 
 ${self._list_schem_args(request_cli_schema)}
 
-* The cursor position is always set relative to the current one, unless the field name starts with the '${FIELD_SEP}' character. Fields can be nested such as in `-r f${FIELD_SEP}s${FIELD_SEP}o` .
-* **Lists** are always appended to, in the example, the list at `struct${FIELD_SEP}sub_struct${FIELD_SEP}strings` will have the value `["first", "second"]`.
-* **Mappings** are set using the `key=value` form.
-* You can also set nested fields without setting the cursor explicitly. For example, to set the mapping from the root, you would specify `-r struct${FIELD_SEP}sub_struct${FIELD_SEP}mapping=foo=bar`. In case the cursor is not at the root, you may explicitly drill down from the root using a leading '${FIELD_SEP}' character.
+${'###'} About Cursors
+
+The cursor position is key to comfortably set complex nested structures. The following rules apply:
+
+* The cursor position is always set relative to the current one, unless the field name starts with the `${FIELD_SEP}` character. Fields can be nested such as in `-${STRUCT_FLAG} f${FIELD_SEP}s${FIELD_SEP}o` .
+* The cursor position is set relative to the top-level structure if it starts with `${FIELD_SEP}`, e.g. `-${STRUCT_FLAG} ${FIELD_SEP}s${FIELD_SEP}s`
+* You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify `-${STRUCT_FLAG} struct${FIELD_SEP}sub_struct=bar`.
+* You can move the cursor one level up by using `${FIELD_SEP}${FIELD_SEP}`. Each additional `${FIELD_SEP}` moves it up one additional level. E.g. `${FIELD_SEP}${FIELD_SEP}${FIELD_SEP}` would go three levels up.
 
 % endif # have request value
 % if mc.media_params:

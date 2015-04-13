@@ -35,7 +35,7 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
 
-_words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
+words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
 RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'u32' : lambda: randint(0, 100),
                      'u64' : lambda: randint(0, 100),
@@ -43,7 +43,7 @@ RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'f32' : lambda: random(),
                      'i32' : lambda: randint(-101, -1),
                      'i64' : lambda: randint(-101, -1),
-                     'String': lambda: '"%s"' % choice(_words),
+                     'String': lambda: '"%s"' % choice(words),
 }
 TREF = '$ref'
 IO_RESPONSE = 'response'

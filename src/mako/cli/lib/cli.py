@@ -4,6 +4,7 @@ import os
 import re
 import collections
 from copy import deepcopy
+from random import (randint, random, choice, seed)
 
 SPLIT_START = '>>>>>>>'
 SPLIT_END = '<<<<<<<'
@@ -35,6 +36,19 @@ CTYPE_POD = 'pod'
 CTYPE_ARRAY = 'list'
 CTYPE_MAP = 'map'
 SchemaEntry = collections.namedtuple('SchemaEntry', ['container_type', 'actual_property', 'property'])
+
+JSON_TYPE_RND_MAP = {'boolean': lambda: str(bool(randint(0, 1))).lower(),
+                     'integer' : lambda: randint(0, 100),
+                     'uint32' : lambda: randint(0, 100),
+                     'uint64' : lambda: randint(0, 65556),
+                     'float' : lambda: random(),
+                     'double' : lambda: random(),
+                     'number' : lambda: random(),
+                     'int32' : lambda: randint(-101, -1),
+                     'int64' : lambda: randint(-101, -1),
+                     'string': lambda: '%s' % choice(util.words).lower()}
+
+assert len(set(JSON_TYPE_RND_MAP.keys()) ^ POD_TYPES) == 0
 
 def new_method_context(resource, method, c):
     m = c.fqan_map[util.to_fqan(c.rtc_map[resource], resource, method)]
@@ -147,7 +161,7 @@ def cli_schema_to_yaml(schema, prefix=''):
 
 # Return a value string suitable for the given field.
 def field_to_value(f):
-    v = f.actual_property.type
+    v = JSON_TYPE_RND_MAP[f.actual_property.type]()
     if f.container_type == CTYPE_MAP:
         v = 'key=%s' % v
     return v
