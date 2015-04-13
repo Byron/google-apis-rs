@@ -129,7 +129,8 @@ def cli_schema_to_yaml(schema, prefix=''):
     else:
         o = ''
     prefix += '  '
-    for fn, f in schema.fields.iteritems():
+    for fn in sorted(schema.fields.keys()):
+        f = schema.fields[fn]
         o += '%s%s:' % (prefix, mangle_subcommand(fn))
         if not isinstance(f, SchemaEntry):
             o += '\n' + cli_schema_to_yaml(f, prefix)

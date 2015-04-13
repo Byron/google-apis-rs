@@ -3,7 +3,8 @@
     from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
-                     FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml)
+                     FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml, SchemaEntry,
+                     STRUCT_FLAG)
 
     from copy import deepcopy
 
@@ -67,10 +68,9 @@ For example, a structure like this:
 ${cli_schema_to_yaml(request_cli_schema)}
 ```
 
-can be set completely with the following arguments. Note how the cursor position is adjusted the respective fields:
-```
--r scalar_int=2 -r struct -r scalar_float=4.2 -r sub_struct -r strings=first -r strings=second -r mapping=key=value -r ${FIELD_SEP} -r scalar_str=other
-```
+can be set completely with the following arguments. Note how the cursor position is adjusted to the respective fields:
+
+${self._list_schem_args(request_cli_schema)}
 
 * The cursor position is always set relative to the current one, unless the field name starts with the '${FIELD_SEP}' character. Fields can be nested such as in `-r f${FIELD_SEP}s${FIELD_SEP}o` .
 * **Lists** are always appended to, in the example, the list at `struct${FIELD_SEP}sub_struct${FIELD_SEP}strings` will have the value `["first", "second"]`.
@@ -151,4 +151,28 @@ ${SPLIT_END}
 <%def name="_md_property(p)">\
 * **-${PARAM_FLAG} ${mangle_subcommand(p.name)}=${p.type}**
     - ${p.get('description') or NO_DESC | indent_all_but_first_by(2)}
+</%def>
+
+<%def name="_list_schem_args(schema, abs_cursor='')">\
+<%
+    def cursor_fmt(cursor):
+        return '-%s %s ' % (STRUCT_FLAG, cursor)
+
+    def cursor_arg():
+        if abs_cursor:
+            return cursor_fmt(abs_cursor)
+        return ''
+    abs_cursor_arg = cursor_arg()
+%>\
+% for fn in sorted(schema.fields.keys()):
+<% f = schema.fields[fn] %>\
+% if isinstance(f, SchemaEntry):
+* **${abs_cursor_arg}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${f.actual_property.type}**
+    - ${f.property.get('description', NO_DESC) | indent_all_but_first_by(2)}
+<% abs_cursor_arg = '' %>
+% else:
+${self._list_schem_args(f, '%s' % (abs_cursor + FIELD_SEP + mangle_subcommand(fn)))}
+<% abs_cursor_arg = cursor_arg() or cursor_fmt(FIELD_SEP) %>\
+% endif
+% endfor
 </%def>
