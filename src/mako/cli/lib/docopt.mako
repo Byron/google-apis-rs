@@ -13,7 +13,7 @@
     upload_protocols_used = set()
     output_used = False
 %>\
-docopt!(Args derive Debug, "
+docopt!(Options derive Debug, "
 Usage: 
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
