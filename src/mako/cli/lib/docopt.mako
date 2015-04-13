@@ -49,41 +49,14 @@ Usage:
         output_used = True
     # handle output
 %>\
-  ${util.program_name()} [config] ${mangle_subcommand(resource)} ${mangle_subcommand(method)} ${' '.join(args)}
+  ${util.program_name()} [options] ${mangle_subcommand(resource)} ${mangle_subcommand(method)} ${' '.join(args)}
     % endfor # each method
 % endfor # end for each resource
   ${util.program_name()} --help
 
-% if param_used|struct_used|output_used or upload_protocols_used:
-Options:
-% if struct_used:
-    -${STRUCT_FLAG} ${v_arg}  set request structure field;
-            ${v_arg} supports cursor form 'field[${FIELD_SEP}subfield]...' to 
-            set the curor for upcoming values and supports the value form
-            'field[${FIELD_SEP}subfield]...=value' to set an actual field.
-% endif
-% if upload_protocols_used:
-    -${UPLOAD_FLAG}  <mode> ${FILE_ARG} ${MIME_ARG}
-            <mode> may be one of the following upload modes: ${put_and(sorted(upload_protocols_used))}
-            ${FILE_ARG} path to file to upload. It must be seekable.
-            ${MIME_ARG} the mime type, like 'application/octet-stream', 
-            which is the default
-% endif
-% if param_used:
-    -${PARAM_FLAG} ${v_arg}  set optional request parameter; ${v_arg} is of form 'name=value'
-% endif
-% if output_used:
-    -${OUTPUT_FLAG} ${OUT_ARG}
-            The `destination` to which to write the server result to. 
-            It will either be a json-encoded structure, or the
-            media file you are downloading.
-            `destination` may be '-' to indicate standard output, or
-            a filepath that is to contain the received bytes.
-            If unset, it defaults to standard output.
-% endif
+All documentation details can be found TODO: <URL to github.io docs here, see #51>
 
-% endif # any special option is used
-Config:
+Configuration:
 % if supports_scopes(auth):
   --${SCOPE_FLAG} <url>  
             Specify the authentication a method should be executed in. Each scope requires
