@@ -171,8 +171,8 @@ ${SPLIT_END}
     - ${f.property.get('description', NO_DESC) | indent_all_but_first_by(2)}
 <% abs_cursor_arg = '' %>
 % else:
-${self._list_schem_args(f, '%s' % (abs_cursor + FIELD_SEP + mangle_subcommand(fn)))}
-<% abs_cursor_arg = cursor_arg() or cursor_fmt(FIELD_SEP) %>\
+${self._list_schem_args(f, '%s' % mangle_subcommand(fn))}
+<% abs_cursor_arg = cursor_fmt(FIELD_SEP + FIELD_SEP) %>\
 % endif
 % endfor
 </%def>
