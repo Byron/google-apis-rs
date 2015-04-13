@@ -9,6 +9,8 @@
 mod cmn;
 use cmn::{InvalidOptionsError, ArgumentError};
 
+use std::fs;
+
 struct Engine {
     opts: Options,
 }
@@ -16,9 +18,18 @@ struct Engine {
 
 impl Engine {
     fn new(options: Options) -> Result<Engine, InvalidOptionsError> {
-        Ok(Engine {
+        {
+            let config_dir = match cmn::assure_config_dir_exists(&options.flag_config_dir) {
+                Err(e) => return Err(InvalidOptionsError::single(e, 3)),
+                Ok(p) => p,
+            };
+        }
+
+        let mut engine = Engine {
             opts: options,
-        })
+        };
+
+        Ok(engine)
     }
 }
 </%def>

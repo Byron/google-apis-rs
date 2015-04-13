@@ -14,6 +14,7 @@
 #![plugin(docopt_macros)]
 
 extern crate docopt;
+extern crate yup_oauth2 as oauth2;
 extern crate rustc_serialize;
 
 use std::io;
