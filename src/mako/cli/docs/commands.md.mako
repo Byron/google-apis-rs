@@ -1,10 +1,11 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
+    from mako.filters import xml_escape
     from util import (hash_comment, new_context, method_default_scope, indent_all_but_first_by, is_repeated_property)
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
                      FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml, SchemaEntry,
-                     STRUCT_FLAG)
+                     STRUCT_FLAG, field_to_value, CTYPE_ARRAY, CTYPE_MAP)
 
     from copy import deepcopy
 
@@ -22,7 +23,7 @@
 %>\
 ${SPLIT_START} ${subcommand_md_filename(resource, method)}
 % if 'description' in mc.m:
-${mc.m.description}
+${mc.m.description | xml_escape}
 % endif # show method description
 % if mc.m.get('scopes'):
 # Scopes
@@ -51,7 +52,7 @@ You can set the scope for this method like this: `${util.program_name()} --${SCO
 # Required Scalar ${len(rprops) > 1 and 'Arguments' or 'Argument'}
 % for p in rprops:
 * **<${mangle_subcommand(p.name)}\>**
-    - ${p.get('description') or NO_DESC | indent_all_but_first_by(2)}
+    - ${p.get('description') or NO_DESC | xml_escape, indent_all_but_first_by(2)}
 % endfor  # each required property (which is not the request value)
 % endif # have required properties
 % if mc.request_value:
@@ -88,7 +89,7 @@ This method supports the upload of data, using the following protocol${len(mc.me
 
 * **-${UPLOAD_FLAG} ${docopt_mode(protocols)} ${escape_html(FILE_ARG)} ${escape_html(MIME_ARG)}**
 % for mp in mc.media_params:
-    - **${mp.protocol}** - ${mp.get('description', NO_DESC).split('\n')[0]}
+    - **${mp.protocol}** - ${mp.get('description', NO_DESC).split('\n')[0] | xml_escape}
 % endfor # each media param
     - **${escape_html(FILE_ARG)}**
         + Path to file to upload. It must be seekable.
@@ -150,7 +151,7 @@ ${SPLIT_END}
 
 <%def name="_md_property(p)">\
 * **-${PARAM_FLAG} ${mangle_subcommand(p.name)}=${p.type}**
-    - ${p.get('description') or NO_DESC | indent_all_but_first_by(2)}
+    - ${p.get('description') or NO_DESC | xml_escape ,indent_all_but_first_by(2)}
 </%def>
 
 <%def name="_list_schem_args(schema, abs_cursor='')">\
@@ -165,13 +166,23 @@ ${SPLIT_END}
     abs_cursor_arg = cursor_arg()
 %>\
 % for fn in sorted(schema.fields.keys()):
-<% f = schema.fields[fn] %>\
+<% 
+    f = schema.fields[fn] 
+    cursor_prefix = ''
+    if abs_cursor == '':
+        cursor_prefix = FIELD_SEP
+%>\
 % if isinstance(f, SchemaEntry):
-* **${abs_cursor_arg}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${f.actual_property.type}**
-    - ${f.property.get('description', NO_DESC) | indent_all_but_first_by(2)}
+* **${abs_cursor_arg}-${STRUCT_FLAG} ${mangle_subcommand(fn)}=${field_to_value(f)}**
+    - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
+% if f.container_type == CTYPE_ARRAY:
+    - Each invocation of this argument appends the given value to the array.
+% elif f.container_type == CTYPE_MAP:
+    - the value will be associated with the given `key`
+% endif # handle container type
 <% abs_cursor_arg = '' %>
 % else:
-${self._list_schem_args(f, '%s' % mangle_subcommand(fn))}
+${self._list_schem_args(f, '%s%s' % (cursor_prefix, mangle_subcommand(fn)))}
 <% abs_cursor_arg = cursor_fmt(FIELD_SEP + FIELD_SEP) %>\
 % endif
 % endfor

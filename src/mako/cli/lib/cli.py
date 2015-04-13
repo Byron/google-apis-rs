@@ -145,6 +145,13 @@ def cli_schema_to_yaml(schema, prefix=''):
     return o
 
 
+# Return a value string suitable for the given field.
+def field_to_value(f):
+    v = f.actual_property.type
+    if f.container_type == CTYPE_MAP:
+        v = 'key=%s' % v
+    return v
+
 # split the result along split segments
 def process_template_result(r, output_file):
     found = False
