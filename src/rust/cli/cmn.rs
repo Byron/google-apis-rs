@@ -6,7 +6,6 @@ use std::env;
 use std::io;
 use std::fmt;
 use std::path::Path;
-use std::cell::RefCell;
 
 use std::io::{Write, Read};
 
@@ -90,6 +89,13 @@ impl InvalidOptionsError {
         InvalidOptionsError {
             issues: vec![err],
             exit_code: exit_code,
+        }
+    }
+
+    pub fn new() -> InvalidOptionsError {
+        InvalidOptionsError {
+            issues: Vec::new(),
+            exit_code: 1,
         }
     }
 }

@@ -16,6 +16,7 @@
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
 extern crate rustc_serialize;
+extern crate hyper;
 extern crate ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))} as api;
 
 use std::io;
@@ -28,7 +29,7 @@ ${engine.new(c)}\
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    println!("{:?}", opts);
+    println!("DEBUG: {:?}", opts);
     match Engine::new(opts) {
         Err(err) => {
             write!(io::stderr(), "{}", err).ok();
