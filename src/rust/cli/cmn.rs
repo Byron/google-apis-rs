@@ -58,21 +58,21 @@ impl fmt::Display for ConfigurationError {
 }
 
 #[derive(Debug)]
-pub enum ArgumentError {
+pub enum CLIError {
     Configuration(ConfigurationError),
 }
 
-impl fmt::Display for ArgumentError {
+impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            ArgumentError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err)
+            CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err)
         }
     }
 }
 
 #[derive(Debug)]
 pub struct InvalidOptionsError {
-    pub issues: Vec<ArgumentError>,
+    pub issues: Vec<CLIError>,
     pub exit_code: i32,
 }
 
@@ -86,7 +86,7 @@ impl fmt::Display for InvalidOptionsError {
 }
 
 impl InvalidOptionsError {
-    pub fn single(err: ArgumentError, exit_code: i32) -> InvalidOptionsError {
+    pub fn single(err: CLIError, exit_code: i32) -> InvalidOptionsError {
         InvalidOptionsError {
             issues: vec![err],
             exit_code: exit_code,
@@ -94,16 +94,16 @@ impl InvalidOptionsError {
     }
 }
 
-pub fn assure_config_dir_exists(dir: &str) -> Result<String, ArgumentError> {
+pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     let trdir = dir.trim();
     if trdir.len() == 0 {
-        return Err(ArgumentError::Configuration(ConfigurationError::DirectoryUnset))
+        return Err(CLIError::Configuration(ConfigurationError::DirectoryUnset))
     }
 
     let expanded_config_dir = 
         if trdir.as_bytes()[0] == b'~' {
             match env::var("HOME").ok().or(env::var("UserProfile").ok()) {
-                None => return Err(ArgumentError::Configuration(ConfigurationError::HomeExpansionFailed(trdir.to_string()))),
+                None => return Err(CLIError::Configuration(ConfigurationError::HomeExpansionFailed(trdir.to_string()))),
                 Some(mut user) => {
                     user.push_str(&trdir[1..]);
                     user
@@ -115,7 +115,7 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, ArgumentError> {
 
     if let Err(err) = fs::create_dir(&expanded_config_dir) {
         if err.kind() != io::ErrorKind::AlreadyExists {
-            return Err(ArgumentError::Configuration(
+            return Err(CLIError::Configuration(
                     ConfigurationError::DirectoryCreationFailed((expanded_config_dir, err))))
         }
     }
@@ -123,11 +123,11 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, ArgumentError> {
     Ok(expanded_config_dir)
 }
 
-pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Result<ApplicationSecret, ArgumentError> {
+pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
     let secret_io_error = |io_err: io::Error| {
-            Err(ArgumentError::Configuration(ConfigurationError::IOError(
+            Err(CLIError::Configuration(ConfigurationError::IOError(
                 (secret_str(), io_err)
             )))
     };
@@ -173,14 +173,14 @@ pub fn application_secret_from_directory(dir: &str, secret_basename: &str) -> Re
                     return secret_io_error(io_err)
                 }
                 match json::decode::<ConsoleApplicationSecret>(&json_encoded_secret) {
-                    Err(json_decode_error) => return Err(ArgumentError::Configuration(
+                    Err(json_decode_error) => return Err(CLIError::Configuration(
                         ConfigurationError::Secret(ApplicationSecretError::DecoderError(
                                                 (secret_str(), json_decode_error)
                                               )))),
                     Ok(console_secret) => match console_secret.installed {
                         Some(secret) => return Ok(secret),
                         None => return Err(
-                                    ArgumentError::Configuration(
+                                    CLIError::Configuration(
                                     ConfigurationError::Secret(
                                     ApplicationSecretError::FormatError(secret_str())
                                     )))

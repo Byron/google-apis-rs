@@ -215,7 +215,7 @@ pub struct DefaultDelegate;
 impl Delegate for DefaultDelegate {}
 
 
-
+#[derive(Debug)]
 pub enum Error {
     /// The http connection failed
     HttpError(hyper::HttpError),
