@@ -15,6 +15,7 @@ UPLOAD_FLAG = 'u'
 OUTPUT_FLAG = 'o'
 VALUE_ARG = 'v'
 SCOPE_FLAG = 'scope'
+CONFIG_DIR_FLAG = 'config-dir'
 
 FILE_ARG = '<file>'
 MIME_ARG = '<mime>'

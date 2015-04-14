@@ -7,7 +7,7 @@
 %>\
 <%def name="new(c)">\
 mod cmn;
-use cmn::{InvalidOptionsError};
+use cmn::InvalidOptionsError;
 
 use oauth2::ApplicationSecret;
 

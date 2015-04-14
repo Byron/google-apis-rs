@@ -30,7 +30,7 @@ fn main() {
     println!("{:?}", opts);
     match Engine::new(opts) {
         Err(e) => {
-            write!(io::stderr(), "{:?}", e).ok();
+            write!(io::stderr(), "{}", e).ok();
             env::set_exit_status(e.exit_code);
         },
         Ok(mut engine) => {

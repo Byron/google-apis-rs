@@ -2,7 +2,8 @@
 <%!
     from util import (put_and, supports_scopes)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG)
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
+                     CONFIG_DIR_FLAG)
 
     v_arg = '<%s>' % VALUE_ARG
 %>\
@@ -63,7 +64,7 @@ Configuration:
             the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
 % endif scopes
-  --config-dir <folder>
+  --${CONFIG_DIR_FLAG} <folder>
             A directory into which we will store our persistent data. Defaults to a user-writable
             directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
