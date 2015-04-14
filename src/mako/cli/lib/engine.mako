@@ -3,18 +3,19 @@
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident, arg_ident, POD_TYPES)
+                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident)
 
     v_arg = '<%s>' % VALUE_ARG
-    def to_opt_ident(p):
-        return 'self.opt.' + arg_ident(p.name)
+    SOPT = 'self.opt.'
+    def to_opt_arg_ident(p):
+        return SOPT + arg_ident(p.name)
 %>\
 <%def name="new(c)">\
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 mod cmn;
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str};
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts};
 use std::default::Default;
 use std::str::FromStr;
 
@@ -119,16 +120,14 @@ self.opt.${cmd_ident(method)} {
 <%def name="_method_call_impl(c, resource, method)" buffered="True">\
 <%
     mc = new_method_context(resource, method, c)
-    ## if is_request_value_property(mc, p):
-    ##         continue
-    ##     args.append('<%s>' % mangle_subcommand(p.name))
+    handle_output = mc.response_schema or mc.m.get('supportsMediaDownload', False)
 %>\
     ## REQUIRED PARAMETERS
 % for p in mc.required_props:
 <% 
     prop_name = mangle_ident(p.name)
     prop_type = activity_rust_type(c.schemas, p, allow_optionals=False)
-    opt_ident = to_opt_ident(p)
+    opt_ident = to_opt_arg_ident(p)
 %>\
     % if is_request_value_property(mc, p):
 let ${prop_name}: api::${prop_type} = Default::default();
@@ -146,13 +145,13 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_sub
             borrow = '&'
         arg_name = mangle_ident(p.name)
         if ptype == 'string':
-            arg_name = to_opt_ident(p)
+            arg_name = to_opt_arg_ident(p)
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\
 let call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 ## TODO: set parameters
-## TODO: parse upload and output information
+## TODO: parse upload
 if dry_run {
     None
 } else {
@@ -162,6 +161,15 @@ if dry_run {
     % if mc.media_params:
     return None
     % else:
+    % if handle_output:
+    let ostream = match writer_from_opts(${SOPT + flag_ident(OUTPUT_FLAG)}, &${SOPT + arg_ident(OUT_ARG[1:-1])}) {
+        Err(cli_err) => {
+            err.issues.push(cli_err);
+            return None
+        },
+        Ok(bs) => bs,
+    };
+    % endif # handle output
     match call.${api.terms.action}() {
         Err(api_err) => Some(api_err),
         Ok(res) => {

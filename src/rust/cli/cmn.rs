@@ -8,9 +8,26 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use std::io::{Write, Read};
+use std::io::{Write, Read, stdout};
 
 use std::default::Default;
+
+// May panic if we can't open the file - this is anticipated, we can't currently communicate this 
+// kind of error: TODO: fix this architecture :)
+pub fn writer_from_opts(flag: bool, arg: &str) -> Result<Box<Write>, CLIError> {
+    if !flag && arg == "-" {
+        Ok(Box::new(stdout()))
+    } else {
+         match fs::OpenOptions::new().create(true).write(true).open(arg) {
+            Err(io_err) => {
+                Err(CLIError::Configuration(
+                        ConfigurationError::IOError((arg.to_string(), io_err))
+                ))
+            },
+            Ok(f) => Ok(Box::new(f)),
+        }
+    }
+}
 
 
 pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError, 
