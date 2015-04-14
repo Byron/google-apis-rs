@@ -6,11 +6,28 @@ use std::env;
 use std::io;
 use std::fmt;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
 use std::io::{Write, Read};
 
 use std::default::Default;
 
+
+pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError, 
+                                  arg_name: &'static str, 
+                                  arg_type: &'static str) -> T
+                                                        where   T: FromStr + Default,
+                                                             <T as FromStr>::Err: fmt::Display {
+    match FromStr::from_str(arg) {
+        Err(perr) => {
+            err.issues.push(
+                CLIError::ParseError((arg_name, arg_type, format!("{}", perr)))
+            );
+            Default::default()
+        },
+        Ok(v) => v,
+    }
+}
 
 pub struct JsonTokenStorage {
     pub program_name: &'static str,
@@ -57,11 +74,11 @@ impl fmt::Display for ApplicationSecretError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             ApplicationSecretError::DecoderError((ref path, ref err))
-                => writeln!(f, "Could not decode file at '{}' with error: {}"
-                          , path, err),
+                => writeln!(f, "Could not decode file at '{}' with error: {}", 
+                            path, err),
             ApplicationSecretError::FormatError(ref path)
-                => writeln!(f, "'installed' field is unset in secret file at '{}'"
-                            , path),
+                => writeln!(f, "'installed' field is unset in secret file at '{}'", 
+                            path),
         }
     }
 }
@@ -95,14 +112,16 @@ impl fmt::Display for ConfigurationError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
-    ParseError(String),
+    ParseError((&'static str, &'static str, String)),
 }
 
 impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err),
-            CLIError::ParseError(ref desc) => desc.fmt(f),
+            CLIError::ParseError((arg_name, type_name, ref err_desc)) 
+                => writeln!(f, "Failed to parse argument {} as {} with error: {}",
+                            arg_name, type_name, err_desc),
         }
     }
 }

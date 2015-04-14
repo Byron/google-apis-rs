@@ -6,13 +6,15 @@
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES)
 
     v_arg = '<%s>' % VALUE_ARG
+    def to_opt_ident(p):
+        return 'self.opt.' + arg_ident(p.name)
 %>\
 <%def name="new(c)">\
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 mod cmn;
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage};
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str};
 use std::default::Default;
 use std::str::FromStr;
 
@@ -126,24 +128,12 @@ self.opt.${cmd_ident(method)} {
 <% 
     prop_name = mangle_ident(p.name)
     prop_type = activity_rust_type(c.schemas, p, allow_optionals=False)
-    opt_ident = 'self.opt.' + arg_ident(p.name)
+    opt_ident = to_opt_ident(p)
 %>\
     % if is_request_value_property(mc, p):
 let ${prop_name}: api::${prop_type} = Default::default();
-    % else:
-let ${prop_name}: ${prop_type} = \
-        % if p.type == 'string':
-${opt_ident}.clone();
-        % else:
-
-    match FromStr::from_str(&${opt_ident}) {
-        Err(perr) => {
-            err.issues.push(CLIError::ParseError(format!("Failed to parse argument <${mangle_subcommand(p.name)}> as ${p.type} with error: {}", perr)));
-            Default::default()
-        },
-        Ok(v) => v,
-    };
-        % endif # handle argument type
+    % elif p.type != 'string':
+let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
     % endif # handle request value
 % endfor # each required parameter
 <%
@@ -151,10 +141,13 @@ ${opt_ident}.clone();
     for p in mc.required_props:
         borrow = ''
         # if type is not available, we know it's the request value, which should also be borrowed
-        ptype = p.get('type', 'string')
-        if ptype not in POD_TYPES or ptype == 'string':
+        ptype = p.get('type', None)
+        if ptype not in POD_TYPES or ptype in ('string', None):
             borrow = '&'
-        call_args.append(borrow + mangle_ident(p.name))
+        arg_name = mangle_ident(p.name)
+        if ptype == 'string':
+            arg_name = to_opt_ident(p)
+        call_args.append(borrow + arg_name)
     # end for each required prop
 %>\
 let call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
@@ -163,6 +156,7 @@ let call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.j
 if dry_run {
     None
 } else {
+    assert!(err.issues.len() == 0);
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
     ## TODO: unify error handling
     % if mc.media_params:
