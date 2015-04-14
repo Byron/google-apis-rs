@@ -1,15 +1,51 @@
-use oauth2::{ApplicationSecret, ConsoleApplicationSecret};
+use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use rustc_serialize::json;
 
 use std::fs;
 use std::env;
 use std::io;
 use std::fmt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use std::io::{Write, Read};
 
 use std::default::Default;
+
+
+pub struct JsonTokenStorage {
+    pub program_name: &'static str,
+    pub db_dir: String,
+}
+
+impl JsonTokenStorage {
+    fn path(&self, scope_hash: u64) -> PathBuf {
+        Path::new(&self.db_dir).join(&format!("{}-token-{}.json", self.program_name, scope_hash))
+    }
+}
+
+impl TokenStorage for JsonTokenStorage {
+    // NOTE: logging might be interesting, currently we swallow all errors
+    fn set(&mut self, scope_hash: u64, token: Option<Token>) {
+        let json_token = json::encode(&token).unwrap();
+        let res = fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash));
+        if let Ok(mut f) = res {
+            f.write(json_token.as_bytes()).ok();
+        }
+    }
+
+    fn get(&self, scope_hash: u64) -> Option<Token> {
+        if let Ok(mut f) = fs::File::open(&self.path(scope_hash)) {
+            let mut json_string = String::new();
+            if let Ok(_) = f.read_to_string(&mut json_string) {
+                if let Ok(token) = json::decode::<Token>(&json_string) {
+                    return Some(token)
+                }
+            }
+        }
+        None
+    }
+}
+
 
 #[derive(Debug)]
 pub enum ApplicationSecretError {

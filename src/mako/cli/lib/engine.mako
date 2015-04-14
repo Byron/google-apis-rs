@@ -12,15 +12,14 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 mod cmn;
-use cmn::InvalidOptionsError;
-use std::default::Default;
+use cmn::{InvalidOptionsError, JsonTokenStorage};
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, MemoryStorage};
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
 
 struct Engine {
     opt: Options,
     config_dir: String,
-    hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, MemoryStorage, hyper::Client>>,
+    hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
 }
 
 
@@ -83,7 +82,10 @@ self.opt.${cmd_ident(method)} {
 
         let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                                       hyper::Client::new(),
-                                      <MemoryStorage as Default>::default(), None);
+                                      JsonTokenStorage {
+                                        program_name: "${util.program_name()}",
+                                        db_dir: config_dir.clone(),
+                                      }, None);
         let engine = Engine {
             opt: opt,
             config_dir: config_dir,
