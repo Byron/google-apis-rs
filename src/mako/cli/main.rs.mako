@@ -17,6 +17,7 @@
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
 extern crate rustc_serialize;
+extern crate serde;
 extern crate hyper;
 extern crate ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))} as api;
 

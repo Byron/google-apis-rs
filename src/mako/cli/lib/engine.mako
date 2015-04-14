@@ -20,6 +20,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
+use rustc_serialize::json;
 
 struct Engine {
     opt: Options,
@@ -162,18 +163,22 @@ if dry_run {
     return None
     % else:
     % if handle_output:
-    let ostream = match writer_from_opts(${SOPT + flag_ident(OUTPUT_FLAG)}, &${SOPT + arg_ident(OUT_ARG[1:-1])}) {
-        Err(cli_err) => {
-            err.issues.push(cli_err);
-            return None
-        },
-        Ok(bs) => bs,
-    };
+    let mut ostream = writer_from_opts(${SOPT + flag_ident(OUTPUT_FLAG)}, &${SOPT + arg_ident(OUT_ARG[1:-1])});
     % endif # handle output
     match call.${api.terms.action}() {
         Err(api_err) => Some(api_err),
-        Ok(res) => {
-            println!("DEBUG: {:?}", res);
+        % if mc.response_schema:
+        Ok((response, output_schema)) => {
+        % else:
+        Ok(mut response) => {
+        % endif # handle output structure
+            println!("DEBUG: REMOVE ME {:?}", response);
+            % if mc.response_schema:
+            serde::json::to_writer(&mut ostream, &output_schema).unwrap();
+            % elif mc.m.get('supportsMediaDownload', False):
+            ## Download is the only option - nothing else matters
+            io::copy(&mut response, &mut ostream).unwrap();
+            % endif
             None
         }
     }

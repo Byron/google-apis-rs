@@ -55,15 +55,15 @@ ${struct};
 <%def name="new(s, c)">\
 <% 
     markers = schema_markers(s, c, transitive=True)
-    traits = ['Clone', 'Debug']
+    # We always need Serialization support, as others might want to serialize the response, even though we will 
+    # only deserialize it.
+    traits = ['Clone', 'Debug', 'Serialize']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
         traits.insert(0, 'Default')
     
     allow_optionals = True
-    if REQUEST_MARKER_TRAIT in markers:
-        traits.append('Serialize')
     if RESPONSE_MARKER_TRAIT in markers:
         traits.append('Deserialize')
 

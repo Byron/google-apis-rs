@@ -29,3 +29,5 @@ cargo:
     - docopt = "= 0.6.59"
     - docopt_macros = "= 0.6.59"
     - rustc-serialize = "*"
+    - serde = ">= 0.3.0"
+    - serde_macros = "*"
