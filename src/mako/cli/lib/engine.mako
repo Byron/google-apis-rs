@@ -3,7 +3,7 @@
     from util import hub_type
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident)
+                     cmd_ident, call_method_ident)
 
     v_arg = '<%s>' % VALUE_ARG
 %>\
@@ -24,8 +24,18 @@ struct Engine {
 
 
 impl Engine {
+% for resource in sorted(c.rta_map.keys()):
+    % for method in sorted(c.rta_map[resource]):
+    fn ${call_method_ident(resource, method)}(&self, dry_run: bool, err: &mut InvalidOptionsError) -> Option<api::Error> {
+        ${self._method_call_impl(c, resource, method)}\
+    }
+
+    % endfor # each method
+% endfor 
     fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
         let mut err = InvalidOptionsError::new();
+        let mut call_result: Option<api::Error> = None;
+        let mut err_opt: Option<InvalidOptionsError> = None;
 
 ## RESOURCE LOOP: check for set primary subcommand
 % for resource in sorted(c.rta_map.keys()):
@@ -43,7 +53,7 @@ self.opt.${cmd_ident(resource)} {
  else if \
             % endif
 self.opt.${cmd_ident(method)} {
-
+                call_result = self.${call_method_ident(resource, method)}(dry_run, &mut err);
             }\
         % endfor # each method
  else {
@@ -57,13 +67,10 @@ self.opt.${cmd_ident(method)} {
 
         if dry_run {
             if err.issues.len() > 0 {
-                (None, Some(err))
-            } else {
-                (None, None)
+                err_opt = Some(err);
             }
-        } else {
-            unreachable!();
         }
+        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
@@ -104,4 +111,8 @@ self.opt.${cmd_ident(method)} {
         self._doit(false).0
     }
 }
+</%def>
+
+<%def name="_method_call_impl(c, resource, method)">\
+None
 </%def>

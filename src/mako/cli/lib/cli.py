@@ -74,9 +74,16 @@ def is_request_value_property(mc, p):
 def mangle_subcommand(name):
     return util.camel_to_under(name).replace('_', '-').replace('.', '-')
 
+def ident(name):
+    return mangle_subcommand(name).replace('-', '_')
+
 # return the identifier of a command for the given name, suitable to address the command field in the docopt structure
 def cmd_ident(name):
-    return 'cmd_' + mangle_subcommand(name).replace('-', '_')
+    return 'cmd_' + ident(name)
+
+# Returns identifier for method dealing with options for the given resource-method pair
+def call_method_ident(resource, method):
+    return '_%s_%s' % (ident(resource), ident(method))
 
 # transform the resource name into a suitable filename to contain the markdown documentation for it
 def subcommand_md_filename(resource, method):
