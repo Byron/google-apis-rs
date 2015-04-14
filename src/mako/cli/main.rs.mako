@@ -36,7 +36,7 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                write!(io::stderr(), "TODO: display {:?}", err).ok();
+                write!(io::stderr(), "{}", err).ok();
                 env::set_exit_status(1);
             }
         }
