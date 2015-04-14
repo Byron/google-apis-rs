@@ -95,12 +95,14 @@ impl fmt::Display for ConfigurationError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
+    ParseError(String),
 }
 
 impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err)
+            CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err),
+            CLIError::ParseError(ref desc) => desc.fmt(f),
         }
     }
 }

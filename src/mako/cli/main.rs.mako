@@ -12,6 +12,7 @@
 </%block>
 #![feature(plugin, exit_status)]
 #![plugin(docopt_macros)]
+#![allow(unused_variables, unused_imports, dead_code)]
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;

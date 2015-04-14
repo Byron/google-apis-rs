@@ -26,6 +26,6 @@ cargo:
   keywords: [cli]
   is_executable: YES
   dependencies:
-    - docopt = "*"
-    - docopt_macros = "*"
+    - docopt = "= 0.6.59"
+    - docopt_macros = "= 0.6.59"
     - rustc-serialize = "*"

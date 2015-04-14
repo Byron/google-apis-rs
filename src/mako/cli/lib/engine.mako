@@ -1,9 +1,9 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
-    from util import hub_type
+    from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident)
+                     cmd_ident, call_method_ident, arg_ident, POD_TYPES)
 
     v_arg = '<%s>' % VALUE_ARG
 %>\
@@ -12,13 +12,14 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 mod cmn;
-use cmn::{InvalidOptionsError, JsonTokenStorage};
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage};
+use std::default::Default;
+use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
 
 struct Engine {
     opt: Options,
-    config_dir: String,
     hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
 }
 
@@ -26,15 +27,16 @@ struct Engine {
 impl Engine {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
-    fn ${call_method_ident(resource, method)}(&self, dry_run: bool, err: &mut InvalidOptionsError) -> Option<api::Error> {
-        ${self._method_call_impl(c, resource, method)}\
+    fn ${call_method_ident(resource, method)}(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
+        ${self._method_call_impl(c, resource, method) | indent_all_but_first_by(2)}
     }
 
     % endfor # each method
 % endfor 
     fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error> = None;
+        let mut call_result: Option<api::Error>;
         let mut err_opt: Option<InvalidOptionsError> = None;
 
 ## RESOURCE LOOP: check for set primary subcommand
@@ -95,7 +97,6 @@ self.opt.${cmd_ident(method)} {
                                       }, None);
         let engine = Engine {
             opt: opt,
-            config_dir: config_dir,
             hub: ${hub_type_name}::new(hyper::Client::new(), auth),
         };
 
@@ -113,6 +114,67 @@ self.opt.${cmd_ident(method)} {
 }
 </%def>
 
-<%def name="_method_call_impl(c, resource, method)">\
-None
+<%def name="_method_call_impl(c, resource, method)" buffered="True">\
+<%
+    mc = new_method_context(resource, method, c)
+    ## if is_request_value_property(mc, p):
+    ##         continue
+    ##     args.append('<%s>' % mangle_subcommand(p.name))
+%>\
+    ## REQUIRED PARAMETERS
+% for p in mc.required_props:
+<% 
+    prop_name = mangle_ident(p.name)
+    prop_type = activity_rust_type(c.schemas, p, allow_optionals=False)
+    opt_ident = 'self.opt.' + arg_ident(p.name)
+%>\
+    % if is_request_value_property(mc, p):
+let ${prop_name}: api::${prop_type} = Default::default();
+    % else:
+let ${prop_name}: ${prop_type} = \
+        % if p.type == 'string':
+${opt_ident}.clone();
+        % else:
+
+    match FromStr::from_str(&${opt_ident}) {
+        Err(perr) => {
+            err.issues.push(CLIError::ParseError(format!("Failed to parse argument <${mangle_subcommand(p.name)}> as ${p.type} with error: {}", perr)));
+            Default::default()
+        },
+        Ok(v) => v,
+    };
+        % endif # handle argument type
+    % endif # handle request value
+% endfor # each required parameter
+<%
+    call_args = list()
+    for p in mc.required_props:
+        borrow = ''
+        # if type is not available, we know it's the request value, which should also be borrowed
+        ptype = p.get('type', 'string')
+        if ptype not in POD_TYPES or ptype == 'string':
+            borrow = '&'
+        call_args.append(borrow + mangle_ident(p.name))
+    # end for each required prop
+%>\
+let call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
+## TODO: set parameters
+## TODO: parse upload and output information
+if dry_run {
+    None
+} else {
+    ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
+    ## TODO: unify error handling
+    % if mc.media_params:
+    return None
+    % else:
+    match call.${api.terms.action}() {
+        Err(api_err) => Some(api_err),
+        Ok(res) => {
+            println!("DEBUG: {:?}", res);
+            None
+        }
+    }
+    % endif
+}\
 </%def>

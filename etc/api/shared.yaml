@@ -3,6 +3,11 @@ api:
     # exclude APIs which currently don't build correctly. State the reason for the exclusion as well
     # to allow looking at it at a later point.
     - 
+  terms:
+    # how to actually do something with the API
+    action: doit
+    # when a resource is supposed to be uploaded
+    upload_action: upload
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside

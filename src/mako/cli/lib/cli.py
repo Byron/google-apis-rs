@@ -81,6 +81,10 @@ def ident(name):
 def cmd_ident(name):
     return 'cmd_' + ident(name)
 
+# Similar to cmd_ident, but for arguments
+def arg_ident(name):
+    return 'arg_' + ident(name)
+
 # Returns identifier for method dealing with options for the given resource-method pair
 def call_method_ident(resource, method):
     return '_%s_%s' % (ident(resource), ident(method))
