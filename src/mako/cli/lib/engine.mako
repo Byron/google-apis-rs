@@ -1,6 +1,7 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
-    from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN)
+    from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
+                      upload_action_fn)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_RND_MAP)
@@ -16,6 +17,8 @@
         if ptype not in POD_TYPES or ptype in ('string', None):
             borrow = '&'
         return borrow
+
+    STANDARD = 'standard-request'
 %>\
 <%def name="new(c)">\
 <%
@@ -136,7 +139,8 @@ self.opt.${cmd_ident(method)} {
     optional_prop_names = set(p.name for p in optional_props)
 
     global_parameter_names = set()
-    track_download_flag = (supports_media_download and 
+    track_download_flag = (not mc.media_params and
+                           supports_media_download and 
                           (parameters is not UNDEFINED and 'alt' in parameters) or ('alt' in optional_prop_names))
     if parameters is not UNDEFINED:
         global_parameter_names = list(pn for pn in sorted(parameters.keys()) if pn not in optional_prop_names)
@@ -245,6 +249,8 @@ ${SOPT + cmd_ident(p.protocol)} {
     };
 let mut input_file = input_file_from_opts(&${SOPT + arg_ident(FILE_ARG[1:-1])}, err);
 let mime_type = input_mime_from_opts(&${SOPT + arg_ident(MIME_ARG[1:-1])}, err);
+% else:
+let protocol = "${STANDARD}";
 % endif # support upload
 if dry_run {
     None
@@ -252,13 +258,19 @@ if dry_run {
     assert!(err.issues.len() == 0);
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
     ## TODO: unify error handling
-    % if mc.media_params:
-    return None
-    % else:
     % if handle_output:
     let mut ostream = writer_from_opts(${SOPT + flag_ident(OUTPUT_FLAG)}, &${SOPT + arg_ident(OUT_ARG[1:-1])});
     % endif # handle output
-    match call.${api.terms.action}() {
+    match match protocol {
+        % if mc.media_params:
+        % for p in mc.media_params:
+        "${p.protocol}" => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        % endfor
+        % else:
+        "${STANDARD}" => call.${api.terms.action}(),
+        % endif
+        _ => unreachable!(),
+    } {
         Err(api_err) => Some(api_err),
         % if mc.response_schema:
         Ok((mut response, output_schema)) => {
@@ -288,6 +300,5 @@ if dry_run {
             None
         }
     }
-    % endif
 }\
 </%def>
