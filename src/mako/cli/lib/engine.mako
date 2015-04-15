@@ -1,6 +1,6 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
-    from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name)
+    from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_RND_MAP)
@@ -128,9 +128,12 @@ self.opt.${cmd_ident(method)} {
 <%def name="_method_call_impl(c, resource, method)" buffered="True">\
 <%
     mc = new_method_context(resource, method, c)
-    handle_output = mc.response_schema or mc.m.get('supportsMediaDownload', False)
-    
+    supports_media_download = mc.m.get('supportsMediaDownload', False)
+    handle_output = mc.response_schema or supports_media_download
+    track_download_flag = supports_media_download and parameters is not UNDEFINED and 'alt' in parameters
+
     optional_props = [p for p in mc.optional_props if not p.get('skip_example', False)]
+    optional_prop_names = set(p.name for p in optional_props)
     handle_props = optional_props or parameters is not UNDEFINED
 %>\
     ## REQUIRED PARAMETERS
@@ -158,6 +161,9 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_sub
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\
+% if track_download_flag:
+let mut download_mode = false;
+% endif
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
 for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
@@ -165,15 +171,41 @@ for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
     match key {
 % for p in optional_props:
 <% 
-    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_RND_MAP[p.type]()
+    ptype = p.type
+    if p.type == 'string' and 'Count' in p.name:
+        ptype = 'int64'
+    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_RND_MAP[ptype]()
 %>\
         "${ident(p.name)}" => call = call.${mangle_ident(setter_fn_name(p))}(\
-        % if p.type != 'string':
+        % if ptype != 'string':
 arg_from_str(${value_unwrap}, err, "${ident(p.name)}", "${p.type}")),
         % else:
 ${value_unwrap}),
         % endif # handle conversion
 % endfor # each property
+    % if parameters is not UNDEFINED:
+    % for pn, p in list((pn, p) for (pn, p) in parameters.iteritems() if pn not in optional_prop_names):
+        \
+    % if not loop.first:
+|\
+    % endif
+"${ident(pn)}"\
+    % if not loop.last:
+
+    % endif
+    % endfor # each global parameter
+ => {
+<%
+    value_unwrap = 'value.unwrap_or("unset")'
+%>\
+    % if track_download_flag:
+            if key == "alt" && ${value_unwrap} == "media" {
+                download_mode = true;
+            }
+    % endif
+            call = call.${ADD_PARAM_FN}(key, ${value_unwrap})
+        },
+    % endif # handle global parameters
         _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
     }
 }
@@ -194,16 +226,29 @@ if dry_run {
     match call.${api.terms.action}() {
         Err(api_err) => Some(api_err),
         % if mc.response_schema:
-        Ok((response, output_schema)) => {
+        Ok((mut response, output_schema)) => {
         % else:
         Ok(mut response) => {
         % endif # handle output structure
             println!("DEBUG: REMOVE ME {:?}", response);
+            ## We are not generating optimal code, but hope it will still be logically correct.
+            ## If not, we might build the code in python
+            ## TODO: Fix this
+            % if track_download_flag:
+            if !download_mode {
+            % endif
             % if mc.response_schema:
             serde::json::to_writer(&mut ostream, &output_schema).unwrap();
-            % elif mc.m.get('supportsMediaDownload', False):
+            % endif
+            % if track_download_flag:
+            } else {
+            % endif
+            % if supports_media_download:
             ## Download is the only option - nothing else matters
             io::copy(&mut response, &mut ostream).unwrap();
+            % endif
+            % if track_download_flag:
+            }
             % endif
             None
         }
