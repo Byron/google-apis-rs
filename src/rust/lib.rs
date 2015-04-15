@@ -5,6 +5,7 @@
 #[macro_use]
 extern crate hyper;
 extern crate mime;
+extern crate rustc_serialize;
 extern crate yup_oauth2 as oauth2;
 extern crate serde;
 
