@@ -3,7 +3,7 @@
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident)
+                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_RND_MAP)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -129,7 +129,9 @@ self.opt.${cmd_ident(method)} {
 <%
     mc = new_method_context(resource, method, c)
     handle_output = mc.response_schema or mc.m.get('supportsMediaDownload', False)
-    handle_props = mc.optional_props or parameters is not UNDEFINED
+    
+    optional_props = [p for p in mc.optional_props if not p.get('skip_example', False)]
+    handle_props = optional_props or parameters is not UNDEFINED
 %>\
     ## REQUIRED PARAMETERS
 % for p in mc.required_props:
@@ -158,18 +160,18 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_sub
 %>\
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
-<%
-    optional_props = [p for p in mc.optional_props if not p.get('skip_example', False)]
-%>\
 for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
-    let (key, value) = parse_kv_arg(&*parg, err, "default");
+    let (key, value) = parse_kv_arg(&*parg, err);
     match key {
 % for p in optional_props:
+<% 
+    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_RND_MAP[p.type]()
+%>\
         "${ident(p.name)}" => call = call.${mangle_ident(setter_fn_name(p))}(\
         % if p.type != 'string':
-arg_from_str(value, err, "${ident(p.name)}", "${p.type}")),
+arg_from_str(${value_unwrap}, err, "${ident(p.name)}", "${p.type}")),
         % else:
-value),
+${value_unwrap}),
         % endif # handle conversion
 % endfor # each property
         _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),

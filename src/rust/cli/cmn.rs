@@ -12,21 +12,21 @@ use std::io::{Write, Read, stdout};
 
 use std::default::Default;
 
-pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, default: &'static str)
-                                                                        -> (&'a str, &'a str) {
+pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
+                                                                        -> (&'a str, Option<&'a str>) {
     let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string()));
     match kv.rfind('=') {
         None => {
             add_err();
-            return (kv, default)
+            return (kv, None)
         },
         Some(pos) => {
             let key = &kv[..pos];
             if kv.len() <= pos + 1 {
                 add_err();
-                return (key, default)
+                return (key, None)
             }
-            (key, &kv[pos+1..])
+            (key, Some(&kv[pos+1..]))
         }
     }
 }
