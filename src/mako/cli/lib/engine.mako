@@ -130,10 +130,14 @@ self.opt.${cmd_ident(method)} {
     mc = new_method_context(resource, method, c)
     supports_media_download = mc.m.get('supportsMediaDownload', False)
     handle_output = mc.response_schema or supports_media_download
-    track_download_flag = supports_media_download and parameters is not UNDEFINED and 'alt' in parameters
-
     optional_props = [p for p in mc.optional_props if not p.get('skip_example', False)]
     optional_prop_names = set(p.name for p in optional_props)
+
+    global_parameter_names = set()
+    track_download_flag = (supports_media_download and 
+                          (parameters is not UNDEFINED and 'alt' in parameters) or ('alt' in optional_prop_names))
+    if parameters is not UNDEFINED:
+        global_parameter_names = list(pn for pn in sorted(parameters.keys()) if pn not in optional_prop_names)
     handle_props = optional_props or parameters is not UNDEFINED
 %>\
     ## REQUIRED PARAMETERS
@@ -176,20 +180,28 @@ for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
         ptype = 'int64'
     value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_RND_MAP[ptype]()
 %>\
-        "${ident(p.name)}" => call = call.${mangle_ident(setter_fn_name(p))}(\
+        "${mangle_subcommand(p.name)}" => {
+        % if p.name == 'alt':
+            if ${value_unwrap} == "media" {
+                download_mode = true;
+            }
+        % endif
+            call = call.${mangle_ident(setter_fn_name(p))}(\
         % if ptype != 'string':
-arg_from_str(${value_unwrap}, err, "${ident(p.name)}", "${p.type}")),
+arg_from_str(${value_unwrap}, err, "${mangle_subcommand(p.name)}", "${p.type}")\
         % else:
-${value_unwrap}),
+${value_unwrap}\
         % endif # handle conversion
+);
+        },
 % endfor # each property
     % if parameters is not UNDEFINED:
-    % for pn, p in list((pn, p) for (pn, p) in parameters.iteritems() if pn not in optional_prop_names):
+    % for pn in global_parameter_names:
         \
     % if not loop.first:
 |\
     % endif
-"${ident(pn)}"\
+"${mangle_subcommand(pn)}"\
     % if not loop.last:
 
     % endif
@@ -198,12 +210,17 @@ ${value_unwrap}),
 <%
     value_unwrap = 'value.unwrap_or("unset")'
 %>\
-    % if track_download_flag:
+    % if track_download_flag and 'alt' in global_parameter_names:
             if key == "alt" && ${value_unwrap} == "media" {
                 download_mode = true;
             }
     % endif
-            call = call.${ADD_PARAM_FN}(key, ${value_unwrap})
+            let map = [
+            % for pn in list(pn for pn in global_parameter_names if mangle_subcommand(pn) != pn):
+                ("${mangle_subcommand(pn)}", "${pn}"),
+            % endfor # each global parameter
+            ];
+            call = call.${ADD_PARAM_FN}(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap})
         },
     % endif # handle global parameters
         _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),

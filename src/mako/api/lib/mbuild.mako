@@ -45,6 +45,13 @@
     ThisType = mb_type(resource, method) + mb_tparams
 
     params, request_value = build_all_params(c, m)
+    alt_param = None
+    for p in params:
+        if p.name == 'alt':
+            alt_param = p
+            break
+        # end
+    # end
 
     part_prop, parts = parts_from_params(params)
     part_desc = make_parts_desc(part_prop)
@@ -56,7 +63,11 @@ ${m.description | rust_doc_comment}
 % endif
 % if m.get('supportsMediaDownload', False):
 /// This method supports **media download**. To enable it, adjust the builder like this:
+% if alt_param:
+/// `.${mangle_ident(setter_fn_name(alt_param))}("media")`.
+% else:
 /// `${ADD_PARAM_MEDIA_EXAMPLE}`.
+% endif
 % if response_schema:
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
 /// but not the `${unique_type_name(response_schema.id)}` structure that you would usually get. The latter will be a default value.
@@ -140,7 +151,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// 
     /// # Additional Parameters
     ///
-    % for opn, op in parameters.iteritems():
+    % for opn, op in list((opn, op) for (opn, op) in parameters.iteritems() if opn not in [p.name for p in params]):
     /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
     % endfor
     % endif
