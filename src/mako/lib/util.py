@@ -551,6 +551,12 @@ def is_required_property(p):
 def is_repeated_property(p):
     return p.get('repeated', False)
 
+def setter_fn_name(p):
+    fn_name = p.name
+    if is_repeated_property(p):
+        fn_name = 'add_' + fn_name
+    return fn_name
+
 # method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
 def organize_params(params, request_value):
     part_prop = None

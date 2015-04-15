@@ -12,6 +12,25 @@ use std::io::{Write, Read, stdout};
 
 use std::default::Default;
 
+pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, default: &'static str)
+                                                                        -> (&'a str, &'a str) {
+    let mut add_err = || err.issues.push(CLIError::InvalidKeyValueSyntax(kv.to_string()));
+    match kv.rfind('=') {
+        None => {
+            add_err();
+            return (kv, default)
+        },
+        Some(pos) => {
+            let key = &kv[..pos];
+            if kv.len() <= pos + 1 {
+                add_err();
+                return (key, default)
+            }
+            (key, &kv[pos+1..])
+        }
+    }
+}
+
 // May panic if we can't open the file - this is anticipated, we can't currently communicate this 
 // kind of error: TODO: fix this architecture :)
 pub fn writer_from_opts(flag: bool, arg: &str) -> Box<Write> {
@@ -31,7 +50,7 @@ pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError,
     match FromStr::from_str(arg) {
         Err(perr) => {
             err.issues.push(
-                CLIError::ParseError((arg_name, arg_type, format!("{}", perr)))
+                CLIError::ParseError((arg_name, arg_type, arg.to_string(), format!("{}", perr)))
             );
             Default::default()
         },
@@ -122,16 +141,23 @@ impl fmt::Display for ConfigurationError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
-    ParseError((&'static str, &'static str, String)),
+    ParseError((&'static str, &'static str, String, String)),
+    UnknownParameter(String),
+    InvalidKeyValueSyntax(String),
 }
 
 impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err),
-            CLIError::ParseError((arg_name, type_name, ref err_desc)) 
-                => writeln!(f, "Failed to parse argument {} as {} with error: {}",
-                            arg_name, type_name, err_desc),
+            CLIError::ParseError((arg_name, type_name, ref value, ref err_desc)) 
+                => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}",
+                            arg_name, value, type_name, err_desc),
+            CLIError::UnknownParameter(ref param_name) 
+                => writeln!(f, "Parameter '{}' is unknown.", param_name),
+            CLIError::InvalidKeyValueSyntax(ref kv)
+                => writeln!(f, "'{}' does not match <key>=<value>", kv),
+
         }
     }
 }

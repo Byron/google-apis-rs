@@ -11,7 +11,7 @@
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name, size_to_bytes, method_default_scope,
-                      is_repeated_property)
+                      is_repeated_property, setter_fn_name)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -27,12 +27,6 @@
         part_desc += ''.join('* *%s*\n' % part for part in parts)
         part_desc = part_desc[:-1]
         return part_desc
-
-    def setter_fn_name(p):
-        fn_name = p.name
-        if is_repeated_property(p):
-            fn_name = 'add_' + fn_name
-        return fn_name
 %>\
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
