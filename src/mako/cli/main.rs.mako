@@ -12,18 +12,18 @@
 </%block>
 #![feature(plugin, exit_status)]
 #![plugin(docopt_macros)]
-#![allow(unused_variables, unused_imports, dead_code, unsed_mut)]
+#![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 extern crate docopt;
 extern crate yup_oauth2 as oauth2;
 extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
+extern crate mime;
 extern crate ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))} as api;
 
-use std::io;
 use std::env;
-use std::io::Write;
+use std::io::{self, Write};
 
 ${docopt.new(c)}\
 

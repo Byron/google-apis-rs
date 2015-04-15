@@ -1,5 +1,6 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use rustc_serialize::json;
+use mime::Mime;
 
 use std::fs;
 use std::env;
@@ -27,6 +28,26 @@ pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError)
                 return (key, None)
             }
             (key, Some(&kv[pos+1..]))
+        }
+    }
+}
+
+pub fn input_file_from_opts(file_path: &str, err: &mut InvalidOptionsError) -> Option<fs::File> {
+    match fs::File::open(file_path) {
+        Ok(f) => Some(f),
+        Err(io_err) => {
+            err.issues.push(CLIError::Input(InputError::IOError((file_path.to_string(), io_err))));
+            None
+        }
+    }
+}
+
+pub fn input_mime_from_opts(mime: &str, err: &mut InvalidOptionsError) -> Option<Mime> {
+    match mime.parse() {
+        Ok(m) => Some(m),
+        Err(_) => {
+            err.issues.push(CLIError::Input(InputError::Mime(mime.to_string())));
+            None
         }
     }
 }
@@ -139,17 +160,36 @@ impl fmt::Display for ConfigurationError {
 }
 
 #[derive(Debug)]
+pub enum InputError {
+    IOError((String, io::Error)),
+    Mime(String),
+}
+
+impl fmt::Display for InputError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        match *self {
+            InputError::IOError((ref file_path, ref io_err))
+                => writeln!(f, "Failed to open '{}' for reading with error: {}", file_path, io_err),
+            InputError::Mime(ref mime)
+                => writeln!(f, "'{}' is not a known mime-type", mime),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
     ParseError((&'static str, &'static str, String, String)),
     UnknownParameter(String),
     InvalidKeyValueSyntax(String),
+    Input(InputError),
 }
 
 impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            CLIError::Configuration(ref err) => writeln!(f, "Configuration -> {}", err),
+            CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
+            CLIError::Input(ref err) => write!(f, "Input -> {}", err),
             CLIError::ParseError((arg_name, type_name, ref value, ref err_desc)) 
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}",
                             arg_name, value, type_name, err_desc),

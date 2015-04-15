@@ -22,7 +22,9 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 mod cmn;
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg};
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+          input_file_from_opts, input_mime_from_opts};
+
 use std::default::Default;
 use std::str::FromStr;
 
@@ -227,7 +229,23 @@ ${value_unwrap}\
     }
 }
 % endif # handle call parameters
-## TODO: parse upload
+% if mc.media_params:
+let protocol = 
+% for p in mc.media_params:
+    % if loop.first:
+    if \
+    % else:
+    } else if \
+    % endif
+${SOPT + cmd_ident(p.protocol)} {
+        "${p.protocol}"
+% endfor # each media param
+    } else { 
+        unreachable!() 
+    };
+let mut input_file = input_file_from_opts(&${SOPT + arg_ident(FILE_ARG[1:-1])}, err);
+let mime_type = input_mime_from_opts(&${SOPT + arg_ident(MIME_ARG[1:-1])}, err);
+% endif # support upload
 if dry_run {
     None
 } else {
