@@ -196,7 +196,7 @@ impl fmt::Display for CLIError {
             CLIError::UnknownParameter(ref param_name) 
                 => writeln!(f, "Parameter '{}' is unknown.", param_name),
             CLIError::InvalidKeyValueSyntax(ref kv)
-                => writeln!(f, "'{}' does not match <key>=<value>", kv),
+                => writeln!(f, "'{}' does not match pattern <key>=<value>", kv),
 
         }
     }

@@ -4,7 +4,7 @@
                       upload_action_fn)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_RND_MAP)
+                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt.'
@@ -184,7 +184,7 @@ for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
     ptype = p.type
     if p.type == 'string' and 'Count' in p.name:
         ptype = 'int64'
-    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_RND_MAP[ptype]()
+    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
 %>\
         "${mangle_subcommand(p.name)}" => {
         % if p.name == 'alt':

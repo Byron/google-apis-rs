@@ -31,7 +31,6 @@ ${engine.new(c)}\
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    println!("DEBUG: {:?}", opts);
     match Engine::new(opts) {
         Err(err) => {
             write!(io::stderr(), "{}", err).ok();

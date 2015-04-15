@@ -49,6 +49,17 @@ JSON_TYPE_RND_MAP = {'boolean': lambda: str(bool(randint(0, 1))).lower(),
                      'int64' : lambda: randint(-101, -1),
                      'string': lambda: '%s' % choice(util.words).lower()}
 
+JSON_TYPE_VALUE_MAP = {'boolean': 'false',
+                       'integer' : '-0',
+                       'uint32' : '0',
+                       'uint64' : '0',
+                       'float' : '0.0',
+                       'double' : '0.0',
+                       'number' : '0.0',
+                       'int32' : '-0',
+                       'int64' : '-0',
+                       'string': ''}
+
 assert len(set(JSON_TYPE_RND_MAP.keys()) ^ POD_TYPES) == 0
 
 def new_method_context(resource, method, c):
